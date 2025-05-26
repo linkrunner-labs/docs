@@ -165,6 +165,36 @@ private fun setUserData() {
 }
 ```
 
+## Setting CleverTap ID
+
+Use the `setAdditionalData` method to set CleverTap ID:
+
+```kotlin
+private fun setIntegrationData() {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val integrationData: IntegrationData = IntegrationData(clevertapId="YOUR_CLEVERTAP_ID")
+
+            val result = LinkRunner.getInstance().setAdditionalData(integrationData)
+
+            result.onSuccess {
+                println("CleverTap ID set successfully")
+            }.onFailure { error ->
+                println("Error setting CleverTap ID: ${error.message}")
+            }
+        } catch (e: Exception) {
+            println("Exception setting CleverTap ID: ${e.message}")
+        }
+    }
+}
+```
+
+### Parameters for `LinkRunner.setAdditionalData`
+
+- `clevertapId`: String (optional) - CleverTap user identifier
+
+This method allows you to connect user identities across different analytics and marketing platforms.
+
 ## Tracking Custom Events
 
 Track custom events in your app:
@@ -295,6 +325,7 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 | ------------------------------------------- | ---------------------- | ---------------------------------------- |
 | `LinkRunner.getInstance().init`             | Application class      | Once when app starts                     |
 | `LinkRunner.getInstance().getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed |
+| `LinkRunner.getInstance().setAdditionalData` | Integration code    | When third-party integration IDs are available |
 | `LinkRunner.getInstance().signup`           | Onboarding flow        | Once after user completes onboarding     |
 | `LinkRunner.getInstance().setUserData`      | Authentication logic   | Every time app opens with logged-in user |
 | `LinkRunner.getInstance().trackEvent`       | Throughout app         | When specific user actions occur         |

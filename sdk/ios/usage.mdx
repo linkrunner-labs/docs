@@ -160,6 +160,25 @@ func setUserData() async {
 }
 ```
 
+## Setting CleverTap ID
+
+Use `setAdditionalData` to add CleverTap ID to the SDK:
+
+```swift
+func setAdditionalData() async {
+    do {
+        let integrationData = IntegrationData(
+            clevertapId:clevertapId
+        )
+        
+        try await LinkrunnerSDK.shared.setAdditionalData(integrationData)
+        print("CleverTap ID set successfully")
+    } catch {
+        print("Error setting cleverTap ID:", error)
+    }
+}
+```
+
 ## Tracking Custom Events
 
 Track custom events in your app:
@@ -268,6 +287,7 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 | ---------------------------------------- | --------------------- | -------------------------------------------------------- |
 | `LinkrunnerSDK.shared.initialize`        | App initialization    | Once when app starts                                     |
 | `LinkrunnerSDK.shared.getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed                  |
+| `LinkRunner.getInstance().setAdditionalData` | Integration code    | When third-party integration IDs are available |
 | `LinkrunnerSDK.shared.signup`            | Onboarding flow       | Once after user completes onboarding                     |
 | `LinkrunnerSDK.shared.setUserData`       | Authentication logic  | Every time app opens with logged-in user                 |
 | `LinkrunnerSDK.shared.triggerDeeplink`   | After navigation init | Once after your navigation is ready to handle deep links |
