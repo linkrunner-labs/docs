@@ -10,10 +10,10 @@ This guide will help you implement Linkrunner functionality in your native Andro
 
 ## Initialization
 
-Initialize the Linkrunner SDK in your application, typically in your `Application` class or main activity:
-
 You can find your project token [here](https://www.linkrunner.io/dashboard?s=members&m=documentation).
 
+Note: This method returns a void. To get attribution data and deeplink information,
+use the getAttributionData method.
 ```kotlin
 import android.app.Application
 import io.linkrunner.sdk.LinkRunner
@@ -28,20 +28,14 @@ class MyApplication : Application() {
         // Initialize LinkRunner with SDK signing
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val initResponse = LinkRunner.getInstance().init(
+                LinkRunner.getInstance().init(
                     context = applicationContext,
                     token = "YOUR_PROJECT_TOKEN",
                     keyId = "YOUR_KEY_ID" // Required for SDK signing
                     secretKey = "YOUR_SECRET_KEY", // Required for SDK signing
                 )
 
-                initResponse.onSuccess { response ->
-                    // Handle successful initialization
-                    println("LinkRunner initialized successfully: $response")
-                }.onFailure { error ->
-                    // Handle initialization error
-                    println("Error initializing LinkRunner: ${error.message}")
-                }
+                println("LinkRunner initialized successfully")
             } catch (e: Exception) {
                 println("Exception during initialization: ${e.message}")
             }
@@ -58,19 +52,6 @@ For enhanced security, the LinkRunner SDK requires the following signing paramet
 - **`keyId`**: A unique identifier for the key pair used in the signing process
 
 You can find your project token, secret key, and key ID [here](https://www.linkrunner.io/settings?s=sdk-signing).
-
-### Response from `init`
-
-The initialization method returns useful data including:
-
-```kotlin
-data class InitResponse(
-    val campaignData: ClientCampaignData? = null,
-    val ipLocationData: IPLocationData? = null,
-    val deeplink: String? = null,
-    val rootDomain: Boolean? = null
-)
-```
 
 ## User Registration
 
@@ -104,21 +85,50 @@ private fun onSignup() {
                 isFirstTimeUser = true, // Optional
             )
 
-            val result = LinkRunner.getInstance().signup(
+            LinkRunner.getInstance().signup(
                 userData = userData,
                 additionalData = mapOf("custom_field" to "custom_value") // Optional: Any additional data
             )
-
-            result.onSuccess {
-                println("Signup successful")
-            }.onFailure { error ->
-                println("Error during signup: ${error.message}")
-            }
+            println("Signup successful")
         } catch (e: Exception) {
             println("Exception during signup: ${e.message}")
         }
     }
 }
+```
+
+## Getting Attribution Data
+
+To get attribution data and deeplink information for the current installation, use the `getAttributionData` function:
+
+```kotlin
+val attributionDataResult = LinkRunner.getInstance().getAttributionData()
+attributionDataResult.onSuccess { attributionData ->
+    println("Attribution data: $attributionData")
+    // Attribution data includes:
+    // - deeplink: The deep link URL that led to app installation
+    // - campaignData: Campaign information
+}
+```
+
+```kotlin
+data class AttributionData(
+    val deeplink: String?,
+    val campaignData: CampaignData,
+    val attributionSource: String
+)
+
+data class CampaignData(
+    val id: String,
+    val name: String,
+    val adNetwork: String?,
+    val type: String,
+    val installedAt: String,
+    val storeClickAt: String?,
+    val groupName: String,
+    val assetName: String,
+    val assetGroupName: String
+)
 ```
 
 ## Setting User Data
@@ -279,14 +289,15 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 
 ## Function Placement Guide
 
-| Function                                  | Where to Place       | When to Call                             |
-| ----------------------------------------- | -------------------- | ---------------------------------------- |
-| `LinkRunner.getInstance().init`           | Application class    | Once when app starts                     |
-| `LinkRunner.getInstance().signup`         | Onboarding flow      | Once after user completes onboarding     |
-| `LinkRunner.getInstance().setUserData`    | Authentication logic | Every time app opens with logged-in user |
-| `LinkRunner.getInstance().trackEvent`     | Throughout app       | When specific user actions occur         |
-| `LinkRunner.getInstance().capturePayment` | Payment processing   | When user makes a payment                |
-| `LinkRunner.getInstance().removePayment`  | Refund flow          | When payment needs to be removed         |
+| Function                                    | Where to Place         | When to Call                             |
+| ------------------------------------------- | ---------------------- | ---------------------------------------- |
+| `LinkRunner.getInstance().init`             | Application class      | Once when app starts                     |
+| `LinkRunner.getInstance().getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed |
+| `LinkRunner.getInstance().signup`           | Onboarding flow        | Once after user completes onboarding     |
+| `LinkRunner.getInstance().setUserData`      | Authentication logic   | Every time app opens with logged-in user |
+| `LinkRunner.getInstance().trackEvent`       | Throughout app         | When specific user actions occur         |
+| `LinkRunner.getInstance().capturePayment`   | Payment processing     | When user makes a payment                |
+| `LinkRunner.getInstance().removePayment`    | Refund flow            | When payment needs to be removed         |
 
 ## Complete Example
 

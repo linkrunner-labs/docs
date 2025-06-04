@@ -12,6 +12,8 @@ Initialize the Linkrunner SDK in your app's startup code, typically in your `App
 
 You can find your project token [here](https://www.linkrunner.io/dashboard?s=members&m=documentation).
 
+Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
+
 ```swift
 import Linkrunner
 import SwiftUI
@@ -21,12 +23,12 @@ struct MyApp: App {
     init() {
         Task {
             do {
-                let initResponse = try await LinkrunnerSDK.shared.initialize(
+                try await LinkrunnerSDK.shared.initialize(
                     token: "YOUR_PROJECT_TOKEN",
                     keyId: "YOUR_KEY_ID", // Required for SDK signing
                     secretKey: "YOUR_SECRET_KEY" // Required for SDK signing
                 )
-                print("Linkrunner initialized successfully:", initResponse)
+                print("Linkrunner initialized successfully")
             } catch {
                 print("Error initializing Linkrunner:", error)
             }
@@ -49,20 +51,6 @@ For enhanced security, the LinkRunner SDK requires the following signing paramet
 - **`keyId`**: A unique identifier for the key pair used in the signing process
 
 You can find your project token, secret key, and key ID [here](https://www.linkrunner.io/settings?s=sdk-signing).
-
-### Response from initialize
-
-The initialization method returns useful data including:
-
-```swift
-struct LRInitResponse: Codable, Sendable {
-    let attributionSource: String
-    let campaignData: CampaignData?
-    let deeplink: String?
-    let ipLocationData: LRIPLocationData
-    let rootDomain: Bool
-}
-```
 
 ## User Registration
 
@@ -95,15 +83,58 @@ func onSignup() async {
             posthogDistinctId: "posthogDistinctId" // Optional - PostHog Distinct ID
         )
 
-        let result = try await LinkrunnerSDK.shared.signup(
+        try await LinkrunnerSDK.shared.signup(
             userData: userData,
             additionalData: [:] // Optional: Any additional data
         )
 
-        print("Signup successful:", result)
+        print("Signup successful")
     } catch {
         print("Error during signup:", error)
     }
+}
+```
+
+## Getting Attribution Data
+
+To get attribution data and deeplink information for the current installation, use the `getAttributionData` function:
+
+```swift
+func getAttributionInfo() async {
+    do {
+        let attributionData = try await LinkrunnerSDK.shared.getAttributionData()
+        print("Attribution data:", attributionData)
+        
+        // Attribution data includes:
+        // - deeplink: The deep link URL that led to app installation
+        // - campaignData: Campaign information
+        if let deeplink = attributionData.deeplink {
+            print("Deeplink:", deeplink)
+            // Handle the deeplink in your app
+        }
+    } catch {
+        print("Error getting attribution data:", error)
+    }
+}
+```
+
+```swift
+struct AttributionData: Codable, Sendable {
+    let deeplink: String?
+    let campaignData: CampaignData
+    let attributionSource: String
+}
+
+struct CampaignData: Codable, Sendable {
+    let id: String
+    let name: String
+    let adNetwork: String?
+    let type: String
+    let installedAt: String
+    let storeClickAt: String?
+    let groupName: String
+    let assetName: String
+    let assetGroupName: String
 }
 ```
 
@@ -233,15 +264,16 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 
 ## Function Placement Guide
 
-| Function                               | Where to Place        | When to Call                                             |
-| -------------------------------------- | --------------------- | -------------------------------------------------------- |
-| `LinkrunnerSDK.shared.initialize`      | App initialization    | Once when app starts                                     |
-| `LinkrunnerSDK.shared.signup`          | Onboarding flow       | Once after user completes onboarding                     |
-| `LinkrunnerSDK.shared.setUserData`     | Authentication logic  | Every time app opens with logged-in user                 |
-| `LinkrunnerSDK.shared.triggerDeeplink` | After navigation init | Once after your navigation is ready to handle deep links |
-| `LinkrunnerSDK.shared.trackEvent`      | Throughout app        | When specific user actions occur                         |
-| `LinkrunnerSDK.shared.capturePayment`  | Payment processing    | When user makes a payment                                |
-| `LinkrunnerSDK.shared.removePayment`   | Refund flow           | When payment needs to be removed                         |
+| Function                                 | Where to Place        | When to Call                                             |
+| ---------------------------------------- | --------------------- | -------------------------------------------------------- |
+| `LinkrunnerSDK.shared.initialize`        | App initialization    | Once when app starts                                     |
+| `LinkrunnerSDK.shared.getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed                  |
+| `LinkrunnerSDK.shared.signup`            | Onboarding flow       | Once after user completes onboarding                     |
+| `LinkrunnerSDK.shared.setUserData`       | Authentication logic  | Every time app opens with logged-in user                 |
+| `LinkrunnerSDK.shared.triggerDeeplink`   | After navigation init | Once after your navigation is ready to handle deep links |
+| `LinkrunnerSDK.shared.trackEvent`        | Throughout app        | When specific user actions occur                         |
+| `LinkrunnerSDK.shared.capturePayment`    | Payment processing    | When user makes a payment                                |
+| `LinkrunnerSDK.shared.removePayment`     | Refund flow           | When payment needs to be removed                         |
 
 ## Complete Example
 
@@ -263,8 +295,8 @@ struct MyApp: App {
 
     func initializeLinkrunner() async {
         do {
-            let initResponse = try await LinkrunnerSDK.shared.initialize(token: "YOUR_PROJECT_TOKEN")
-            print("Linkrunner initialized successfully:", initResponse)
+            try await LinkrunnerSDK.shared.initialize(token: "YOUR_PROJECT_TOKEN")
+            print("Linkrunner initialized successfully")
         } catch {
             print("Error initializing Linkrunner:", error)
         }
