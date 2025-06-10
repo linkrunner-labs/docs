@@ -25,12 +25,14 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Initialize LinkRunner
+        // Initialize LinkRunner with SDK signing
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val initResponse = LinkRunner.getInstance().init(
                     context = applicationContext,
-                    token = "YOUR_PROJECT_TOKEN"
+                    token = "YOUR_PROJECT_TOKEN",
+                    keyId = "YOUR_KEY_ID" // Required for SDK signing
+                    secretKey = "YOUR_SECRET_KEY", // Required for SDK signing
                 )
 
                 initResponse.onSuccess { response ->
@@ -47,6 +49,15 @@ class MyApplication : Application() {
     }
 }
 ```
+
+### SDK Signing Parameters (Optional)
+
+For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+
+- **`secretKey`**: A unique secret key used for request signing and authentication
+- **`keyId`**: A unique identifier for the key pair used in the signing process
+
+You can find your project token, secret key, and key ID [here](http://localhost:3000/settings?s=sdk-signing).
 
 ### Response from `init`
 
@@ -204,25 +215,25 @@ private fun capturePayment() {
 
 #### Available Payment Types
 
-| Type | Description |
-|------|-------------|
-| `FIRST_PAYMENT` | User's first payment |
-| `WALLET_TOPUP` | Adding funds to wallet |
-| `FUNDS_WITHDRAWAL` | Withdrawing funds |
+| Type                   | Description              |
+| ---------------------- | ------------------------ |
+| `FIRST_PAYMENT`        | User's first payment     |
+| `WALLET_TOPUP`         | Adding funds to wallet   |
+| `FUNDS_WITHDRAWAL`     | Withdrawing funds        |
 | `SUBSCRIPTION_CREATED` | New subscription created |
-| `SUBSCRIPTION_RENEWED` | Subscription renewal |
-| `ONE_TIME` | One-time payment |
-| `RECURRING` | Recurring payment |
-| `DEFAULT` | Default payment type |
+| `SUBSCRIPTION_RENEWED` | Subscription renewal     |
+| `ONE_TIME`             | One-time payment         |
+| `RECURRING`            | Recurring payment        |
+| `DEFAULT`              | Default payment type     |
 
 #### Available Payment Statuses
 
-| Status | Description |
-|--------|-------------|
-| `PAYMENT_INITIATED` | Payment process started |
+| Status              | Description                    |
+| ------------------- | ------------------------------ |
+| `PAYMENT_INITIATED` | Payment process started        |
 | `PAYMENT_COMPLETED` | Payment successfully completed |
-| `PAYMENT_FAILED` | Payment failed |
-| `PAYMENT_CANCELLED` | Payment was cancelled |
+| `PAYMENT_FAILED`    | Payment failed                 |
+| `PAYMENT_CANCELLED` | Payment was cancelled          |
 
 ### Removing Payments
 
@@ -297,12 +308,14 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Initialize LinkRunner
+        // Initialize LinkRunner with SDK signing
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 LinkRunner.getInstance().init(
                     context = applicationContext,
-                    token = "YOUR_PROJECT_TOKEN"
+                    token = "YOUR_PROJECT_TOKEN",
+                    secretKey = "YOUR_SECRET_KEY", // Required for SDK signing
+                    keyId = "YOUR_KEY_ID" // Required for SDK signing
                 )
             } catch (e: Exception) {
                 println("Error initializing LinkRunner: ${e.message}")
