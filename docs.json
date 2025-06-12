@@ -38,6 +38,10 @@
                                 "pages": ["sdk/android/installation", "sdk/android/usage"]
                             },
                             {
+                                "group": "Expo",
+                                "pages": ["sdk/expo/installation", "sdk/expo/usage"]
+                            },
+                            {
                                 "group": "Deep Linking",
                                 "pages": ["sdk/deep-linking/setup", "sdk/deep-linking/verification"]
                             }

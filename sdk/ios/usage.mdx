@@ -21,7 +21,11 @@ struct MyApp: App {
     init() {
         Task {
             do {
-                let initResponse = try await LinkrunnerSDK.shared.initialize(token: "YOUR_PROJECT_TOKEN")
+                let initResponse = try await LinkrunnerSDK.shared.initialize(
+                    token: "YOUR_PROJECT_TOKEN",
+                    keyId: "YOUR_KEY_ID", // Required for SDK signing
+                    secretKey: "YOUR_SECRET_KEY" // Required for SDK signing
+                )
                 print("Linkrunner initialized successfully:", initResponse)
             } catch {
                 print("Error initializing Linkrunner:", error)
@@ -36,6 +40,15 @@ struct MyApp: App {
     }
 }
 ```
+
+### SDK Signing Parameters (Optional)
+
+For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+
+- **`secretKey`**: A unique secret key used for request signing and authentication
+- **`keyId`**: A unique identifier for the key pair used in the signing process
+
+You can find your project token, secret key, and key ID [here](https://www.linkrunner.io/settings?s=sdk-signing).
 
 ### Response from initialize
 
@@ -112,24 +125,6 @@ func setUserData() async {
         print("User data set successfully")
     } catch {
         print("Error setting user data:", error)
-    }
-}
-```
-
-## Handling Deferred Deep Links
-
-`triggerDeeplink` is an optional function which has to be called once after the user onboards and the main stack is ready for navigation. This function handles deferred deep links (links that led to app installation):
-
-```swift
-func triggerDeeplink() async {
-    await LinkrunnerSDK.shared.triggerDeeplink()
-}
-
-// Call this after your navigation is ready to trigger the deeplink
-override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
-    Task {
-        await triggerDeeplink()
     }
 }
 ```

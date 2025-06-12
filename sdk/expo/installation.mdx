@@ -1,0 +1,62 @@
+---
+title: "Expo Installation"
+description: "How to install the Linkrunner SDK for Expo applications"
+icon: "react"
+---
+
+# Expo SDK Installation
+
+This guide will help you install and set up the Linkrunner SDK in your Expo application.
+
+## Requirements
+
+- Expo SDK 52.0 or higher
+- Node.js 18.0 or higher
+- React Native 0.70 or higher
+
+## Installation
+
+### Step 1: Install the Package
+
+Install the Linkrunner package using Expo CLI:
+
+```bash
+npx expo install expo-linkrunner
+```
+
+### Step 2: Install Required Dependencies
+
+Install the peer dependencies required by expo-linkrunner:
+
+```bash
+npx expo install @react-native-async-storage/async-storage expo-device expo-network expo-tracking-transparency
+```
+
+## Configuration
+
+### iOS Configuration
+
+For iOS, to access the advertising identifier (IDFA), add the expo-tracking-transparency plugin to your `app.json`:
+
+```json
+{
+    "expo": {
+        "plugins": [
+            [
+                "expo-tracking-transparency",
+                {
+                    "userTrackingPermission": "This identifier will be used to deliver personalized ads and improve your app experience."
+                }
+            ]
+        ]
+    }
+}
+```
+
+### Android Configuration
+
+No additional configuration is required for Android. The SDK automatically handles the necessary permissions.
+
+## Next Steps
+
+After installation, proceed to the [Usage Guide](/sdk/expo/usage) to learn how to initialize and use the Linkrunner SDK in your Expo application.
