@@ -3,20 +3,16 @@ frontend:
     phases:
         preBuild:
             commands:
-                - echo "Installing dependencies and Mintlify CLI"
-                - npm install
-                - npm install -g mintlify
+                - corepack enable
+                - pnpm install --frozen-lockfile # or npm ci
         build:
             commands:
-                - echo "Building Mintlify documentation"
-                - mintlify build
-        postBuild:
-            commands:
-                - echo "Build completed successfully"
+                - pnpm run build # Next.js build / export
     artifacts:
-        baseDirectory: _site
-        files:
-            - "**/*"
+        # if you used `output: 'export'`
+        # baseDirectory: out
+        # otherwise leave blank – Amplify handles .next for SSR
     cache:
         paths:
             - node_modules/**/*
+            - ~/.pnpm-store/**/*
