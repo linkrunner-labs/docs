@@ -7,11 +7,11 @@ frontend:
                 - pnpm install --frozen-lockfile # or npm ci
         build:
             commands:
-                - pnpm run build # Next.js build / export
+                - pnpm run export # script calls: next build && next export
     artifacts:
-        # if you used `output: 'export'`
-        # baseDirectory: out
-        # otherwise leave blank – Amplify handles .next for SSR
+        baseDirectory: out # ← folder created by next export
+        files:
+            - "**/*"
     cache:
         paths:
             - node_modules/**/*

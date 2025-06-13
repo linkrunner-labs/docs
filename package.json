@@ -7,7 +7,8 @@
         "dev": "mintlify dev",
         "build": "mintlify build",
         "preview": "mintlify preview",
-        "install-mintlify": "npm install -g mintlify"
+        "install-mintlify": "npm install -g mintlify",
+        "export": "next build && next export"
     },
     "dependencies": {
         "mintlify": "latest"
