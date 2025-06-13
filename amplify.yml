@@ -1,0 +1,22 @@
+version: 1
+frontend:
+    phases:
+        preBuild:
+            commands:
+                - echo "Installing dependencies and Mintlify CLI"
+                - npm install
+                - npm install -g mintlify
+        build:
+            commands:
+                - echo "Building Mintlify documentation"
+                - mintlify build
+        postBuild:
+            commands:
+                - echo "Build completed successfully"
+    artifacts:
+        baseDirectory: _site
+        files:
+            - "**/*"
+    cache:
+        paths:
+            - node_modules/**/*

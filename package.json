@@ -1,0 +1,26 @@
+{
+    "name": "linkrunner-docs",
+    "version": "1.0.0",
+    "description": "Linkrunner documentation built with Mintlify",
+    "main": "index.js",
+    "scripts": {
+        "dev": "mintlify dev",
+        "build": "mintlify build",
+        "preview": "mintlify preview",
+        "install-mintlify": "npm install -g mintlify"
+    },
+    "dependencies": {
+        "mintlify": "latest"
+    },
+    "devDependencies": {},
+    "keywords": [
+        "documentation",
+        "mintlify",
+        "linkrunner"
+    ],
+    "author": "Linkrunner Team",
+    "license": "MIT",
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
