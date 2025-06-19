@@ -70,6 +70,18 @@ If you plan to use IDFA (Identifier for Advertisers), you need to request permis
 
 The SDK requires network access to communicate with Linkrunner services. Make sure your app has the appropriate permissions for network access.
 
+## Configuring sending postback copies to Linkrunner
+
+To enable SKAdNetwork postback copies to be sent to Linkrunner, you need to configure the NSAdvertisingAttributionReportEndpoint in your app's Info.plist file:
+
+1. Select the Info.plist file in the project navigator in Xcode.
+2. Add the new key to the properties list.
+3. Enter the key name NSAdvertisingAttributionReportEndpoint.
+4. Enter the String property type.
+5. In the property value, enter https://linkrunner-skan.com
+
+This configuration allows Apple to send copies of SKAdNetwork postbacks to Linkrunner, enabling better attribution tracking for your iOS campaigns.
+
 ## Next Steps
 
 After installation, proceed to the [Usage Guide](/sdk/ios/usage) to learn how to initialize and use the Linkrunner SDK in your iOS application.
