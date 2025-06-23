@@ -57,12 +57,12 @@
                         ]
                     },
                     {
-                        "group": "Features",
-                        "pages": ["feature/custom-store-listing"]
-                    },
-                    {
                         "group": "Ad Network Integration",
                         "pages": ["ad-networks/google-ads"]
+                    },
+                    {
+                        "group": "Features",
+                        "pages": ["feature/custom-store-listing"]
                     }
                 ]
             },
