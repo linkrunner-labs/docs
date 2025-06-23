@@ -1,0 +1,99 @@
+---
+title: "Google Ads Integration"
+description: "Connect your app with Google Ads for enhanced campaign tracking and optimization"
+icon: "google"
+---
+
+## Overview
+
+Google Ads integration with Linkrunner enables you to track conversions and optimize your app campaigns directly within the Google Ads platform. This integration allows you to import events from your app into Google Ads as conversion actions, providing better insights into your campaign performance and user behavior.
+
+## Setup Process
+
+Setting up Google Ads integration involves two main steps: creating a link ID for your mobile app and importing events for conversion tracking.
+
+## 1. Create Link ID for Android/iOS App
+
+To connect your mobile app with Google Ads, you'll need to create a link ID that enables data sharing between Linkrunner and Google Ads.
+
+### Step 1: Access Third-party App Analytics
+
+1. Go to your Google Ads dashboard
+2. Navigate to **Tools** (side panel) → **Data Manager** → **Third-party app Analytics**
+3. Or visit directly: [https://ads.google.com/aw/productlinks/thirdpartyappanalytics](https://ads.google.com/aw/productlinks/thirdpartyappanalytics) and click on **Create Link ID**
+
+![Google Ads Dashboard - Third-party App Analytics](/images/google_ads/google-ads-dashboard-1.webp)
+
+### Step 2: Add App Analytics Provider
+
+1. In the Third-party app analytics section, click on the **"+ Create link ID"**
+2. Select **"Other provider"** from the App analytics provider dropdown menu
+3. Enter the following provider ID: `9936233049`
+4. Select the platform (iOS or Android) and search for your app
+5. Click on **"Create link ID"**
+
+![Google Ads Dashboard - Add Provider](/images/google_ads/google-ads-dashboard-2.webp)
+
+### Step 3: Configure in Linkrunner Dashboard
+
+1. Copy the received link ID from Google Ads
+2. Navigate to your Linkrunner Dashboard
+3. Go to [Settings → Google Ads integration](https://linkrunner.io/settings?s=google-ads-integration)
+4. Paste the link ID in the designated field
+5. Save your configuration
+
+![Google Ads Dashboard - Link ID Created](/images/google_ads/google-ads-dashboard-3.webp)
+
+## 2. Importing Events for Conversion Actions Setup
+
+After creating the link ID, you can import app events from Linkrunner into Google Ads to set up conversion tracking.
+
+### Step 1: Access Conversions Dashboard
+
+1. On Google Ads Dashboard, navigate to **Goals** [sidebar] → **Conversions** → **Summary**
+2. Or visit directly: [https://ads.google.com/aw/conversions](https://ads.google.com/aw/conversions)
+
+### Step 2: Create Conversion Action
+
+1. Click on **"+ Create conversion action"**
+2. On the "Start tracking conversions" popup:
+    - Select **"App"**
+    - Then select **"Third-party app analytics"**
+    - Press **Continue**
+
+### Step 3: Import Events
+
+1. Select all the events you want to import from the available list
+2. To get started, we recommend selecting the `first_open` event
+3. Configure additional settings as needed for each conversion action
+4. Save your conversion actions
+
+## Important Notes
+
+<Note>
+    After generating the link ID, it might take up to **12 hours** for the events to show up in Google Ads. This is a
+    normal processing delay from Google's side.
+</Note>
+
+<Tip>
+    Start with basic events like `first_open` to verify the integration is working before adding more complex conversion
+    events.
+</Tip>
+
+## Troubleshooting
+
+### Events Not Showing Up
+
+-   Ensure the link ID was copied correctly
+-   Wait the full 12 hours for Google's processing
+-   Verify that your app is sending events to Linkrunner
+
+### Link ID Creation Issues
+
+-   Make sure you've selected the correct platform (iOS/Android)
+-   Verify your app is published and searchable in the respective app store
+-   Double-check the provider ID: `9936233049`
+
+---
+
+For any questions or assistance with Google Ads integration, please contact us at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).
