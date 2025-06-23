@@ -71,7 +71,7 @@
                     },
                     {
                         "group": "Latest Releases",
-                        "pages": ["feature/latest/q1-2025"]
+                        "pages": ["feature/latest/q2-2025", "feature/latest/q1-2025"]
                     }
                 ]
             }
