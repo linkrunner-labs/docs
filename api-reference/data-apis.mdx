@@ -141,14 +141,36 @@ GET /attributed-users
 
 #### Query Parameters
 
-| Parameter  | Type   | Description                    |
-| ---------- | ------ | ------------------------------ |
-| display_id | string | The display ID of the campaign |
+| Parameter   | Type   | Required | Description                                                                                |
+| ----------- | ------ | -------- | ------------------------------------------------------------------------------------------ |
+| display_id  | string | Yes      | The display ID of the campaign                                                             |
+| start_timestamp  | string | No       | Start time in ISO 8601 format (e.g., "2025-06-12T19:00:00")    |
+| end_timestamp    | string | No       | End time in ISO 8601 format (e.g., "2025-06-12T19:00:00")      |
+| timezone    | string | No       | IANA timezone identifier. See [IANA Time Zone Database](https://nodatime.org/TimeZones) |
 
-#### Example Request
+#### Note
+If no timezone is provided, UTC (Coordinated Universal Time) will be used as the default timezone.
 
+#### Time Format Details
+
+1. **ISO 8601 Time Format**:
+   - Format: `YYYY-MM-DDThh:mm:ss`
+
+2. **IANA Timezone**:
+   - Use standard IANA timezone identifiers (e.g., "America/New_York", "Asia/Tokyo")
+   - IANA Identifer for Indian Time Zone: "Asia/Kolkata"
+   - Full list available at [IANA Time Zone Database](https://www.iana.org/time-zones)
+   - Default: "UTC" (when timezone parameter is not provided)
+
+#### Example Requests
+
+1. **Basic Request** (uses UTC by default):
 ```
 GET /attributed-users?display_id=XYZ123
+```
+2. **With Time Range**:
+```
+GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-12T19:00:00&end_timestamp=2025-06-13T19:00:00&timezone=Asia/Kolkata
 ```
 
 #### Response
