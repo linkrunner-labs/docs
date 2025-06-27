@@ -124,9 +124,12 @@ Future<void> setUserData() async {
     await Linkrunner.setUserData(
       userData: LRUserData(
         id: '123', // Required: User ID
-        name: 'John Doe', // Required
-        phone: '9876543210', // Required
-        email: 'user@example.com', // Required
+        name: 'John Doe', // Optional
+        phone: '9876543210', // Optional
+        email: 'user@example.com', // Optional
+        mixpanelDistinctId: 'mixpanelDistinctId', // Optional - Mixpanel Distinct ID
+        amplitudeDeviceId: 'amplitudeDeviceId', // Optional - Amplitude User ID
+        posthogDistinctId: 'posthogDistinctId', // Optional - PostHog Distinct ID
       ),
     );
     print('User data set successfully');
