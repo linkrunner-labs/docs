@@ -23,18 +23,20 @@ For enhanced security, the LinkRunner SDK requires the following signing paramet
 
 You can find your project token, secret key, and key ID [here](https://www.linkrunner.io/settings?s=sdk-signing).
 
+Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
+
 ```dart
 import 'package:linkrunner/linkrunner.dart';
 
 Future<void> initLinkrunner() async {
   try {
     // Initialize with your project token and SDK signing parameters
-    final initData = await Linkrunner.init({
+    await Linkrunner.init({
       'token': 'YOUR_PROJECT_TOKEN',
       'keyId': 'YOUR_KEY_ID', // Optional: Required for SDK signing
       'secretKey': 'YOUR_SECRET_KEY', // Optional: Required for SDK signing
     });
-    print('Linkrunner initialized: $initData');
+    print('Linkrunner initialized');
   } catch (e) {
     print('Error initializing Linkrunner: $e');
   }
@@ -67,7 +69,7 @@ If the platform's identifier function is not called, you must provide a user ide
 ```dart
 Future<void> onSignup() async {
   try {
-    final result = await Linkrunner.signup(
+    await Linkrunner.signup(
       userData: LRUserData(
         id: '123', // Required: User ID
         name: 'John Doe', // Optional
@@ -82,9 +84,32 @@ Future<void> onSignup() async {
       ),
       additionalData: {}, // Optional: Any additional data
     );
-    print('Signup successful: $result');
+    print('Signup successful');
   } catch (e) {
     print('Error during signup: $e');
+  }
+}
+
+## Getting Attribution Data
+
+To get attribution data and deeplink information for the current installation, use the `getAttributionData` function:
+
+```dart
+Future<void> getAttributionInfo() async {
+  try {
+    final attributionData = await Linkrunner.getAttributionData();
+    print('Attribution data: $attributionData');
+    
+    // Attribution data includes:
+    // - deeplink: The deep link URL that led to app installation
+    // - campaignData: Campaign information
+    final deeplink = attributionData.deeplink;
+    if (deeplink != null) {
+      print('Deeplink: $deeplink');
+      // Handle the deeplink in your app
+    }
+  } catch (e) {
+    print('Error getting attribution data: $e');
   }
 }
 ```
@@ -221,15 +246,16 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 
 ## Function Placement Guide
 
-| Function                     | Where to Place                   | When to Call                             |
-| ---------------------------- | -------------------------------- | ---------------------------------------- |
-| `Linkrunner.init`            | Main app initState or equivalent | Once when app starts                     |
-| `Linkrunner.signup`          | Onboarding flow                  | Once after user completes onboarding     |
-| `Linkrunner.setUserData`     | Authentication logic             | Every time app opens with logged-in user |
-| `Linkrunner.triggerDeeplink` | After navigation init            | Once after navigation is ready           |
-| `Linkrunner.trackEvent`      | Throughout app                   | When specific user actions occur         |
-| `Linkrunner.capturePayment`  | Payment processing               | When user makes a payment                |
-| `Linkrunner.removePayment`   | Refund flow                      | When payment needs to be removed         |
+| Function                          | Where to Place              | When to Call                             |
+| --------------------------------- | ------------------------- | ---------------------------------------- |
+| `Linkrunner.init`                 | App initialization        | Once when app starts                     |
+| `Linkrunner.getAttributionData`   | Attribution data handling flow | Whenever the attribution data is needed |
+| `Linkrunner.signup`               | Onboarding flow           | Once after user completes onboarding     |
+| `Linkrunner.setUserData`          | Authentication logic      | Every time app opens with logged-in user |
+| `Linkrunner.triggerDeeplink`      | After navigation init     | Once after navigation is ready           |
+| `Linkrunner.trackEvent`           | Throughout app            | When specific user actions occur         |
+| `Linkrunner.capturePayment`       | Payment processing        | When user makes a payment                |
+| `Linkrunner.removePayment`        | Refund flow               | When payment needs to be removed         |
 
 ## Complete Example
 

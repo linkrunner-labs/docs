@@ -23,6 +23,8 @@ For enhanced security, the LinkRunner SDK requires the following signing paramet
 
 You can find your project token, secret key, and key ID [here](https://www.linkrunner.io/settings?s=sdk-signing).
 
+Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
+
 ```javascript
 import linkrunner from "rn-linkrunner";
 
@@ -32,44 +34,13 @@ useEffect(() => {
 }, []); // Empty dependency array ensures it runs only once
 
 const init = async () => {
-    const initData = await linkrunner.init({
+    await linkrunner.init(
         token: "YOUR_PROJECT_TOKEN",
         keyId: "YOUR_KEY_ID", // Optional: Required for SDK signing
         secretKey: "YOUR_SECRET_KEY", // Optional: Required for SDK signing
-    });
-    console.log("Linkrunner initialized:", initData);
+    );
+    console.log("Linkrunner initialized");
 };
-```
-
-### Response from `linkrunner.init`
-
-The initialization method returns useful data including:
-
-```typescript
-{
-    ip_location_data: {
-        ip: string;
-        city: string;
-        countryLong: string;
-        countryShort: string;
-        latitude: number;
-        longitude: number;
-        region: string;
-        timeZone: string;
-        zipCode: string;
-    }
-    deeplink: string;
-    root_domain: boolean;
-    campaign_data: {
-        id: string;
-        name: string;
-        type: "ORGANIC" | "INORGANIC";
-        ad_network: "META" | "GOOGLE" | null;
-        group_name: string | null;
-        asset_group_name: string | null;
-        asset_name: string | null;
-    }
-}
 ```
 
 ## User Registration
@@ -90,22 +61,62 @@ If the platform's identifier function is not called, you must provide a user ide
 
 ```javascript
 const onSignup = async () => {
-    const result = await linkrunner.signup({
-        user_data: {
-            id: "123", // Required: User ID
-            name: "John Doe", // Optional
-            phone: "9876543210", // Optional
-            email: "user@example.com", // Optional
-            // These properties are used to track reinstalls
-            user_created_at: "2024-01-01T00:00:00Z", // Optional
-            is_first_time_user: true, // Optional
-            mixpanel_distinct_id: "mixpanel_distinct_id", // Optional - Mixpanel Distinct ID
-            amplitude_device_id: "amplitude_device_id", // Optional - Amplitude User ID
-            posthog_distinct_id: "posthog_distinct_id", // Optional - PostHog Distinct ID
-        },
-        data: {}, // Optional: Any additional data
-    });
+    try {
+        await linkrunner.signup({
+            user_data: {
+                id: "123", // Required: User ID
+                name: "John Doe", // Optional
+                phone: "9876543210", // Optional
+                email: "user@example.com", // Optional
+                // These properties are used to track reinstalls
+                user_created_at: "2024-01-01T00:00:00Z", // Optional
+                is_first_time_user: true, // Optional
+                mixpanel_distinct_id: "mixpanel_distinct_id", // Optional - Mixpanel Distinct ID
+                amplitude_device_id: "amplitude_device_id", // Optional - Amplitude User ID
+                posthog_distinct_id: "posthog_distinct_id", // Optional - PostHog Distinct ID
+            },
+            data: {}, // Optional: Any additional data
+        });
+        console.log("Signup successful");
+    } catch (error) {
+        console.error("Error during signup:", error);
+    }
 };
+```
+
+## Getting Attribution Data
+
+To get attribution data and deeplink information for the current installation, use the `getAttributionData` function:
+
+```javascript
+const getAttributionInfo = async () => {
+    try {
+        const attributionData = await linkrunner.getAttributionData();
+        console.log("Attribution data:", attributionData);
+    } catch (error) {
+        console.error("Error getting attribution data:", error);
+    }
+};
+```
+
+The `getAttributionData` function returns:
+
+```typescript
+{
+    deeplink: string | null;
+    campaign_data: {
+        id: string;
+        name: string;
+        type: string; // "ORGANIC" | "INORGANIC"
+        ad_network: string | null; // "META" | "GOOGLE" | null
+        installed_at: string;
+        store_click_at: string | null;
+        group_name: string;
+        asset_name: string;
+        asset_group_name: string;
+    };
+    attribution_source: string;
+}
 ```
 
 ## Setting User Data
@@ -218,6 +229,7 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 | Function                     | Where to Place           | When to Call                             |
 | ---------------------------- | ------------------------ | ---------------------------------------- |
 | `linkrunner.init`            | App.tsx within useEffect | Once when app starts                     |
+| `linkrunner.getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed |
 | `linkrunner.signup`          | Onboarding flow          | Once after user completes onboarding     |
 | `linkrunner.setUserData`     | Authentication logic     | Every time app opens with logged-in user |
 | `linkrunner.triggerDeeplink` | After navigation init    | Once after navigation is ready           |
