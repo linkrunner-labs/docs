@@ -89,6 +89,7 @@ Future<void> onSignup() async {
     print('Error during signup: $e');
   }
 }
+```
 
 ## Getting Attribution Data
 
@@ -99,17 +100,47 @@ Future<void> getAttributionInfo() async {
   try {
     final attributionData = await Linkrunner.getAttributionData();
     print('Attribution data: $attributionData');
-    
-    // Attribution data includes:
-    // - deeplink: The deep link URL that led to app installation
-    // - campaignData: Campaign information
-    final deeplink = attributionData.deeplink;
-    if (deeplink != null) {
-      print('Deeplink: $deeplink');
-      // Handle the deeplink in your app
-    }
   } catch (e) {
     print('Error getting attribution data: $e');
+  }
+}
+```
+
+The `getAttributionData` function returns an `AttributionData` object with the following structure:
+
+```dart
+class AttributionData {
+  final String? deeplink;            // Optional: The deep link URL that led to app installation
+  final CampaignData campaignData;   // Required: Campaign information
+}
+
+class CampaignData {
+  final String id;                   // Required: Campaign ID
+  final String name;                 // Required: Campaign name
+  final String? adNetwork;           // Optional: "META" | "GOOGLE" | null
+  final String? groupName;           // Optional: Campaign group name
+  final String? assetGroupName;      // Optional: Asset group name
+  final String? assetName;           // Optional: Asset name
+  final String type;                 // Required: Campaign type ("ORGANIC" | "INORGANIC")
+  final String installedAt;          // Required: Installation timestamp
+  final String storeClickAt;         // Required: Store click timestamp
+}
+```
+
+Example response:
+```dart
+{
+  "deeplink": "myapp://product/123",
+  "campaign_data": {
+    "id": "camp_123",
+    "name": "Summer Sale 2024",
+    "ad_network": "META",
+    "group_name": "iOS Campaign",
+    "asset_group_name": "Product Catalog",
+    "asset_name": "Banner Ad 1",
+    "type": "INORGANIC",
+    "installed_at": "2024-03-20T10:30:00Z",
+    "store_click_at": "2024-03-20T10:29:45Z"
   }
 }
 ```
@@ -139,7 +170,7 @@ Future<void> setUserData() async {
 }
 ```
 
-## Setting CleverTap ID
+## Set Additional Data
 
 Use the `setAdditionalData` method to set CleverTap ID:
 
@@ -251,9 +282,6 @@ The SDK offers options to enhance user privacy:
 ```dart
 // Enable PII (Personally Identifiable Information) hashing
 Linkrunner.enablePIIHashing(true);
-
-// Check if PII hashing is enabled
-bool isHashingEnabled = Linkrunner.isPIIHashingEnabled();
 ```
 
 When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
