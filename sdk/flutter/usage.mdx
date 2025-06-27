@@ -31,11 +31,11 @@ import 'package:linkrunner/linkrunner.dart';
 Future<void> initLinkrunner() async {
   try {
     // Initialize with your project token and SDK signing parameters
-    await Linkrunner.init({
-      'token': 'YOUR_PROJECT_TOKEN',
-      'keyId': 'YOUR_KEY_ID', // Optional: Required for SDK signing
-      'secretKey': 'YOUR_SECRET_KEY', // Optional: Required for SDK signing
-    });
+    await Linkrunner.init(
+      'YOUR_PROJECT_TOKEN',
+      'YOUR_SECRET_KEY', // Optional: Required for SDK signing
+      'YOUR_KEY_ID', // Optional: Required for SDK signing
+    );
     print('Linkrunner initialized');
   } catch (e) {
     print('Error initializing Linkrunner: $e');
@@ -82,7 +82,7 @@ Future<void> onSignup() async {
         amplitudeDeviceId: 'amplitudeDeviceId', // Optional - Amplitude User ID
         posthogDistinctId: 'posthogDistinctId', // Optional - PostHog Distinct ID
       ),
-      additionalData: {}, // Optional: Any additional data
+      data: {}, // Optional: Any additional data
     );
     print('Signup successful');
   } catch (e) {
@@ -124,12 +124,9 @@ Future<void> setUserData() async {
     await Linkrunner.setUserData(
       userData: LRUserData(
         id: '123', // Required: User ID
-        name: 'John Doe', // Optional
-        phone: '9876543210', // Optional
-        email: 'user@example.com', // Optional
-        mixpanelDistinctId: 'mixpanelDistinctId', // Optional - Mixpanel Distinct ID
-        amplitudeDeviceId: 'amplitudeDeviceId', // Optional - Amplitude User ID
-        posthogDistinctId: 'posthogDistinctId', // Optional - PostHog Distinct ID
+        name: 'John Doe', // Required
+        phone: '9876543210', // Required
+        email: 'user@example.com', // Required
       ),
     );
     print('User data set successfully');
@@ -196,11 +193,11 @@ Future<void> capturePayment() async {
   try {
     await Linkrunner.capturePayment(
       capturePayment: LRCapturePayment(
-        amount: 99.99, // Payment amount
-        userId: 'user123', // User identifier
+        amount: 99.99, // Required: Payment amount
+        userId: 'user123', // Required: User identifier
         paymentId: 'payment456', // Optional: Unique payment identifier
-        type: PaymentType.FIRST_PAYMENT, // optional
-        status: PaymentStatus.PAYMENT_COMPLETED, // optional
+        type: PaymentType.FIRST_PAYMENT, // Optional: Payment type
+        status: PaymentStatus.PAYMENT_COMPLETED, // Optional: Payment status
       ),
     );
     print('Payment captured successfully');
@@ -208,9 +205,23 @@ Future<void> capturePayment() async {
     print('Error capturing payment: $e');
   }
 }
+
+Future<void> removePayment() async {
+  try {
+    await Linkrunner.removePayment(
+      removePayment: LRRemovePayment(
+        userId: 'user123', // Either userId or paymentId must be provided
+        paymentId: 'payment456', // Optional: Unique payment identifier
+      ),
+    );
+    print('Payment removed successfully');
+  } catch (e) {
+    print('Error removing payment: $e');
+  }
+}
 ```
 
-#### Parameters for `Linkrunner.capturePayment`
+#### Parameters for `LRCapturePayment`
 
 - `amount`: double (required) - The payment amount
 - `userId`: String (required) - Identifier for the user making the payment
@@ -223,37 +234,12 @@ Future<void> capturePayment() async {
     - `SUBSCRIPTION_RENEWED` - Subscription renewal
     - `ONE_TIME` - One-time payment
     - `RECURRING` - Recurring payment
-    - `DEFAULT` - Default type (used if not specified)
+    - `DEFAULT_PAYMENT` - Default type (used if not specified)
 - `status`: PaymentStatus (optional) - Status of the payment. Available options:
     - `PAYMENT_INITIATED` - Payment has been initiated
     - `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
     - `PAYMENT_FAILED` - Payment attempt failed
     - `PAYMENT_CANCELLED` - Payment was cancelled
-
-### Removing Payments
-
-Remove payment records (for refunds or cancellations):
-
-```dart
-Future<void> removePayment() async {
-  try {
-    await Linkrunner.removePayment(
-      userId: 'user123', // User identifier
-      paymentId: 'payment456', // Optional: Unique payment identifier
-    );
-    print('Payment removed successfully');
-  } catch (e) {
-    print('Error removing payment: $e');
-  }
-}
-```
-
-#### Parameters for `Linkrunner.removePayment`
-
-- `userId`: String (required) - Identifier for the user whose payment is being removed
-- `paymentId`: String (optional) - Unique identifier for the payment to be removed
-
-Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If only `userId` is provided, all payments for that user will be removed.
 
 ## Enhanced Privacy Controls
 
