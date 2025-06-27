@@ -139,6 +139,24 @@ const setUserData = async () => {
 };
 ```
 
+## Setting CleverTap ID
+
+Use the `setAdditionalData` method to set CleverTap ID:
+
+```javascript
+const setIntegrationData = async () => {
+    await linkrunner.setAdditionalData({
+        clevertapId: "YOUR_CLEVERTAP_USER_ID", // CleverTap user identifier
+    });
+};
+```
+
+### Parameters for `linkrunner.setAdditionalData`
+
+- `clevertapId`: string (optional) - CleverTap user identifier
+
+This method allows you to connect user identities across different analytics and marketing platforms.
+
 ## Tracking Custom Events
 
 Track custom events in your app:
@@ -230,6 +248,7 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 | ---------------------------- | ------------------------ | ---------------------------------------- |
 | `linkrunner.init`            | App.tsx within useEffect | Once when app starts                     |
 | `linkrunner.getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed |
+| `linkrunner.setAdditionalData` | Integration code        | When third-party integration IDs are available |
 | `linkrunner.signup`          | Onboarding flow          | Once after user completes onboarding     |
 | `linkrunner.setUserData`     | Authentication logic     | Every time app opens with logged-in user |
 | `linkrunner.triggerDeeplink` | After navigation init    | Once after navigation is ready           |

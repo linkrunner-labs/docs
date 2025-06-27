@@ -139,6 +139,31 @@ Future<void> setUserData() async {
 }
 ```
 
+## Setting CleverTap ID
+
+Use the `setAdditionalData` method to set CleverTap ID:
+
+```dart
+Future<void> setIntegrationData() async {
+  try {
+    await Linkrunner.setAdditionalData(
+      integrationData: {
+        'clevertapId': 'YOUR_CLEVERTAP_USER_ID', // CleverTap user identifier
+      },
+    );
+    print('CleverTap ID set successfully');
+  } catch (e) {
+    print('Error setting CleverTap ID: $e');
+  }
+}
+```
+
+### Parameters for `Linkrunner.setAdditionalData`
+
+- `clevertapId`: String (optional) - CleverTap user identifier
+
+This method allows you to connect user identities across different analytics and marketing platforms.
+
 ## Tracking Custom Events
 
 Track custom events in your app:
@@ -250,6 +275,7 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 | --------------------------------- | ------------------------- | ---------------------------------------- |
 | `Linkrunner.init`                 | App initialization        | Once when app starts                     |
 | `Linkrunner.getAttributionData`   | Attribution data handling flow | Whenever the attribution data is needed |
+| `Linkrunner.setAdditionalData` | Integration code                | When third-party integration IDs are available |
 | `Linkrunner.signup`               | Onboarding flow           | Once after user completes onboarding     |
 | `Linkrunner.setUserData`          | Authentication logic      | Every time app opens with logged-in user |
 | `Linkrunner.triggerDeeplink`      | After navigation init     | Once after navigation is ready           |
