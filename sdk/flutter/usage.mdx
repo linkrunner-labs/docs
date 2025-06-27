@@ -14,14 +14,29 @@ Initialize the Linkrunner SDK when your app starts:
 
 You can find your project token [here](https://www.linkrunner.io/dashboard?s=members&m=documentation).
 
+### SDK Signing Parameters (Optional)
+
+For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+
+- **`secretKey`**: A unique secret key used for request signing and authentication
+- **`keyId`**: A unique identifier for the key pair used in the signing process
+
+You can find your project token, secret key, and key ID [here](https://www.linkrunner.io/settings?s=sdk-signing).
+
+Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
+
 ```dart
 import 'package:linkrunner/linkrunner.dart';
 
 Future<void> initLinkrunner() async {
   try {
-    // Initialize with your project token
-    final initData = await Linkrunner.init('YOUR_PROJECT_TOKEN');
-    print('Linkrunner initialized: $initData');
+    // Initialize with your project token and SDK signing parameters
+    await Linkrunner.init(
+      'YOUR_PROJECT_TOKEN',
+      'YOUR_SECRET_KEY', // Optional: Required for SDK signing
+      'YOUR_KEY_ID', // Optional: Required for SDK signing
+    );
+    print('Linkrunner initialized');
   } catch (e) {
     print('Error initializing Linkrunner: $e');
   }
@@ -54,7 +69,7 @@ If the platform's identifier function is not called, you must provide a user ide
 ```dart
 Future<void> onSignup() async {
   try {
-    final result = await Linkrunner.signup(
+    await Linkrunner.signup(
       userData: LRUserData(
         id: '123', // Required: User ID
         name: 'John Doe', // Optional
@@ -67,11 +82,65 @@ Future<void> onSignup() async {
         amplitudeDeviceId: 'amplitudeDeviceId', // Optional - Amplitude User ID
         posthogDistinctId: 'posthogDistinctId', // Optional - PostHog Distinct ID
       ),
-      additionalData: {}, // Optional: Any additional data
+      data: {}, // Optional: Any additional data
     );
-    print('Signup successful: $result');
+    print('Signup successful');
   } catch (e) {
     print('Error during signup: $e');
+  }
+}
+```
+
+## Getting Attribution Data
+
+To get attribution data and deeplink information for the current installation, use the `getAttributionData` function:
+
+```dart
+Future<void> getAttributionInfo() async {
+  try {
+    final attributionData = await Linkrunner.getAttributionData();
+    print('Attribution data: $attributionData');
+  } catch (e) {
+    print('Error getting attribution data: $e');
+  }
+}
+```
+
+The `getAttributionData` function returns an `AttributionData` object with the following structure:
+
+```dart
+class AttributionData {
+  final String? deeplink;            // Optional: The deep link URL that led to app installation
+  final CampaignData campaignData;   // Required: Campaign information
+}
+
+class CampaignData {
+  final String id;                   // Required: Campaign ID
+  final String name;                 // Required: Campaign name
+  final String? adNetwork;           // Optional: "META" | "GOOGLE" | null
+  final String? groupName;           // Optional: Campaign group name
+  final String? assetGroupName;      // Optional: Asset group name
+  final String? assetName;           // Optional: Asset name
+  final String type;                 // Required: Campaign type ("ORGANIC" | "INORGANIC")
+  final String installedAt;          // Required: Installation timestamp
+  final String storeClickAt;         // Required: Store click timestamp
+}
+```
+
+Example response:
+```dart
+{
+  "deeplink": "myapp://product/123",
+  "campaign_data": {
+    "id": "camp_123",
+    "name": "Summer Sale 2024",
+    "ad_network": "META",
+    "group_name": "iOS Campaign",
+    "asset_group_name": "Product Catalog",
+    "asset_name": "Banner Ad 1",
+    "type": "INORGANIC",
+    "installed_at": "2024-03-20T10:30:00Z",
+    "store_click_at": "2024-03-20T10:29:45Z"
   }
 }
 ```
@@ -101,28 +170,30 @@ Future<void> setUserData() async {
 }
 ```
 
-## Handling Deferred Deep Links
+## Set Additional Data
 
-`triggerDeeplink` is an optional function which has to be called once after the user onboards and the main stack is ready for navigation. This function handles deferred deep links (links that led to app installation):
+Use the `setAdditionalData` method to set CleverTap ID:
 
 ```dart
-Future<void> triggerDeeplink() {
+Future<void> setIntegrationData() async {
   try {
-    Linkrunner.triggerDeeplink();
+    await Linkrunner.setAdditionalData(
+      integrationData: {
+        'clevertapId': 'YOUR_CLEVERTAP_USER_ID', // CleverTap user identifier
+      },
+    );
+    print('CleverTap ID set successfully');
   } catch (e) {
-    print('Error triggering deeplink: $e');
-  }
-}
-
-// Call this after your navigation is ready
-@override
-void didChangeDependencies() {
-  super.didChangeDependencies();
-  if (_isNavigationReady) {
-    triggerDeeplink();
+    print('Error setting CleverTap ID: $e');
   }
 }
 ```
+
+### Parameters for `Linkrunner.setAdditionalData`
+
+- `clevertapId`: String (optional) - CleverTap user identifier
+
+This method allows you to connect user identities across different analytics and marketing platforms.
 
 ## Tracking Custom Events
 
@@ -156,11 +227,11 @@ Future<void> capturePayment() async {
   try {
     await Linkrunner.capturePayment(
       capturePayment: LRCapturePayment(
-        amount: 99.99, // Payment amount
-        userId: 'user123', // User identifier
+        amount: 99.99, // Required: Payment amount
+        userId: 'user123', // Required: User identifier
         paymentId: 'payment456', // Optional: Unique payment identifier
-        type: PaymentType.FIRST_PAYMENT, // optional
-        status: PaymentStatus.PAYMENT_COMPLETED, // optional
+        type: PaymentType.FIRST_PAYMENT, // Optional: Payment type
+        status: PaymentStatus.PAYMENT_COMPLETED, // Optional: Payment status
       ),
     );
     print('Payment captured successfully');
@@ -168,9 +239,23 @@ Future<void> capturePayment() async {
     print('Error capturing payment: $e');
   }
 }
+
+Future<void> removePayment() async {
+  try {
+    await Linkrunner.removePayment(
+      removePayment: LRRemovePayment(
+        userId: 'user123', // Either userId or paymentId must be provided
+        paymentId: 'payment456', // Optional: Unique payment identifier
+      ),
+    );
+    print('Payment removed successfully');
+  } catch (e) {
+    print('Error removing payment: $e');
+  }
+}
 ```
 
-#### Parameters for `Linkrunner.capturePayment`
+#### Parameters for `LRCapturePayment`
 
 - `amount`: double (required) - The payment amount
 - `userId`: String (required) - Identifier for the user making the payment
@@ -183,49 +268,37 @@ Future<void> capturePayment() async {
     - `SUBSCRIPTION_RENEWED` - Subscription renewal
     - `ONE_TIME` - One-time payment
     - `RECURRING` - Recurring payment
-    - `DEFAULT` - Default type (used if not specified)
+    - `DEFAULT_PAYMENT` - Default type (used if not specified)
 - `status`: PaymentStatus (optional) - Status of the payment. Available options:
     - `PAYMENT_INITIATED` - Payment has been initiated
     - `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
     - `PAYMENT_FAILED` - Payment attempt failed
     - `PAYMENT_CANCELLED` - Payment was cancelled
 
-### Removing Payments
+## Enhanced Privacy Controls
 
-Remove payment records (for refunds or cancellations):
+The SDK offers options to enhance user privacy:
 
 ```dart
-Future<void> removePayment() async {
-  try {
-    await Linkrunner.removePayment(
-      userId: 'user123', // User identifier
-      paymentId: 'payment456', // Optional: Unique payment identifier
-    );
-    print('Payment removed successfully');
-  } catch (e) {
-    print('Error removing payment: $e');
-  }
-}
+// Enable PII (Personally Identifiable Information) hashing
+Linkrunner.enablePIIHashing(true);
 ```
 
-#### Parameters for `Linkrunner.removePayment`
-
-- `userId`: String (required) - Identifier for the user whose payment is being removed
-- `paymentId`: String (optional) - Unique identifier for the payment to be removed
-
-Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If only `userId` is provided, all payments for that user will be removed.
+When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
 
 ## Function Placement Guide
 
-| Function                     | Where to Place                   | When to Call                             |
-| ---------------------------- | -------------------------------- | ---------------------------------------- |
-| `Linkrunner.init`            | Main app initState or equivalent | Once when app starts                     |
-| `Linkrunner.signup`          | Onboarding flow                  | Once after user completes onboarding     |
-| `Linkrunner.setUserData`     | Authentication logic             | Every time app opens with logged-in user |
-| `Linkrunner.triggerDeeplink` | After navigation init            | Once after navigation is ready           |
-| `Linkrunner.trackEvent`      | Throughout app                   | When specific user actions occur         |
-| `Linkrunner.capturePayment`  | Payment processing               | When user makes a payment                |
-| `Linkrunner.removePayment`   | Refund flow                      | When payment needs to be removed         |
+| Function                          | Where to Place              | When to Call                             |
+| --------------------------------- | ------------------------- | ---------------------------------------- |
+| `Linkrunner.init`                 | App initialization        | Once when app starts                     |
+| `Linkrunner.getAttributionData`   | Attribution data handling flow | Whenever the attribution data is needed |
+| `Linkrunner.setAdditionalData` | Integration code                | When third-party integration IDs are available |
+| `Linkrunner.signup`               | Onboarding flow           | Once after user completes onboarding     |
+| `Linkrunner.setUserData`          | Authentication logic      | Every time app opens with logged-in user |
+| `Linkrunner.triggerDeeplink`      | After navigation init     | Once after navigation is ready           |
+| `Linkrunner.trackEvent`           | Throughout app            | When specific user actions occur         |
+| `Linkrunner.capturePayment`       | Payment processing        | When user makes a payment                |
+| `Linkrunner.removePayment`        | Refund flow               | When payment needs to be removed         |
 
 ## Complete Example
 
