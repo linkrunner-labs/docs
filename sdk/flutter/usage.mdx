@@ -14,13 +14,26 @@ Initialize the Linkrunner SDK when your app starts:
 
 You can find your project token [here](https://www.linkrunner.io/dashboard?s=members&m=documentation).
 
+### SDK Signing Parameters (Optional)
+
+For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+
+- **`secretKey`**: A unique secret key used for request signing and authentication
+- **`keyId`**: A unique identifier for the key pair used in the signing process
+
+You can find your project token, secret key, and key ID [here](https://www.linkrunner.io/settings?s=sdk-signing).
+
 ```dart
 import 'package:linkrunner/linkrunner.dart';
 
 Future<void> initLinkrunner() async {
   try {
-    // Initialize with your project token
-    final initData = await Linkrunner.init('YOUR_PROJECT_TOKEN');
+    // Initialize with your project token and SDK signing parameters
+    final initData = await Linkrunner.init({
+      'token': 'YOUR_PROJECT_TOKEN',
+      'keyId': 'YOUR_KEY_ID', // Optional: Required for SDK signing
+      'secretKey': 'YOUR_SECRET_KEY', // Optional: Required for SDK signing
+    });
     print('Linkrunner initialized: $initData');
   } catch (e) {
     print('Error initializing Linkrunner: $e');
@@ -97,29 +110,6 @@ Future<void> setUserData() async {
     print('User data set successfully');
   } catch (e) {
     print('Error setting user data: $e');
-  }
-}
-```
-
-## Handling Deferred Deep Links
-
-`triggerDeeplink` is an optional function which has to be called once after the user onboards and the main stack is ready for navigation. This function handles deferred deep links (links that led to app installation):
-
-```dart
-Future<void> triggerDeeplink() {
-  try {
-    Linkrunner.triggerDeeplink();
-  } catch (e) {
-    print('Error triggering deeplink: $e');
-  }
-}
-
-// Call this after your navigation is ready
-@override
-void didChangeDependencies() {
-  super.didChangeDependencies();
-  if (_isNavigationReady) {
-    triggerDeeplink();
   }
 }
 ```
@@ -214,6 +204,20 @@ Future<void> removePayment() async {
 - `paymentId`: String (optional) - Unique identifier for the payment to be removed
 
 Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If only `userId` is provided, all payments for that user will be removed.
+
+## Enhanced Privacy Controls
+
+The SDK offers options to enhance user privacy:
+
+```dart
+// Enable PII (Personally Identifiable Information) hashing
+Linkrunner.enablePIIHashing(true);
+
+// Check if PII hashing is enabled
+bool isHashingEnabled = Linkrunner.isPIIHashingEnabled();
+```
+
+When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
 
 ## Function Placement Guide
 
