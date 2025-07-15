@@ -1,0 +1,622 @@
+---
+title: "Web SDK Usage"
+description: "Complete guide to using the Linkrunner Web SDK for tracking and analytics"
+icon: "code"
+---
+
+This guide covers how to use the Linkrunner Web SDK after installation. Learn how to initialize the SDK, track events, handle errors, and implement best practices.
+
+## Basic Usage
+
+### Initialization
+
+The SDK must be initialized before you can track events. There are two ways to initialize:
+
+<CodeGroup>
+```javascript Auto-initialization
+<!-- The SDK auto-initializes from script attributes -->
+<script 
+    src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js"
+    token="your-token-here"
+    debug="true"
+></script>
+
+<!-- SDK is ready to use immediately -->
+<script>
+  // Check if SDK is ready
+  if (window.LinkrunnerSDK.isReady()) {
+    console.log('SDK is ready!');
+  }
+</script>
+```
+
+```javascript Manual initialization
+<script src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js"></script>
+<script>
+  async function initializeSDK() {
+    try {
+      const response = await window.LinkrunnerSDK.init({
+        token: 'your-token-here',
+        debug: true,
+        appVersion: '1.0.0',
+        platform: 'web'
+      });
+      
+      console.log('SDK initialized:', response);
+    } catch (error) {
+      console.error('SDK initialization failed:', error);
+    }
+  }
+  
+  initializeSDK();
+</script>
+```
+</CodeGroup>
+
+### Configuration Options
+
+When initializing manually, you can pass these configuration options:
+
+```javascript
+await window.LinkrunnerSDK.init({
+  // Required
+  token: 'your-linkrunner-token',
+  
+  // Optional - Debug & Development
+  debug: true                           // Enable debug logging
+});
+```
+
+## Page View Tracking
+
+### Automatic Page Views
+
+By default, the SDK automatically captures an initial page view when initialized. For single-page applications, you'll need to manually track page changes.
+
+### Manual Page View Tracking
+
+<CodeGroup>
+```javascript Basic page view
+// Track current page
+await window.LinkrunnerSDK.capturePageView();
+
+// Track specific URL
+await window.LinkrunnerSDK.capturePageView('/products/item-123');
+
+// Track with full URL
+await window.LinkrunnerSDK.capturePageView('https://example.com/page');
+```
+
+```javascript With error handling
+async function trackPageView(url) {
+  try {
+    const response = await window.LinkrunnerSDK.capturePageView(url);
+    console.log('Page view tracked:', response);
+  } catch (error) {
+    console.error('Failed to track page view:', error);
+  }
+}
+
+// Usage
+trackPageView('/dashboard');
+```
+</CodeGroup>
+
+### SPA (Single Page Application) Integration
+
+For SPAs, track page views on route changes:
+
+<CodeGroup>
+```javascript History API
+// Track on pushState/replaceState
+const originalPushState = history.pushState;
+const originalReplaceState = history.replaceState;
+
+history.pushState = function(...args) {
+  originalPushState.apply(history, args);
+  window.LinkrunnerSDK.capturePageView(location.pathname);
+};
+
+history.replaceState = function(...args) {
+  originalReplaceState.apply(history, args);
+  window.LinkrunnerSDK.capturePageView(location.pathname);
+};
+
+// Track on popstate (back/forward buttons)
+window.addEventListener('popstate', () => {
+  window.LinkrunnerSDK.capturePageView(location.pathname);
+});
+```
+
+```javascript With React Router
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
+function usePageViewTracking() {
+  const location = useLocation();
+  
+  useEffect(() => {
+    if (window.LinkrunnerSDK?.isReady()) {
+      window.LinkrunnerSDK.capturePageView(location.pathname);
+    }
+  }, [location]);
+}
+
+// Use in your app component
+function App() {
+  usePageViewTracking();
+  return <div>Your app content</div>;
+}
+```
+</CodeGroup>
+
+## SDK State Management
+
+### Checking SDK Status
+
+```javascript
+// Check if SDK is ready
+const isReady = window.LinkrunnerSDK.isReady();
+
+// Get current state
+const state = window.LinkrunnerSDK.getState();
+console.log('SDK state:', state); // 'uninitialized', 'initializing', 'ready', 'error', 'destroyed'
+
+// Get detailed health status
+const health = window.LinkrunnerSDK.getHealthStatus();
+console.log('Health status:', health);
+```
+
+### State Monitoring
+
+```javascript
+function monitorSDKStatus() {
+  const checkStatus = () => {
+    const state = window.LinkrunnerSDK.getState();
+    const isReady = window.LinkrunnerSDK.isReady();
+    
+    console.log(`SDK State: ${state}, Ready: ${isReady}`);
+    
+    if (state === 'error') {
+      const error = window.LinkrunnerSDK.getLastError();
+      console.error('SDK Error:', error);
+    }
+  };
+  
+  // Check immediately
+  checkStatus();
+  
+  // Check periodically
+  const interval = setInterval(checkStatus, 5000);
+  
+  // Stop monitoring when SDK is ready
+  if (window.LinkrunnerSDK.isReady()) {
+    clearInterval(interval);
+  }
+}
+
+monitorSDKStatus();
+```
+
+## Session & Instance Management
+
+### Getting Session Information
+
+```javascript
+// Get current session ID
+const sessionId = window.LinkrunnerSDK.getSessionId();
+console.log('Session ID:', sessionId);
+
+// Get install instance ID (persists across sessions)
+const installId = window.LinkrunnerSDK.getInstallInstanceId();
+console.log('Install Instance ID:', installId);
+
+// Get configuration
+const config = window.LinkrunnerSDK.getConfig();
+console.log('SDK Config:', config);
+```
+
+### SDK Lifecycle Management
+
+```javascript
+// Reset SDK (clears session but keeps install ID)
+window.LinkrunnerSDK.reset();
+
+// Reinitialize after reset
+await window.LinkrunnerSDK.init({
+  token: 'your-token-here'
+});
+
+// Completely destroy SDK instance
+window.LinkrunnerSDK.destroy();
+```
+
+## Error Handling
+
+### Try-Catch Pattern
+
+```javascript
+async function safeSDKOperation() {
+  try {
+    // Check if SDK is ready first
+    if (!window.LinkrunnerSDK.isReady()) {
+      throw new Error('SDK not ready');
+    }
+    
+    const response = await window.LinkrunnerSDK.capturePageView();
+    console.log('Success:', response);
+    
+  } catch (error) {
+    console.error('SDK operation failed:', error);
+    
+    // Handle specific errors
+    if (error.name === 'NetworkError') {
+      console.log('Network issue - will retry later');
+    } else if (error.name === 'TimeoutError') {
+      console.log('Request timed out');
+    }
+  }
+}
+```
+
+### Error Recovery
+
+```javascript
+async function initializeWithRetry(maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      await window.LinkrunnerSDK.init({
+        token: 'your-token-here',
+        timeout: 5000 * attempt // Increase timeout on retries
+      });
+      
+      console.log(`SDK initialized on attempt ${attempt}`);
+      return;
+      
+    } catch (error) {
+      console.error(`Initialization attempt ${attempt} failed:`, error);
+      
+      if (attempt === maxRetries) {
+        console.error('SDK initialization failed after all retries');
+        throw error;
+      }
+      
+      // Wait before retry
+      await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+    }
+  }
+}
+```
+
+## Advanced Usage
+
+### Custom Device Context
+
+```javascript
+// Add custom context to page views
+function trackPageWithContext(path, context = {}) {
+  // Note: Custom context would be added to future SDK versions
+  return window.LinkrunnerSDK.capturePageView(path);
+}
+
+// Usage
+trackPageWithContext('/products/electronics', {
+  category: 'electronics',
+  userId: 'user-123',
+  experimentVariant: 'A'
+});
+```
+
+### Conditional Tracking
+
+```javascript
+function shouldTrack() {
+  // Don't track in development
+  if (location.hostname === 'localhost') return false;
+  
+  // Don't track if user opted out
+  if (localStorage.getItem('tracking-opt-out') === 'true') return false;
+  
+  // Don't track bots
+  const isBot = /bot|crawler|spider/i.test(navigator.userAgent);
+  if (isBot) return false;
+  
+  return true;
+}
+
+async function conditionalPageView(path) {
+  if (shouldTrack() && window.LinkrunnerSDK.isReady()) {
+    await window.LinkrunnerSDK.capturePageView(path);
+  }
+}
+```
+
+### Performance Optimization
+
+```javascript
+// Debounce rapid page view calls
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+const debouncedPageView = debounce((path) => {
+  window.LinkrunnerSDK.capturePageView(path);
+}, 300);
+
+// Use for rapid navigation
+debouncedPageView('/page1');
+debouncedPageView('/page2'); // This will be ignored
+debouncedPageView('/page3'); // Only this will execute
+```
+
+## Framework Integration Examples
+
+### Vanilla JavaScript
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My App</title>
+</head>
+<body>
+  <!-- Auto-initialize SDK -->
+  <script 
+    src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js"
+    token="your-token-here"
+    debug="true"
+  ></script>
+  
+  <script>
+    // Wait for SDK to be ready
+    function waitForSDK() {
+      if (window.LinkrunnerSDK?.isReady()) {
+        console.log('SDK is ready!');
+        return;
+      }
+      setTimeout(waitForSDK, 100);
+    }
+    
+    waitForSDK();
+  </script>
+</body>
+</html>
+```
+
+### jQuery Integration
+
+```javascript
+$(document).ready(function() {
+  // Initialize SDK
+  window.LinkrunnerSDK.init({
+    token: 'your-token-here'
+  }).then(() => {
+    console.log('SDK ready');
+    
+    // Track page views on AJAX navigation
+    $(document).on('click', '[data-page]', function(e) {
+      e.preventDefault();
+      const page = $(this).data('page');
+      
+      // Load content via AJAX
+      $('#content').load(page, function() {
+        // Track page view after content loads
+        window.LinkrunnerSDK.capturePageView(page);
+      });
+    });
+  });
+});
+```
+
+## Best Practices
+
+### 1. Always Check SDK State
+
+```javascript
+// Good: Check if SDK is ready
+if (window.LinkrunnerSDK?.isReady()) {
+  await window.LinkrunnerSDK.capturePageView();
+}
+
+// Bad: Don't assume SDK is ready
+await window.LinkrunnerSDK.capturePageView(); // May throw error
+```
+
+### 2. Handle Async Operations
+
+```javascript
+// Good: Use async/await or promises
+async function trackPage() {
+  try {
+    await window.LinkrunnerSDK.capturePageView();
+  } catch (error) {
+    console.error('Tracking failed:', error);
+  }
+}
+
+// Bad: Fire and forget
+window.LinkrunnerSDK.capturePageView(); // No error handling
+```
+
+### 3. Environment-Specific Configuration
+
+```javascript
+const config = {
+  token: process.env.NODE_ENV === 'production' 
+    ? 'prod-token-here' 
+    : 'dev-token-here',
+  debug: process.env.NODE_ENV !== 'production',
+  apiUrl: process.env.NODE_ENV === 'production'
+    ? 'https://api.linkrunner.io'
+    : 'http://localhost:4000'
+};
+
+await window.LinkrunnerSDK.init(config);
+```
+
+### 4. Graceful Degradation
+
+```javascript
+function trackPageView(path) {
+  try {
+    if (window.LinkrunnerSDK?.isReady()) {
+      return window.LinkrunnerSDK.capturePageView(path);
+    }
+  } catch (error) {
+    // Log error but don't break app functionality
+    console.warn('Page view tracking failed:', error);
+  }
+}
+```
+
+## Debugging
+
+### Enable Debug Mode
+
+```javascript
+// Enable debug logging
+await window.LinkrunnerSDK.init({
+  token: 'your-token-here',
+  debug: true
+});
+
+// Or enable after initialization
+window.LinkrunnerSDK.setLogLevel('debug');
+window.LinkrunnerSDK.setLogEnabled(true);
+```
+
+### Debug Information
+
+```javascript
+// Get detailed SDK information
+function debugSDK() {
+  console.group('Linkrunner SDK Debug Info');
+  
+  console.log('State:', window.LinkrunnerSDK.getState());
+  console.log('Ready:', window.LinkrunnerSDK.isReady());
+  console.log('Config:', window.LinkrunnerSDK.getConfig());
+  console.log('Session ID:', window.LinkrunnerSDK.getSessionId());
+  console.log('Install ID:', window.LinkrunnerSDK.getInstallInstanceId());
+  console.log('Health:', window.LinkrunnerSDK.getHealthStatus());
+  console.log('Last Error:', window.LinkrunnerSDK.getLastError());
+  
+  console.groupEnd();
+}
+
+// Call when needed
+debugSDK();
+```
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="SDK not initializing">
+    **Symptoms**: SDK state remains 'uninitialized' or 'initializing'
+    
+    **Solutions**:
+    ```javascript
+    // Check network connectivity
+    console.log('Online:', navigator.onLine);
+    
+    // Verify token format
+    console.log('Token length:', token.length);
+    
+    // Check API endpoint
+    fetch('https://api.linkrunner.io/health')
+      .then(r => console.log('API reachable:', r.ok))
+      .catch(e => console.log('API unreachable:', e));
+    ```
+  </Accordion>
+
+  <Accordion title="Page views not tracking">
+    **Symptoms**: No page view data in dashboard
+    
+    **Solutions**:
+    ```javascript
+    // Verify SDK is ready
+    if (!window.LinkrunnerSDK.isReady()) {
+      console.error('SDK not ready for tracking');
+    }
+    
+    // Check for errors
+    const error = window.LinkrunnerSDK.getLastError();
+    if (error) {
+      console.error('SDK Error:', error);
+    }
+    
+    // Test page view manually
+    window.LinkrunnerSDK.capturePageView('/test')
+      .then(r => console.log('Test successful:', r))
+      .catch(e => console.error('Test failed:', e));
+    ```
+  </Accordion>
+
+  <Accordion title="Multiple SDK instances">
+    **Symptoms**: Duplicate tracking or conflicts
+    
+    **Solutions**:
+    ```javascript
+    // Ensure single instance
+    if (window.LinkrunnerSDK) {
+      console.warn('SDK already loaded');
+    } else {
+      // Load SDK
+    }
+    
+    // Reset if needed
+    window.LinkrunnerSDK.reset();
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Testing
+
+```javascript
+// Test SDK functionality
+async function testSDK() {
+  console.log('Testing Linkrunner SDK...');
+  
+  // Test 1: Check if loaded
+  if (!window.LinkrunnerSDK) {
+    console.error('❌ SDK not loaded');
+    return;
+  }
+  console.log('✅ SDK loaded');
+  
+  // Test 2: Check initialization
+  if (!window.LinkrunnerSDK.isReady()) {
+    console.error('❌ SDK not ready');
+    return;
+  }
+  console.log('✅ SDK ready');
+  
+  // Test 3: Test page view
+  try {
+    await window.LinkrunnerSDK.capturePageView('/test');
+    console.log('✅ Page view test successful');
+  } catch (error) {
+    console.error('❌ Page view test failed:', error);
+  }
+  
+  console.log('SDK testing complete');
+}
+
+// Run test
+testSDK();
+```
+
+## Next Steps
+
+- Explore [API Reference](/sdk/web/api-reference) for detailed method documentation
+- Check out [Framework Integrations](/sdk/web/framework-integrations) for specific implementation guides
+- Review [Performance Best Practices](https://linkrunner.io/docs/performance) for optimization tips 

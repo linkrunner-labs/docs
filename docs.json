@@ -22,6 +22,13 @@
                         "pages": [
                             "sdk/migration-guide",
                             {
+                                "group": "Web SDK",
+                                "pages": [
+                                    "sdk/web/installation", 
+                                    "sdk/web/framework-integrations"
+                                ]
+                            },
+                            {
                                 "group": "React Native",
                                 "pages": ["sdk/react-native/installation", "sdk/react-native/usage"]
                             },

@@ -1,0 +1,254 @@
+---
+title: "Framework Integrations"
+description: "Integration guides for popular web frameworks and libraries with the Linkrunner Web SDK"
+icon: "puzzle"
+---
+
+This guide provides step-by-step integration examples for popular web frameworks and libraries. Each section includes complete code examples and best practices.
+
+## React
+
+<CodeGroup>
+```javascript Method 1: Script Tag in index.html
+// Add this to your public/index.html
+<script 
+  src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js"
+  token="your-token-here"
+  debug="true"
+></script>
+```
+
+```javascript Method 2: Dynamic Loading with useEffect
+import logo from './logo.svg';
+import './App.css';
+import React, { useEffect, useState } from 'react';
+
+function App() {
+  const [linkrunnerSDKLoaded, setLinkrunnerSDKLoaded] = useState(false);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js';
+    script.async = true;
+
+    script.onload = () => {
+      setLinkrunnerSDKLoaded(true);
+      console.log('Linkrunner SDK loaded successfully');
+    };
+
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
+  const handleInitViaDynamicLoading = async () => {
+    if (window.LinkrunnerSDK) {
+      const initOptions = {
+        token: 'your-token',
+        debug: true,
+      };
+
+      console.log('Initializing with options:', initOptions);
+      const response = await window.LinkrunnerSDK.init(initOptions);
+      alert(`Response: ${JSON.stringify(response)}`);
+    } else {
+      alert('Script not loaded yet!');
+    }
+  };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        {linkrunnerSDKLoaded && (
+          <button onClick={handleInitViaDynamicLoading} style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            margin: '10px',
+            cursor: 'pointer'
+          }}>
+            2. Test via dynamic loading
+          </button>
+        )}
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+  );
+}
+
+export default App;
+```
+
+{/* ```javascript Method 3: Custom useScript Hook
+import logo from './logo.svg';
+import './App.css';
+import React, { useEffect, useState } from 'react';
+
+function useScript(src) {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let script = document.querySelector(`script[src="${src}"]`);
+
+    if (!script) {
+      script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      document.body.appendChild(script);
+    }
+
+    const handleLoad = () => setLoading(false);
+    const handleError = () => {
+      setError(new Error(`Failed to load script: ${src}`));
+      setLoading(false);
+    };
+
+    script.addEventListener('load', handleLoad);
+    script.addEventListener('error', handleError);
+
+    if (script.complete) handleLoad();
+
+    return () => {
+      script.removeEventListener('load', handleLoad);
+      script.removeEventListener('error', handleError);
+    };
+  }, [src]);
+
+  return { loading, error };
+}
+
+function App() {
+  const { loading, error } = useScript('https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js');
+
+  const handleInitViaCustomHook = async () => {
+    if (window.LinkrunnerSDK) {
+      const initOptions = {
+        token: 'your-token',
+        debug: true,
+      };
+
+      console.log('Initializing with options:', initOptions);
+      const response = await window.LinkrunnerSDK.init(initOptions);
+      alert(`Response: ${JSON.stringify(response)}`);
+    } else {
+      alert('Script not loaded yet!');
+    }
+  };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        {loading && <p style={{ color: 'yellow' }}>Loading Linkrunner SDK...</p>}
+        {error && <p style={{ color: 'red' }}>Error loading script</p>}
+        {!loading && !error && (
+          <button onClick={handleInitViaCustomHook} style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            margin: '10px',
+            cursor: 'pointer'
+          }}>
+            3. Generate UUID
+          </button>
+        )}
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+  );
+}
+
+export default App;
+``` */}
+</CodeGroup>
+
+## Next.js
+
+Dynamic Loading with useEffect approach adapted for Next.js:
+
+```javascript pages/_app.js
+import { useEffect, useState } from 'react';
+
+export default function MyApp({ Component, pageProps }) {
+  const [linkrunnerSDKLoaded, setLinkrunnerSDKLoaded] = useState(false);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js';
+    script.async = true;
+
+    script.onload = () => {
+      setLinkrunnerSDKLoaded(true);
+      console.log('Linkrunner SDK loaded successfully');
+    };
+
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
+  const handleInitViaDynamicLoading = async () => {
+    if (window.LinkrunnerSDK) {
+      const initOptions = {
+        token: 'your-token',
+        debug: true,
+      };
+
+      console.log('Initializing with options:', initOptions);
+      const response = await window.LinkrunnerSDK.init(initOptions);
+      alert(`Response: ${JSON.stringify(response)}`);
+    } else {
+      alert('Script not loaded yet!');
+    }
+  };
+
+  return (
+    <div>
+      <header>
+        <h1>Next.js App with Linkrunner SDK</h1>
+        {linkrunnerSDKLoaded && (
+          <button onClick={handleInitViaDynamicLoading} style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            margin: '10px',
+            cursor: 'pointer'
+          }}>
+            Initialize SDK via Dynamic Loading
+          </button>
+        )}
+      </header>
+      <Component {...pageProps} />
+    </div>
+  );
+}
+``` 

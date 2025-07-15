@@ -1,0 +1,161 @@
+---
+title: "Web SDK Installation"
+description: "How to install and set up the Linkrunner Web SDK for JavaScript and TypeScript applications"
+icon: "globe"
+---
+
+This guide will help you install and set up the Linkrunner Web SDK in your web application. The SDK supports vanilla JavaScript, TypeScript, and all modern JavaScript frameworks.
+
+## Quick Start
+
+The fastest way to get started is using our CDN with auto-initialization:
+
+```html
+<script 
+    src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js"
+    token="your-token-here"
+    debug="true"
+></script>
+```
+
+That's it! The SDK will automatically initialize and start tracking page views.
+
+## Installation
+
+Add the SDK script tag to your HTML:
+
+<CodeGroup>
+```html Auto-initialization
+<!-- Auto-initializes from script attributes -->
+<script 
+    src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js"
+    token="your-token-here"
+    api-url="https://api.linkrunner.io"
+    debug="false"
+></script>
+```
+
+```html Manual initialization
+<!-- Load SDK and initialize manually -->
+<script src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js"></script>
+<script>
+  window.LinkrunnerSDK.init({
+    token: 'your-token-here',
+    debug: true
+  });
+</script>
+```
+</CodeGroup>
+
+## Available Build Formats
+
+The SDK is available in multiple formats to suit different use cases:
+
+| Format | File | Use Case |
+|--------|------|----------|
+| **UMD** | `linkrunner-sdk.umd.js` | Universal format, works everywhere |
+| **ES Module** | `linkrunner-sdk.esm.js` | Modern bundlers (Webpack, Vite, etc.) |
+| **Minified** | `linkrunner-sdk.min.js` | Production use, smaller file size |
+
+{/* ## Browser Support
+
+The Linkrunner Web SDK supports all modern browsers:
+
+- **Chrome** 60+
+- **Firefox** 55+
+- **Safari** 12+
+- **Edge** 79+
+- **Opera** 47+
+
+<Note>
+For older browser support, use the UMD build which includes necessary polyfills.
+</Note> */}
+
+{/* ## Getting Your Token
+
+<Steps>
+  <Step title="Log in to Linkrunner">
+    Go to [linkrunner.io](https://linkrunner.io) and log in to your account
+  </Step>
+  <Step title="Navigate to Settings">
+    Click on Settings in the dashboard sidebar
+  </Step>
+  <Step title="Go to API Keys">
+    Select the "API Keys" or "SDK Configuration" section
+  </Step>
+  <Step title="Copy Your Token">
+    Find your Web SDK token and copy it to your clipboard
+  </Step>
+</Steps> */}
+
+## Verification
+
+To verify the SDK is working correctly:
+
+1. Open your browser's developer console
+2. Look for Linkrunner SDK log messages
+3. Check that no errors are displayed
+
+## Next Steps
+
+After installation, proceed to the [Usage Guide](/sdk/web/usage) to learn how to:
+
+- Initialize the SDK properly
+- Track page views and custom events
+- Handle errors and debugging
+- Integrate with popular frameworks
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="SDK not loading">
+    **Problem**: Script fails to load or SDK is undefined
+    
+    **Solutions**:
+    - Check network connectivity and CDN availability
+    - Verify the script URL is correct
+    - Check browser console for errors
+    - Try using a different CDN endpoint
+  </Accordion>
+
+  <Accordion title="Initialization fails">
+    **Problem**: SDK loads but initialization fails
+    
+    **Solutions**:
+    - Verify your token is correct and active
+    - Check API endpoint URL
+    - Ensure you have an internet connection
+    - Enable debug mode to see detailed error messages
+  </Accordion>
+</AccordionGroup>
+
+### Debug Mode
+
+Enable debug mode to see detailed logging:
+
+```html
+<!-- Auto-initialization with debug -->
+<script 
+    src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js"
+    token="your-token-here"
+    debug="true"
+></script>
+```
+
+```javascript
+// Manual initialization with debug
+await window.LinkrunnerSDK.init({
+  token: 'your-token-here',
+  debug: true
+});
+```
+
+### Support
+
+If you encounter issues:
+
+1. Check the [troubleshooting guide](/sdk/web/usage#troubleshooting)
+2. Review the [API reference](/sdk/web/api-reference)
+3. Contact support at [darshil@linkrunner.io](mailto:darshil@linkrunner.io) 
