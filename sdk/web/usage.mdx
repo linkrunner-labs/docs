@@ -35,7 +35,7 @@ The SDK must be initialized before you can track events. There are two ways to i
 <script>
   async function initializeSDK() {
     try {
-      const response = await window.LinkrunnerSDK.init({
+      const response = await window.LinkrunnerSDK.capturePageView({
         token: 'your-token-here',
         debug: true,
         appVersion: '1.0.0',
@@ -58,7 +58,7 @@ The SDK must be initialized before you can track events. There are two ways to i
 When initializing manually, you can pass these configuration options:
 
 ```javascript
-await window.LinkrunnerSDK.init({
+await window.LinkrunnerSDK.capturePageView({
   // Required
   token: 'your-linkrunner-token',
   
@@ -223,7 +223,7 @@ console.log('SDK Config:', config);
 window.LinkrunnerSDK.reset();
 
 // Reinitialize after reset
-await window.LinkrunnerSDK.init({
+await window.LinkrunnerSDK.capturePageView({
   token: 'your-token-here'
 });
 
@@ -265,7 +265,7 @@ async function safeSDKOperation() {
 async function initializeWithRetry(maxRetries = 3) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      await window.LinkrunnerSDK.init({
+      await window.LinkrunnerSDK.capturePageView({
         token: 'your-token-here',
         timeout: 5000 * attempt // Increase timeout on retries
       });
@@ -396,7 +396,7 @@ debouncedPageView('/page3'); // Only this will execute
 ```javascript
 $(document).ready(function() {
   // Initialize SDK
-  window.LinkrunnerSDK.init({
+  window.LinkrunnerSDK.capturePageView({
     token: 'your-token-here'
   }).then(() => {
     console.log('SDK ready');
@@ -459,7 +459,7 @@ const config = {
     : 'http://localhost:4000'
 };
 
-await window.LinkrunnerSDK.init(config);
+await window.LinkrunnerSDK.capturePageView(config);
 ```
 
 ### 4. Graceful Degradation
@@ -483,7 +483,7 @@ function trackPageView(path) {
 
 ```javascript
 // Enable debug logging
-await window.LinkrunnerSDK.init({
+await window.LinkrunnerSDK.capturePageView({
   token: 'your-token-here',
   debug: true
 });

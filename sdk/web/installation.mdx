@@ -39,7 +39,7 @@ Add the SDK script tag to your HTML:
 <!-- Load SDK and initialize manually -->
 <script src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js"></script>
 <script>
-  window.LinkrunnerSDK.init({
+  window.LinkrunnerSDK.capturePageView({
     token: 'your-token-here',
     debug: true
   });
@@ -146,7 +146,7 @@ Enable debug mode to see detailed logging:
 
 ```javascript
 // Manual initialization with debug
-await window.LinkrunnerSDK.init({
+await window.LinkrunnerSDK.capturePageView({
   token: 'your-token-here',
   debug: true
 });

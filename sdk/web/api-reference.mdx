@@ -14,7 +14,7 @@ The SDK is available globally as `window.LinkrunnerSDK` when loaded via CDN, or 
 
 ```javascript
 // Available globally after CDN load
-window.LinkrunnerSDK.init({ ... });
+window.LinkrunnerSDK.capturePageView({ ... });
 
 // Check if SDK is loaded
 if (typeof window.LinkrunnerSDK !== 'undefined') {
@@ -110,7 +110,7 @@ Initialize the Linkrunner SDK with your configuration.
 
 ```javascript
 try {
-  const response = await window.LinkrunnerSDK.init({
+  const response = await window.LinkrunnerSDK.capturePageView({
     token: 'your-api-token',
     debug: true,
     appVersion: '2.1.0',
@@ -429,7 +429,7 @@ Completely destroy the SDK instance and clear all storage.
 window.LinkrunnerSDK.reset();
 
 // Reinitialize
-await window.LinkrunnerSDK.init({ token: 'your-token' });
+await window.LinkrunnerSDK.capturePageView({ token: 'your-token' });
 
 // Or completely destroy
 window.LinkrunnerSDK.destroy();
@@ -649,7 +649,7 @@ When using CDN with auto-initialization, these HTML attributes are supported:
 
 ```typescript
 try {
-  await window.LinkrunnerSDK.init({ token: 'your-token' });
+  await window.LinkrunnerSDK.capturePageView({ token: 'your-token' });
 } catch (error) {
   if (error instanceof Error) {
     console.error('Init failed:', error.message);

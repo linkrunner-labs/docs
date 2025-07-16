@@ -54,7 +54,7 @@ function App() {
       };
 
       console.log('Initializing with options:', initOptions);
-      const response = await window.LinkrunnerSDK.init(initOptions);
+      const response = await window.LinkrunnerSDK.capturePageView(initOptions);
       alert(`Response: ${JSON.stringify(response)}`);
     } else {
       alert('Script not loaded yet!');
@@ -144,7 +144,7 @@ function App() {
       };
 
       console.log('Initializing with options:', initOptions);
-      const response = await window.LinkrunnerSDK.init(initOptions);
+      const response = await window.LinkrunnerSDK.capturePageView(initOptions);
       alert(`Response: ${JSON.stringify(response)}`);
     } else {
       alert('Script not loaded yet!');
@@ -225,7 +225,7 @@ export default function MyApp({ Component, pageProps }) {
       };
 
       console.log('Initializing with options:', initOptions);
-      const response = await window.LinkrunnerSDK.init(initOptions);
+      const response = await window.LinkrunnerSDK.capturePageView(initOptions);
       alert(`Response: ${JSON.stringify(response)}`);
     } else {
       alert('Script not loaded yet!');
