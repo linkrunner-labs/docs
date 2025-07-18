@@ -36,7 +36,7 @@ POST: /capture-event
     "event_data": {
         "product_id": "ABC123",
         "category": "electronics",
-        "price": 249.99,
+        "amount": 249.99,
         "currency": "USD",
         "is_featured": true
     },
@@ -84,6 +84,27 @@ Here are some common event names you might want to track:
 | `level_completed`      | User completes a level (for games) |
 | `achievement_unlocked` | User unlocks an achievement        |
 | `user_referred`        | User refers someone                |
+
+## Revenue Sharing with Ad Networks
+
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+
+```json
+{
+    "event_name": "purchase_completed",
+    "event_data": {
+        "product_id": "ABC123",
+        "category": "electronics",
+        "amount": 149.99
+    },
+    "user_id": "user_12345"
+}
+```
+
+<Note>
+    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number, not as a
+    string.
+</Note>
 
 ## Best Practices
 

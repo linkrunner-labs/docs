@@ -70,15 +70,15 @@ Call the `signup` method once after the user has completed your app's onboarding
 
 It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
 
-- [Mixpanel - ID Management & User Identification](https://docs.mixpanel.com/docs/tracking-methods/id-management/identifying-users-simplified)
-- [PostHog - How User Identification Works](https://posthog.com/docs/product-analytics/identify#how-identify-works)
-- [Amplitude - Identify Users Documentation](https://amplitude.com/docs/get-started/identify-users)
+-   [Mixpanel - ID Management & User Identification](https://docs.mixpanel.com/docs/tracking-methods/id-management/identifying-users-simplified)
+-   [PostHog - How User Identification Works](https://posthog.com/docs/product-analytics/identify#how-identify-works)
+-   [Amplitude - Identify Users Documentation](https://amplitude.com/docs/get-started/identify-users)
 
 If the platform's identifier function is not called, you must provide a user identifier for Mixpanel, PostHog, and Amplitude integration.
 
-- mixpanel_distinct_id for Mixpanel
-- posthog_distinct_id for PostHog
-- amplitude_device_id for Amplitude
+-   mixpanel_distinct_id for Mixpanel
+-   posthog_distinct_id for PostHog
+-   amplitude_device_id for Amplitude
 
 ```javascript
 const onSignup = async () => {
@@ -122,10 +122,29 @@ Track custom events in your app:
 const trackEvent = async () => {
     await linkrunner.trackEvent(
         "purchase_initiated", // Event name
-        { product_id: "12345", category: "electronics" } // Optional: Event data
+        { product_id: "12345", category: "electronics", amount: 99.99 } // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
     );
 };
 ```
+
+### Revenue Sharing with Ad Networks
+
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+
+```javascript
+const trackPurchaseEvent = async () => {
+    await linkrunner.trackEvent("purchase_completed", {
+        product_id: "12345",
+        category: "electronics",
+        amount: 149.99, // Revenue amount as a number
+    });
+};
+```
+
+<Note>
+    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number, not as a
+    string.
+</Note>
 
 ## Revenue Tracking
 
@@ -147,23 +166,23 @@ const capturePayment = async () => {
 
 #### Parameters for `linkrunner.capturePayment`
 
-- `amount`: number (required) - The payment amount
-- `userId`: string (required) - Identifier for the user making the payment
-- `paymentId`: string (optional) - Unique identifier for the payment
-- `type`: string (optional) - Type of payment. Available options:
-    - `FIRST_PAYMENT` - First payment made by the user
-    - `WALLET_TOPUP` - Adding funds to a wallet
-    - `FUNDS_WITHDRAWAL` - Withdrawing funds
-    - `SUBSCRIPTION_CREATED` - New subscription created
-    - `SUBSCRIPTION_RENEWED` - Subscription renewal
-    - `ONE_TIME` - One-time payment
-    - `RECURRING` - Recurring payment
-    - `DEFAULT` - Default type (used if not specified)
-- `status`: string (optional) - Status of the payment. Available options:
-    - `PAYMENT_INITIATED` - Payment has been initiated
-    - `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
-    - `PAYMENT_FAILED` - Payment attempt failed
-    - `PAYMENT_CANCELLED` - Payment was cancelled
+-   `amount`: number (required) - The payment amount
+-   `userId`: string (required) - Identifier for the user making the payment
+-   `paymentId`: string (optional) - Unique identifier for the payment
+-   `type`: string (optional) - Type of payment. Available options:
+    -   `FIRST_PAYMENT` - First payment made by the user
+    -   `WALLET_TOPUP` - Adding funds to a wallet
+    -   `FUNDS_WITHDRAWAL` - Withdrawing funds
+    -   `SUBSCRIPTION_CREATED` - New subscription created
+    -   `SUBSCRIPTION_RENEWED` - Subscription renewal
+    -   `ONE_TIME` - One-time payment
+    -   `RECURRING` - Recurring payment
+    -   `DEFAULT` - Default type (used if not specified)
+-   `status`: string (optional) - Status of the payment. Available options:
+    -   `PAYMENT_INITIATED` - Payment has been initiated
+    -   `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
+    -   `PAYMENT_FAILED` - Payment attempt failed
+    -   `PAYMENT_CANCELLED` - Payment was cancelled
 
 ### Removing Payments
 
@@ -180,23 +199,23 @@ const removePayment = async () => {
 
 #### Parameters for `linkrunner.removePayment`
 
-- `userId`: string (required) - Identifier for the user whose payment is being removed
-- `paymentId`: string (optional) - Unique identifier for the payment to be removed
+-   `userId`: string (required) - Identifier for the user whose payment is being removed
+-   `paymentId`: string (optional) - Unique identifier for the payment to be removed
 
 Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If only `userId` is provided, all payments for that user will be removed.
 
 ## Function Placement Guide
 
-| Function                        | Where to Place                                    | When to Call                                         |
-| ------------------------------- | ------------------------------------------------- | ---------------------------------------------------- |
-| `linkrunner.init`               | App.tsx within useEffect                          | Once when app starts                                |
-| `linkrunner.signup`             | Onboarding flow                                   | Once after user completes onboarding               |
-| `linkrunner.setUserData`        | Authentication logic                              | Every time app opens with logged-in user           |
-| `linkrunner.triggerDeeplink`    | After navigation init                             | Once after navigation is ready                      |
-| `linkrunner.trackEvent`         | Throughout app                                    | When specific user actions occur                    |
-| `linkrunner.capturePayment`     | Payment processing                                | When user makes a payment                           |
-| `linkrunner.removePayment`      | Refund flow                                       | When payment needs to be removed                    |
-| `linkrunner.getAttributionData` | Attribution handling logic                        | When you need attribution data                      |
+| Function                        | Where to Place             | When to Call                             |
+| ------------------------------- | -------------------------- | ---------------------------------------- |
+| `linkrunner.init`               | App.tsx within useEffect   | Once when app starts                     |
+| `linkrunner.signup`             | Onboarding flow            | Once after user completes onboarding     |
+| `linkrunner.setUserData`        | Authentication logic       | Every time app opens with logged-in user |
+| `linkrunner.triggerDeeplink`    | After navigation init      | Once after navigation is ready           |
+| `linkrunner.trackEvent`         | Throughout app             | When specific user actions occur         |
+| `linkrunner.capturePayment`     | Payment processing         | When user makes a payment                |
+| `linkrunner.removePayment`      | Refund flow                | When payment needs to be removed         |
+| `linkrunner.getAttributionData` | Attribution handling logic | When you need attribution data           |
 
 ## Support
 

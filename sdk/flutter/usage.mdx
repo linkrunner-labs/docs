@@ -18,8 +18,8 @@ You can find your project token [here](https://www.linkrunner.io/dashboard?s=mem
 
 For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
 
-- **`secretKey`**: A unique secret key used for request signing and authentication
-- **`keyId`**: A unique identifier for the key pair used in the signing process
+-   **`secretKey`**: A unique secret key used for request signing and authentication
+-   **`keyId`**: A unique identifier for the key pair used in the signing process
 
 You can find your project token, secret key, and key ID [here](https://www.linkrunner.io/settings?s=sdk-signing).
 
@@ -56,15 +56,15 @@ Call the `signup` method once after the user has completed your app's onboarding
 
 It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
 
-- [Mixpanel - ID Management & User Identification](https://docs.mixpanel.com/docs/tracking-methods/id-management/identifying-users-simplified)
-- [PostHog - How User Identification Works](https://posthog.com/docs/product-analytics/identify#how-identify-works)
-- [Amplitude - Identify Users Documentation](https://amplitude.com/docs/get-started/identify-users)
+-   [Mixpanel - ID Management & User Identification](https://docs.mixpanel.com/docs/tracking-methods/id-management/identifying-users-simplified)
+-   [PostHog - How User Identification Works](https://posthog.com/docs/product-analytics/identify#how-identify-works)
+-   [Amplitude - Identify Users Documentation](https://amplitude.com/docs/get-started/identify-users)
 
 If the platform's identifier function is not called, you must provide a user identifier for Mixpanel, PostHog, and Amplitude integration.
 
-- mixpanelDistinctId for Mixpanel
-- amplitudeDeviceId for Amplitude
-- posthogDistinctId for PostHog
+-   mixpanelDistinctId for Mixpanel
+-   amplitudeDeviceId for Amplitude
+-   posthogDistinctId for PostHog
 
 ```dart
 Future<void> onSignup() async {
@@ -128,6 +128,7 @@ class CampaignData {
 ```
 
 Example response:
+
 ```dart
 {
   "deeplink": "myapp://product/123",
@@ -191,7 +192,7 @@ Future<void> setIntegrationData() async {
 
 ### Parameters for `Linkrunner.setAdditionalData`
 
-- `clevertapId`: String (optional) - CleverTap user identifier
+-   `clevertapId`: String (optional) - CleverTap user identifier
 
 This method allows you to connect user identities across different analytics and marketing platforms.
 
@@ -207,6 +208,7 @@ Future<void> trackEvent() async {
       eventData: { // Optional: Event data
         'product_id': '12345',
         'category': 'electronics',
+        'amount': 99.99, // Include amount as a number for revenue sharing with ad networks like Google and Meta
       },
     );
     print('Event tracked successfully');
@@ -215,6 +217,33 @@ Future<void> trackEvent() async {
   }
 }
 ```
+
+### Revenue Sharing with Ad Networks
+
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+
+```dart
+Future<void> trackPurchaseEvent() async {
+  try {
+    await Linkrunner.trackEvent(
+      eventName: 'purchase_completed',
+      eventData: {
+        'product_id': '12345',
+        'category': 'electronics',
+        'amount': 149.99, // Revenue amount as a number
+      },
+    );
+    print('Purchase event with revenue tracked successfully');
+  } catch (e) {
+    print('Error tracking purchase event: $e');
+  }
+}
+```
+
+<Note>
+    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number (double
+    or int), not as a string.
+</Note>
 
 ## Revenue Tracking
 
@@ -257,23 +286,23 @@ Future<void> removePayment() async {
 
 #### Parameters for `LRCapturePayment`
 
-- `amount`: double (required) - The payment amount
-- `userId`: String (required) - Identifier for the user making the payment
-- `paymentId`: String (optional) - Unique identifier for the payment
-- `type`: PaymentType (optional) - Type of payment. Available options:
-    - `FIRST_PAYMENT` - First payment made by the user
-    - `WALLET_TOPUP` - Adding funds to a wallet
-    - `FUNDS_WITHDRAWAL` - Withdrawing funds
-    - `SUBSCRIPTION_CREATED` - New subscription created
-    - `SUBSCRIPTION_RENEWED` - Subscription renewal
-    - `ONE_TIME` - One-time payment
-    - `RECURRING` - Recurring payment
-    - `DEFAULT_PAYMENT` - Default type (used if not specified)
-- `status`: PaymentStatus (optional) - Status of the payment. Available options:
-    - `PAYMENT_INITIATED` - Payment has been initiated
-    - `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
-    - `PAYMENT_FAILED` - Payment attempt failed
-    - `PAYMENT_CANCELLED` - Payment was cancelled
+-   `amount`: double (required) - The payment amount
+-   `userId`: String (required) - Identifier for the user making the payment
+-   `paymentId`: String (optional) - Unique identifier for the payment
+-   `type`: PaymentType (optional) - Type of payment. Available options:
+    -   `FIRST_PAYMENT` - First payment made by the user
+    -   `WALLET_TOPUP` - Adding funds to a wallet
+    -   `FUNDS_WITHDRAWAL` - Withdrawing funds
+    -   `SUBSCRIPTION_CREATED` - New subscription created
+    -   `SUBSCRIPTION_RENEWED` - Subscription renewal
+    -   `ONE_TIME` - One-time payment
+    -   `RECURRING` - Recurring payment
+    -   `DEFAULT_PAYMENT` - Default type (used if not specified)
+-   `status`: PaymentStatus (optional) - Status of the payment. Available options:
+    -   `PAYMENT_INITIATED` - Payment has been initiated
+    -   `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
+    -   `PAYMENT_FAILED` - Payment attempt failed
+    -   `PAYMENT_CANCELLED` - Payment was cancelled
 
 ## Enhanced Privacy Controls
 
@@ -288,17 +317,17 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 
 ## Function Placement Guide
 
-| Function                          | Where to Place              | When to Call                             |
-| --------------------------------- | ------------------------- | ---------------------------------------- |
-| `Linkrunner.init`                 | App initialization        | Once when app starts                     |
-| `Linkrunner.getAttributionData`   | Attribution data handling flow | Whenever the attribution data is needed |
-| `Linkrunner.setAdditionalData` | Integration code                | When third-party integration IDs are available |
-| `Linkrunner.signup`               | Onboarding flow           | Once after user completes onboarding     |
-| `Linkrunner.setUserData`          | Authentication logic      | Every time app opens with logged-in user |
-| `Linkrunner.triggerDeeplink`      | After navigation init     | Once after navigation is ready           |
-| `Linkrunner.trackEvent`           | Throughout app            | When specific user actions occur         |
-| `Linkrunner.capturePayment`       | Payment processing        | When user makes a payment                |
-| `Linkrunner.removePayment`        | Refund flow               | When payment needs to be removed         |
+| Function                        | Where to Place                 | When to Call                                   |
+| ------------------------------- | ------------------------------ | ---------------------------------------------- |
+| `Linkrunner.init`               | App initialization             | Once when app starts                           |
+| `Linkrunner.getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed        |
+| `Linkrunner.setAdditionalData`  | Integration code               | When third-party integration IDs are available |
+| `Linkrunner.signup`             | Onboarding flow                | Once after user completes onboarding           |
+| `Linkrunner.setUserData`        | Authentication logic           | Every time app opens with logged-in user       |
+| `Linkrunner.triggerDeeplink`    | After navigation init          | Once after navigation is ready                 |
+| `Linkrunner.trackEvent`         | Throughout app                 | When specific user actions occur               |
+| `Linkrunner.capturePayment`     | Payment processing             | When user makes a payment                      |
+| `Linkrunner.removePayment`      | Refund flow                    | When payment needs to be removed               |
 
 ## Complete Example
 
