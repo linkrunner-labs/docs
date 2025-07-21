@@ -66,9 +66,14 @@ GET /campaigns
 
 #### Query Parameters
 
-| Parameter | Type   | Description                                      |
-| --------- | ------ | ------------------------------------------------ |
-| filter    | string | Filter campaigns by status (ACTIVE/INACTIVE/ALL) |
+| Parameter | Type    | Required | Description                                      |
+| --------- | ------ | -------- | ------------------------------------------------ |
+| filter    | string | No       | Filter campaigns by status (ACTIVE/INACTIVE/ALL) |
+| page      | string | No       | The page number to retrieve (for pagination) |
+| limit     | string | No       | The maximum number of results to return per page |
+
+#### Note
+If 'page' and 'limit' are not provided, all campaigns will be returned in the response.
 
 #### Example Request
 
@@ -152,6 +157,7 @@ GET /attributed-users
 
 #### Note
 If no timezone is provided, UTC (Coordinated Universal Time) will be used as the default timezone.
+If 'page' and 'limit' are not provided, all attributed users will be returned in the response.
 
 #### Time Format Details
 
