@@ -9,89 +9,66 @@ This guide provides step-by-step integration examples for popular web frameworks
 ## React
 
 <CodeGroup>
-```javascript Method 1: Script Tag in index.html
-// Add this to your public/index.html
-<script 
-  src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js"
-  token="your-token-here"
-  debug="true"
-></script>
+```bash Installation
+npm install linkrunner-web
+# or
+yarn add linkrunner-web
 ```
 
-```javascript Method 2: Dynamic Loading with useEffect
-import logo from './logo.svg';
-import './App.css';
-import React, { useEffect, useState } from 'react';
+```javascript Basic Setup
+import { useEffect } from 'react';
+import Linkrunner from 'linkrunner-web';
 
-function App() {
-  const [linkrunnerSDKLoaded, setLinkrunnerSDKLoaded] = useState(false);
-
+export default function App() {
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js';
-    script.async = true;
-
-    script.onload = () => {
-      setLinkrunnerSDKLoaded(true);
-      console.log('Linkrunner SDK loaded successfully');
-    };
-
-    document.body.appendChild(script);
-
-    return () => {
-      // Cleanup
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
+    initLinkrunner();
   }, []);
 
-  const handleInitViaDynamicLoading = async () => {
-    if (window.LinkrunnerSDK) {
-      const initOptions = {
-        token: 'your-token',
-        debug: true,
-      };
-
-      console.log('Initializing with options:', initOptions);
-      const response = await window.LinkrunnerSDK.capturePageView(initOptions);
-      alert(`Response: ${JSON.stringify(response)}`);
-    } else {
-      alert('Script not loaded yet!');
-    }
+  const initLinkrunner = async () => {
+    await Linkrunner.configure({
+      token: 'YOUR_PROJECT_TOKEN',
+      debug: false // Optional: Enable debug logging (default: false)
+    });
   };
 
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        {linkrunnerSDKLoaded && (
-          <button onClick={handleInitViaDynamicLoading} style={{
-            padding: '10px 20px',
-            fontSize: '16px',
-            margin: '10px',
-            cursor: 'pointer'
-          }}>
-            2. Test via dynamic loading
-          </button>
-        )}
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h1>My React App</h1>
+        <p>Linkrunner Web SDK is automatically tracking page views!</p>
       </header>
     </div>
   );
 }
+```
 
-export default App;
+```typescript TypeScript Support
+import { useEffect } from 'react';
+import Linkrunner, { SDKConfig } from 'linkrunner-web';
+
+export default function App() {
+  useEffect(() => {
+    initLinkrunner();
+  }, []);
+
+  const initLinkrunner = async () => {
+    const config: SDKConfig = {
+      token: 'YOUR_PROJECT_TOKEN',
+      debug: true
+    };
+
+    await Linkrunner.configure(config);
+  };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>My React App</h1>
+        <p>Linkrunner Web SDK is automatically tracking page views!</p>
+      </header>
+    </div>
+  );
+}
 ```
 
 {/* ```javascript Method 3: Custom useScript Hook
@@ -189,66 +166,59 @@ export default App;
 
 ## Next.js
 
-Dynamic Loading with useEffect approach adapted for Next.js:
+<CodeGroup>
+```bash Installation
+npm install linkrunner-web
+# or
+yarn add linkrunner-web
+```
 
 ```javascript pages/_app.js
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import Linkrunner from 'linkrunner-web';
 
 export default function MyApp({ Component, pageProps }) {
-  const [linkrunnerSDKLoaded, setLinkrunnerSDKLoaded] = useState(false);
-
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js';
-    script.async = true;
-
-    script.onload = () => {
-      setLinkrunnerSDKLoaded(true);
-      console.log('Linkrunner SDK loaded successfully');
-    };
-
-    document.body.appendChild(script);
-
-    return () => {
-      // Cleanup
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
+    initLinkrunner();
   }, []);
 
-  const handleInitViaDynamicLoading = async () => {
-    if (window.LinkrunnerSDK) {
-      const initOptions = {
-        token: 'your-token',
-        debug: true,
-      };
-
-      console.log('Initializing with options:', initOptions);
-      const response = await window.LinkrunnerSDK.capturePageView(initOptions);
-      alert(`Response: ${JSON.stringify(response)}`);
-    } else {
-      alert('Script not loaded yet!');
-    }
+  const initLinkrunner = async () => {
+    await Linkrunner.configure({
+      token: 'YOUR_PROJECT_TOKEN',
+      debug: false // Optional: Enable debug logging (default: false)
+    });
   };
 
   return (
-    <div>
-      <header>
-        <h1>Next.js App with Linkrunner SDK</h1>
-        {linkrunnerSDKLoaded && (
-          <button onClick={handleInitViaDynamicLoading} style={{
-            padding: '10px 20px',
-            fontSize: '16px',
-            margin: '10px',
-            cursor: 'pointer'
-          }}>
-            Initialize SDK via Dynamic Loading
-          </button>
-        )}
-      </header>
+    <>
       <Component {...pageProps} />
-    </div>
+    </>
   );
 }
-``` 
+```
+
+```javascript app/layout.js (App Router)
+'use client';
+import { useEffect } from 'react';
+import Linkrunner from 'linkrunner-web';
+
+export default function RootLayout({ children }) {
+  useEffect(() => {
+    initLinkrunner();
+  }, []);
+
+  const initLinkrunner = async () => {
+    await Linkrunner.configure({
+      token: 'YOUR_PROJECT_TOKEN',
+      debug: false
+    });
+  };
+
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+</CodeGroup> 
