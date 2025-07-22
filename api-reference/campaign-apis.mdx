@@ -1,0 +1,271 @@
+---
+title: "Campaign APIs"
+description: "Documentation for Linkrunner Campaign APIs"
+icon: "rocket"
+---
+
+## Base URL
+
+```
+https://api.linkrunner.io/api/v1
+```
+
+## Authentication
+
+All API requests require authentication using an API key. You must include this key in the header of every request.
+
+### API Key Header
+
+Include the following header in all API requests:
+
+```
+linkrunner-key: YOUR_API_KEY
+```
+
+Replace `YOUR_API_KEY` with your actual API key.
+
+### Obtaining Your API Key
+
+You can find your API key on the Linkrunner settings page:
+
+1. Go to https://www.linkrunner.io/settings?s=data-apis
+2. Locate your Server key on this page
+3. Use this key in the `linkrunner-key` header for all API requests
+
+Keep your API key confidential. Do not share it or expose it in client-side code. Always make API requests from a secure server-side environment.
+
+### Error Responses
+
+-   **401 Unauthorized**
+    -   `"Server key missing!"`
+    -   `"Server key invalid!"`
+-   **429 Too Many Requests**
+-   Message: `"Rate limit exceeded. Please try again later."`
+-   Cause: You've exceeded the rate limit of 10 requests per second.
+
+### Rate Limit Details
+
+-   Rate: 10 requests per second
+-   Status code on limit exceeded: 429 (Too Many Requests)
+
+## Endpoints
+
+### 1. Create Campaign
+
+Create a new campaign.
+
+#### Request
+
+```
+POST /create-campaign
+```
+
+#### Request Body
+
+```json
+{
+    "name": "Summer Sale 2023",
+    "deeplink": "https://app.domain.com/promo/summer25",
+    "link_for_desktop_users": "https://www.your-website.com",
+    "custom_display_id": "summer-sale-2025"
+}
+```
+
+| Parameter              | Type   | Description                                          |
+| ---------------------- | ------ | ---------------------------------------------------- |
+| name                   | string | **Required**. Name of the campaign                   |
+| deeplink               | string | **Optional**. Deep link URL for the campaign         |
+| link_for_desktop_users | string | **Optional**. For desktop visitors                   |
+| custom_display_id      | string | **Optional**. Custom identifier for display purposes |
+
+#### Response
+
+```json
+{
+    "msg": "Campaign created successfully!",
+    "status": 201,
+    "data": {
+        "id": 123,
+        "name": "Summer Sale 2023",
+        "link": "https://app.domain.com/promo/summer25",
+        "website": "https://www.your-website.com",
+        "custom_display_id": "summer-sale-2025",
+        "created_at": "2023-05-01T12:00:00Z"
+    }
+}
+```
+
+### 2. Edit Campaign
+
+Update an existing campaign.
+
+#### Request
+
+```
+PATCH /api/v1/campaigns/:display_id
+```
+
+#### Request Body
+
+```json
+{
+    "name": "campaign name",
+    "active": false
+}
+```
+
+| Parameter | Type    | Description                   |
+| --------- | ------- | ----------------------------- |
+| name      | string  | **Optional**. Name of the campaign |
+| active    | boolean | **Optional**. Campaign status |
+
+#### Responses
+
+1. **200** Campaign updated successfully
+2. **400** Invalid request parameters
+3. **404** Campaign not found
+4. **500** Internal server error
+
+#### Success Response
+
+```json
+{
+    "msg": "Campaign updated successfully!",
+    "status": 200,
+    "data": {
+        "display_id": "TOhmGM",
+        "name": "campaign name",
+        "created_at": "2025-07-09T17:18:41.912Z",
+        "update_at": "2025-07-17T08:58:26.740Z",
+        "google": false,
+        "meta": false,
+        "meta_campaign_id": "",
+        "meta_web_to_app": false,
+        "active": false,
+        "default_link": true,
+        "attributed_users": 0
+    }
+}
+```
+
+#### Error Responses
+
+| HTTP Status | Message | When/Why |
+| ----------- | ------- | -------- |
+| 400 | "Campaign display ID is required!" | If the display_id param is missing |
+| 400 | "At least one field (name or active) is required for update!" | If both name and active are missing in the request body |
+| 400 | "Campaign name cannot be empty!" | If name is provided but is empty or only whitespace |
+| 400 | "Active field must be a boolean!" | If active is provided but is not a boolean |
+| 404 | "Campaign not found!" | If the campaign with the given display_id does not exist |
+| 500 | "Internal server error" |  |
+
+### 3. Delete Campaign
+
+Delete an existing campaign.
+
+#### Request
+
+```
+DELETE /api/v1/campaigns/:display_id
+```
+
+#### Responses
+
+1. **204** Campaign deleted successfully
+2. **400** Invalid request parameters
+3. **404** Campaign not found
+4. **500** Internal server error
+
+#### Success Response
+
+```json
+{
+    "msg": "Campaign deleted successfully!",
+    "status": 204
+}
+```
+
+#### Error Responses
+
+| HTTP Status | Message | When/Why |
+| ----------- | ------- | -------- |
+| 400 | "Campaign display ID is required!" | If the display_id param is missing |
+| 404 | "Campaign not found!" | If the campaign with the given display_id does not exist |
+| 500 | "Internal server error" |  |
+
+## Best Practices
+
+1. **Campaign naming**: Use descriptive names that identify the purpose of the campaign
+2. **Deep links**: Ensure your deep links are properly formatted and lead to valid destinations
+3. **Custom IDs**: Use meaningful custom display IDs that are easy to recognize and remember. Duplicate ids are not allowed!
+4. **Desktop links**: Provide a `link_for_desktop_users` URL to ensure desktop visitors are redirected to a relevant webpage instead of app stores.
+
+## Examples
+
+### Creating a New Campaign
+
+```javascript
+fetch("https://api.linkrunner.io/api/v1/create-campaign", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "linkrunner-key": "YOUR-SERVER-KEY",
+    },
+    body: JSON.stringify({
+        name: "Product Launch 2023",
+        deeplink: "https://app.domain.com/promo/summer25",
+        link_for_desktop_users: "https://www.your-website.com",
+        custom_display_id: "summer-sale-2025",
+    }),
+})
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error("Error:", error));
+```
+
+### Editing a Campaign
+
+```javascript
+fetch("https://api.linkrunner.io/api/v1/campaigns/TOhmGM", {
+    method: "PUT",
+    headers: {
+        "Content-Type": "application/json",
+        "linkrunner-key": "YOUR-SERVER-KEY",
+    },
+    body: JSON.stringify({
+        name: "Updated Campaign Name",
+        active: true,
+    }),
+})
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error("Error:", error));
+```
+
+### Deleting a Campaign
+
+```javascript
+fetch("https://api.linkrunner.io/api/v1/campaigns/TOhmGM", {
+    method: "DELETE",
+    headers: {
+        "linkrunner-key": "YOUR-SERVER-KEY",
+    },
+})
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error("Error:", error));
+```
+
+## Error Handling
+
+The API will return appropriate HTTP status codes along with error messages when issues occur. Common errors across all endpoints include:
+
+-   **400 Bad Request**: Missing required parameters or invalid input
+-   **401 Unauthorized**: API key is required or invalid
+-   **404 Not Found**: Campaign not found
+-   **429 Too Many Requests**: You've exceeded the rate limit, please try again later
+-   **500 Internal Server Error**: Contact support if this persists
+
+Specific error responses for each endpoint are detailed in their respective sections above.
+
+For any help please reach out to [darshil@linkrunner.io](mailto:darshil@linkrunner.io)

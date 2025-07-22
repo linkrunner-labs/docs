@@ -66,9 +66,14 @@ GET /campaigns
 
 #### Query Parameters
 
-| Parameter | Type   | Description                                      |
-| --------- | ------ | ------------------------------------------------ |
-| filter    | string | Filter campaigns by status (ACTIVE/INACTIVE/ALL) |
+| Parameter | Type    | Required | Description                                      |
+| --------- | ------ | -------- | ------------------------------------------------ |
+| filter    | string | No       | Filter campaigns by status (ACTIVE/INACTIVE/ALL) |
+| page      | string | No       | The page number to retrieve (for pagination) |
+| limit     | string | No       | The maximum number of results to return per page |
+
+#### Note
+If 'page' and 'limit' are not provided, all campaigns will be returned in the response.
 
 #### Example Request
 
@@ -147,9 +152,12 @@ GET /attributed-users
 | start_timestamp  | string | No       | Start time in ISO 8601 format (e.g., "2025-06-12T19:00:00")    |
 | end_timestamp    | string | No       | End time in ISO 8601 format (e.g., "2025-06-12T19:00:00")      |
 | timezone    | string | No       | IANA timezone identifier. See [IANA Time Zone Database](https://nodatime.org/TimeZones) |
+| page        |  string | No      | The page number to retrieve (for pagination). Defaults to 1 if not specified. |
+| limit       | string   | No     | The maximum number of results to return per page. Defaults to 10 if not specified. |
 
 #### Note
 If no timezone is provided, UTC (Coordinated Universal Time) will be used as the default timezone.
+If 'page' and 'limit' are not provided, all attributed users will be returned in the response.
 
 #### Time Format Details
 
