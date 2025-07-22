@@ -126,15 +126,13 @@ Call `setUserData` each time the app opens and the user is logged in:
 ```javascript
 const setUserData = async () => {
     await linkrunner.setUserData({
-        user_data: {
-            id: "123", // Required: User ID
-            name: "John Doe", // Optional
-            phone: "9876543210", // Optional
-            email: "user@example.com", // Optional
-            mixpanel_distinct_id: "mixpanel_distinct_id", // Optional - Mixpanel Distinct ID
-            amplitude_device_id: "amplitude_device_id", // Optional - Amplitude User ID
-            posthog_distinct_id: "posthog_distinct_id", // Optional - PostHog Distinct ID
-        },
+        id: "123", // Required: User ID
+        name: "John Doe", // Optional
+        phone: "9876543210", // Optional
+        email: "user@example.com", // Optional
+        mixpanel_distinct_id: "mixpanel_distinct_id", // Optional - Mixpanel Distinct ID
+        amplitude_device_id: "amplitude_device_id", // Optional - Amplitude User ID
+        posthog_distinct_id: "posthog_distinct_id", // Optional - PostHog Distinct ID
     });
 };
 ```
