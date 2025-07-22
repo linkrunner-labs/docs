@@ -50,7 +50,11 @@ Keep your API key confidential. Do not share it or expose it in client-side code
 
 ## Endpoints
 
-### 1. Create Campaign
+### 1. List Campaigns
+
+For getting/listing existing campaigns, please refer to the [List Campaigns API documentation](https://docs.linkrunner.io/api-reference/data-apis#1-list-campaigns).
+
+### 2. Create Campaign
 
 Create a new campaign.
 
@@ -114,10 +118,10 @@ PATCH /api/v1/campaigns/:display_id
 }
 ```
 
-| Parameter | Type    | Description                   |
-| --------- | ------- | ----------------------------- |
+| Parameter | Type    | Description                        |
+| --------- | ------- | ---------------------------------- |
 | name      | string  | **Optional**. Name of the campaign |
-| active    | boolean | **Optional**. Campaign status |
+| active    | boolean | **Optional**. Campaign status      |
 
 #### Responses
 
@@ -150,14 +154,14 @@ PATCH /api/v1/campaigns/:display_id
 
 #### Error Responses
 
-| HTTP Status | Message | When/Why |
-| ----------- | ------- | -------- |
-| 400 | "Campaign display ID is required!" | If the display_id param is missing |
-| 400 | "At least one field (name or active) is required for update!" | If both name and active are missing in the request body |
-| 400 | "Campaign name cannot be empty!" | If name is provided but is empty or only whitespace |
-| 400 | "Active field must be a boolean!" | If active is provided but is not a boolean |
-| 404 | "Campaign not found!" | If the campaign with the given display_id does not exist |
-| 500 | "Internal server error" |  |
+| HTTP Status | Message                                                       | When/Why                                                 |
+| ----------- | ------------------------------------------------------------- | -------------------------------------------------------- |
+| 400         | "Campaign display ID is required!"                            | If the display_id param is missing                       |
+| 400         | "At least one field (name or active) is required for update!" | If both name and active are missing in the request body  |
+| 400         | "Campaign name cannot be empty!"                              | If name is provided but is empty or only whitespace      |
+| 400         | "Active field must be a boolean!"                             | If active is provided but is not a boolean               |
+| 404         | "Campaign not found!"                                         | If the campaign with the given display_id does not exist |
+| 500         | "Internal server error"                                       |                                                          |
 
 ### 3. Delete Campaign
 
@@ -187,11 +191,11 @@ DELETE /api/v1/campaigns/:display_id
 
 #### Error Responses
 
-| HTTP Status | Message | When/Why |
-| ----------- | ------- | -------- |
-| 400 | "Campaign display ID is required!" | If the display_id param is missing |
-| 404 | "Campaign not found!" | If the campaign with the given display_id does not exist |
-| 500 | "Internal server error" |  |
+| HTTP Status | Message                            | When/Why                                                 |
+| ----------- | ---------------------------------- | -------------------------------------------------------- |
+| 400         | "Campaign display ID is required!" | If the display_id param is missing                       |
+| 404         | "Campaign not found!"              | If the campaign with the given display_id does not exist |
+| 500         | "Internal server error"            |                                                          |
 
 ## Best Practices
 
