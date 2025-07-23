@@ -6,13 +6,19 @@ icon: "rocket"
 
 This guide will help you install and set up the Linkrunner SDK in your Expo application.
 
+
+<Info>
+**Migrating from an older version?**  
+For instructions on upgrading to version 3.0.0 or higher, see the [Migration Guide](#migration-guide-for-version-3-0-0) below.
+</Info>
+
 ## Requirements
 
 - Expo SDK 52.0 or higher
 - Node.js 18.0 or higher
 - React Native 0.70 or higher
 
-## Installation
+## Installation (For Linkrunner Expo SDK version **3.0.0 or lower**)
 
 ### Step 1: Install the Package
 
@@ -54,6 +60,71 @@ For iOS, to access the advertising identifier (IDFA), add the expo-tracking-tran
 ### Android Configuration
 
 No additional configuration is required for Android. The SDK automatically handles the necessary permissions.
+
+## Migration Guide for Version 3.0.0
+
+### Architecture Changes
+
+Starting with version 3.0.0, the Expo SDK has been redesigned to use a new architecture:
+
+- **Config Plugin Architecture**: The SDK now uses an Expo config plugin for better integration with the Expo ecosystem
+- **React Native SDK**: Business logic is now handled by the React Native SDK, ensuring consistency across platforms
+- **Improved Developer Experience**: Simplified setup with automatic native configuration
+
+### Breaking Changes
+
+- The package installation process has changed to require both React Native and Expo SDKs
+- Plugin configuration is now required in `app.json`
+
+### Migration Steps
+
+If you're upgrading from a previous version:
+
+1. **Uninstall the old package**:
+   ```bash
+   npx expo uninstall expo-linkrunner
+   ```
+
+2. **Install both SDKs** (see Installation section below)
+
+3. **Update your app.json** to include the new plugin configuration
+
+## Installation (For Linkrunner Expo SDK version **3.0.0 or higher**)
+
+### Step 1: Install Both Packages
+
+Install both the React Native and Expo packages:
+
+```bash
+npm install rn-linkrunner
+
+npx expo install expo-linkrunner
+```
+
+## Configuration
+
+### Add Plugin to app.json
+
+**Important**: You must add the expo-linkrunner plugin to your `app.json` plugins array:
+
+```json
+{
+    "expo": {
+        "plugins": [
+            "expo-linkrunner"
+        ]
+    }
+}
+```
+
+## What the `expo-linkrunner` plugin does?
+
+When you add `expo-linkrunner` to your `app.json` plugins and run the Expo prebuild step, the config plugin automatically makes the following changes to your iOS project:
+
+- **Adds `NSUserTrackingUsageDescription`** in your iOS Info.plist if not already present. 
+- **Automatically applies the `expo-tracking-transparency` plugin** with a default permission message
+
+These changes are required for IDFA (Identifier for Advertisers) tracking and to comply with Apple's App Tracking Transparency (ATT) requirements.
 
 ## Next Steps
 
