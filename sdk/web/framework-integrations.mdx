@@ -10,26 +10,18 @@ This guide provides step-by-step integration examples for popular web frameworks
 
 <CodeGroup>
 ```bash Installation
-npm install linkrunner-web
+npm install @linkrunner/web-sdk
 # or
-yarn add linkrunner-web
+yarn add @linkrunner/web-sdk
 ```
 
 ```javascript Basic Setup
-import { useEffect } from 'react';
-import Linkrunner from 'linkrunner-web';
+import { useLinkrunner } from '@linkrunner/web-sdk';
 
 export default function App() {
-  useEffect(() => {
-    initLinkrunner();
-  }, []);
-
-  const initLinkrunner = async () => {
-    await Linkrunner.configure({
-      token: 'YOUR_PROJECT_TOKEN',
-      debug: false // Optional: Enable debug logging (default: false)
-    });
-  };
+  useLinkrunner({
+    token: "YOUR_PROJECT_TOKEN",
+  });
 
   return (
     <div className="App">
@@ -43,22 +35,13 @@ export default function App() {
 ```
 
 ```typescript TypeScript Support
-import { useEffect } from 'react';
-import Linkrunner, { SDKConfig } from 'linkrunner-web';
+import { useLinkrunner } from '@linkrunner/web-sdk';
 
 export default function App() {
-  useEffect(() => {
-    initLinkrunner();
-  }, []);
-
-  const initLinkrunner = async () => {
-    const config: SDKConfig = {
-      token: 'YOUR_PROJECT_TOKEN',
-      debug: true
-    };
-
-    await Linkrunner.configure(config);
-  };
+  useLinkrunner({
+    token: "YOUR_PROJECT_TOKEN",
+    debug: true, // Optional: Enable debug logging (default: false)
+  });
 
   return (
     <div className="App">
@@ -168,26 +151,18 @@ export default App;
 
 <CodeGroup>
 ```bash Installation
-npm install linkrunner-web
+npm install @linkrunner/web-sdk
 # or
-yarn add linkrunner-web
+yarn add @linkrunner/web-sdk
 ```
 
 ```javascript pages/_app.js
-import { useEffect } from 'react';
-import Linkrunner from 'linkrunner-web';
+import { useLinkrunner } from '@linkrunner/web-sdk';
 
 export default function MyApp({ Component, pageProps }) {
-  useEffect(() => {
-    initLinkrunner();
-  }, []);
-
-  const initLinkrunner = async () => {
-    await Linkrunner.configure({
-      token: 'YOUR_PROJECT_TOKEN',
-      debug: false // Optional: Enable debug logging (default: false)
-    });
-  };
+  useLinkrunner({
+    token: "8u01kLwGQpE27BHvciexNdkv",
+  });
 
   return (
     <>
@@ -199,20 +174,12 @@ export default function MyApp({ Component, pageProps }) {
 
 ```javascript app/layout.js (App Router)
 'use client';
-import { useEffect } from 'react';
-import Linkrunner from 'linkrunner-web';
+import { useLinkrunner } from '@linkrunner/web-sdk';
 
 export default function RootLayout({ children }) {
-  useEffect(() => {
-    initLinkrunner();
-  }, []);
-
-  const initLinkrunner = async () => {
-    await Linkrunner.configure({
-      token: 'YOUR_PROJECT_TOKEN',
-      debug: false
-    });
-  };
+  useLinkrunner({
+    token: "8u01kLwGQpE27BHvciexNdkv",
+  });
 
   return (
     <html lang="en">
