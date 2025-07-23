@@ -16,7 +16,7 @@ yarn add @linkrunner/web-sdk
 ```
 
 ```javascript Basic Setup
-import { useLinkrunner } from '@linkrunner/web-sdk';
+import { useLinkrunner } from '@linkrunner/web-sdk/react';
 
 export default function App() {
   useLinkrunner({
@@ -35,7 +35,7 @@ export default function App() {
 ```
 
 ```typescript TypeScript Support
-import { useLinkrunner } from '@linkrunner/web-sdk';
+import { useLinkrunner } from '@linkrunner/web-sdk/react';
 
 export default function App() {
   useLinkrunner({
@@ -157,7 +157,7 @@ yarn add @linkrunner/web-sdk
 ```
 
 ```javascript pages/_app.js
-import { useLinkrunner } from '@linkrunner/web-sdk';
+import { useLinkrunner } from '@linkrunner/web-sdk/react';
 
 export default function MyApp({ Component, pageProps }) {
   useLinkrunner({
@@ -174,7 +174,7 @@ export default function MyApp({ Component, pageProps }) {
 
 ```javascript app/layout.js (App Router)
 'use client';
-import { useLinkrunner } from '@linkrunner/web-sdk';
+import { useLinkrunner } from '@linkrunner/web-sdk/react';
 
 export default function RootLayout({ children }) {
   useLinkrunner({
