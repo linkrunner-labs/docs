@@ -25,8 +25,9 @@ struct MyApp: App {
             do {
                 try await LinkrunnerSDK.shared.initialize(
                     token: "YOUR_PROJECT_TOKEN",
-                    keyId: "YOUR_KEY_ID", // Required for SDK signing
-                    secretKey: "YOUR_SECRET_KEY" // Required for SDK signing
+                    secretKey: "YOUR_SECRET_KEY", // Optional: Required for SDK signing
+                    keyId: "YOUR_KEY_ID", // Optional: Required for SDK signing
+                    debug: true // Optional: Enable debug mode for development (defaults to false)
                 )
                 print("Linkrunner initialized successfully")
             } catch {
@@ -49,6 +50,8 @@ For enhanced security, the LinkRunner SDK requires the following signing paramet
 
 -   **`secretKey`**: A unique secret key used for request signing and authentication
 -   **`keyId`**: A unique identifier for the key pair used in the signing process
+-   **`disableIdfa`** (optional): Boolean flag to disable IDFA collection (defaults to false)
+-   **`debug`** (optional): Boolean flag to enable debug mode for development (defaults to false)
 
 You can find your project token, secret key, and key ID [here](https://www.linkrunner.io/settings?s=sdk-signing).
 
