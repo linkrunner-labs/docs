@@ -6,54 +6,57 @@ icon: "rocket"
 
 This guide will help you install and set up the Linkrunner SDK in your Expo application.
 
+<Info>
+    **Migrating from an older version?** For instructions on upgrading from 1.x.x/2.x.x to version 3.x.x, see the
+    [Migration Guide](/sdk/expo/migration-guide).
+</Info>
+
 ## Requirements
 
-- Expo SDK 52.0 or higher
-- Node.js 18.0 or higher
-- React Native 0.70 or higher
+-   Expo SDK 52.0 or higher
+-   Node.js 18.0 or higher
+-   React Native 0.70 or higher
 
 ## Installation
 
-### Step 1: Install the Package
+### Step 1: Install Both Packages
 
-Install the Linkrunner package using Expo CLI:
+Install both the React Native and Expo packages:
 
 ```bash
+npm install rn-linkrunner
+
 npx expo install expo-linkrunner
-```
-
-### Step 2: Install Required Dependencies
-
-Install the peer dependencies required by expo-linkrunner:
-
-```bash
-npx expo install @react-native-async-storage/async-storage expo-device expo-network expo-tracking-transparency
 ```
 
 ## Configuration
 
-### iOS Configuration
+### Add Plugin to app.json
 
-For iOS, to access the advertising identifier (IDFA), add the expo-tracking-transparency plugin to your `app.json`:
+**Important**: You must add the expo-linkrunner plugin to your `app.json` plugins array:
 
 ```json
 {
     "expo": {
         "plugins": [
-            [
-                "expo-tracking-transparency",
-                {
-                    "userTrackingPermission": "This identifier will be used to deliver personalized ads and improve your app experience."
-                }
-            ]
+            "expo-linkrunner",
+            {
+                "userTrackingPermission": "This identifier will be used to deliver personalized ads.",
+                "debug": true
+            }
         ]
     }
 }
 ```
 
-### Android Configuration
+## What the `expo-linkrunner` plugin does?
 
-No additional configuration is required for Android. The SDK automatically handles the necessary permissions.
+When you add `expo-linkrunner` to your `app.json` plugins and run the Expo prebuild step, the config plugin automatically makes the following changes to your iOS project:
+
+-   **Adds `NSUserTrackingUsageDescription`** in your iOS Info.plist if not already present.
+-   **Automatically applies the `expo-tracking-transparency` plugin** with a default permission message
+
+These changes are required for IDFA (Identifier for Advertisers) tracking and to comply with Apple's App Tracking Transparency (ATT) requirements.
 
 ## Next Steps
 
