@@ -38,7 +38,13 @@ npx expo install expo-linkrunner
 ```json
 {
     "expo": {
-        "plugins": ["expo-linkrunner"]
+        "plugins": [
+            "expo-linkrunner",
+            {
+                "userTrackingPermission": "This identifier will be used to deliver personalized ads.",
+                "debug": true
+            }
+        ]
     }
 }
 ```
