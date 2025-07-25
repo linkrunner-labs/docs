@@ -39,7 +39,7 @@
                             },
                             {
                                 "group": "Expo",
-                                "pages": ["sdk/expo/installation", "sdk/expo/usage", "sdk/expo/migration-guide"]
+                                "pages": ["sdk/expo/installation", "sdk/expo/migration-guide"]
                             },
                             {
                                 "group": "Deep Linking",
