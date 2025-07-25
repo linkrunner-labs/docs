@@ -64,11 +64,14 @@ These changes are required for IDFA (Identifier for Advertisers) tracking and to
 
 The `expo-linkrunner` package is a config plugin that automatically configures your Expo project for Linkrunner SDK integration. Once you've completed the installation and configuration steps above:
 
-1. **Prebuild your project** (if using a custom development client):
+1. **Prebuild your project**:
 
-    ```bash
-    npx expo prebuild
-    ```
+    - **For EAS Build**: If your `android` and `ios` folders are in `.gitignore` (recommended), EAS Build will automatically run the prebuild step during the build process. No manual action required.
+
+    - **For local development or custom development clients**:
+        ```bash
+        npx expo prebuild
+        ```
 
 2. **Follow the React Native usage guide**: Since `expo-linkrunner` is a config plugin that prepares your project, the actual SDK usage is identical to React Native. Please refer to the [React Native Usage Guide](/sdk/react-native/usage) for:
     - Initializing the SDK
