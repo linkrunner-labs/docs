@@ -264,23 +264,6 @@ When using subdomains for deep linking, you can create a structured approach to 
     }
     ```
 
-    ### Step 3: Use Linkrunner SDK to handle incoming links
-
-    The Linkrunner SDK provides methods to manage and track deep links:
-
-    ```dart
-    import 'package:linkrunner/linkrunner.dart';
-
-    // Initialize the SDK
-    await LinkRunner.initialize('YOUR_API_KEY');
-
-    // Listen for deep links
-    LinkRunner.onDeepLink((url) {
-      print('Deep link received: $url');
-      // Your custom handling logic
-    });
-    ```
-
   </Tab>
 </Tabs>
 
