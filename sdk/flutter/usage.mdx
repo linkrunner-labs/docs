@@ -35,6 +35,7 @@ Future<void> initLinkrunner() async {
       'YOUR_PROJECT_TOKEN',
       'YOUR_SECRET_KEY', // Optional: Required for SDK signing
       'YOUR_KEY_ID', // Optional: Required for SDK signing
+      true, // Optional: Enable debug mode for development (defaults to false)
     );
     print('Linkrunner initialized');
   } catch (e) {
