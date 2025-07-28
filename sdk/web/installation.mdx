@@ -1,0 +1,93 @@
+---
+title: "Web Installation"
+description: "How to install the Linkrunner SDK for web applications"
+icon: "globe"
+---
+
+This guide will help you install and set up the Linkrunner SDK in your web application.
+
+## Requirements
+
+-   Modern browser (Chrome 60+, Firefox 55+, Safari 12+, Edge 79+)
+-   JavaScript ES6+ support
+-   HTTPS enabled (recommended for production)
+
+## Getting Your Web SDK Token
+
+Before installing the SDK, you'll need to obtain your Web SDK token:
+
+1. Go to [https://linkrunner.io/dashboard](https://linkrunner.io/dashboard)
+2. In the top navigation, click on **Settings**
+3. In the left sidebar, select **Web SDK**
+4. Copy your **Web SDK Token** from this page
+
+
+## Installation
+
+### CDN
+
+Add the Linkrunner SDK to your HTML:
+
+```html
+<!-- Auto-initialize from script attributes -->
+<script src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js" token="YOUR_PROJECT_TOKEN" debug="true"></script>
+```
+
+### NPM Package
+
+```bash
+# Using npm
+npm install @linkrunner/web-sdk
+
+# Using yarn
+yarn add @linkrunner/web-sdk
+```
+
+### Module Import
+
+After installing via NPM, import the SDK:
+
+```javascript
+// ES Module
+import LinkrunnerSDK from "@linkrunner/web-sdk";
+
+// CommonJS
+const LinkrunnerSDK = require("@linkrunner/web-sdk");
+```
+
+## Configuration
+
+### Script Attributes (CDN)
+
+When using the CDN version, configure via script attributes:
+
+```html
+<script
+    src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js"
+    token="YOUR_PROJECT_TOKEN"
+></script>
+```
+
+### Manual Initialization
+
+For manual initialization or when using NPM:
+
+```javascript
+window.LinkrunnerSDK.init({
+    token: "YOUR_PROJECT_TOKEN",
+});
+```
+
+## Verification
+
+To verify the SDK is working:
+
+1. Open your browser's developer console
+2. Look for "Linkrunner SDK initialized" message
+3. Check that no errors are displayed
+
+> **Note:** Enable debug mode during development to see detailed logs.
+
+## Next Steps
+
+After installation, proceed to the [Usage Guide](/sdk/web/usage) to learn how to initialize and use the Linkrunner SDK in your web application.

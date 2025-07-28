@@ -1,0 +1,108 @@
+---
+title: "Framework Integrations"
+description: "Integration guides for popular web frameworks with the Linkrunner Web SDK"
+icon: "puzzle"
+---
+
+This guide provides integration examples for popular web frameworks. Each section includes complete code examples and best practices.
+
+## React
+
+### Installation
+
+```bash
+npm install @linkrunner/web-sdk
+# or
+yarn add @linkrunner/web-sdk
+```
+
+### Basic Setup
+
+```javascript
+import { useLinkrunner } from "@linkrunner/web-sdk/react";
+
+export default function App() {
+    useLinkrunner({
+        token: "YOUR_PROJECT_TOKEN",
+        debug: true, // Enable debug logging in development
+    });
+
+    return (
+        <div className="App">
+            <h1>My React App</h1>
+            <p>Linkrunner SDK is automatically tracking page views!</p>
+        </div>
+    );
+}
+```
+
+### With React Router
+
+```javascript
+import { useLinkrunner } from "@linkrunner/web-sdk/react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+function App() {
+    useLinkrunner({
+        token: "YOUR_PROJECT_TOKEN",
+    });
+
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/about" element={<About />} />
+            </Routes>
+        </BrowserRouter>
+    );
+}
+```
+
+## Next.js
+
+### Installation
+
+```bash
+npm install @linkrunner/web-sdk
+# or
+yarn add @linkrunner/web-sdk
+```
+
+### Pages Router
+
+```javascript
+// pages/_app.js
+import { useLinkrunner } from "@linkrunner/web-sdk/react";
+
+export default function MyApp({ Component, pageProps }) {
+    useLinkrunner({
+        token: "YOUR_PROJECT_TOKEN",
+    });
+
+    return <Component {...pageProps} />;
+}
+```
+
+### App Router
+
+```javascript app/page.js (App Router)
+'use client';
+import { useLinkrunner } from '@linkrunner/web-sdk/react';
+
+export default function Home() {
+  useLinkrunner({
+    token: "YOUR_TOKEN_HERE",
+  });
+
+  return (
+    <div>
+        Example
+    </div>
+  );
+}
+```
+
+## Support
+
+If you encounter issues during integration, contact us at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).
