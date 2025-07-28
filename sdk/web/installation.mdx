@@ -12,6 +12,16 @@ This guide will help you install and set up the Linkrunner SDK in your web appli
 -   JavaScript ES6+ support
 -   HTTPS enabled (recommended for production)
 
+## Getting Your Web SDK Token
+
+Before installing the SDK, you'll need to obtain your Web SDK token:
+
+1. Go to [https://linkrunner.io/dashboard](https://linkrunner.io/dashboard)
+2. In the top navigation, click on **Settings**
+3. In the left sidebar, select **Web SDK**
+4. Copy your **Web SDK Token** from this page
+
+
 ## Installation
 
 ### CDN
@@ -55,8 +65,6 @@ When using the CDN version, configure via script attributes:
 <script
     src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js"
     token="YOUR_PROJECT_TOKEN"
-    api-url="https://api.linkrunner.io"
-    debug="false"
 ></script>
 ```
 
@@ -67,8 +75,6 @@ For manual initialization or when using NPM:
 ```javascript
 window.LinkrunnerSDK.init({
     token: "YOUR_PROJECT_TOKEN",
-    debug: true,
-    apiUrl: "https://api.linkrunner.io", // Optional: Custom API endpoint
 });
 ```
 
