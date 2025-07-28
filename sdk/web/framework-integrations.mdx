@@ -161,7 +161,7 @@ import { useLinkrunner } from '@linkrunner/web-sdk/react';
 
 export default function MyApp({ Component, pageProps }) {
   useLinkrunner({
-    token: "8u01kLwGQpE27BHvciexNdkv",
+    token: "YOUR_TOKEN_HERE",
   });
 
   return (
@@ -172,19 +172,19 @@ export default function MyApp({ Component, pageProps }) {
 }
 ```
 
-```javascript app/layout.js (App Router)
+```javascript app/page.js (App Router)
 'use client';
 import { useLinkrunner } from '@linkrunner/web-sdk/react';
 
-export default function RootLayout({ children }) {
+export default function Home() {
   useLinkrunner({
-    token: "8u01kLwGQpE27BHvciexNdkv",
+    token: "YOUR_TOKEN_HERE",
   });
 
   return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
+    <div>
+        YOOOO!!
+    </div>
   );
 }
 ```
