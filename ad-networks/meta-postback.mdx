@@ -1,20 +1,20 @@
 ---
-title: "Meta CAPI Integration"
-description: "Connect your app with Meta's Conversions API for enhanced conversion tracking and campaign optimization"
+title: "Meta Postback Integration"
+description: "Connect your app with Meta's postback for enhanced conversion tracking and campaign optimization"
 icon: "meta"
 ---
 
 ## Overview
 
-Meta Conversions API (CAPI) integration with Linkrunner enables you to send conversion data directly from your server to Meta, providing more reliable tracking and better campaign optimization. This server-side integration helps improve data accuracy, reduces the impact of iOS 14.5+ changes, and enhances your ability to measure and optimize Facebook and Instagram ad campaigns.
+Meta postback integration with Linkrunner enables you to send conversion data directly from your server to Meta, providing more reliable tracking and better campaign optimization. This server-side integration helps improve data accuracy, reduces the impact of iOS 14.5+ changes, and enhances your ability to measure and optimize Facebook and Instagram ad campaigns.
 
 ## Setup Process
 
-Setting up Meta CAPI integration involves four main steps: creating a Meta developer app, setting up a dataset ID, generating an access token, and configuring Linkrunner with your credentials.
+Setting up Meta postback integration involves four main steps: creating a Meta developer app, setting up a dataset ID, generating an access token, and configuring Linkrunner with your credentials.
 
 ## Prerequisites
 
-Before setting up Meta CAPI with Linkrunner, ensure you have:
+Before setting up Meta postback with Linkrunner, ensure you have:
 
 - A Meta Business account
 - Admin access to the Meta app you want to integrate
@@ -86,14 +86,14 @@ To authenticate your server's API requests to Meta, you'll need to generate an a
     Your access token grants access to send data to Meta on behalf of the account. Keep it secure and never expose it in client-side code.
 </Note>
 
-## 4. Configure Linkrunner with Meta CAPI
+## 4. Configure Linkrunner with Meta Postback
 
 Now that you have all the required credentials, configure them in your Linkrunner dashboard.
 
 ### Step 1: Access Linkrunner Settings
 
 1. Go to your [Linkrunner Dashboard](https://linkrunner.io/dashboard)
-2. Navigate to **Settings** → **Meta Integration** → **Conversions API**
+2. Navigate to **Settings** → **Meta Integration** → **Meta Conversion Postback Integration**
 
 ### Step 2: Enter Configuration Details
 
@@ -125,7 +125,7 @@ After setting up your integration, verify that events are being sent correctly.
 ## Important Notes
 
 <Note>
-    After configuring Meta CAPI, it might take up to **1 hour** for events to show up in Meta Events Manager. This is a normal processing delay from Meta's side.
+    After configuring Meta Postback, it might take up to **1 hour** for events to show up in Meta Events Manager. This is a normal processing delay from Meta's side.
 </Note>
 
 ## Troubleshooting
@@ -149,14 +149,6 @@ After setting up your integration, verify that events are being sent correctly.
 - Verify that user data is properly formatted according to Meta's requirements
 - Check for any data validation errors in the Meta Events Manager
 
-## Reference Resources
-
-For additional help with your Meta CAPI implementation:
-
-- [Meta Conversions API Documentation](https://developers.facebook.com/docs/marketing-api/conversions-api/)
-- [Meta Business Help Center](https://www.facebook.com/business/help/2041148702652965)
-- [Meta Events Manager Guide](https://www.facebook.com/business/help/1596608850646104)
-
 ---
 
-For any questions or assistance with Meta CAPI integration, please contact us at [darshil@linkrunner.io](mailto:darshil@linkrunner.io). 
+For any questions or assistance with Meta postback integration, please contact us at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).

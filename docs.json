@@ -67,7 +67,7 @@
                         "group": "Ad Network Integration",
                         "pages": [
                             "ad-networks/google-ads",
-                            "ad-networks/meta-capi"
+                            "ad-networks/meta-postback"
                         ]
                     },
                     {
