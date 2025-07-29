@@ -1,0 +1,162 @@
+---
+title: "Meta CAPI Integration"
+description: "Connect your app with Meta's Conversions API for enhanced conversion tracking and campaign optimization"
+icon: "meta"
+---
+
+## Overview
+
+Meta Conversions API (CAPI) integration with Linkrunner enables you to send conversion data directly from your server to Meta, providing more reliable tracking and better campaign optimization. This server-side integration helps improve data accuracy, reduces the impact of iOS 14.5+ changes, and enhances your ability to measure and optimize Facebook and Instagram ad campaigns.
+
+## Setup Process
+
+Setting up Meta CAPI integration involves four main steps: creating a Meta developer app, setting up a dataset ID, generating an access token, and configuring Linkrunner with your credentials.
+
+## Prerequisites
+
+Before setting up Meta CAPI with Linkrunner, ensure you have:
+
+- A Meta Business account
+- Admin access to the Meta app you want to integrate
+- Access to Meta Events Manager
+- Your mobile app published on App Store or Google Play Store
+
+## 1. Create a Meta Developer App
+
+If you don't already have a Meta developer app, follow these steps:
+
+### Step 1: Access Meta for Developers
+
+1. Go to [Meta for Developers](https://developers.facebook.com/)
+2. Click on **"My Apps"** in the top navigation
+3. Click **"Create App"** and follow the prompts
+
+### Step 2: Configure App Settings
+
+1. Select **"Business"** as the app type
+2. Fill in the required information including:
+   - App name
+   - App contact email
+   - Business account (if applicable)
+3. Click **"Create App"** to complete the setup
+
+<Note>
+    Make note of your **App ID** as you'll need this for the Linkrunner configuration.
+</Note>
+
+## 2. Create a Dataset ID
+
+A dataset ID is required to link your app with Meta's events system and enable conversion tracking.
+
+### Step 1: Access Meta Events Manager
+
+1. Go to [Meta Events Manager](https://www.facebook.com/events_manager2/)
+2. Click the **"Datasets"** tab on the left side of the page
+3. Select the mobile app you want to link to your dataset
+
+### Step 2: Create the Dataset
+
+1. Click **"Settings"** at the top of the page
+2. Find the **"Linking"** section and click **"Link"**
+3. Read about datasets, then click **"Next"**
+4. Choose how you want to create your dataset:
+   - **"Create from a pixel ID"** (if you have an existing pixel)
+   - **"Create new"** (recommended for most mobile apps)
+5. Click **"Next"**
+6. Check the box to confirm you've read the notice
+7. Click **"Create"**
+
+## 3. Generate an Access Token
+
+To authenticate your server's API requests to Meta, you'll need to generate an access token.
+
+### Step 1: Navigate to Dataset Settings
+
+1. Go to your dataset in Events Manager
+2. Navigate to **"Settings"**
+3. Scroll down and search for **"generate token"**
+
+### Step 2: Generate the Token
+
+1. Click on the token generation option
+2. Follow the flow to generate a token
+3. Copy and securely store this token
+
+<Note>
+    Your access token grants access to send data to Meta on behalf of the account. Keep it secure and never expose it in client-side code.
+</Note>
+
+## 4. Configure Linkrunner with Meta CAPI
+
+Now that you have all the required credentials, configure them in your Linkrunner dashboard.
+
+### Step 1: Access Linkrunner Settings
+
+1. Go to your [Linkrunner Dashboard](https://linkrunner.io/dashboard)
+2. Navigate to **Settings** → **Meta Integration** → **Conversions API**
+
+### Step 2: Enter Configuration Details
+
+Enter the following information:
+- **Meta App ID** (from Step 1)
+- **Meta Dataset ID** (from Step 2)
+- **Access Token** (from Step 3)
+
+### Step 3: Save Configuration
+
+1. Review all entered information for accuracy
+2. Click **"Save"** to complete the configuration
+
+## 5. Test Your Integration
+
+After setting up your integration, verify that events are being sent correctly.
+
+### Step 1: Trigger Test Events
+
+1. Trigger a test event in your app (such as an app install or in-app purchase)
+2. Wait a few minutes for the event to be processed
+
+### Step 2: Verify in Meta Events Manager
+
+1. Go to Meta Events Manager and select your dataset
+2. Click on **"Test Events"** to see if your event was received
+3. Verify that the event data is accurate and complete
+
+## Important Notes
+
+<Note>
+    After configuring Meta CAPI, it might take up to **1 hour** for events to show up in Meta Events Manager. This is a normal processing delay from Meta's side.
+</Note>
+
+## Troubleshooting
+
+### Events Not Showing Up
+
+- Ensure all credentials (App ID, Dataset ID, Access Token) were copied correctly
+- Wait the full 1 hour for Meta's processing
+- Verify that your app is sending events to Linkrunner
+- Check that your access token has the necessary permissions
+
+### Configuration Issues
+
+- Make sure your Meta developer app is properly configured
+- Verify your dataset is linked to the correct mobile app
+- Double-check that your access token is active and hasn't expired
+
+### Data Quality Issues
+
+- Ensure your app is sending complete event data
+- Verify that user data is properly formatted according to Meta's requirements
+- Check for any data validation errors in the Meta Events Manager
+
+## Reference Resources
+
+For additional help with your Meta CAPI implementation:
+
+- [Meta Conversions API Documentation](https://developers.facebook.com/docs/marketing-api/conversions-api/)
+- [Meta Business Help Center](https://www.facebook.com/business/help/2041148702652965)
+- [Meta Events Manager Guide](https://www.facebook.com/business/help/1596608850646104)
+
+---
+
+For any questions or assistance with Meta CAPI integration, please contact us at [darshil@linkrunner.io](mailto:darshil@linkrunner.io). 
