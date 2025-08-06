@@ -325,7 +325,6 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 | `Linkrunner.setAdditionalData`  | Integration code               | When third-party integration IDs are available |
 | `Linkrunner.signup`             | Onboarding flow                | Once after user completes onboarding           |
 | `Linkrunner.setUserData`        | Authentication logic           | Every time app opens with logged-in user       |
-| `Linkrunner.triggerDeeplink`    | After navigation init          | Once after navigation is ready                 |
 | `Linkrunner.trackEvent`         | Throughout app                 | When specific user actions occur               |
 | `Linkrunner.capturePayment`     | Payment processing             | When user makes a payment                      |
 | `Linkrunner.removePayment`      | Refund flow                    | When payment needs to be removed               |
@@ -376,20 +375,8 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _initialized = true;
       });
-      // Handle any deeplinks after navigation is set up
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        triggerDeeplink();
-      });
     } catch (e) {
       print('Error initializing Linkrunner: $e');
-    }
-  }
-
-  Future<void> triggerDeeplink() async {
-    try {
-      await Linkrunner.triggerDeeplink();
-    } catch (e) {
-      print('Error triggering deeplink: $e');
     }
   }
 
