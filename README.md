@@ -22,4 +22,4 @@ Run the following command at the root of your documentation (where docs.json is)
 mintlify dev
 ```
 
-7th July - 1
+7th July - 2
