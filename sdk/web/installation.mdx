@@ -78,6 +78,31 @@ window.LinkrunnerSDK.init({
 });
 ```
 
+### Getting Store Links (CDN)
+
+After initialization, you can use the `getStoreLink` function:
+
+```javascript
+// Initialize the SDK first
+window.LinkrunnerSDK.init({
+    token: "YOUR_PROJECT_TOKEN",
+});
+
+// Get store link
+async function handleGetStoreLink() {
+    try {
+        const storeLink = await LinkrunnerSDK.getStoreLink();
+        console.log("Store link:", storeLink);
+        // Use the store link as needed
+    } catch (error) {
+        console.error("Error getting store link:", error);
+    }
+}
+
+// Call the function when needed
+handleGetStoreLink();
+```
+
 ## Verification
 
 To verify the SDK is working:

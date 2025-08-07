@@ -36,6 +36,39 @@ export default function App() {
 }
 ```
 
+### Getting Store Links
+
+Use the `getStoreLink` function to retrieve store links for your products:
+
+```javascript
+import { useLinkrunner } from "@linkrunner/web-sdk/react";
+
+export default function ProductComponent() {
+    const { getStoreLink } = useLinkrunner({
+        token: "YOUR_PROJECT_TOKEN",
+    });
+
+    const handleGetStoreLink = async () => {
+        try {
+            const storeLink = await getStoreLink();
+            console.log("Store link:", storeLink);
+            // Use the store link as needed
+        } catch (error) {
+            console.error("Error getting store link:", error);
+        }
+    };
+
+    return (
+        <div>
+            <h2>Product Page</h2>
+            <button onClick={handleGetStoreLink}>
+                Get Store Link
+            </button>
+        </div>
+    );
+}
+```
+
 ### With React Router
 
 ```javascript
