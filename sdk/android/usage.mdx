@@ -413,8 +413,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Trigger deeplink when navigation is ready
-        triggerDeeplink()
 
         // Set user data if user is logged in
         if (isUserLoggedIn()) {
@@ -439,16 +437,6 @@ class MainActivity : AppCompatActivity() {
                 LinkRunner.getInstance().setUserData(userData)
             } catch (e: Exception) {
                 println("Error setting user data: ${e.message}")
-            }
-        }
-    }
-
-    private fun triggerDeeplink() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                LinkRunner.getInstance().triggerDeeplink()
-            } catch (e: Exception) {
-                println("Error triggering deeplink: ${e.message}")
             }
         }
     }

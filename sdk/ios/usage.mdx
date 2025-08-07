@@ -321,7 +321,6 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 | `LinkRunner.getInstance().setAdditionalData` | Integration code               | When third-party integration IDs are available           |
 | `LinkrunnerSDK.shared.signup`                | Onboarding flow                | Once after user completes onboarding                     |
 | `LinkrunnerSDK.shared.setUserData`           | Authentication logic           | Every time app opens with logged-in user                 |
-| `LinkrunnerSDK.shared.triggerDeeplink`       | After navigation init          | Once after your navigation is ready to handle deep links |
 | `LinkrunnerSDK.shared.trackEvent`            | Throughout app                 | When specific user actions occur                         |
 | `LinkrunnerSDK.shared.capturePayment`        | Payment processing             | When user makes a payment                                |
 | `LinkrunnerSDK.shared.removePayment`         | Refund flow                    | When payment needs to be removed                         |
@@ -375,16 +374,7 @@ struct ContentView: View {
                 .buttonStyle(.borderedProminent)
             }
             .padding()
-            .onAppear {
-                Task {
-                    await triggerDeeplink()
-                }
-            }
         }
-    }
-
-    func triggerDeeplink() async {
-        await LinkrunnerSDK.shared.triggerDeeplink()
     }
 
     func trackCustomEvent() async {

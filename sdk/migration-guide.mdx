@@ -4,7 +4,7 @@ description: "Learn how to migrate from 0.x.x to 1.x.x versions"
 icon: "arrow-right-arrow-left"
 ---
 
-We've made important updates to our SDKs, removing the previously used `trigger` method and introducing three new methods: `signup`, `setUserData`, and `triggerDeeplink`. This guide explains how to migrate your existing code to use these new methods.
+We've made important updates to our SDKs, removing the previously used `trigger` method and introducing three new methods: `signup` and `setUserData`. This guide explains how to migrate your existing code to use these new methods.
 
 ## Do I need to migrate?
 
@@ -55,15 +55,10 @@ If you're installing our SDK for the first time with version 1.0.0 or above, you
               ),
             );
             ```
-            - Use `triggerDeeplink` after navigation is initialized:
-            ```dart
-            await linkrunner.triggerDeeplink();
-            ```
 
     2. **Recommended Implementation:**
         - Call `signup` once, immediately after user onboarding.
         - Call `setUserData` whenever the user is logged in and opens the app.
-        - Call `triggerDeeplink` once your app navigation is ready.
 
     These changes ensure more precise control and improved functionality within your Flutter application.
 
@@ -100,15 +95,10 @@ If you're installing our SDK for the first time with version 1.0.0 or above, you
                 },
             });
             ```
-            - Use `triggerDeeplink` after navigation is initialized:
-            ```javascript
-            await linkrunner.triggerDeeplink();
-            ```
 
     2. **Recommended Implementation:**
         - Call `signup` once, immediately after user onboarding.
         - Call `setUserData` whenever the user is logged in and opens the app.
-        - Call `triggerDeeplink` once your app navigation is ready.
 
     These changes ensure more precise control and improved functionality within your React Native application.
 
