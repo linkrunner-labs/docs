@@ -51,7 +51,9 @@ export default function ProductComponent() {
     const handleGetStoreLink = async () => {
         try {
             const storeLink = await getStoreLink();
-            console.log("Store link:", storeLink);
+            if (storeLink) {
+                window.open(storeLink, "_blank");
+            }
             // Use the store link as needed
         } catch (error) {
             console.error("Error getting store link:", error);
@@ -61,9 +63,7 @@ export default function ProductComponent() {
     return (
         <div>
             <h2>Product Page</h2>
-            <button onClick={handleGetStoreLink}>
-                Get Store Link
-            </button>
+            <button onClick={handleGetStoreLink}>Get Store Link</button>
         </div>
     );
 }
@@ -120,19 +120,15 @@ export default function MyApp({ Component, pageProps }) {
 ### App Router
 
 ```javascript app/page.js (App Router)
-'use client';
-import { useLinkrunner } from '@linkrunner/web-sdk/react';
+"use client";
+import { useLinkrunner } from "@linkrunner/web-sdk/react";
 
 export default function Home() {
-  useLinkrunner({
-    token: "YOUR_TOKEN_HERE",
-  });
+    useLinkrunner({
+        token: "YOUR_TOKEN_HERE",
+    });
 
-  return (
-    <div>
-        Example
-    </div>
-  );
+    return <div>Example</div>;
 }
 ```
 
