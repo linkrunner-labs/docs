@@ -8,8 +8,9 @@ This guide will help you install and set up the Linkrunner SDK in your Flutter a
 
 ## Requirements
 
--   Flutter 3.0 or higher
--   Dart 3.3 or higher
+-   Flutter 3.19.0 or higher
+-   Dart 3.3.0 or higher
+-   iOS 15.0+ / Android 5.0 (API level 21) and above
 
 ## Installation
 
@@ -54,10 +55,10 @@ android {
 
 #### iOS Configuration
 
-1. Update your iOS deployment target to iOS 12.0 or higher in your `ios/Podfile`:
+1. Update your iOS deployment target to iOS 15.0 or higher in your `ios/Podfile`:
 
 ```ruby
-platform :ios, '12.0'
+platform :ios, '15.0'
 ```
 
 2. Add the following to your `Info.plist` file for App Tracking Transparency:
@@ -71,15 +72,15 @@ platform :ios, '12.0'
 
 The Linkrunner SDK uses the following packages:
 
--   advertising_id
--   android_play_install_referrer
--   app_links
--   connectivity_plus
--   device_info_plus
--   http
--   package_info_plus
--   shared_preferences
--   url_launcher
+-   advertising_id: ^2.7.1
+-   android_play_install_referrer: ^0.4.0
+-   app_links: ^6.1.4
+-   connectivity_plus: ^6.0.3
+-   device_info_plus: ^11.0.0
+-   http: ^1.2.1
+-   package_info_plus: ^8.0.0
+-   shared_preferences: ^2.0.11
+-   url_launcher: ^6.2.6
 
 These are automatically installed when you add the Linkrunner SDK to your application.
 

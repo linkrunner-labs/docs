@@ -34,7 +34,7 @@ If you're installing our SDK for the first time with version 1.0.0 or above, you
         - **New Methods:**
             - Use `signup` after your onboarding process:
             ```dart
-            await linkrunner.signup(
+            await LinkRunner().signup(
               userData: LRUserData(
                 id: '1',
                 name: 'John Doe',
@@ -46,7 +46,7 @@ If you're installing our SDK for the first time with version 1.0.0 or above, you
             ```
             - Use `setUserData` every time the app opens with a logged-in user:
             ```dart
-            await linkrunner.setUserData(
+            await LinkRunner().setUserData(
               userData: LRUserData(
                 id: '1',
                 name: 'John Doe',

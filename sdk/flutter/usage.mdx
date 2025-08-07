@@ -4,15 +4,37 @@ description: "How to use the Linkrunner SDK in your Flutter app"
 icon: "flutter"
 ---
 
-# Using the Flutter SDK
-
-This guide will help you implement Linkrunner functionality in your Flutter application.
-
 ## Initializing the SDK
 
 Initialize the Linkrunner SDK when your app starts:
 
 You can find your project token [here](https://www.linkrunner.io/dashboard?s=members&m=documentation).
+
+```dart
+import 'package:linkrunner/linkrunner.dart';
+
+Future<void> initLinkrunner() async {
+  try {
+    // Initialize with your project token and SDK signing parameters
+    await LinkRunner().init(
+      'YOUR_PROJECT_TOKEN',
+      'YOUR_SECRET_KEY', // Optional: Required for SDK signing
+      'YOUR_KEY_ID', // Optional: Required for SDK signing
+      true, // Optional: Enable debug mode for development (defaults to false)
+    );
+    print('LinkRunner initialized');
+  } catch (e) {
+    print('Error initializing LinkRunner: $e');
+  }
+}
+
+// Call this in your app's initialization
+@override
+void initState() {
+  super.initState();
+  initLinkrunner();
+}
+```
 
 ### SDK Signing Parameters (Optional)
 
@@ -24,32 +46,6 @@ For enhanced security, the LinkRunner SDK requires the following signing paramet
 You can find your project token, secret key, and key ID [here](https://www.linkrunner.io/settings?s=sdk-signing).
 
 Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
-
-```dart
-import 'package:linkrunner/linkrunner.dart';
-
-Future<void> initLinkrunner() async {
-  try {
-    // Initialize with your project token and SDK signing parameters
-    await Linkrunner.init(
-      'YOUR_PROJECT_TOKEN',
-      'YOUR_SECRET_KEY', // Optional: Required for SDK signing
-      'YOUR_KEY_ID', // Optional: Required for SDK signing
-      true, // Optional: Enable debug mode for development (defaults to false)
-    );
-    print('Linkrunner initialized');
-  } catch (e) {
-    print('Error initializing Linkrunner: $e');
-  }
-}
-
-// Call this in your app's initialization
-@override
-void initState() {
-  super.initState();
-  initLinkrunner();
-}
-```
 
 ## User Registration
 
@@ -70,7 +66,7 @@ If the platform's identifier function is not called, you must provide a user ide
 ```dart
 Future<void> onSignup() async {
   try {
-    await Linkrunner.signup(
+    await LinkRunner().signup(
       userData: LRUserData(
         id: '123', // Required: User ID
         name: 'John Doe', // Optional
@@ -99,7 +95,7 @@ To get attribution data and deeplink information for the current installation, u
 ```dart
 Future<void> getAttributionInfo() async {
   try {
-    final attributionData = await Linkrunner.getAttributionData();
+    final attributionData = await LinkRunner().getAttributionData();
     print('Attribution data: $attributionData');
   } catch (e) {
     print('Error getting attribution data: $e');
@@ -154,7 +150,7 @@ Call `setUserData` each time the app opens and the user is logged in:
 ```dart
 Future<void> setUserData() async {
   try {
-    await Linkrunner.setUserData(
+    await LinkRunner().setUserData(
       userData: LRUserData(
         id: '123', // Required: User ID
         name: 'John Doe', // Optional
@@ -179,9 +175,9 @@ Use the `setAdditionalData` method to set CleverTap ID:
 ```dart
 Future<void> setIntegrationData() async {
   try {
-    await Linkrunner.setAdditionalData(
+    await LinkRunner().setAdditionalData(
       integrationData: {
-        'clevertapId': 'YOUR_CLEVERTAP_USER_ID', // CleverTap user identifier
+        'clevertap_id': 'YOUR_CLEVERTAP_USER_ID', // CleverTap user identifier
       },
     );
     print('CleverTap ID set successfully');
@@ -191,9 +187,9 @@ Future<void> setIntegrationData() async {
 }
 ```
 
-### Parameters for `Linkrunner.setAdditionalData`
+### Parameters for `LinkRunner.setAdditionalData`
 
--   `clevertapId`: String (optional) - CleverTap user identifier
+-   `clevertap_id`: String (optional) - CleverTap user identifier
 
 This method allows you to connect user identities across different analytics and marketing platforms.
 
@@ -204,7 +200,7 @@ Track custom events in your app:
 ```dart
 Future<void> trackEvent() async {
   try {
-    await Linkrunner.trackEvent(
+    await LinkRunner().trackEvent(
       eventName: 'purchase_initiated', // Event name
       eventData: { // Optional: Event data
         'product_id': '12345',
@@ -226,7 +222,7 @@ To enable revenue sharing with ad networks like Google Ads and Meta, include an 
 ```dart
 Future<void> trackPurchaseEvent() async {
   try {
-    await Linkrunner.trackEvent(
+    await LinkRunner().trackEvent(
       eventName: 'purchase_completed',
       eventData: {
         'product_id': '12345',
@@ -255,7 +251,7 @@ Track payment information:
 ```dart
 Future<void> capturePayment() async {
   try {
-    await Linkrunner.capturePayment(
+    await LinkRunner().capturePayment(
       capturePayment: LRCapturePayment(
         amount: 99.99, // Required: Payment amount
         userId: 'user123', // Required: User identifier
@@ -272,7 +268,7 @@ Future<void> capturePayment() async {
 
 Future<void> removePayment() async {
   try {
-    await Linkrunner.removePayment(
+    await LinkRunner().removePayment(
       removePayment: LRRemovePayment(
         userId: 'user123', // Either userId or paymentId must be provided
         paymentId: 'payment456', // Optional: Unique payment identifier
@@ -291,19 +287,19 @@ Future<void> removePayment() async {
 -   `userId`: String (required) - Identifier for the user making the payment
 -   `paymentId`: String (optional) - Unique identifier for the payment
 -   `type`: PaymentType (optional) - Type of payment. Available options:
-    -   `FIRST_PAYMENT` - First payment made by the user
-    -   `WALLET_TOPUP` - Adding funds to a wallet
-    -   `FUNDS_WITHDRAWAL` - Withdrawing funds
-    -   `SUBSCRIPTION_CREATED` - New subscription created
-    -   `SUBSCRIPTION_RENEWED` - Subscription renewal
-    -   `ONE_TIME` - One-time payment
-    -   `RECURRING` - Recurring payment
-    -   `DEFAULT_PAYMENT` - Default type (used if not specified)
+    -   `PaymentType.FIRST_PAYMENT` - First payment made by the user
+    -   `PaymentType.WALLET_TOPUP` - Adding funds to a wallet
+    -   `PaymentType.FUNDS_WITHDRAWAL` - Withdrawing funds
+    -   `PaymentType.SUBSCRIPTION_CREATED` - New subscription created
+    -   `PaymentType.SUBSCRIPTION_RENEWED` - Subscription renewal
+    -   `PaymentType.ONE_TIME` - One-time payment
+    -   `PaymentType.RECURRING` - Recurring payment
+    -   `PaymentType.DEFAULT_PAYMENT` - Default type (used if not specified)
 -   `status`: PaymentStatus (optional) - Status of the payment. Available options:
-    -   `PAYMENT_INITIATED` - Payment has been initiated
-    -   `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
-    -   `PAYMENT_FAILED` - Payment attempt failed
-    -   `PAYMENT_CANCELLED` - Payment was cancelled
+    -   `PaymentStatus.PAYMENT_INITIATED` - Payment has been initiated
+    -   `PaymentStatus.PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
+    -   `PaymentStatus.PAYMENT_FAILED` - Payment attempt failed
+    -   `PaymentStatus.PAYMENT_CANCELLED` - Payment was cancelled
 
 ## Enhanced Privacy Controls
 
@@ -311,23 +307,23 @@ The SDK offers options to enhance user privacy:
 
 ```dart
 // Enable PII (Personally Identifiable Information) hashing
-Linkrunner.enablePIIHashing(true);
+LinkRunner().enablePIIHashing(true);
 ```
 
 When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
 
 ## Function Placement Guide
 
-| Function                        | Where to Place                 | When to Call                                   |
-| ------------------------------- | ------------------------------ | ---------------------------------------------- |
-| `Linkrunner.init`               | App initialization             | Once when app starts                           |
-| `Linkrunner.getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed        |
-| `Linkrunner.setAdditionalData`  | Integration code               | When third-party integration IDs are available |
-| `Linkrunner.signup`             | Onboarding flow                | Once after user completes onboarding           |
-| `Linkrunner.setUserData`        | Authentication logic           | Every time app opens with logged-in user       |
-| `Linkrunner.trackEvent`         | Throughout app                 | When specific user actions occur               |
-| `Linkrunner.capturePayment`     | Payment processing             | When user makes a payment                      |
-| `Linkrunner.removePayment`      | Refund flow                    | When payment needs to be removed               |
+| Function                          | Where to Place                 | When to Call                                   |
+| --------------------------------- | ------------------------------ | ---------------------------------------------- |
+| `LinkRunner().init`               | App initialization             | Once when app starts                           |
+| `LinkRunner().getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed        |
+| `LinkRunner().setAdditionalData`  | Integration code               | When third-party integration IDs are available |
+| `LinkRunner().signup`             | Onboarding flow                | Once after user completes onboarding           |
+| `LinkRunner().setUserData`        | Authentication logic           | Every time app opens with logged-in user       |
+| `LinkRunner().trackEvent`         | Throughout app                 | When specific user actions occur               |
+| `LinkRunner().capturePayment`     | Payment processing             | When user makes a payment                      |
+| `LinkRunner().removePayment`      | Refund flow                    | When payment needs to be removed               |
 
 ## Complete Example
 
@@ -371,12 +367,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _initializeLinkrunner() async {
     try {
-      final initData = await Linkrunner.init('YOUR_PROJECT_TOKEN');
+      await LinkRunner().init('YOUR_PROJECT_TOKEN');
       setState(() {
         _initialized = true;
       });
     } catch (e) {
-      print('Error initializing Linkrunner: $e');
+      print('Error initializing LinkRunner: $e');
     }
   }
 
@@ -388,11 +384,11 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Linkrunner ${_initialized ? 'Initialized' : 'Initializing...'}'),
+            Text('LinkRunner ${_initialized ? 'Initialized' : 'Initializing...'}'),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
-                await Linkrunner.trackEvent('button_clicked');
+                await LinkRunner().trackEvent(eventName: 'button_clicked');
               },
               child: Text('Track Custom Event'),
             ),
