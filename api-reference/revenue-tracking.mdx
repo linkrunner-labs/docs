@@ -4,8 +4,6 @@ description: "Documentation for Linkrunner Revenue Tracking API"
 icon: "money-bill"
 ---
 
-This documentation is for tracking revenue from your backend only! For tracking revenue from your app please go through the [Flutter](https://pub.dev/packages/linkrunner) or [React Native](https://www.npmjs.com/package/rn-linkrunner) documentation.
-
 ## Base URL
 
 ```
@@ -41,6 +39,30 @@ POST: /capture-payment
 ```
 
 **NOTE:** If you accept payments in multiple currencies convert them to one currency before calling the API.
+
+**Deduplication:** We perform idempotent deduplication using `payment_id`. If you send multiple requests with the same `payment_id`, only the first will be recorded and subsequent ones will be ignored. To ensure idempotency, always provide a unique `payment_id` per transaction.
+
+### Payment types
+
+-   **FIRST_PAYMENT**: User's first payment
+-   **WALLET_TOPUP**: Adding funds to a wallet
+-   **FUNDS_WITHDRAWAL**: Withdrawing funds
+-   **SUBSCRIPTION_CREATED**: Subscription started
+-   **SUBSCRIPTION_RENEWED**: Subscription renewed
+-   **ONE_TIME**: One-time payment
+-   **RECURRING**: Recurring payment
+-   **DEFAULT**: Generic/unspecified payment type
+
+If `type` is omitted, it defaults to **DEFAULT**.
+
+### Payment status
+
+-   **PAYMENT_INITIATED**: Payment has been initiated
+-   **PAYMENT_COMPLETED**: Payment completed successfully
+-   **PAYMENT_FAILED**: Payment attempt failed
+-   **PAYMENT_CANCELLED**: Payment was cancelled
+
+If `status` is omitted, it defaults to **PAYMENT_COMPLETED**.
 
 ### Responses
 
