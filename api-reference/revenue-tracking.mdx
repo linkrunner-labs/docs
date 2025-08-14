@@ -34,17 +34,19 @@ POST: /capture-payment
     "payment_id": "ABC", // optional but recommended
     "amount": 25096, // Send amount in one currency only
     "type": "FIRST_PAYMENT", // optional
+    // "type": "SECOND_PAYMENT", // optional
     "status": "PAYMENT_COMPLETED" // optional
 }
 ```
 
 **NOTE:** If you accept payments in multiple currencies convert them to one currency before calling the API.
 
-**Deduplication:** We perform idempotent deduplication using `payment_id`. If you send multiple requests with the same `payment_id`, only the first will be recorded and subsequent ones will be ignored. To ensure idempotency, always provide a unique `payment_id` per transaction.
+**Deduplication:** We perform idempotent deduplication using a combination of `type` and `payment_id`. For each unique combination of payment type and payment ID, only one record will be created. If you send multiple requests with the same `type` and `payment_id` combination, only the first will be recorded and subsequent ones will be ignored. To ensure proper deduplication, always provide a unique `payment_id` for each transaction of a given type.
 
 ### Payment types
 
 -   **FIRST_PAYMENT**: User's first payment
+-   **SECOND_PAYMENT**: User's second payment
 -   **WALLET_TOPUP**: Adding funds to a wallet
 -   **FUNDS_WITHDRAWAL**: Withdrawing funds
 -   **SUBSCRIPTION_CREATED**: Subscription started

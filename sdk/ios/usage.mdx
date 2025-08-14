@@ -259,6 +259,7 @@ func capturePayment() async {
 ```swift
 public enum PaymentType: String, Sendable {
     case firstPayment = "FIRST_PAYMENT"
+    case secondPayment = "SECOND_PAYMENT"
     case walletTopup = "WALLET_TOPUP"
     case fundsWithdrawal = "FUNDS_WITHDRAWAL"
     case subscriptionCreated = "SUBSCRIPTION_CREATED"
@@ -314,16 +315,16 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 
 ## Function Placement Guide
 
-| Function                                     | Where to Place                 | When to Call                                             |
-| -------------------------------------------- | ------------------------------ | -------------------------------------------------------- |
-| `LinkrunnerSDK.shared.initialize`            | App initialization             | Once when app starts                                     |
-| `LinkrunnerSDK.shared.getAttributionData`    | Attribution data handling flow | Whenever the attribution data is needed                  |
-| `LinkRunner.getInstance().setAdditionalData` | Integration code               | When third-party integration IDs are available           |
-| `LinkrunnerSDK.shared.signup`                | Onboarding flow                | Once after user completes onboarding                     |
-| `LinkrunnerSDK.shared.setUserData`           | Authentication logic           | Every time app opens with logged-in user                 |
-| `LinkrunnerSDK.shared.trackEvent`            | Throughout app                 | When specific user actions occur                         |
-| `LinkrunnerSDK.shared.capturePayment`        | Payment processing             | When user makes a payment                                |
-| `LinkrunnerSDK.shared.removePayment`         | Refund flow                    | When payment needs to be removed                         |
+| Function                                     | Where to Place                 | When to Call                                   |
+| -------------------------------------------- | ------------------------------ | ---------------------------------------------- |
+| `LinkrunnerSDK.shared.initialize`            | App initialization             | Once when app starts                           |
+| `LinkrunnerSDK.shared.getAttributionData`    | Attribution data handling flow | Whenever the attribution data is needed        |
+| `LinkRunner.getInstance().setAdditionalData` | Integration code               | When third-party integration IDs are available |
+| `LinkrunnerSDK.shared.signup`                | Onboarding flow                | Once after user completes onboarding           |
+| `LinkrunnerSDK.shared.setUserData`           | Authentication logic           | Every time app opens with logged-in user       |
+| `LinkrunnerSDK.shared.trackEvent`            | Throughout app                 | When specific user actions occur               |
+| `LinkrunnerSDK.shared.capturePayment`        | Payment processing             | When user makes a payment                      |
+| `LinkrunnerSDK.shared.removePayment`         | Refund flow                    | When payment needs to be removed               |
 
 ## Complete Example
 

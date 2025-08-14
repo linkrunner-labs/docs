@@ -257,6 +257,7 @@ Future<void> capturePayment() async {
         userId: 'user123', // Required: User identifier
         paymentId: 'payment456', // Optional: Unique payment identifier
         type: PaymentType.FIRST_PAYMENT, // Optional: Payment type
+        // type: PaymentType.SECOND_PAYMENT, // Optional: Payment type
         status: PaymentStatus.PAYMENT_COMPLETED, // Optional: Payment status
       ),
     );
@@ -288,6 +289,7 @@ Future<void> removePayment() async {
 -   `paymentId`: String (optional) - Unique identifier for the payment
 -   `type`: PaymentType (optional) - Type of payment. Available options:
     -   `PaymentType.FIRST_PAYMENT` - First payment made by the user
+    -   `PaymentType.SECOND_PAYMENT` - Second payment made by the user
     -   `PaymentType.WALLET_TOPUP` - Adding funds to a wallet
     -   `PaymentType.FUNDS_WITHDRAWAL` - Withdrawing funds
     -   `PaymentType.SUBSCRIPTION_CREATED` - New subscription created

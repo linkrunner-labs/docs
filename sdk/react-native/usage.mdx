@@ -201,6 +201,7 @@ const capturePayment = async () => {
         userId: "user123", // User identifier
         paymentId: "payment456", // Optional: Unique payment identifier
         type: "FIRST_PAYMENT", // Optional: Payment type
+        // type: "SECOND_PAYMENT", // Optional: Payment type
         status: "PAYMENT_COMPLETED", // Optional: Payment status
     });
 };
@@ -213,6 +214,7 @@ const capturePayment = async () => {
 -   `paymentId`: string (optional) - Unique identifier for the payment
 -   `type`: string (optional) - Type of payment. Available options:
     -   `FIRST_PAYMENT` - First payment made by the user
+    -   `SECOND_PAYMENT` - Second payment made by the user
     -   `WALLET_TOPUP` - Adding funds to a wallet
     -   `FUNDS_WITHDRAWAL` - Withdrawing funds
     -   `SUBSCRIPTION_CREATED` - New subscription created

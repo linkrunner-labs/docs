@@ -270,6 +270,7 @@ private fun capturePayment() {
                 userId = "user123",         // Required: User identifier
                 amount = 99.99,              // Required: Payment amount
                 type = PaymentType.FIRST_PAYMENT,  // Optional: Defaults to DEFAULT
+                // type = PaymentType.SECOND_PAYMENT,  // Optional: Defaults to DEFAULT
                 status = PaymentStatus.PAYMENT_COMPLETED  // Optional: Defaults to PAYMENT_COMPLETED
             )
 
@@ -292,6 +293,7 @@ private fun capturePayment() {
 | Type                   | Description              |
 | ---------------------- | ------------------------ |
 | `FIRST_PAYMENT`        | User's first payment     |
+| `SECOND_PAYMENT`       | User's second payment    |
 | `WALLET_TOPUP`         | Adding funds to wallet   |
 | `FUNDS_WITHDRAWAL`     | Withdrawing funds        |
 | `SUBSCRIPTION_CREATED` | New subscription created |
