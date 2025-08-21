@@ -93,13 +93,60 @@ POST /create-campaign
         "name": "Summer Sale 2023",
         "link": "https://app.domain.com/promo/summer25",
         "website": "https://www.your-website.com",
-        "custom_display_id": "summer-sale-2025",
+        "display_id": "summer-sale-2025",
         "created_at": "2023-05-01T12:00:00Z"
     }
 }
 ```
 
-### 2. Edit Campaign
+### 2.1. Create Campaign with Short Link
+
+Create a new campaign with a short link by including the `is_shortlink: true` parameter.
+
+#### Request
+
+```
+POST /create-campaign
+```
+
+#### Request Body
+
+```json
+{
+    "name": "Spring Launch 2024",
+    "deeplink": "https://app.domain.com/promo/spring24",
+    "link_for_desktop_users": "https://www.your-website.com",
+    "custom_display_id": "spring-launch-2024",
+    "is_shortlink": true
+}
+```
+
+| Parameter              | Type    | Description                                          |
+| ---------------------- | ------- | ---------------------------------------------------- |
+| name                   | string  | **Required**. Name of the campaign                   |
+| deeplink               | string  | **Optional**. Deep link URL for the campaign         |
+| link_for_desktop_users | string  | **Optional**. For desktop visitors                   |
+| custom_display_id      | string  | **Optional**. Custom identifier for display purposes |
+| is_shortlink           | boolean | **Required**. Set to `true` to create a short link   |
+
+#### Response
+
+```json
+{
+    "msg": "Campaign created successfully!",
+    "status": 201,
+    "data": {
+        "id": 123,
+        "name": "Summer Sale 2023",
+        "link": "https://app.domain.com/spring-launch-2024",
+        "website": null,
+        "display_id": "spring-launch-2024",
+        "created_at": "2023-05-01T12:00:00Z"
+    }
+}
+```
+
+### 3. Edit Campaign
 
 Update an existing campaign.
 
@@ -163,7 +210,7 @@ PATCH /api/v1/campaigns/:display_id
 | 404         | "Campaign not found!"                                         | If the campaign with the given display_id does not exist |
 | 500         | "Internal server error"                                       |                                                          |
 
-### 3. Delete Campaign
+### 4. Delete Campaign
 
 Delete an existing campaign.
 
