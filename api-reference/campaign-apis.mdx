@@ -66,28 +66,14 @@ POST /create-campaign
 
 #### Request Body Examples
 
-**Standard Campaign:**
+**Creating Campaign:**
 ```json
 {
     "name": "Summer Sale 2023",
     "deeplink": "https://app.domain.com/promo/summer25",
     "link_for_desktop_users": "https://www.your-website.com",
-    "link_for_android_users": "https://www.your-android-website.com",
-    "link_for_ios_users": "https://www.your-ios-website.com",
-    "custom_display_id": "summer-sale-2025"
-}
-```
-
-**Campaign with Short Link:**
-```json
-{
-    "name": "Summer Sale 2023",
-    "deeplink": "https://app.domain.com/promo/summer25",
-    "link_for_desktop_users": "https://www.your-website.com",
-    "link_for_android_users": "https://www.your-android-website.com",
-    "link_for_ios_users": "https://www.your-ios-website.com",
     "custom_display_id": "summer-sale-2025",
-    "is_shortlink": true
+    "is_shortlink": false //pass this as true to create a shortened campaign link
 }
 ```
 
@@ -98,10 +84,12 @@ POST /create-campaign
 | `name` | string | Yes | The display name of your campaign. This helps you identify the campaign in your dashboard. |
 | `deeplink` | string | No | The URL that mobile app users will be directed to when they click your campaign link. Should be a valid deep link URL for your mobile application. |
 | `link_for_desktop_users` | string | No | The fallback URL for desktop users who click your campaign link. Typically points to your website or web application. |
-| `link_for_android_users` | string | No | The fallback URL for android users who click your campaign link. Typically points to your website or web application. |
-| `link_for_ios_users` | string | No | The fallback URL for ios users who click your campaign link. Typically points to your website or web application. |
+| `android_web_redirect` | string | No | Provide this only if you want the user to be explicitly redirected to a specific web URL on Android. |
+| `ios_web_redirect` | string | No | Provide this only if you want the user to be explicitly redirected to a specific web URL on iOS. |
 | `custom_display_id` | string | No | A custom identifier for your campaign. Must be unique across your account. If not provided, a random ID will be generated. |
 | `is_shortlink` | boolean | No | Set to `true` to create a shortened campaign link. When enabled, creates a compact URL format suitable for sharing. |
+
+##### Note: If `android_web_redirect` or `ios_web_redirect` is provided, it will override the default store listing link for that platform within the campaign and redirect users to the specified URL instead.
 
 #### Response
 
@@ -115,8 +103,6 @@ POST /create-campaign
         "name": "Summer Sale 2023",
         "link": "https://lr-dev.subbox.in/promo/summer25?c=summer-sale-2025",
         "website": "https://www.your-website.com",
-        "link_for_android_users": "https://www.your-android-website.com",
-        "link_for_ios_users": "https://www.your-ios-website.com",
         "display_id": "summer-sale-2025",
         "created_at": "2023-05-01T12:00:00Z"
     }
@@ -133,8 +119,6 @@ POST /create-campaign
         "name": "Spring Launch 2024",
         "link": "https://app.domain.com/?c=spring-launch-2024",
         "website": "https://www.your-website.com",
-        "link_for_android_users": "https://www.your-android-website.com",
-        "link_for_ios_users": "https://www.your-ios-website.com",
         "display_id": "spring-launch-2024",
         "created_at": "2023-05-01T12:00:00Z"
     }
@@ -149,8 +133,6 @@ POST /create-campaign
 | `name` | string | The campaign name as provided in the request. |
 | `link` | string | The generated shareable campaign URL. For short links, this will be in format `https://app.domain.com/?c={display_id}`. |
 | `website` | string\|null | The desktop fallback URL. Will be `null` for short link campaigns. |
-| `link_for_android_users` | string\|null | The android fallback URL. Will be `null` for short link campaigns. |
-| `link_for_ios_users` | string\|null | The android fallback URL. Will be `null` for short link campaigns. |
 | `display_id` | string | The campaign's display identifier (custom or auto-generated). |
 | `created_at` | string | ISO 8601 timestamp of when the campaign was created. |
 
