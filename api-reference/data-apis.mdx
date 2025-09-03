@@ -17,15 +17,14 @@ All API requests require authentication. Include your server key in the request 
 ### Error Responses
 
 -   **401 Unauthorized**
-    -   `"Server key missing!"`
-    -   `"Server key invalid!"`
+    -   `"Unauthorized access."` - Missing or invalid API key
 -   **429 Too Many Requests**
--   Message: `"Rate limit exceeded. Please try again later."`
--   Cause: You've exceeded the rate limit of 10 requests per second.
+    -   Message: `"Rate limit exceeded. Please try again later."`
+    -   Cause: You've exceeded the rate limit of 30 requests per second.
 
 ### Rate Limit Details
 
--   Rate: 10 requests per second
+-   Rate: 30 requests per second
 -   Status code on limit exceeded: 429 (Too Many Requests)
 
 ## Authentication
@@ -40,7 +39,7 @@ Include the following header in all API requests:
 linkrunner-key: YOUR_API_KEY
 ```
 
-Replace `YOUR_API_KEY` with your actual API key.
+Replace `YOUR_API_KEY` with your actual API key. (Refer instructions below)
 
 ### Obtaining Your API Key
 
@@ -56,7 +55,7 @@ Keep your API key confidential. Do not share it or expose it in client-side code
 
 ### 1. List Campaigns
 
-Retrieve a list of campaigns based on their status.
+Retrieve a paginated list of campaigns with optional filtering by status or specific link.
 
 #### Request
 
@@ -66,29 +65,55 @@ GET /campaigns
 
 #### Query Parameters
 
-| Parameter | Type    | Required | Description                                      |
-| --------- | ------ | -------- | ------------------------------------------------ |
-| filter    | string | No       | Filter campaigns by status (ACTIVE/INACTIVE/ALL) |
-| page      | string | No       | The page number to retrieve (for pagination) |
-| limit     | string | No       | The maximum number of results to return per page |
+| Parameter | Type   | Required | Description                                                                                           |
+| --------- | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
+| filter    | string | No       | Filter campaigns by status. Options: `ACTIVE`, `INACTIVE`, `ALL` (default: `ALL`)                     |
+| link      | string | No       | Filter campaigns by a specific link URL. The system will extract the campaign from the provided link. |
+| page      | number | No       | The page number to retrieve. Must be a positive integer. (default: `1`)                               |
+| limit     | number | No       | The number of campaigns to return per page. Must be between 1 and 1000. (default: `100`, max: `1000`) |
 
-#### Note
-If 'page' and 'limit' are not provided, all campaigns will be returned in the response.
+#### Pagination
 
-#### Example Request
+Pagination is automatically applied to all requests with the following defaults:
+
+-   **Default page**: 1
+-   **Default limit**: 100 campaigns per page
+-   **Maximum limit**: 1000 campaigns per page
+
+#### Example Requests
+
+1. **Basic Request** (returns first 100 campaigns):
 
 ```
-GET /campaigns?filter=ALL
+GET /campaigns
+```
+
+2. **Filter Active Campaigns with Pagination**:
+
+```
+GET /campaigns?filter=ACTIVE&page=2&limit=50
+```
+
+3. **Get Campaign by Link**:
+
+```
+GET /campaigns?link=https://yourdomain.com?c=XYZ123
+```
+
+4. **All Campaigns with Custom Limit**:
+
+```
+GET /campaigns?filter=ALL&limit=200
 ```
 
 #### Response
 
 ```json
 {
-    "msg": "Campaigns fetched successfully!",
+    "msg": "Successfully retrieved 10 campaigns (all campaigns). Showing page 1 of 4.",
     "status": 200,
     "data": {
-        "total_campaigns": 35,
+        "total_campaigns": 10,
         "campaigns": [
             {
                 "display_id": "XYZ123",
@@ -98,15 +123,34 @@ GET /campaigns?filter=ALL
                 "google": false,
                 "meta": true,
                 "meta_campaign_id": "987654321098765432",
+                "meta_web_to_app": false,
                 "active": true,
                 "default_link": true,
-                "attributed_users": 491
+                "attributed_users": 491,
+                "link": "https://yourdomain.com?c=XYZ123",
+                "shareable_link": "https://yourdomain.com/XYZ123"
             }
             // ... more campaigns
-        ]
+        ],
+        "pagination": {
+            "total": 35,
+            "pages": 4,
+            "page": 1,
+            "limit": 10
+        }
     }
 }
 ```
+
+#### Error Responses
+
+| Status Code | Error Message                                                      | Description                                           |
+| ----------- | ------------------------------------------------------------------ | ----------------------------------------------------- |
+| 400         | "Invalid request parameters."                                      | Invalid link, domain not found, or campaign not found |
+| 401         | "Unauthorized access."                                             | Missing or invalid API key                            |
+| 422         | "Invalid page number '{page}'. Page must be a positive integer..." | Page parameter is not a positive integer              |
+| 422         | "Invalid limit '{limit}'. Limit must be between 1 and 1000..."     | Limit parameter is not between 1 and 1000             |
+| 422         | "Limit {limit} exceeds maximum allowed value of 1000..."           | Limit exceeds 1000                                    |
 
 #### TypeScript Types
 
@@ -119,9 +163,19 @@ interface Campaign {
     google: boolean;
     meta: boolean;
     meta_campaign_id: string | null;
+    meta_web_to_app: boolean;
     active: boolean;
     default_link: boolean;
     attributed_users: number;
+    link: string;
+    shareable_link: string;
+}
+
+interface PaginationInfo {
+    total: number;
+    pages: number;
+    page: number;
+    limit: number;
 }
 
 interface CampaignsResponse {
@@ -130,13 +184,14 @@ interface CampaignsResponse {
     data: {
         total_campaigns: number;
         campaigns: Campaign[];
+        pagination: PaginationInfo;
     };
 }
 ```
 
 ### 2. Get Attributed Users
 
-Retrieve a list of users attributed to a specific campaign.
+Retrieve a paginated list of users attributed to a specific campaign with optional time range filtering.
 
 #### Request
 
@@ -146,49 +201,64 @@ GET /attributed-users
 
 #### Query Parameters
 
-| Parameter   | Type   | Required | Description                                                                                |
-| ----------- | ------ | -------- | ------------------------------------------------------------------------------------------ |
-| display_id  | string | Yes      | The display ID of the campaign                                                             |
-| start_timestamp  | string | No       | Start time in ISO 8601 format (e.g., "2025-06-12T19:00:00")    |
-| end_timestamp    | string | No       | End time in ISO 8601 format (e.g., "2025-06-12T19:00:00")      |
-| timezone    | string | No       | IANA timezone identifier. See [IANA Time Zone Database](https://nodatime.org/TimeZones) |
-| page        |  string | No      | The page number to retrieve (for pagination). Defaults to 1 if not specified. |
-| limit       | string   | No     | The maximum number of results to return per page. Defaults to 10 if not specified. |
+| Parameter       | Type   | Required | Description                                                                                              |
+| --------------- | ------ | -------- | -------------------------------------------------------------------------------------------------------- |
+| display_id      | string | Yes      | The display ID of the campaign to retrieve attributed users for                                          |
+| start_timestamp | string | No       | Start time in ISO 8601 format (e.g., "2025-06-23T10:29:26.074")                                          |
+| end_timestamp   | string | No       | End time in ISO 8601 format (e.g., "2025-06-23T10:29:26.074")                                            |
+| timezone        | string | No       | IANA timezone identifier. See [IANA Time Zone Database](https://nodatime.org/TimeZones) (default: `UTC`) |
+| page            | number | No       | The page number to retrieve. Must be a positive integer. (default: `1`)                                  |
+| limit           | number | No       | The number of users to return per page. Must be between 1 and 1000. (default: `50`, max: `1000`)         |
 
-#### Note
-If no timezone is provided, UTC (Coordinated Universal Time) will be used as the default timezone.
-If 'page' and 'limit' are not provided, all attributed users will be returned in the response.
+#### Pagination
+
+Pagination is automatically applied to all requests with the following defaults:
+
+-   **Default page**: 1
+-   **Default limit**: 50 users per page
+-   **Maximum limit**: 1000 users per page
 
 #### Time Format Details
 
-1. **ISO 8601 Time Format**:
-   - Format: `YYYY-MM-DDThh:mm:ss`
-
-2. **IANA Timezone**:
-   - Use standard IANA timezone identifiers (e.g., "America/New_York", "Asia/Tokyo")
-   - IANA Identifer for Indian Time Zone: "Asia/Kolkata"
-   - Full list available at [IANA Time Zone Database](https://www.iana.org/time-zones)
-   - Default: "UTC" (when timezone parameter is not provided)
+-   **ISO 8601 Format**: Use `YYYY-MM-DDThh:mm:ss.SSS` format (e.g., `2025-06-23T10:29:26.074`)
+-   **IANA Timezone**: Standard timezone identifiers like `America/New_York`, `Asia/Tokyo`, `Asia/Kolkata`
+-   **Default Timezone**: UTC is used when timezone parameter is not provided
+-   **Time Range**: Both start and end timestamps are optional; you can filter by start time only, end time only, or both
 
 #### Example Requests
 
-1. **Basic Request** (uses UTC by default):
+1. **Basic Request** (returns first 50 users):
+
 ```
 GET /attributed-users?display_id=XYZ123
 ```
-2. **With Time Range**:
+
+2. **With Time Range and Timezone**:
+
 ```
-GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-12T19:00:00&end_timestamp=2025-06-13T19:00:00&timezone=Asia/Kolkata
+GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-23T10:29:26.074&end_timestamp=2025-06-24T10:29:26.074&timezone=Asia/Kolkata
+```
+
+3. **With Pagination**:
+
+```
+GET /attributed-users?display_id=XYZ123&page=2&limit=100
+```
+
+4. **With All Parameters**:
+
+```
+GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-23T10:29:26.074&end_timestamp=2025-06-24T10:29:26.074&timezone=America/New_York&page=3&limit=200
 ```
 
 #### Response
 
 ```json
 {
-    "msg": "Attributed users fetched successfully!",
+    "msg": "Successfully retrieved 123 attributed users for campaign XYZ123. Showing page 1 of 3.",
     "status": 200,
     "data": {
-        "total_users": 23,
+        "total_users": 50,
         "users": [
             {
                 "attributed_at": "2024-09-23T08:13:34.417Z",
@@ -202,7 +272,6 @@ GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-12T19:00:00&end_
                 "ad_creative_name": "Variation_8",
                 "ad_set_id": "138726384957162840",
                 "ad_set_name": "Engagement",
-                "is_instagram": true,
                 "publisher_platform": "instagram",
                 "platform_position": null,
                 "user_data": {
@@ -210,8 +279,6 @@ GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-12T19:00:00&end_
                     "name": "John Smith",
                     "email": "john.smith@example.com",
                     "phone": "+1234567890",
-                    "broker": null,
-                    "deviceOs": "android",
                     "device_data": {
                         "brand": "Samsung",
                         "base_os": "",
@@ -231,10 +298,29 @@ GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-12T19:00:00&end_
                 }
             }
             // ... more users
-        ]
+        ],
+        "pagination": {
+            "total": 123,
+            "pages": 3,
+            "page": 1,
+            "limit": 50
+        }
     }
 }
 ```
+
+#### Error Responses
+
+| Status Code | Error Message                                                      | Description                               |
+| ----------- | ------------------------------------------------------------------ | ----------------------------------------- |
+| 400         | "Invalid timezone format."                                         | Invalid IANA timezone identifier provided |
+| 400         | "Invalid timestamp format."                                        | Invalid start or end timestamp format     |
+| 401         | "Authentication failed."                                           | Invalid or missing API key                |
+| 404         | "Resource not found."                                              | Campaign does not exist in the project    |
+| 422         | "Required parameter missing."                                      | Missing required display_id parameter     |
+| 422         | "Invalid page number '{page}'. Page must be a positive integer..." | Page parameter is not a positive integer  |
+| 422         | "Invalid limit '{limit}'. Limit must be between 1 and 1000..."     | Limit parameter is not between 1 and 1000 |
+| 422         | "Limit {limit} exceeds maximum allowed value of 1000..."           | Limit exceeds 1000                        |
 
 #### TypeScript Types
 
@@ -257,13 +343,13 @@ interface DeviceData {
 }
 
 interface UserData {
-    id: string;
+    id: string | null;
     name: string | null;
     email: string | null;
-    phone: string;
-    broker: string | null;
-    deviceOs: string;
+    phone: string | null;
     device_data: DeviceData;
+    // Additional user data fields may be included
+    [key: string]: any;
 }
 
 interface AttributedUser {
@@ -278,10 +364,16 @@ interface AttributedUser {
     ad_creative_name: string;
     ad_set_id: string;
     ad_set_name: string;
-    is_instagram: boolean;
-    publisher_platform: "instagram";
-    platform_position: string;
+    publisher_platform: string | null;
+    platform_position: string | null;
     user_data: UserData;
+}
+
+interface PaginationInfo {
+    total: number;
+    pages: number;
+    page: number;
+    limit: number;
 }
 
 interface AttributedUsersResponse {
@@ -290,6 +382,7 @@ interface AttributedUsersResponse {
     data: {
         total_users: number;
         users: AttributedUser[];
+        pagination: PaginationInfo;
     };
 }
 ```
@@ -304,7 +397,3 @@ interface AttributedUsersResponse {
 -   The TypeScript types provided are based on the example responses
 
 For any help please reach out to [darshil@linkrunner.io](mailto:darshil@linkrunner.io)
-
-[Want to track revenue using Linkrunner APIs? Checkout the documentation here](https://www.notion.so/Linkrunner-Revenue-Tracking-Endpoint-6bd234abb6d44c53bc8af3637f5da1d1?pvs=21)
-
-### [Linkrunner.io](https://Linkrunner.io)
