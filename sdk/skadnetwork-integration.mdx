@@ -1,0 +1,86 @@
+---
+title: "SKAdNetwork Integration"
+description: "Configure SKAdNetwork integration for iOS attribution with Linkrunner"
+icon: "apple"
+---
+
+# SKAdNetwork Integration
+
+SKAdNetwork integration allows Linkrunner to provide privacy-preserving attribution for iOS campaigns through Apple's framework.
+
+## Prerequisites
+
+### SDK Updates
+
+Ensure you're using the minimum required SDK versions for SKAdNetwork support:
+
+<CardGroup cols={3}>
+  <Card title="React Native" icon="react">
+    **rn-linkrunner >=2.3.0**
+  </Card>
+  <Card title="Expo" icon="rocket">
+    **expo-linkrunner >=3.2.0**  
+  </Card>
+  <Card title="Native iOS" icon="swift">
+    **ios-linkrunner >=3.1.0**
+  </Card>
+</CardGroup>
+
+These SDK updates are necessary so that Linkrunner can use the SKAN schema configured to update the right values as users perform actions on the app, ensuring the right values are sent in postbacks.
+
+<Note>
+For SKAdNetwork functionality, ensure your SDK version is **greater than or equal to** the minimum versions listed above.
+</Note>
+
+### Dashboard Configuration
+
+Complete the SKAdNetwork integration checklist on the Linkrunner dashboard for both Google and Meta:
+
+#### Google Ads Integration
+📋 [Complete Google Ads SKAN Checklist](https://www.linkrunner.io/settings?s=google-ads-integration&section=skadnetwork&p_id=27&google_ads=skan_integration)
+
+Linkrunner automatically sends the schema configuration to Google.
+
+#### Meta Configuration
+📋 [Complete Meta SKAN Checklist](https://www.linkrunner.io/settings?s=meta-integration&section=skadnetwork&p_id=27&google_ads=skan_integration&meta_tab=skan_integration)
+
+For Meta (Facebook) integration, you'll need to provide access to your Meta Business Account Manager:
+
+<Note>
+Grant access to **access@linkrunner.io** in your Meta Business Manager so we can configure the SKAN schema on Meta for you.
+</Note>
+
+## Configuring Postback Copies to Linkrunner
+
+To enable SKAdNetwork postback copies to be sent to Linkrunner, you need to configure the `NSAdvertisingAttributionReportEndpoint` in your app's Info.plist file:
+
+### For Native iOS, Flutter, and React Native
+
+1. Select the `Info.plist` file in the project navigator in Xcode
+2. Add the new keys to the properties list
+3. Enter the key name `NSAdvertisingAttributionReportEndpoint`
+4. Enter the `String` property type
+5. In the property value, enter `https://linkrunner-skan.com`
+6. Add another key named `AttributionCopyEndpoint`
+7. Enter the `String` property type
+8. In the property value, enter `https://linkrunner-skan.com`
+
+```xml
+<key>NSAdvertisingAttributionReportEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+<key>AttributionCopyEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+```
+
+### For Expo
+
+If you're using Expo, the plugin already adds this configuration automatically - no additional setup required.
+
+<Note>
+This configuration allows Apple to send copies of SKAdNetwork postbacks to Linkrunner, enabling better attribution tracking for your iOS campaigns.
+</Note>
+
+
+## Support
+
+For SKAdNetwork integration support, contact us at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).

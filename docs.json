@@ -51,7 +51,8 @@
                             {
                                 "group": "Deep Linking",
                                 "pages": ["sdk/deep-linking/setup", "sdk/deep-linking/verification"]
-                            }
+                            },
+                            "sdk/skadnetwork-integration"
                         ]
                     },
                     {

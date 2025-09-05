@@ -35,6 +35,19 @@ cd ios && pod install
 <string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
 ```
 
+### Step 3: SKAdNetwork Configuration
+
+To enable SKAdNetwork postback copies to be sent to Linkrunner, add the following keys to your `Info.plist` file:
+
+```xml
+<key>NSAdvertisingAttributionReportEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+<key>AttributionCopyEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+```
+
+For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/sdk/skadnetwork-integration).
+
 ## Expo Support
 
 If you are using Expo, follow the above steps to install the required packages. After this, you will need to use development builds since the Linkrunner SDK relies on native libraries. Follow the [Expo Development Builds Documentation](https://docs.expo.dev/develop/development-builds/introduction/) to get started.
