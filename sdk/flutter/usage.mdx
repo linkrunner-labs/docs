@@ -143,31 +143,6 @@ Example response:
 }
 ```
 
-## Setting User Data
-
-Call `setUserData` each time the app opens and the user is logged in:
-
-```dart
-Future<void> setUserData() async {
-  try {
-    await LinkRunner().setUserData(
-      userData: LRUserData(
-        id: '123', // Required: User ID
-        name: 'John Doe', // Optional
-        phone: '9876543210', // Optional
-        email: 'user@example.com', // Optional
-        mixpanelDistinctId: 'mixpanelDistinctId', // Optional - Mixpanel Distinct ID
-        amplitudeDeviceId: 'amplitudeDeviceId', // Optional - Amplitude User ID
-        posthogDistinctId: 'posthogDistinctId', // Optional - PostHog Distinct ID
-      ),
-    );
-    print('User data set successfully');
-  } catch (e) {
-    print('Error setting user data: $e');
-  }
-}
-```
-
 ## Set Additional Data
 
 Use the `setAdditionalData` method to set CleverTap ID:
