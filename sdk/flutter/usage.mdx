@@ -31,6 +31,7 @@ Future<void> initLinkrunner() async {
 // Call this in your app's initialization
 @override
 void initState() {
+  WidgetsFlutterBinding.ensureInitialized();
   super.initState();
   initLinkrunner();
 }
