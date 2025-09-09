@@ -6,21 +6,16 @@ icon: "flutter"
 
 ## Initializing the SDK
 
-Initialize the Linkrunner SDK when your app starts:
-
-You can find your project token [here](https://www.linkrunner.io/dashboard?s=members&m=documentation).
+You'll need your [project token](https://dashboard.linkrunner.io/dashboard?m=documentation) to get started!
 
 ```dart
 import 'package:linkrunner/linkrunner.dart';
 
 Future<void> initLinkrunner() async {
   try {
-    // Initialize with your project token and SDK signing parameters
+    // Initialize with your project token
     await LinkRunner().init(
       'YOUR_PROJECT_TOKEN',
-      'YOUR_SECRET_KEY', // Optional: Required for SDK signing
-      'YOUR_KEY_ID', // Optional: Required for SDK signing
-      true, // Optional: Enable debug mode for development (defaults to false)
     );
     print('LinkRunner initialized');
   } catch (e) {
@@ -31,20 +26,11 @@ Future<void> initLinkrunner() async {
 // Call this in your app's initialization
 @override
 void initState() {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized(); // Make sure this is added!
   super.initState();
   initLinkrunner();
 }
 ```
-
-### SDK Signing Parameters (Optional)
-
-For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
-
--   **`secretKey`**: A unique secret key used for request signing and authentication
--   **`keyId`**: A unique identifier for the key pair used in the signing process
-
-You can find your project token, secret key, and key ID [here](https://www.linkrunner.io/settings?s=sdk-signing).
 
 Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
 
@@ -278,6 +264,35 @@ Future<void> removePayment() async {
     -   `PaymentStatus.PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
     -   `PaymentStatus.PAYMENT_FAILED` - Payment attempt failed
     -   `PaymentStatus.PAYMENT_CANCELLED` - Payment was cancelled
+
+## SDK Signing (Optional)
+
+The SDK signing feature provides the following parameters during initialization:
+
+-   **`secretKey`**: A unique secret key used for request signing and authentication
+-   **`keyId`**: A unique identifier for the key pair used in the signing process
+
+You can find your project token, secret key, and key ID [here](https://www.linkrunner.io/settings?s=sdk-signing).
+
+```dart
+import 'dart:io' show Platform;
+import 'package:linkrunner/linkrunner.dart';
+
+Future<void> initLinkrunnerWithSigning() async {
+  try {
+    // Initialize with your project token and SDK signing parameters
+    await LinkRunner().init(
+      'YOUR_PROJECT_TOKEN',
+      Platform.isIOS ? 'YOUR_IOS_SECRET_KEY' : 'YOUR_ANDROID_SECRET_KEY', // Platform-specific secret key
+      Platform.isIOS ? 'YOUR_IOS_KEY_ID' : 'YOUR_ANDROID_KEY_ID', // Platform-specific key ID
+      true, // Optional: Enable debug mode for development (defaults to false)
+    );
+    print('LinkRunner initialized with SDK signing');
+  } catch (e) {
+    print('Error initializing LinkRunner: $e');
+  }
+}
+```
 
 ## Enhanced Privacy Controls
 
