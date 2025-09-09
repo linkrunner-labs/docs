@@ -23,10 +23,7 @@
                             "sdk/migration-guide",
                             {
                                 "group": "Web SDK",
-                                "pages": [
-                                    "sdk/web/installation", 
-                                    "sdk/web/framework-integrations"
-                                ]
+                                "pages": ["sdk/web/installation", "sdk/web/framework-integrations"]
                             },
                             {
                                 "group": "React Native",
@@ -71,19 +68,6 @@
                     {
                         "group": "Features",
                         "pages": ["feature/custom-store-listing"]
-                    }
-                ]
-            },
-            {
-                "tab": "Feature Releases",
-                "groups": [
-                    {
-                        "group": "Overview",
-                        "pages": ["feature-releases"]
-                    },
-                    {
-                        "group": "Latest Releases",
-                        "pages": ["feature/latest/q1-2025"]
                     }
                 ]
             }
