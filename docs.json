@@ -67,7 +67,7 @@
                     },
                     {
                         "group": "Features",
-                        "pages": ["feature/custom-store-listing"]
+                        "pages": ["feature/custom-store-listing", "web-to-app/google"]
                     }
                 ]
             }

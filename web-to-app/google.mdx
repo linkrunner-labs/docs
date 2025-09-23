@@ -1,0 +1,73 @@
+---
+title: "Track Google Ads traffic from web to app"
+description: "Set up and track Google web to app campaigns with proper attribution using Linkrunner"
+icon: "computer"
+---
+
+Google web to app campaigns enable you to reach users through web search and display ads, directing them to your website where they can discover and download your app.
+
+## Campaign Setup
+
+### 1. Create Google Ads Campaign
+
+- Log in to your Google Ads account
+- Create a new campaign
+- Configure the campaign to redirect users to your website
+- Set up your targeting, bidding, and creative assets
+
+### 2. Landing Page URL Structure
+
+When users click on your Google ads and land on your webpage, the URL will contain important campaign tracking parameters. Here's an example of what the URL structure looks like:
+
+```
+https://www.example.com/products/your-product?variant=12345&country=US&currency=USD&utm_source=google
+&gad_campaignid=12345678
+&gbraid=0AAAAADDyA9sExample123456789
+&gclid=Cj0KCQjw58PGBhCkARIsADbDilzExample123456789
+```
+
+
+### 3. Parameter Capture and App Download Link Setup
+
+Your website must capture the following Google campaign parameters from the landing page URL:
+
+- `gad_campaignid` - Google Ads campaign ID (required)
+- `gclid` - Google Click Identifier
+- `gbraid` - Google conversion tracking parameter
+
+When users click the "Download App" button on your website, redirect them to your Linkrunner domain with these parameters:
+
+```javascript
+// Example: Capture parameters from URL
+const urlParams = new URLSearchParams(window.location.search);
+const gadCampaignId = urlParams.get('gad_campaignid');
+const gclid = urlParams.get('gclid');
+const gbraid = urlParams.get('gbraid');
+
+// Construct app download link
+const linkrunnerDomain = 'https://your-domain.linkrunner.io';
+const downloadLink = `${linkrunnerDomain}?gad_campaignid=${gadCampaignId}&gclid=${gclid}&gbraid=${gbraid}`;
+
+// Redirect user to app store
+window.location.href = downloadLink;
+```
+
+<Warning>
+The `gad_campaignid` parameter must always be passed to ensure proper campaign attribution. The parameter names must be exact matches: `gad_campaignid`, `gclid`, and `gbraid`.
+</Warning>
+
+<Note>
+Replace `your-domain.linkrunner.io` with the actual domain you've configured in your Linkrunner dashboard for app attribution.
+</Note>
+
+## Implementation Checklist
+
+- [ ] Create Google Ads web campaign targeting your website
+- [ ] Configure website to capture `gad_campaignid`, `gclid`, and `gbraid` parameters
+- [ ] Set up "Download App" button to redirect with captured parameters
+- [ ] Test the complete flow from ad click to app install attribution
+- [ ] Verify attribution data appears in your Linkrunner dashboard
+
+## Support
+
+For web to app campaign support, contact us at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).
