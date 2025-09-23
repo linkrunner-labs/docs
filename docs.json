@@ -66,12 +66,8 @@
                         "pages": ["ad-networks/google-ads"]
                     },
                     {
-                        "group": "Web to App Ads",
-                        "pages": ["web-to-app/google"]
-                    },
-                    {
                         "group": "Features",
-                        "pages": ["feature/custom-store-listing"]
+                        "pages": ["feature/custom-store-listing", "web-to-app/google"]
                     }
                 ]
             }
