@@ -73,7 +73,13 @@ The `expo-linkrunner` package is a config plugin that automatically configures y
         npx expo prebuild
         ```
 
-2. **Follow the React Native usage guide**: Since `expo-linkrunner` is a config plugin that prepares your project, the actual SDK usage is identical to React Native. Please refer to the [React Native Usage Guide](/sdk/react-native/usage) for:
+2. **Backup Configuration (Android)**:
+
+For Android apps, the SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
+
+For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android/installation#backup-configuration).
+
+3. **Follow the React Native usage guide**: Since `expo-linkrunner` is a config plugin that prepares your project, the actual SDK usage is identical to React Native. Please refer to the [React Native Usage Guide](/sdk/react-native/usage) for:
     - Initializing the SDK
     - Tracking events
     - Handling deep links

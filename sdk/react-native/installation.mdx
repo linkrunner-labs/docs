@@ -48,6 +48,12 @@ To enable SKAdNetwork postback copies to be sent to Linkrunner, add the followin
 
 For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/sdk/skadnetwork-integration).
 
+### Step 4: Android Backup Configuration
+
+For Android apps, the SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
+
+For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android/installation#backup-configuration).
+
 ## Expo Support
 
 If you are using Expo, follow the above steps to install the required packages. After this, you will need to use development builds since the Linkrunner SDK relies on native libraries. Follow the [Expo Development Builds Documentation](https://docs.expo.dev/develop/development-builds/introduction/) to get started.
