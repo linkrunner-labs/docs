@@ -259,6 +259,12 @@ linkrunner.enablePIIHashing(true);
 
 When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
 
+## Backup Configuration (Android)
+
+For Android apps, the SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
+
+For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android/usage#backup-configuration).
+
 ## Function Placement Guide
 
 | Function                        | Where to Place                 | When to Call                                   |
