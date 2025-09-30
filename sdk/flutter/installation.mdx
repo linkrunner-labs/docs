@@ -72,6 +72,12 @@ android {
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 ```
 
+3. Backup Configuration
+
+For Android apps, the SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
+
+For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android/usage#backup-configuration).
+
 #### iOS Configuration
 
 1. Update your iOS deployment target to iOS 15.0 or higher in your `ios/Podfile`:
