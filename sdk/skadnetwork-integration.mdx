@@ -12,15 +12,21 @@ SKAdNetwork integration allows Linkrunner to provide privacy-preserving attribut
 
 Ensure you're using the minimum required SDK versions for SKAdNetwork support:
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
     <Card title="React Native" icon="react">
         **rn-linkrunner >=2.3.0**
     </Card>
     <Card title="Expo" icon="rocket">
         **expo-linkrunner >=3.2.0**
     </Card>
-    <Card title="Native iOS" icon="swift">
+</CardGroup>
+
+<CardGroup cols={2}>
+     <Card title="Native iOS" icon="swift">
         **ios-linkrunner >=3.1.0**
+    </Card>
+    <Card title="Flutter" icon="flutter">
+        **linkrunner >=3.1.1**
     </Card>
 </CardGroup>
 
@@ -51,6 +57,25 @@ For Meta (Facebook) integration, you'll need to provide access to your Meta Busi
     Grant access to **access@linkrunner.io** in your Meta Business Manager so we can configure the SKAN schema on Meta
     for you.
 </Note>
+
+### Meta Ads Dashboard Configuration
+
+<Warning>
+    Only perform this configuration when the Linkrunner SDK with the versions listed in the **SDK Updates** section above is live in your app.
+</Warning>
+
+You'll need to turn OFF the **SKAdNetwork for the Facebook SDK** option in your Meta Ads Dashboard:
+
+1. Navigate to **Events Manager** > **Datasets** > **[Your Dataset Name]**
+2. Go to the **Apple's SKAdNetwork** section
+3. Look for **Extra Settings**
+4. Find the **SKAdNetwork for the Facebook SDK** toggle and turn it **OFF**
+
+<Note>
+    When this toggle is ON, Meta will receive app activity through the SKAdNetwork API from made from the Facebook SDK. However, **Linkrunner will not be able to send postbacks accurately** if this toggle remains enabled.
+</Note>
+
+![SKAdNetwork Setting Toggle on Meta Dashboard](/images/SKAdNetwork-meta-dashboard-toggle.png)
 
 ## Configuring Postback Copies to Linkrunner
 
