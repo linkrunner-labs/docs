@@ -63,7 +63,7 @@
                     },
                     {
                         "group": "Ad Network Integration",
-                        "pages": ["ad-networks/google-ads"]
+                        "pages": ["ad-networks/google-ads", "ad-networks/tiktok"]
                     },
                     {
                         "group": "Features",
