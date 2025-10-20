@@ -1,6 +1,6 @@
 ---
 title: "Uninstall Tracking"
-description: "Learn how to implement uninstall measurement for Android applications using Firebase Cloud Messaging"
+description: "Learn how to implement uninstall measurement for Android and Flutter applications using Firebase Cloud Messaging"
 icon: "chart-line-down"
 ---
 
@@ -17,8 +17,8 @@ Linkrunner sends a silent push notification to each device once per day. If the 
 Here's what you need to know before getting started:
 
 **Requirements:**
-- [Android SDK 3.1.2 and later](https://docs.linkrunner.io/sdk/android/installation)
-- [Add Firebase to your Android project](https://firebase.google.com/docs/android/setup)
+- [Android SDK 3.1.2 and later](https://docs.linkrunner.io/sdk/android/installation) or [Flutter SDK](https://docs.linkrunner.io/sdk/flutter/installation)
+- [Add Firebase to your Android project](https://firebase.google.com/docs/android/setup) or [Add Firebase to your Flutter project](https://firebase.google.com/docs/flutter/setup)
 
 ## Connect Firebase Cloud Messaging (FCM) with Linkrunner
 
@@ -72,25 +72,46 @@ The Linkrunner service account has been assigned the role of Linkrunner Uninstal
 
 
 
-### Integrate with Linkrunner Android SDK
+### Integrate with Linkrunner SDK
 
-Follow these instructions to integrate FCM with the Linkrunner Android SDK:
+Follow these instructions to integrate FCM with the Linkrunner SDK:
 
-  1. Ensure that you have the required dependency for Firebase Messaging in your build.gradle file (module level):
-    ```java
-    dependencies {
-       // ...
-       implementation 'com.google.firebase:firebase-messaging:25.0.1'
-       // ...
-    }
-    ```
+  1. **Add Firebase Messaging dependency:**
 
-  2. Set up a Firebase Cloud Messaging client app on Android. See the [Firebase Cloud Messaging documentation](https://firebase.google.com/docs/cloud-messaging/get-started?platform=android) for detailed instructions.
+    <Tabs>
+        <Tab title="Android">
+         Add the Firebase Messaging dependency to your build.gradle file (module level):
+         ```java
+         dependencies {
+            // ...
+            implementation 'com.google.firebase:firebase-messaging:25.0.1'
+            // ...
+         }
+         ```
+        </Tab>
+        <Tab title="Flutter">
+         Add the Firebase Messaging plugin to your Flutter project:
+         ```bash
+         flutter pub add firebase_messaging
+         ```
+        </Tab>
+    </Tabs>
+
+  2. **Set up Firebase Cloud Messaging:**
+
+    <Tabs>
+        <Tab title="Android">
+         Set up a Firebase Cloud Messaging client app on Android. See the [Firebase Cloud Messaging documentation](https://firebase.google.com/docs/cloud-messaging/get-started?platform=android) for detailed instructions.
+        </Tab>
+        <Tab title="Flutter">
+         Set up a Firebase Cloud Messaging client app on Flutter. See the [Firebase Cloud Messaging documentation](https://firebase.google.com/docs/cloud-messaging/flutter/client) for detailed instructions.
+        </Tab>
+    </Tabs>
 
   3. Configure your app to provide the device's push token to the Linkrunner SDK.
 
     <Tabs>
-        <Tab title="Kotlin">
+        <Tab title="Android">
          ```kotlin
             import io.linkrunner.sdk.LinkRunner
             import com.google.firebase.messaging.FirebaseMessaging
@@ -136,52 +157,41 @@ Follow these instructions to integrate FCM with the Linkrunner Android SDK:
             }
          ```
         </Tab>
-        <Tab title="Java">
-         ```java
-            import android.app.Service;
-            import androidx.annotation.NonNull;
-            import com.google.firebase.messaging.FirebaseMessaging;
-            import com.google.firebase.messaging.FirebaseMessagingService;
-            import com.google.firebase.messaging.RemoteMessage;
-            import io.linkrunner.sdk.LinkRunner;
+        <Tab title="Flutter">
+         ```dart
+            import 'package:firebase_messaging/firebase_messaging.dart';
+            import 'package:linkrunner/linkrunner.dart';
 
-            public class MyFirebaseMessagingService extends FirebaseMessagingService {
-
-                @Override
-                public void onCreate() {
-                    super.onCreate();
-                    // Fetch FCM token and set in Linkrunner SDK
-                    FirebaseMessaging.getInstance().getToken()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                // Passing the token to LinkRunner on a background thread
-                                new Thread(() -> {
-                                    LinkRunner.getInstance().setPushToken(task.getResult());
-                                }).start();
-                            }
-                        });
+            class MyFirebaseMessagingService {
+              
+              static Future<void> initialize() async {
+                // Fetch FCM token and set in Linkrunner SDK
+                String? token = await FirebaseMessaging.instance.getToken();
+                if (token != null) {
+                  await LinkRunner().setPushToken(token);
                 }
+              }
 
-                @Override
-                public void onNewToken(@NonNull String token) {
-                    super.onNewToken(token);
-                    // Receive new FCM token and set in Linkrunner SDK
-                    new Thread(() -> {
-                        LinkRunner.getInstance().setPushToken(token);
-                    }).start();
-                }
+              static void setupTokenRefresh() {
+                // Receive new FCM token and set in Linkrunner SDK
+                FirebaseMessaging.instance.onTokenRefresh
+                    .listen((fcmToken) async {
+                      await LinkRunner().setPushToken(fcmToken);
+                    })
+                    .onError((err) {
+                      // Error getting token.
+                    });
+              }
 
-                @Override
-                public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
-                    super.onMessageReceived(remoteMessage);
-
-                    if (remoteMessage.getData().containsKey("lr-uninstall-tracking")) {
-                        // Ignore uninstall tracking message
-                        return;
-                    } else {
-                        // Handle other data payloads here
-                    }
-                }
+              static void setupMessageListener() {
+                FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+                  if (message.data.containsKey("lr-uninstall-tracking")) {
+                    return;
+                  } else {
+                    // Handle other data payloads here
+                  }
+                });
+              }
             }
          ```
         </Tab>
