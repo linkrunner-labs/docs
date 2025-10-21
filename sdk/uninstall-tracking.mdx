@@ -10,8 +10,6 @@ Uninstall tracking allows you to measure when users remove your app from their d
 
 Uninstall tracking works by leveraging silent push notification tokens to detect when an app has been removed from a device. When an app is uninstalled, its associated FCM token becomes invalid, which can be detected by attempting to send silent push notifications to the device.
 
-Linkrunner sends a silent push notification to each device once per day. If the notification fails to be delivered due to an invalid FCM token, the app is marked as uninstalled.
-
 ## Before you begin
 
 Here's what you need to know before getting started:
