@@ -39,7 +39,10 @@
                             },
                             {
                                 "group": "Android",
-                                "pages": ["sdk/android/installation", "sdk/android/usage"]
+                                "pages": [
+                                    "sdk/android/installation", 
+                                    "sdk/android/usage"
+                                ]
                             },
                             {
                                 "group": "Expo",
@@ -49,7 +52,8 @@
                                 "group": "Deep Linking",
                                 "pages": ["sdk/deep-linking/setup", "sdk/deep-linking/verification"]
                             },
-                            "sdk/skadnetwork-integration"
+                            "sdk/skadnetwork-integration",
+                            "sdk/uninstall-tracking"
                         ]
                     },
                     {

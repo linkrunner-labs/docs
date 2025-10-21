@@ -1,0 +1,200 @@
+---
+title: "Uninstall Tracking"
+description: "Learn how to implement uninstall measurement for Android and Flutter applications using Firebase Cloud Messaging"
+icon: "chart-line-down"
+---
+
+Uninstall tracking allows you to measure when users remove your app from their devices, providing valuable insights into user retention and app performance. This guide shows you how to implement uninstall measurement using Firebase Cloud Messaging (FCM).
+
+## Overview
+
+Uninstall tracking works by leveraging silent push notification tokens to detect when an app has been removed from a device. When an app is uninstalled, its associated FCM token becomes invalid, which can be detected by attempting to send silent push notifications to the device.
+
+Linkrunner sends a silent push notification to each device once per day. If the notification fails to be delivered due to an invalid FCM token, the app is marked as uninstalled.
+
+## Before you begin
+
+Here's what you need to know before getting started:
+
+**Requirements:**
+- [Android SDK 3.1.2 and later](https://docs.linkrunner.io/sdk/android/installation) or [Flutter SDK](https://docs.linkrunner.io/sdk/flutter/installation)
+- [Add Firebase to your Android project](https://firebase.google.com/docs/android/setup) or [Add Firebase to your Flutter project](https://firebase.google.com/docs/flutter/setup)
+
+## Connect Firebase Cloud Messaging (FCM) with Linkrunner
+
+### FCM HTTP v1 API
+
+To configure FCM HTTP V1 for uninstalls:
+
+**Enable the FCM API:**
+1. Go to the [FCM console](https://console.firebase.google.com).
+2. Select a project.
+3. Go to **Project Overview** > **Project settings**.
+4. Copy the Project ID. This will be required in a later step.
+![Project ID](/images/firebase-project-id.png)
+5. Go to the **Cloud Messaging** tab.
+6. Make sure that Firebase Cloud Messaging API (V1) is set to Enabled.
+
+**Create a custom role for Linkrunner Uninstall:**
+1. Go to the **Service accounts** tab.
+2. Click **Manage service account permissions**.
+3. A new browser tab opens in Google Cloud Platform.
+4. In the side menu, select **Roles**.
+5. Click **+ Create role**.
+6. Enter the following details:
+   - **Title**: Linkrunner Uninstalls
+   - **ID**: lr_uninstalls
+   - **Role launch stage**: General availability
+7. Click **+ Add permissions**.
+8. In **Enter property name or value** field, enter `cloudmessaging.messages.create` and select it from the search results.
+![Google Cloud Permission](/images/google-cloud-permission.png)
+9. Check the **cloudmessaging.messages.create** option and click **Add**.
+10. Click **Create**.
+
+**Assign Linkrunner the FCM uninstall role:**
+1. In the side menu, select **IAM**.
+2. Open the **View by Principals** tab.
+3. Click **Grant Access**.
+4. In **Add Principals** -> **New principals** field, enter `lr-uninstalls-tracking@lr-uninstalls-tracking.iam.gserviceaccount.com`
+5. In **Assign Roles** -> **Select a role** field, enter `Linkrunner Uninstalls` and select it from the search results.
+6. Click **Save**.
+
+The Linkrunner service account has been assigned the role of Linkrunner Uninstalls.
+
+
+
+### Linkrunner Dashboard
+
+1. In Linkrunner, go to **Settings** > **Uninstall Tracking**.
+2. Enter the Firebase Project ID that you copied initially and click **Save**.
+
+![Uninstall Tracking](/images/uninstall-tracking-dashboard.png)
+
+
+
+### Integrate with Linkrunner SDK
+
+Follow these instructions to integrate FCM with the Linkrunner SDK:
+
+  1. **Add Firebase Messaging dependency:**
+
+    <Tabs>
+        <Tab title="Android">
+         Add the Firebase Messaging dependency to your build.gradle file (module level):
+         ```java
+         dependencies {
+            // ...
+            implementation 'com.google.firebase:firebase-messaging:25.0.1'
+            // ...
+         }
+         ```
+        </Tab>
+        <Tab title="Flutter">
+         Add the Firebase Messaging plugin to your Flutter project:
+         ```bash
+         flutter pub add firebase_messaging
+         ```
+        </Tab>
+    </Tabs>
+
+  2. **Set up Firebase Cloud Messaging:**
+
+    <Tabs>
+        <Tab title="Android">
+         Set up a Firebase Cloud Messaging client app on Android. See the [Firebase Cloud Messaging documentation](https://firebase.google.com/docs/cloud-messaging/get-started?platform=android) for detailed instructions.
+        </Tab>
+        <Tab title="Flutter">
+         Set up a Firebase Cloud Messaging client app on Flutter. See the [Firebase Cloud Messaging documentation](https://firebase.google.com/docs/cloud-messaging/flutter/client) for detailed instructions.
+        </Tab>
+    </Tabs>
+
+  3. Configure your app to provide the device's push token to the Linkrunner SDK.
+
+    <Tabs>
+        <Tab title="Android">
+         ```kotlin
+            import io.linkrunner.sdk.LinkRunner
+            import com.google.firebase.messaging.FirebaseMessaging
+            import com.google.firebase.messaging.FirebaseMessagingService
+            import com.google.firebase.messaging.RemoteMessage
+            import kotlinx.coroutines.CoroutineScope
+            import kotlinx.coroutines.Dispatchers
+            import kotlinx.coroutines.launch
+
+            class MyFirebaseMessagingService : FirebaseMessagingService() {
+            
+                override fun onCreate() {
+                    super.onCreate()
+                    // Fetch FCM token and set in Linkrunner SDK
+                    FirebaseMessaging.getInstance().token
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful && task.result != null) {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    LinkRunner.getInstance().setPushToken(task.result)
+                                }
+                            }
+                        }
+                }
+
+                override fun onNewToken(token: String) {
+                    super.onNewToken(token)
+
+                    // Receive new FCM token and set in Linkrunner SDK
+                    CoroutineScope(Dispatchers.IO).launch {
+                        LinkRunner.getInstance().setPushToken(token)
+                    }
+                }
+
+                override fun onMessageReceived(remoteMessage: RemoteMessage) {
+                    super.onMessageReceived(remoteMessage)
+
+                    if (remoteMessage.data.containsKey("lr-uninstall-tracking")) {
+                        return
+                    } else {
+                        // Handle other data payloads here
+                    }
+                }
+            }
+         ```
+        </Tab>
+        <Tab title="Flutter">
+         ```dart
+            import 'package:firebase_messaging/firebase_messaging.dart';
+            import 'package:linkrunner/linkrunner.dart';
+
+            class MyFirebaseMessagingService {
+              
+              static Future<void> initialize() async {
+                // Fetch FCM token and set in Linkrunner SDK
+                String? token = await FirebaseMessaging.instance.getToken();
+                if (token != null) {
+                  await LinkRunner().setPushToken(token);
+                }
+              }
+
+              static void setupTokenRefresh() {
+                // Receive new FCM token and set in Linkrunner SDK
+                FirebaseMessaging.instance.onTokenRefresh
+                    .listen((fcmToken) async {
+                      await LinkRunner().setPushToken(fcmToken);
+                    })
+                    .onError((err) {
+                      // Error getting token.
+                    });
+              }
+
+              static void setupMessageListener() {
+                FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+                  if (message.data.containsKey("lr-uninstall-tracking")) {
+                    return;
+                  } else {
+                    // Handle other data payloads here
+                  }
+                });
+              }
+            }
+         ```
+        </Tab>
+    </Tabs>
+
+    Custom implementations of FCM's `onMessageReceived` method can unintentionally make uninstall push notifications visible to users, disrupting the intended silent experience. To avoid this, ensure your logic checks if the message contains `lr-uninstall-tracking` and handles it accordingly, as shown in the code example above.
