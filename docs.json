@@ -39,10 +39,7 @@
                             },
                             {
                                 "group": "Android",
-                                "pages": [
-                                    "sdk/android/installation", 
-                                    "sdk/android/usage"
-                                ]
+                                "pages": ["sdk/android/installation", "sdk/android/usage"]
                             },
                             {
                                 "group": "Expo",
@@ -91,7 +88,7 @@
         "primary": {
             "type": "button",
             "label": "Dashboard",
-            "href": "https://www.linkrunner.io"
+            "href": "https://dashboard.linkrunner.io"
         }
     }
 }

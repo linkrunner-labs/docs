@@ -22,7 +22,7 @@ Ensure you're using the minimum required SDK versions for SKAdNetwork support:
 </CardGroup>
 
 <CardGroup cols={2}>
-     <Card title="Native iOS" icon="swift">
+    <Card title="Native iOS" icon="swift">
         **ios-linkrunner >=3.1.0**
     </Card>
     <Card title="Flutter" icon="flutter">
@@ -43,13 +43,13 @@ Complete the SKAdNetwork integration checklist on the Linkrunner dashboard for b
 
 #### Google Ads Integration
 
-📋 [Complete Google Ads SKAN Checklist](https://www.linkrunner.io/settings?s=google-ads-integration&section=skadnetwork&p_id=27&google_ads=skan_integration)
+📋 [Complete Google Ads SKAN Checklist](https://dashboard.linkrunner.io/settings?s=google-ads-integration&section=skadnetwork&p_id=27&google_ads=skan_integration)
 
 Linkrunner automatically sends the schema configuration to Google.
 
 #### Meta Configuration
 
-📋 [Complete Meta SKAN Checklist](https://www.linkrunner.io/settings?s=meta-integration&section=skadnetwork&p_id=27&google_ads=skan_integration&meta_tab=skan_integration)
+📋 [Complete Meta SKAN Checklist](https://dashboard.linkrunner.io/settings?s=meta-integration&section=skadnetwork&p_id=27&google_ads=skan_integration&meta_tab=skan_integration)
 
 For Meta (Facebook) integration, you'll need to provide access to your Meta Business Account Manager:
 
@@ -61,7 +61,8 @@ For Meta (Facebook) integration, you'll need to provide access to your Meta Busi
 ### Meta Ads Dashboard Configuration
 
 <Warning>
-    Only perform this configuration when the Linkrunner SDK with the versions listed in the **SDK Updates** section above is live in your app.
+    Only perform this configuration when the Linkrunner SDK with the versions listed in the **SDK Updates** section
+    above is live in your app.
 </Warning>
 
 You'll need to turn OFF the **SKAdNetwork for the Facebook SDK** option in your Meta Ads Dashboard:
@@ -72,7 +73,8 @@ You'll need to turn OFF the **SKAdNetwork for the Facebook SDK** option in your 
 4. Find the **SKAdNetwork for the Facebook SDK** toggle and turn it **OFF**
 
 <Note>
-    When this toggle is ON, Meta will receive app activity through the SKAdNetwork API from made from the Facebook SDK. However, **Linkrunner will not be able to send postbacks accurately** if this toggle remains enabled.
+    When this toggle is ON, Meta will receive app activity through the SKAdNetwork API from made from the Facebook SDK.
+    However, **Linkrunner will not be able to send postbacks accurately** if this toggle remains enabled.
 </Note>
 
 ![SKAdNetwork Setting Toggle on Meta Dashboard](/images/SKAdNetwork-meta-dashboard-toggle.png)
