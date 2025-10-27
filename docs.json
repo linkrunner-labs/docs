@@ -31,7 +31,7 @@
                             },
                             {
                                 "group": "Flutter",
-                                "pages": ["sdk/flutter/installation", "sdk/flutter/usage"]
+                                "pages": ["sdk/flutter/installation", "sdk/flutter/usage", "sdk/flutter/uninstall-tracking"]
                             },
                             {
                                 "group": "iOS",
@@ -49,8 +49,7 @@
                                 "group": "Deep Linking",
                                 "pages": ["sdk/deep-linking/setup", "sdk/deep-linking/verification"]
                             },
-                            "sdk/skadnetwork-integration",
-                            "sdk/uninstall-tracking"
+                            "sdk/skadnetwork-integration"
                         ]
                     },
                     {
@@ -68,7 +67,7 @@
                     },
                     {
                         "group": "Features",
-                        "pages": ["feature/custom-store-listing", "web-to-app/google"]
+                        "pages": ["feature/custom-store-listing", "web-to-app/google", "feature/uninstall-tracking"]
                     }
                 ]
             }
