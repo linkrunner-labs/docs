@@ -1,0 +1,18 @@
+---
+title: "Uninstall Tracking"
+icon: "chart-line-down"
+---
+
+Uninstall tracking allows you to measure when users remove your app from their devices, providing valuable insights into user retention and app performance.
+
+## How does it work
+
+- Linkrunner sends a daily API request to Firebase Cloud Messaging (FCM) and Apple Push Notification Services (APNS).
+- FCM and APNS then send a silent push notification to verify if an app is still installed on a given device.
+- An uninstall is recorded if the response indicates that the app was uninstalled (FCM and APNS) for 3 consecutive days.
+
+## Setup
+
+Refer to the following guides to enable uninstall tracking for your application:
+
+- [Flutter](/sdk/flutter/uninstall-tracking)
