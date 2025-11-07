@@ -197,6 +197,8 @@ private fun setIntegrationData() {
 Track custom events in your app:
 
 ```kotlin
+import java.util.UUID
+
 private fun trackEvent() {
     CoroutineScope(Dispatchers.IO).launch {
         try {
@@ -206,7 +208,8 @@ private fun trackEvent() {
                     "product_id" to "12345",
                     "category" to "electronics",
                     "amount" to 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
-                )
+                ),
+                eventId = UUID.randomUUID().toString() // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
             )
 
             result.onSuccess {
@@ -221,11 +224,17 @@ private fun trackEvent() {
 }
 ```
 
+<Note>
+    The `eventId` parameter should be a unique String identifier for each event. It's recommended to use `UUID.randomUUID().toString()` to generate a unique identifier. This helps track and deduplicate events on the server side.
+</Note>
+
 ### Revenue Sharing with Ad Networks
 
 To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
 
 ```kotlin
+import java.util.UUID
+
 private fun trackPurchaseEvent() {
     CoroutineScope(Dispatchers.IO).launch {
         try {
@@ -235,7 +244,8 @@ private fun trackPurchaseEvent() {
                     "product_id" to "12345",
                     "category" to "electronics",
                     "amount" to 149.99 // Revenue amount as a number
-                )
+                ),
+                eventId = UUID.randomUUID().toString() // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
             )
 
             result.onSuccess {
@@ -381,6 +391,7 @@ import io.linkrunner.sdk.models.request.UserDataRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class MyApplication : Application() {
     override fun onCreate() {
@@ -448,7 +459,8 @@ class MainActivity : AppCompatActivity() {
             try {
                 LinkRunner.getInstance().trackEvent(
                     eventName = "button_clicked",
-                    eventData = mapOf("screen" to "main")
+                    eventData = mapOf("screen" to "main"),
+                    eventId = UUID.randomUUID().toString() // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
                 )
             } catch (e: Exception) {
                 println("Error tracking event: ${e.message}")

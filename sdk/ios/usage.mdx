@@ -187,6 +187,8 @@ func setAdditionalData() async {
 Track custom events in your app:
 
 ```swift
+import Foundation
+
 func trackEvent() async {
     do {
         try await LinkrunnerSDK.shared.trackEvent(
@@ -195,7 +197,8 @@ func trackEvent() async {
                 "product_id": "12345",
                 "category": "electronics",
                 "amount": 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
-            ]
+            ],
+            eventId: UUID().uuidString // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
         )
         print("Event tracked successfully")
     } catch {
@@ -204,11 +207,17 @@ func trackEvent() async {
 }
 ```
 
+<Note>
+    The `eventId` parameter should be a unique String identifier for each event. It's recommended to use `UUID().uuidString` to generate a unique identifier. This helps track and deduplicate events on the server side.
+</Note>
+
 ### Revenue Sharing with Ad Networks
 
 To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
 
 ```swift
+import Foundation
+
 func trackPurchaseEvent() async {
     do {
         try await LinkrunnerSDK.shared.trackEvent(
@@ -217,7 +226,8 @@ func trackPurchaseEvent() async {
                 "product_id": "12345",
                 "category": "electronics",
                 "amount": 149.99 // Revenue amount as a number
-            ]
+            ],
+            eventId: UUID().uuidString // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
         )
         print("Purchase event with revenue tracked successfully")
     } catch {
@@ -335,6 +345,7 @@ You can find your project token [here](https://www.linkrunner.io/dashboard?s=mem
 ```swift
 import SwiftUI
 import Linkrunner
+import Foundation
 
 @main
 struct MyApp: App {
@@ -382,7 +393,8 @@ struct ContentView: View {
         do {
             try await LinkrunnerSDK.shared.trackEvent(
                 eventName: "button_clicked",
-                eventData: ["screen": "home"]
+                eventData: ["screen": "home"],
+                eventId: UUID().uuidString // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
             )
             print("Event tracked successfully")
         } catch {

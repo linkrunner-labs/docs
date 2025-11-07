@@ -160,6 +160,10 @@ This method allows you to connect user identities across different analytics and
 Track custom events in your app:
 
 ```dart
+import 'package:uuid/uuid.dart';
+
+final _uuid = Uuid();
+
 Future<void> trackEvent() async {
   try {
     await LinkRunner().trackEvent(
@@ -169,6 +173,7 @@ Future<void> trackEvent() async {
         'category': 'electronics',
         'amount': 99.99, // Include amount as a number for revenue sharing with ad networks like Google and Meta
       },
+      eventId: _uuid.v4(), // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
     );
     print('Event tracked successfully');
   } catch (e) {
@@ -177,11 +182,19 @@ Future<void> trackEvent() async {
 }
 ```
 
+<Note>
+    The `eventId` parameter should be a unique String identifier for each event. It's recommended to use the `uuid` package to generate a unique identifier. This helps track and deduplicate events on the server side.
+</Note>
+
 ### Revenue Sharing with Ad Networks
 
 To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
 
 ```dart
+import 'package:uuid/uuid.dart';
+
+final _uuid = Uuid();
+
 Future<void> trackPurchaseEvent() async {
   try {
     await LinkRunner().trackEvent(
@@ -191,6 +204,7 @@ Future<void> trackPurchaseEvent() async {
         'category': 'electronics',
         'amount': 149.99, // Revenue amount as a number
       },
+      eventId: _uuid.v4(), // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
     );
     print('Purchase event with revenue tracked successfully');
   } catch (e) {
@@ -327,6 +341,9 @@ You can find your project token [here](https://www.linkrunner.io/dashboard?s=mem
 ```dart
 import 'package:flutter/material.dart';
 import 'package:linkrunner/linkrunner.dart';
+import 'package:uuid/uuid.dart';
+
+final _uuid = Uuid();
 
 final linkrunner = LinkRunner();
 
@@ -381,7 +398,10 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
-                await LinkRunner().trackEvent(eventName: 'button_clicked');
+                await LinkRunner().trackEvent(
+                  eventName: 'button_clicked',
+                  eventId: _uuid.v4(), // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
+                );
               },
               child: Text('Track Custom Event'),
             ),
