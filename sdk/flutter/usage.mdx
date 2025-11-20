@@ -16,6 +16,10 @@ Future<void> initLinkrunner() async {
     // Initialize with your project token
     await LinkRunner().init(
       'YOUR_PROJECT_TOKEN',
+      'YOUR_SECRET_KEY', // Optional: Required for SDK signing
+      'YOUR_KEY_ID', // Optional: Required for SDK signing  
+      false, // Optional: Set to true to disable IDFA collection for iOS devices (defaults to false)
+      true // Optional: Enable debug mode for development (defaults to false)
     );
     print('LinkRunner initialized');
   } catch (e) {
