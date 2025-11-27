@@ -72,6 +72,35 @@ android {
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 ```
 
+> **Note:** The `AD_ID` permission (`<uses-permission android:name="com.google.android.gms.permission.AD_ID" />`) is already included in the SDK and is required for collecting device identifiers (GAID). If your app participates in [Designed for Families](https://support.google.com/googleplay/android-developer/topic/9877766?hl=en&ref_topic=9858052), you should revoke AAID and disable AAID collection. See the [Disabling AAID Collection](/sdk/flutter/usage#disabling-aaid-collection) section in the usage guide for more details.
+
+### Revoking the AD_ID Permission
+
+According to [Google's Policy](https://support.google.com/googleplay/android-developer/answer/11043825?hl=en), apps that target children must not transmit the Advertising ID.
+
+To revoke the AD_ID permission, use Flutter SDK version 3.5.0 and above. Children apps targeting Android 13 (API 33) and above must prevent the permission from getting merged into their app by adding a revoke declaration to their Manifest. Use the [`setDisableAaidCollection()`](/sdk/flutter/usage#disabling-aaid-collection) and [`isAaidCollectionDisabled()`](/sdk/flutter/usage#disabling-aaid-collection) functions to disable AAID collection programmatically:
+
+**android/app/src/main/AndroidManifest.xml**
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Remove AD_ID permission that comes from the SDK -->
+    <uses-permission 
+        android:name="com.google.android.gms.permission.AD_ID" 
+        tools:node="remove" />
+
+    <!-- Your other permissions -->
+</manifest>
+```
+
+<Note>
+    Make sure to add `xmlns:tools="http://schemas.android.com/tools"` to your manifest tag to use the `tools:node="remove"` attribute. If you disable AAID collection, you should also remove the AD_ID permission from your manifest to fully comply with Google Play's Family Policy requirements.
+</Note>
+
+For more information, see [Google Play Services documentation](https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info#public-string-getid).
+
 3. Backup Configuration
 
 For Android apps, the SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
