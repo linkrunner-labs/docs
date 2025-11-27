@@ -309,6 +309,32 @@ LinkRunner().enablePIIHashing(true);
 
 When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
 
+## Disabling AAID Collection
+
+<Note>
+    **SDK Version Requirement:** The AAID collection disable functionality requires Flutter SDK version 3.5.0 or higher.
+</Note>
+
+The SDK provides options to disable AAID (Google Advertising ID) collection. This is useful for apps targeting children or families to comply with Google Play's Family Policy.
+
+### Disable AAID Collection
+
+To disable AAID collection, call `setDisableAaidCollection` before SDK initialization:
+
+```dart
+// Disable AAID collection
+LinkRunner().setDisableAaidCollection(true);
+
+// Check if AAID collection is disabled
+bool isDisabled = LinkRunner().isAaidCollectionDisabled();
+```
+
+When AAID collection is disabled, the SDK will not collect or send the Google Advertising ID (GAID) to Linkrunner servers.
+
+### Removing AD_ID Permission
+
+If you want to completely remove the `AD_ID` permission from your app's manifest (for example, for apps targeting children), you can override the SDK's permission declaration in your `android/app/src/main/AndroidManifest.xml`. For detailed instructions on revoking the AD_ID permission, including Google's policy requirements for apps targeting children and Android 13+ (API 33+), see the [Revoking the AD_ID Permission](/sdk/flutter/installation#revoking-the-ad-id-permission) section in the installation guide.
+
 ## Function Placement Guide
 
 | Function                          | Where to Place                 | When to Call                                   |
@@ -321,6 +347,8 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 | `LinkRunner().trackEvent`         | Throughout app                 | When specific user actions occur               |
 | `LinkRunner().capturePayment`     | Payment processing             | When user makes a payment                      |
 | `LinkRunner().removePayment`      | Refund flow                    | When payment needs to be removed               |
+| `LinkRunner().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection |
+| `LinkRunner().isAaidCollectionDisabled` | Privacy settings or compliance checks | When you need to check AAID collection status |
 
 ## Complete Example
 
