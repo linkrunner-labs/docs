@@ -65,12 +65,22 @@ GET /campaigns
 
 #### Query Parameters
 
-| Parameter | Type   | Required | Description                                                                                           |
-| --------- | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
-| filter    | string | No       | Filter campaigns by status. Options: `ACTIVE`, `INACTIVE`, `ALL` (default: `ALL`)                     |
-| link      | string | No       | Filter campaigns by a specific link URL. The system will extract the campaign from the provided link. |
-| page      | number | No       | The page number to retrieve. Must be a positive integer. (default: `1`)                               |
-| limit     | number | No       | The number of campaigns to return per page. Must be between 1 and 1000. (default: `100`, max: `1000`) |
+| Parameter | Type   | Required | Description                                                                                             |
+| --------- | ------ | -------- | ------------------------------------------------------------------------------------------------------- |
+| filter    | string | No       | Filter campaigns by status. Options: `ACTIVE`, `INACTIVE`, `ALL` (default: `ALL`)                       |
+| channel   | string | No       | Filter campaigns by advertising channel/network. Options: `GOOGLE`, `META`, `TIKTOK` (case-insensitive) |
+| link      | string | No       | Filter campaigns by a specific link URL. The system will extract the campaign from the provided link.   |
+| page      | number | No       | The page number to retrieve. Must be a positive integer. (default: `1`)                                 |
+| limit     | number | No       | The number of campaigns to return per page. Must be between 1 and 1000. (default: `100`, max: `1000`)   |
+
+#### Channel Filter Behavior
+
+| Value             | Behavior                                         |
+| ----------------- | ------------------------------------------------ |
+| `GOOGLE`          | Returns campaigns where `google = true`          |
+| `META`            | Returns campaigns where `meta = true`            |
+| `TIKTOK`          | Returns campaigns linked to a TikTok ad network  |
+| _(empty/invalid)_ | No channel filter applied (returns all channels) |
 
 #### Pagination
 
@@ -106,7 +116,33 @@ GET /campaigns?link=https://yourdomain.com?c=XYZ123
 GET /campaigns?filter=ALL&limit=200
 ```
 
+5. **Filter by Channel (Google)**:
+
+```
+GET /campaigns?channel=GOOGLE
+```
+
+6. **Filter by Channel (Meta)**:
+
+```
+GET /campaigns?channel=META
+```
+
+7. **Filter by Channel (TikTok)**:
+
+```
+GET /campaigns?channel=TIKTOK
+```
+
+8. **Combine Channel with Other Filters**:
+
+```
+GET /campaigns?channel=google&filter=ACTIVE&page=1&limit=50
+```
+
 #### Response
+
+**Standard Response (no channel filter):**
 
 ```json
 {
