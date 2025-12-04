@@ -298,6 +298,7 @@ GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-23T10:29:26.074&
         "users": [
             {
                 "attributed_at": "2024-09-23T08:13:34.417Z",
+                "ad_channel": "META",
                 "campaign_display_id": "XYZ123",
                 "campaign_name": "Summer_Promo_2024",
                 "link": null,
@@ -390,6 +391,7 @@ interface UserData {
 
 interface AttributedUser {
     attributed_at: string;
+    ad_channel: "GOOGLE" | "META" | "TIKTOK" | null;
     campaign_display_id: string;
     campaign_name: string;
     link: string | null;
