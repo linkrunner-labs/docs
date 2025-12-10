@@ -31,7 +31,11 @@
                             },
                             {
                                 "group": "Flutter",
-                                "pages": ["sdk/flutter/installation", "sdk/flutter/usage", "sdk/flutter/uninstall-tracking"]
+                                "pages": [
+                                    "sdk/flutter/installation",
+                                    "sdk/flutter/usage",
+                                    "sdk/flutter/uninstall-tracking"
+                                ]
                             },
                             {
                                 "group": "iOS",
@@ -51,10 +55,7 @@
                             },
                             {
                                 "group": "SKAdNetwork",
-                                "pages": [
-                                    "sdk/skadnetwork/integration",
-                                    "sdk/skadnetwork/conversion-values"
-                                ]
+                                "pages": ["sdk/skadnetwork/integration", "sdk/skadnetwork/conversion-values"]
                             }
                         ]
                     },
@@ -73,7 +74,12 @@
                     },
                     {
                         "group": "Features",
-                        "pages": ["feature/custom-store-listing", "web-to-app/google", "feature/uninstall-tracking"]
+                        "pages": [
+                            "feature/custom-store-listing",
+                            "web-to-app/google",
+                            "ad-networks/meta-ads",
+                            "feature/uninstall-tracking"
+                        ]
                     }
                 ]
             }
