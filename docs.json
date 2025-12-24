@@ -20,7 +20,7 @@
                     {
                         "group": "SDK Documentation",
                         "pages": [
-                            "sdk/migration-guide",
+                            "sdk/integration-testing",
                             {
                                 "group": "Web SDK",
                                 "pages": ["sdk/web/installation", "sdk/web/framework-integrations"]

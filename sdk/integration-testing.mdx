@@ -1,0 +1,157 @@
+---
+title: "SDK Integration Testing"
+description: "Validate your Linkrunner setup end-to-end: click → install → signup"
+icon: "flask"
+---
+
+## Overview
+
+This guide helps you verify your Linkrunner integration end-to-end using a real test campaign link. **This testing process applies to all Linkrunner SDKs** (React Native, Flutter, iOS, Android, Expo, and Web).
+
+You'll confirm that:
+
+-   A **click** is tracked when you open the campaign link on a device
+-   An **install** is tracked when you install and open the app after clicking
+-   A **signup** is tracked when you call the SDK signup method (recommended)
+
+## Video walkthrough
+
+<iframe
+    width="100%"
+    height="420"
+    src="https://www.youtube.com/embed/tX05ioHJ6bc?start=315"
+    title="Linkrunner SDK Integration Testing"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+/>
+
+## Prerequisites
+
+### 1) Domain setup (required)
+
+Before you start testing, make sure your Linkrunner domain setup is completed in the dashboard:
+
+-   [Domain settings](https://dashboard.linkrunner.io/settings?s=domains)
+
+If you are setting up Universal Links (iOS) or App Links (Android), also complete deep link verification:
+
+-   [Setup Deep Linking](https://docs.linkrunner.io/sdk/deep-linking/setup)
+-   [Configure verification objects](https://docs.linkrunner.io/sdk/deep-linking/verification)
+
+### 2) SDK integrated in your app
+
+Complete integration for any supported SDK:
+
+-   [React Native Installation](https://docs.linkrunner.io/sdk/react-native/installation) and [React Native Usage](https://docs.linkrunner.io/sdk/react-native/usage)
+-   [Flutter Installation](https://docs.linkrunner.io/sdk/flutter/installation) and [Flutter Usage](https://docs.linkrunner.io/sdk/flutter/usage)
+-   [iOS Installation](https://docs.linkrunner.io/sdk/ios/installation) and [iOS Usage](https://docs.linkrunner.io/sdk/ios/usage)
+-   [Android Installation](https://docs.linkrunner.io/sdk/android/installation) and [Android Usage](https://docs.linkrunner.io/sdk/android/usage)
+-   [Expo Installation](https://docs.linkrunner.io/sdk/expo/installation)
+
+### 3) Enable debug mode during testing
+
+Turn **debug = true** while testing so you can see detailed SDK logs.
+
+Where to enable it:
+
+-   React Native: in `linkrunner.init(...)` (see [React Native Usage](https://docs.linkrunner.io/sdk/react-native/usage))
+-   iOS: in `LinkrunnerSDK.shared.initialize(..., debug: true)` (see [iOS Usage](https://docs.linkrunner.io/sdk/ios/usage))
+-   Android: in `LinkRunner.getInstance().init(..., debug = true)` (see [Android Usage](https://docs.linkrunner.io/sdk/android/usage))
+-   Expo: in `app.json` plugin config (see [Expo Installation](https://docs.linkrunner.io/sdk/expo/installation))
+
+## Test flow (click → install → signup)
+
+### Step 1) Get a test device
+
+Use a physical device or emulator/simulator.
+
+Important setup:
+
+-   Make sure the app is **uninstalled** before starting the test.
+-   If you are retesting, uninstall again before each run to keep results clean.
+
+### Step 2) Create a test campaign in Linkrunner
+
+Create a campaign from the dashboard:
+
+-   [Create Campaign](https://dashboard.linkrunner.io/dashboard?m=create-campaign)
+
+Tip: If you prefer creating campaigns via API, see [Campaign APIs](https://docs.linkrunner.io/api-reference/campaign-apis).
+
+### Step 3) Test the click
+
+1. Copy the campaign link from the dashboard.
+2. Open the campaign link **on the testing device** (browser or in-app browser).
+
+Expected result:
+
+-   The campaign **click count should increase** in the Linkrunner dashboard.
+
+### Step 4) Test the install
+
+1. After clicking the link, install the app **locally from your computer** (the build that contains the Linkrunner SDK).
+2. Open the app on the device.
+
+Important timing rule:
+
+-   Open the app **within 3 minutes** of clicking the link.
+
+<Note>
+    **Alternative flow for slow builds:** If building and installing the app locally takes more than 3 minutes, use this
+    approach instead: 1. First install the app on your device 2. Then open the campaign link in a browser
+    (Chrome/Safari) on the same device 3. Immediately open the app after clicking the link
+</Note>
+
+Expected result:
+
+-   The campaign **install count should increase** in the Linkrunner dashboard.
+
+Optional but recommended:
+
+-   Fetch attribution inside the app after first open using `getAttributionData()` (supported in all SDKs).
+    See your SDK usage guide:
+
+    -   [React Native Usage](https://docs.linkrunner.io/sdk/react-native/usage)
+    -   [Flutter Usage](https://docs.linkrunner.io/sdk/flutter/usage)
+    -   [iOS Usage](https://docs.linkrunner.io/sdk/ios/usage)
+    -   [Android Usage](https://docs.linkrunner.io/sdk/android/usage)
+
+### Step 5) Test the signup event (recommended)
+
+If you have implemented the SDK signup method:
+
+1. Complete onboarding or login in your app.
+2. Call the SDK `signup` method once the user is registered.
+
+Expected result:
+
+-   The campaign **signup count should increase** in the Linkrunner dashboard.
+
+Implementation references:
+
+-   [React Native Usage (signup)](https://docs.linkrunner.io/sdk/react-native/usage)
+-   [Flutter Usage (signup)](https://docs.linkrunner.io/sdk/flutter/usage)
+-   [iOS Usage (signup)](https://docs.linkrunner.io/sdk/ios/usage)
+-   [Android Usage (signup)](https://docs.linkrunner.io/sdk/android/usage)
+
+## Troubleshooting
+
+### Click count not increasing
+
+-   Confirm you opened the **campaign link on the same device** you plan to install on.
+-   Confirm domain setup is complete: [Domain settings](https://dashboard.linkrunner.io/settings?s=domains)
+-   If using Universal Links/App Links, verify deep link verification:
+
+    -   [Configure verification objects](https://docs.linkrunner.io/sdk/deep-linking/verification)
+
+### Install count not increasing
+
+-   Confirm the app was **uninstalled before the test**.
+-   Confirm you **opened the app within 3 minutes** of clicking the link.
+-   Confirm debug mode is enabled and you can see SDK init logs (see your SDK usage guide).
+
+### Signup count not increasing
+
+-   Confirm your app calls `signup` only **after** the user completes onboarding/login.
+-   Confirm you are passing the required user identifier fields per your SDK usage guide.
