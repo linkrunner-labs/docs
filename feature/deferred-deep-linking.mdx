@@ -1,0 +1,102 @@
+---
+title: "Deferred Deep Linking"
+description: "Configure deferred deep links in campaigns to direct users to specific content after app installation"
+icon: "link-simple"
+---
+
+Direct users to specific screens after they install your app from a campaign link. Works on Android & iOS.
+
+## Quick Example
+
+**Campaign Setup:** Enable deferred deep linking, set URL to `get.yourdomain.com/product/123`
+
+**What Happens:**
+
+1. User clicks campaign link (no app installed)
+2. Redirects to App Store/Google Play
+3. User installs and opens app
+4. App calls `getAttributionData()`, receives deep link
+5. Navigate user to product page
+
+## Setup
+
+### 1. Create Campaign with Deep Link
+
+![Create Campaign Screenshot](/images/create-campaign.png)
+
+In the [Linkrunner Dashboard](https://dashboard.linkrunner.io/dashboard?m=create-campaign):
+
+1. Click **"Create Campaign"**
+2. Enable **"Deferred Deep Linking"** toggle
+3. Enter deep link URL: `get.yourdomain.com/product/123`
+
+**URL Format:**
+
+```
+get.yourdomain.com/product/sneakers-123
+get.yourdomain.com/promo/SAVE20
+get.yourdomain.com/onboarding?type=premium
+```
+
+### 2. Handle in Your App
+
+Call `getAttributionData()` when you need attribution data, check for the `deeplink` field, parse the URL, and navigate:
+
+<Tabs>
+  <Tab title="Android">
+
+**See:** [Getting Attribution Data - Android SDK Usage](/sdk/android/usage#getting-attribution-data)
+
+  </Tab>
+  <Tab title="iOS">
+
+**See:** [Getting Attribution Data - iOS SDK Usage](/sdk/ios/usage#getting-attribution-data)
+
+  </Tab>
+  <Tab title="React Native">
+
+**See:** [Getting Attribution Data - React Native SDK Usage](/sdk/react-native/usage#getting-attribution-data)
+
+  </Tab>
+  <Tab title="Flutter">
+
+**See:** [Getting Attribution Data - Flutter SDK Usage](/sdk/flutter/usage#getting-attribution-data)
+
+  </Tab>
+  <Tab title="Expo">
+
+**See:** [Getting Attribution Data - React Native SDK Usage](/sdk/react-native/usage#getting-attribution-data)
+
+  </Tab>
+</Tabs>
+
+## Common Use Cases
+
+**Product Links:** `get.yourdomain.com/product/sneakers-123` → Opens product page
+
+**Promo Codes:** `get.yourdomain.com/promo/SAVE20` → Opens promo with code applied
+
+**Onboarding:** `get.yourdomain.com/onboarding?trial=30days` → Custom onboarding flow
+
+**Referral Tracking:** `get.yourdomain.com/product/123?referrer=jane` → Deep link + attribution ([learn more](/feature/referral-codes))
+
+## Testing
+
+1. Create test campaign with deferred deep linking enabled
+2. Uninstall app completely
+3. Click campaign link on mobile device
+4. Install and verify you land on the correct screen
+
+<Warning>Always test on real devices before launching campaigns.</Warning>
+
+## Troubleshooting
+
+**No deep link returned?** Check that deferred deep linking is enabled in campaign settings and URL is formatted correctly.
+
+**Navigation fails?** Add logging to your URL parsing logic, verify route names match your app's navigation structure, and test with simple paths first.
+
+**Attribution data is null?** Ensure the app was installed via the campaign link (not directly from store) and `getAttributionData()` is called after SDK initialization.
+
+---
+
+Questions? Contact [darshil@linkrunner.io](mailto:darshil@linkrunner.io)

@@ -78,6 +78,8 @@
                             "feature/custom-store-listing",
                             "web-to-app/google",
                             "ad-networks/meta-ads",
+                            "feature/referral-codes",
+                            "feature/deferred-deep-linking",
                             "feature/uninstall-tracking"
                         ]
                     }
