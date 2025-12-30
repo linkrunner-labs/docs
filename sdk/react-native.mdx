@@ -1,12 +1,60 @@
 ---
-title: "React Native Usage"
-description: "How to use the Linkrunner SDK in your React Native app"
+title: "React Native SDK"
+description: "Complete guide for integrating Linkrunner in React Native apps"
 icon: "react"
 ---
 
-# Using the React Native SDK
+## Installation
 
-This guide will help you implement Linkrunner functionality in your React Native application.
+### Step 1: Install the Package
+
+```bash
+# Using npm
+npm install rn-linkrunner
+
+# Using yarn
+yarn add rn-linkrunner
+```
+
+### Step 2: iOS Configuration
+
+If you're developing for iOS, follow these additional steps:
+
+1. Install pods for the package:
+
+```bash
+cd ios && pod install
+```
+
+2. Add the following code to your `info.plist` file:
+
+```xml
+<key>NSUserTrackingUsageDescription</key>
+<string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
+```
+
+### Step 3: SKAdNetwork Configuration
+
+To enable SKAdNetwork postback copies to be sent to Linkrunner, add the following keys to your `Info.plist` file:
+
+```xml
+<key>NSAdvertisingAttributionReportEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+<key>AttributionCopyEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+```
+
+For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork).
+
+### Step 4: Android Backup Configuration
+
+For Android apps, the SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
+
+For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android#backup-configuration).
+
+### Expo Support
+
+If you are using Expo, follow the above steps to install the required packages. After this, you will need to use development builds since the Linkrunner SDK relies on native libraries. Follow the [Expo Development Builds Documentation](https://docs.expo.dev/develop/development-builds/introduction/) to get started.
 
 ## Initialization
 
@@ -33,7 +81,7 @@ useEffect(() => {
     init();
 }, []); // Empty dependency array ensures it runs only once
 
-const init = async () => { 
+const init = async () => {
     await linkrunner.init(
         "YOUR_PROJECT_TOKEN",
         "YOUR_SECRET_KEY", // Optional: Required for SDK signing
@@ -272,6 +320,17 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 | `linkrunner.trackEvent`         | Throughout app                 | When specific user actions occur               |
 | `linkrunner.capturePayment`     | Payment processing             | When user makes a payment                      |
 | `linkrunner.removePayment`      | Refund flow                    | When payment needs to be removed               |
+
+## Next Steps
+
+<CardGroup cols={2}>
+    <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
+        Validate your setup end-to-end
+    </Card>
+    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+        Configure deep links for your app
+    </Card>
+</CardGroup>
 
 ## Support
 
