@@ -20,6 +20,7 @@
                     {
                         "group": "SDK Guides",
                         "pages": [
+                            "testing/integration-testing",
                             "sdk/web",
                             "sdk/react-native",
                             "sdk/flutter",
@@ -68,10 +69,6 @@
                             "api-reference/event-capture",
                             "api-reference/campaign-apis"
                         ]
-                    },
-                    {
-                        "group": "Testing & Validation",
-                        "pages": ["testing/integration-testing"]
                     }
                 ]
             }
