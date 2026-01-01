@@ -1,0 +1,144 @@
+---
+title: "Expo SDK"
+description: "Complete guide for integrating Linkrunner in Expo apps"
+icon: "rocket"
+---
+
+This guide will help you install, configure, and use the Linkrunner SDK in your Expo application.
+
+<Info>
+    **Migrating from an older version?** For instructions on upgrading from 1.x.x/2.x.x to version 3.x.x, see the
+    [Migration Guide](#migration-guide) below.
+</Info>
+
+## Requirements
+
+-   Expo SDK 52.0 or higher
+-   Node.js 18.0 or higher
+-   React Native 0.70 or higher
+
+## Installation
+
+### Step 1: Install Both Packages
+
+Install both the React Native and Expo packages:
+
+```bash
+npm install rn-linkrunner
+
+npx expo install expo-linkrunner
+```
+
+### Step 2: Add Plugin to app.json
+
+**Important**: You must add the expo-linkrunner plugin to your `app.json` plugins array:
+
+```json
+{
+    "expo": {
+        "plugins": [
+            [
+                "expo-linkrunner",
+                {
+                    "userTrackingPermission": "This identifier will be used to deliver personalized ads.",
+                    "debug": true
+                }
+            ]
+        ]
+    }
+}
+```
+
+## What the `expo-linkrunner` Plugin Does
+
+When you add `expo-linkrunner` to your `app.json` plugins and run the Expo prebuild step, the config plugin automatically makes the following changes to your iOS project:
+
+-   **Adds `NSUserTrackingUsageDescription`** in your iOS Info.plist if not already present.
+-   **Automatically applies the `expo-tracking-transparency` plugin** with a default permission message
+
+These changes are required for IDFA (Identifier for Advertisers) tracking and to comply with Apple's App Tracking Transparency (ATT) requirements.
+
+### Step 3: Prebuild Your Project
+
+The `expo-linkrunner` package is a config plugin that automatically configures your Expo project for Linkrunner SDK integration. Once you've completed the installation and configuration steps above:
+
+-   **For EAS Build**: If your `android` and `ios` folders are in `.gitignore` (recommended), EAS Build will automatically run the prebuild step during the build process. No manual action required.
+
+-   **For local development or custom development clients**:
+    ```bash
+    npx expo prebuild
+    ```
+
+### Step 4: Android Backup Configuration
+
+For Android apps, the SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
+
+For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android/installation#backup-configuration).
+
+## SDK Usage
+
+<Note>
+    The `expo-linkrunner` plugin handles the native configuration automatically. All SDK methods and APIs are provided
+    by the `rn-linkrunner` package, which is why you'll use the React Native documentation for implementation details.
+</Note>
+
+Since `expo-linkrunner` is a config plugin that prepares your project, the actual SDK usage is identical to React Native. Please refer to the [React Native SDK Guide](/sdk/react-native) for:
+
+-   Initializing the SDK
+-   User registration
+-   Getting attribution data
+-   Setting user data
+-   Tracking custom events
+-   Revenue tracking
+-   Enhanced privacy controls
+
+## Migration Guide
+
+If you are using expo-linkrunner with v1.x.x or v2.x.x then moving forward you'll need to migrate to a v3.x.x.
+
+### Architecture Changes
+
+Starting with version 3.0.0, the Expo SDK has been redesigned to use a new architecture:
+
+-   **Config Plugin Architecture**: The SDK now uses an Expo config plugin for better integration with the Expo ecosystem
+-   **React Native SDK**: Business logic is now handled by the React Native SDK, ensuring consistency across platforms
+-   **Improved Developer Experience**: Simplified setup with automatic native configuration
+
+### Breaking Changes
+
+-   The package installation process has changed to require both React Native and Expo SDKs
+-   Plugin configuration is now required in `app.json`
+-   All SDK methods and APIs are now provided by the `rn-linkrunner` package
+
+### Migration Steps
+
+1. **Uninstall the old package**:
+
+    ```bash
+    npx expo uninstall expo-linkrunner
+    ```
+
+2. **Install the new version**:
+
+    Follow the [Installation](#installation) steps above to install both `rn-linkrunner` and `expo-linkrunner`.
+
+3. **Update your code to use `rn-linkrunner`**:
+
+    The `expo-linkrunner` package is now just a config plugin. All SDK methods and APIs are now provided by the `rn-linkrunner` package. You'll need to update your imports and usage accordingly.
+
+    For detailed implementation instructions, see the [SDK Usage](#sdk-usage) section above.
+
+## Next Steps
+
+<CardGroup cols={2}>
+    <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
+        Validate your setup end-to-end
+    </Card>
+    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+        Configure deep links for your app
+    </Card>
+</CardGroup>
+
+## Support
+
+If you encounter issues during integration, contact us at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).

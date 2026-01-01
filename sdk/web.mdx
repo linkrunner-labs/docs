@@ -1,0 +1,252 @@
+---
+title: "Web SDK"
+description: "Complete guide for integrating Linkrunner in web applications"
+icon: "globe"
+---
+
+## Requirements
+
+-   Modern browser (Chrome 60+, Firefox 55+, Safari 12+, Edge 79+)
+-   JavaScript ES6+ support
+-   HTTPS enabled (recommended for production)
+
+## Getting Your Web SDK Token
+
+Before installing the SDK, you'll need to obtain your Web SDK token:
+
+1. Go to [https://linkrunner.io/dashboard](https://linkrunner.io/dashboard)
+2. In the top navigation, click on **Settings**
+3. In the left sidebar, select **Web SDK**
+4. Copy your **Web SDK Token** from this page
+
+## Installation
+
+### CDN
+
+Add the Linkrunner SDK to your HTML:
+
+```html
+<!-- Auto-initialize from script attributes -->
+<script src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js" token="YOUR_PROJECT_TOKEN" debug="true"></script>
+```
+
+### NPM Package
+
+```bash
+# Using npm
+npm install @linkrunner/web-sdk
+
+# Using yarn
+yarn add @linkrunner/web-sdk
+```
+
+### Module Import
+
+After installing via NPM, import the SDK:
+
+```javascript
+// ES Module
+import LinkrunnerSDK from "@linkrunner/web-sdk";
+
+// CommonJS
+const LinkrunnerSDK = require("@linkrunner/web-sdk");
+```
+
+## Configuration
+
+### Script Attributes (CDN)
+
+When using the CDN version, configure via script attributes:
+
+```html
+<script src="https://sdk.linkrunner.io/latest/linkrunner-sdk.min.js" token="YOUR_PROJECT_TOKEN"></script>
+```
+
+### Manual Initialization
+
+For manual initialization or when using NPM:
+
+```javascript
+window.LinkrunnerSDK.init({
+    token: "YOUR_PROJECT_TOKEN",
+});
+```
+
+### Getting Store Links (CDN)
+
+After initialization, you can use the `getStoreLink` function:
+
+```javascript
+// Initialize the SDK first
+window.LinkrunnerSDK.init({
+    token: "YOUR_PROJECT_TOKEN",
+});
+
+// Get store link
+async function handleGetStoreLink() {
+    try {
+        const storeLink = await LinkrunnerSDK.getStoreLink();
+        console.log("Store link:", storeLink);
+        // Use the store link as needed
+    } catch (error) {
+        console.error("Error getting store link:", error);
+    }
+}
+
+// Call the function when needed
+handleGetStoreLink();
+```
+
+## Verification
+
+To verify the SDK is working:
+
+1. Open your browser's developer console
+2. Look for "Linkrunner SDK initialized" message
+3. Check that no errors are displayed
+
+<Note>Enable debug mode during development to see detailed logs.</Note>
+
+## Framework Integrations
+
+### React
+
+#### Installation
+
+```bash
+npm install @linkrunner/web-sdk
+# or
+yarn add @linkrunner/web-sdk
+```
+
+#### Basic Setup
+
+```javascript
+import { useLinkrunner } from "@linkrunner/web-sdk/react";
+
+export default function App() {
+    useLinkrunner({
+        token: "YOUR_PROJECT_TOKEN",
+        debug: true, // Enable debug logging in development
+    });
+
+    return (
+        <div className="App">
+            <h1>My React App</h1>
+            <p>Linkrunner SDK is automatically tracking page views!</p>
+        </div>
+    );
+}
+```
+
+#### Getting Store Links
+
+Use the `getStoreLink` function to retrieve store links for your products:
+
+```javascript
+import { useLinkrunner } from "@linkrunner/web-sdk/react";
+
+export default function ProductComponent() {
+    const { getStoreLink } = useLinkrunner({
+        token: "YOUR_PROJECT_TOKEN",
+    });
+
+    const handleGetStoreLink = async () => {
+        try {
+            const storeLink = await getStoreLink();
+            if (storeLink) {
+                window.open(storeLink, "_blank");
+            }
+            // Use the store link as needed
+        } catch (error) {
+            console.error("Error getting store link:", error);
+        }
+    };
+
+    return (
+        <div>
+            <h2>Product Page</h2>
+            <button onClick={handleGetStoreLink}>Get Store Link</button>
+        </div>
+    );
+}
+```
+
+#### With React Router
+
+```javascript
+import { useLinkrunner } from "@linkrunner/web-sdk/react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+function App() {
+    useLinkrunner({
+        token: "YOUR_PROJECT_TOKEN",
+    });
+
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/about" element={<About />} />
+            </Routes>
+        </BrowserRouter>
+    );
+}
+```
+
+### Next.js
+
+#### Installation
+
+```bash
+npm install @linkrunner/web-sdk
+# or
+yarn add @linkrunner/web-sdk
+```
+
+#### Pages Router
+
+```javascript
+// pages/_app.js
+import { useLinkrunner } from "@linkrunner/web-sdk/react";
+
+export default function MyApp({ Component, pageProps }) {
+    useLinkrunner({
+        token: "YOUR_PROJECT_TOKEN",
+    });
+
+    return <Component {...pageProps} />;
+}
+```
+
+#### App Router
+
+```javascript
+// app/page.js (App Router)
+"use client";
+import { useLinkrunner } from "@linkrunner/web-sdk/react";
+
+export default function Home() {
+    useLinkrunner({
+        token: "YOUR_TOKEN_HERE",
+    });
+
+    return <div>Example</div>;
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+    <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
+        Validate your setup end-to-end
+    </Card>
+    <Card title="Track Custom Events" icon="bolt" href="/api-reference/event-capture">
+        Learn about event tracking
+    </Card>
+</CardGroup>
+
+## Support
+
+If you encounter issues during integration, contact us at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).
