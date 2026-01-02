@@ -43,6 +43,7 @@
                             "features/referral-codes",
                             "features/custom-store-listing",
                             "features/uninstall-tracking",
+                            "features/meta-install-referrer",
                             {
                                 "group": "SKAdNetwork",
                                 "pages": [
