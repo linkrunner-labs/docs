@@ -1,12 +1,142 @@
 ---
-title: "Android Usage"
-description: "How to use the Linkrunner SDK in your Android app"
+title: "Android SDK"
+description: "Complete guide for integrating Linkrunner in native Android apps"
 icon: "android"
 ---
 
-# Using the Android SDK
+## Requirements
 
-This guide will help you implement Linkrunner functionality in your native Android application.
+- Android 5.0 (API level 21) or higher
+- Android Studio Flamingo (2022.2.1) or newer
+- Gradle 8.0+
+
+## Installation
+
+### Step 1: Gradle Setup
+
+Add the Linkrunner SDK to your app's `build.gradle` file:
+
+```gradle
+dependencies {
+    implementation 'io.linkrunner:android-sdk:2.1.5'
+}
+```
+
+Make sure you have the Maven Central repository in your project's `settings.gradle` file:
+
+```gradle
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
+
+### Step 2: Required Permissions
+
+Add the following permissions to your `AndroidManifest.xml` file:
+
+```xml
+<!-- Required for the SDK to make network requests -->
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+```
+
+> **Note:** The `AD_ID` permission (`<uses-permission android:name="com.google.android.gms.permission.AD_ID" />`) is already included in the SDK and is required for collecting device identifiers (GAID). If your app participates in [Designed for Families](https://support.google.com/googleplay/android-developer/topic/9877766?hl=en&ref_topic=9858052), you should revoke AAID and disable AAID collection. See the [Disabling AAID Collection](#disabling-aaid-collection) section for more details.
+
+### Step 3: Backup Configuration
+
+The SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
+
+<Note>
+    This backup configuration works similarly for all SDKs (React Native, Flutter, and native Android). The same Android backup rules apply regardless of which SDK you're using.
+</Note>
+
+#### Adding Backup Rules to Your App
+
+**Add to your `AndroidManifest.xml`**:
+
+```xml
+<application
+    android:fullBackupContent="@xml/linkrunner_backup_descriptor"
+    android:dataExtractionRules="@xml/linkrunner_backup_rules">
+    <!-- Your app content -->
+</application>
+```
+
+-   `android:fullBackupContent` - Used for Android 6-11
+-   `android:dataExtractionRules` - Used for Android 12+
+
+#### Merging Backup Rules
+
+If you already have your own backup rules specified (e.g., `android:fullBackupContent="@xml/my_backup_descriptor"` or `android:dataExtractionRules="@xml/my_rules"`), then manually add the following rules to your existing files:
+
+**For legacy backup** (Android 6-11) in `res/xml/my_backup_descriptor`:
+
+```xml
+<full-backup-content>
+    <!-- Exclude LinkRunner SDK SharedPreferences from legacy backup -->
+    <exclude domain="sharedpref" path="io.linkrunner.sdk_prefs"/>
+</full-backup-content>
+```
+
+**For modern backup** (Android 12+) in `res/xml/my_backup_rules.xml`:
+
+```xml
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Exclude LinkRunner SDK SharedPreferences from cloud backup -->
+        <exclude domain="sharedpref" path="io.linkrunner.sdk_prefs"/>
+    </cloud-backup>
+    <device-transfer>
+        <!-- Exclude LinkRunner SDK SharedPreferences from device transfer -->
+        <exclude domain="sharedpref" path="io.linkrunner.sdk_prefs"/>
+    </device-transfer>
+</data-extraction-rules>
+```
+
+### Step 4: Revoking the AD_ID Permission (Optional)
+
+According to [Google's Policy](https://support.google.com/googleplay/android-developer/answer/11043825?hl=en), apps that target children must not transmit the Advertising ID.
+
+To revoke the AD_ID permission, use SDK version 3.5.0 and above. Children apps targeting Android 13 (API 33) and above must prevent the permission from getting merged into their app by adding a revoke declaration to their Manifest. Use the [`setDisableAaidCollection()`](#disabling-aaid-collection) and [`isAaidCollectionDisabled()`](#disabling-aaid-collection) functions to disable AAID collection programmatically:
+
+**AndroidManifest.xml**
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Remove AD_ID permission that comes from the SDK -->
+    <uses-permission
+        android:name="com.google.android.gms.permission.AD_ID"
+        tools:node="remove" />
+
+    <!-- Your other permissions -->
+</manifest>
+```
+
+<Note>
+    Make sure to add `xmlns:tools="http://schemas.android.com/tools"` to your manifest tag to use the `tools:node="remove"` attribute. If you disable AAID collection, you should also remove the AD_ID permission from your manifest to fully comply with Google Play's Family Policy requirements.
+</Note>
+
+For more information, see [Google Play Services documentation](https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info#public-string-getid).
+
+### Importing in Kotlin/Java
+
+After installation, you can import the SDK in your Kotlin or Java files:
+
+```kotlin
+// Kotlin
+import io.linkrunner.sdk.LinkRunner
+```
+
+```java
+// Java
+import io.linkrunner.sdk.LinkRunner;
+```
 
 ## Initialization
 
@@ -14,8 +144,7 @@ Initialize the Linkrunner SDK in your application, typically in your `Applicatio
 
 You can find your project token [here](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
 
-Note: This method returns a void. To get attribution data and deeplink information,
-use the getAttributionData method.
+Note: This method returns a void. To get attribution data and deeplink information, use the `getAttributionData` method.
 
 ```kotlin
 import android.app.Application
@@ -377,7 +506,7 @@ When AAID collection is disabled, the SDK will not collect or send the Google Ad
 
 ### Removing AD_ID Permission
 
-If you want to completely remove the `AD_ID` permission from your app's manifest (for example, for apps targeting children), you can override the SDK's permission declaration in your `AndroidManifest.xml`. For detailed instructions on revoking the AD_ID permission, including Google's policy requirements for apps targeting children and Android 13+ (API 33+), see the [Revoking the AD_ID Permission](/sdk/android/installation#revoking-the-ad-id-permission) section in the installation guide.
+If you want to completely remove the `AD_ID` permission from your app's manifest (for example, for apps targeting children), you can override the SDK's permission declaration in your `AndroidManifest.xml`. For detailed instructions on revoking the AD_ID permission, including Google's policy requirements for apps targeting children and Android 13+ (API 33+), see the [Revoking the AD_ID Permission](#step-4-revoking-the-ad_id-permission-optional) section above.
 
 ## Function Placement Guide
 
@@ -485,6 +614,17 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
+
+## Next Steps
+
+<CardGroup cols={2}>
+    <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
+        Validate your setup end-to-end
+    </Card>
+    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+        Configure deep links for your app
+    </Card>
+</CardGroup>
 
 ## Support
 
