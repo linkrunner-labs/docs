@@ -241,8 +241,6 @@ private fun onSignup() {
 
 To get attribution data and deeplink information for the current installation, use the `getAttributionData` function:
 
-For improved Android attribution tracking, especially with Meta ads, see the [Meta Install Referrer documentation](/features/meta-install-referrer).
-
 ```kotlin
 val attributionDataResult = LinkRunner.getInstance().getAttributionData()
 attributionDataResult.onSuccess { attributionData ->
