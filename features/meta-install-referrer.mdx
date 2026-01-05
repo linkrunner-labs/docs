@@ -1,0 +1,48 @@
+---
+title: "Meta Install Referrer"
+description: "Receive ad campaign metadata from device storage for improved attribution"
+icon: "meta"
+---
+
+## Overview
+
+Meta install referrer allows Linkrunner to receive ad campaign metadata from a device's local storage.
+
+## Meta Install Referrer Basic Flow
+
+The basic flow of the Meta install referrer mechanism is as follows:
+
+1. Once the SDK initializes, it uses the app's Facebook App ID to make a request to the Meta Content Provider API, retrieving the stored metadata from the Facebook app.
+2. Linkrunner SDK sends the install event, along with the attribution data, to the Linkrunner servers.
+
+## Prerequisites
+
+To support the Meta install referrer, the following is required:
+
+- **Android SDK**: Integrate with version 3.5.2 or higher.
+- **Flutter SDK**: Integrate with version 3.6.2 or higher.
+- **React Native SDK**: Integrate with version 2.6.2 or higher.
+- **Facebook App Version**: Users must have version 428.x.x or above installed on their device.
+- **Instagram App Version**: Users must have version 296.x.x or above installed on their device.
+
+## Configure Meta Install Referrer Support
+
+To enable Meta install referrer support make the Facebook App ID available to the SDK by adding it to the AndroidManifest.xml. This can be done either when integrating the Facebook SDK with the app or when integrating the Linkrunner SDK with the app.
+
+### With Facebook SDK Integrated
+
+Refer to [Facebook's official guide](https://developers.facebook.com/docs/android/getting-started) to learn how to add the Facebook App ID to your AndroidManifest.xml. The SDK will read the Facebook App ID from the meta-data tag.
+
+### Without Facebook SDK Integration
+
+Include the following tag in AndroidManifest.xml:
+
+```xml
+<meta-data android:name="com.linkrunner.FacebookApplicationId" android:value="@string/facebook_application_id" />
+```
+
+Include in your strings.xml file:
+
+```xml
+<string name="facebook_application_id" translatable="false"><YOUR_FACEBOOK_APP_ID></string>
+```
