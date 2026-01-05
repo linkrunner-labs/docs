@@ -233,6 +233,21 @@ Users who install your app from this specific ad creative will be directed to th
     example, if one ad features a specific product, you can deep link directly to that product page in your app.
 </Tip>
 
+## Getting Device-Level Data for Android Installs
+
+### Google Play Install Referrer API
+
+When Meta ad campaigns direct Android users to the Google Play Store, campaign attribution data becomes accessible through the Google Play Install Referrer API. Once you submit your [decryption key](/ad-networks/meta-ads#step-2-get-your-referrer-decryption-key) and Linkrunner successfully attributes an install to Meta campaigns, this data appears in the Linkrunner dashboard.
+
+### Meta Install Referrer
+
+Beyond the Google Play Install Referrer API, Linkrunner supports Meta's install referrer feature, which retrieves campaign metadata directly from the device's local storage for enhanced attribution accuracy. Here are the key advantages of Meta install referrer compared to the Google Play API:
+
+- **Broader data capture**: Meta install referrer includes both impression and click data, while Google Play Install Referrer is restricted to click data only
+- **Multi-session support**: Unlike Google Play Install Referrer which only captures the most recent session's data, Meta install referrer can access information from multiple user sessions. The decryption key used here is identical to the one required for Google Play Install Referrer integration.
+
+For setup instructions for Meta install referrer, refer to the [Meta Install Referrer documentation](/features/meta-install-referrer).
+
 ## Troubleshooting
 
 ### Events Not Showing Up in Meta
