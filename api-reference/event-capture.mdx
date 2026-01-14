@@ -50,7 +50,7 @@ POST: /capture-event
 | event_name | string | **Required**. Name of the event to track                  |
 | event_data | object | **Optional**. Additional data associated with the event   |
 | user_id    | string | **Required**. User identifier to associate with the event |
-| event_id   | string | **Optional**. Unique event identifier (String). Recommended to use UUID format for uniqueness |
+| event_id   | string | **Optional**. Unique event identifier (String) for deduplication. If you're tracking the same event from both your app (SDK) and backend (API), make sure to send the same `event_id` from both sources |
 
 ### Responses
 
@@ -100,7 +100,7 @@ To enable revenue sharing with ad networks like Google Ads and Meta, include an 
         "amount": 149.99
     },
     "user_id": "user_12345",
-    "event_id": "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+    "event_id": "550e8400-e29b-41d4-a716-446655440000"
 }
 ```
 
@@ -110,7 +110,7 @@ To enable revenue sharing with ad networks like Google Ads and Meta, include an 
 </Note>
 
 <Note>
-    The `event_id` parameter should be a unique String identifier for each event. It's recommended to use a UUID (Universally Unique Identifier) format to ensure uniqueness. This helps track and deduplicate events on the server side.
+    The `event_id` parameter is optional and should be a unique String identifier for each event. It's used for deduplication on the server side. If you're tracking the same event from both your app (SDK) and backend (API), make sure to send the same `event_id` from both sources to prevent duplicate event tracking.
 </Note>
 
 ## Best Practices
@@ -125,10 +125,6 @@ To enable revenue sharing with ad networks like Google Ads and Meta, include an 
 ### Tracking a Purchase Event
 
 ```javascript
-// Using fetch API with crypto.randomUUID() (available in Node.js 14.17.0+ and modern browsers)
-// For older environments, use a UUID library like 'uuid'
-import { v4 as uuidv4 } from 'uuid'; // npm install uuid
-
 fetch("https://api.linkrunner.io/api/v1/capture-event", {
     method: "POST",
     headers: {
@@ -145,8 +141,7 @@ fetch("https://api.linkrunner.io/api/v1/capture-event", {
             payment_method: "credit_card",
         },
         user_id: "user_12345",
-        event_id: uuidv4(), // Recommended: Use UUID for uniqueness
-        // Alternative: event_id: crypto.randomUUID() // Available in Node.js 14.17.0+ and modern browsers
+        event_id: "550e8400-e29b-41d4-a716-446655440000", // Optional: Unique event identifier for deduplication. Use the same event_id if tracking from both SDK and API
     }),
 })
     .then((response) => response.json())

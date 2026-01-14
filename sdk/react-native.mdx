@@ -210,19 +210,17 @@ This method allows you to connect user identities across different analytics and
 Track custom events in your app:
 
 ```javascript
-import { v4 as uuidv4 } from 'uuid'; // or use crypto.randomUUID() if available
-
 const trackEvent = async () => {
     await linkrunner.trackEvent(
         "purchase_initiated", // Event name
         { product_id: "12345", category: "electronics", amount: 99.99 }, // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
-        uuidv4() // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
+        "550e8400-e29b-41d4-a716-446655440000" // Optional: Unique event identifier (String) for deduplication
     );
 };
 ```
 
 <Note>
-    The `eventId` parameter should be a unique String identifier for each event. It's recommended to use a UUID library (like `uuid`) or `crypto.randomUUID()` to generate a unique identifier. This helps track and deduplicate events on the server side.
+    The `eventId` parameter is optional and should be a unique String identifier for each event. It's used for deduplication on the server side. If you're tracking the same event from both your app and backend, make sure to send the same `eventId` from the [Event Capture API](/api-reference/event-capture) as well.
 </Note>
 
 ### Revenue Sharing with Ad Networks
@@ -230,8 +228,6 @@ const trackEvent = async () => {
 To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
 
 ```javascript
-import { v4 as uuidv4 } from 'uuid'; // or use crypto.randomUUID() if available
-
 const trackPurchaseEvent = async () => {
     await linkrunner.trackEvent(
         "purchase_completed",
@@ -240,7 +236,7 @@ const trackPurchaseEvent = async () => {
             category: "electronics",
             amount: 149.99, // Revenue amount as a number
         },
-        uuidv4() // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
+        "550e8400-e29b-41d4-a716-446655440000" // Optional: Unique event identifier (String) for deduplication
     );
 };
 ```
