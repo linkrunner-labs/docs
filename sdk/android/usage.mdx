@@ -460,7 +460,7 @@ class MainActivity : AppCompatActivity() {
                 LinkRunner.getInstance().trackEvent(
                     eventName = "button_clicked",
                     eventData = mapOf("screen" to "main"),
-                    eventId = UUID.randomUUID().toString() // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
+                    eventId = UUID.randomUUID().toString() // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness.
                 )
             } catch (e: Exception) {
                 println("Error tracking event: ${e.message}")
