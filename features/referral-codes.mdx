@@ -1,0 +1,110 @@
+---
+title: "Referral Code Tracking"
+description: "Track referral sources and campaign parameters using query strings on your Linkrunner subdomain"
+icon: "user-group"
+---
+
+## Overview
+
+Add query parameters to your Linkrunner subdomain URL to track referrals, campaigns, or custom data. When users click your link and install the app, retrieve these parameters through `getAttributionData()`.
+
+**Works for both Android & iOS**
+
+## Quick Example
+
+Create a link with query parameters:
+
+```
+get.yourdomain.com?referrer=user_123&campaign=summer2024
+```
+
+When the user installs your app, call `getAttributionData()` to get the full URL and parse the parameters.
+
+## Setup
+
+### 1. Configure Your Subdomain
+
+1. Go to [Linkrunner Settings → Domains](https://dashboard.linkrunner.io/settings?s=domains)
+2. Add your subdomain (e.g., `get.yourdomain.com`)
+3. Complete domain verification
+
+<Note>
+    No need to create campaigns in the dashboard. Just add query parameters to your subdomain URL and they'll be
+    automatically captured.
+</Note>
+
+### 2. Create Your Links
+
+**Basic referral:**
+
+```
+get.yourdomain.com?referrer=user_1
+```
+
+**Multiple parameters:**
+
+```
+get.yourdomain.com?referrer=user_1&campaign=summer2024&source=instagram
+```
+
+**With deep linking:**
+
+```
+get.yourdomain.com/product/123?referrer=user_456
+```
+
+## Retrieving Data
+
+Call `getAttributionData()` early in your app lifecycle, then parse the `deeplink` field to extract your query parameters.
+
+<Tabs>
+  <Tab title="Android">
+Use `android.net.Uri` to parse the URL and `getQueryParameter()` to extract values.
+
+[See Android Usage Guide →](/sdk/android/usage#getting-attribution-data)
+
+  </Tab>
+  <Tab title="iOS">
+Use `URLComponents` to parse the URL and access the `queryItems` array.
+
+[See iOS Usage Guide →](/sdk/ios/usage#getting-attribution-data)
+
+  </Tab>
+  <Tab title="React Native">
+Use JavaScript's `URL` and `URLSearchParams` to parse and extract parameters.
+
+[See React Native Usage Guide →](/sdk/react-native/usage#getting-attribution-data)
+
+  </Tab>
+  <Tab title="Flutter">
+Use `Uri.parse()` and access the `queryParameters` map.
+
+[See Flutter Usage Guide →](/sdk/flutter/usage#getting-attribution-data)
+
+  </Tab>
+</Tabs>
+
+## Common Use Cases
+
+**Referral programs:** `?referrer=user_12345`
+
+**Influencer tracking:** `?influencer=john_doe&platform=youtube`
+
+**Campaign attribution:** `?campaign=summer_sale&source=instagram`
+
+**Promo codes:** `?promo=SAVE20&referrer=email_campaign`
+
+## Testing
+
+1. Create a test link with query parameters
+2. Uninstall your app completely
+3. Click the link and install from the store
+4. Verify parameters in `getAttributionData()`
+
+<Warning>Always uninstall before testing. Attribution data is cached from the first install.</Warning>
+
+## Troubleshooting
+
+**No parameters showing up?** Verify your subdomain is configured correctly in the [dashboard](https://dashboard.linkrunner.io/settings?s=domains) and that the app was installed via your link (not directly from the store).
+
+**Need help?** Contact [darshil@linkrunner.io](mailto:darshil@linkrunner.io)

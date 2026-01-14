@@ -15,59 +15,62 @@
                 "groups": [
                     {
                         "group": "Getting Started",
-                        "pages": ["introduction"]
+                        "pages": ["introduction", "quickstart"]
                     },
                     {
-                        "group": "SDK Documentation",
+                        "group": "SDK Guides",
                         "pages": [
-                            "sdk/migration-guide",
-                            {
-                                "group": "Web SDK",
-                                "pages": ["sdk/web/installation", "sdk/web/framework-integrations"]
-                            },
-                            {
-                                "group": "React Native",
-                                "pages": ["sdk/react-native/installation", "sdk/react-native/usage"]
-                            },
-                            {
-                                "group": "Flutter",
-                                "pages": ["sdk/flutter/installation", "sdk/flutter/usage"]
-                            },
-                            {
-                                "group": "iOS",
-                                "pages": ["sdk/ios/installation", "sdk/ios/usage"]
-                            },
-                            {
-                                "group": "Android",
-                                "pages": ["sdk/android/installation", "sdk/android/usage"]
-                            },
-                            {
-                                "group": "Expo",
-                                "pages": ["sdk/expo/installation", "sdk/expo/migration-guide"]
-                            },
-                            {
-                                "group": "Deep Linking",
-                                "pages": ["sdk/deep-linking/setup", "sdk/deep-linking/verification"]
-                            },
-                            "sdk/skadnetwork-integration"
+                            "testing/integration-testing",
+                            "sdk/web",
+                            "sdk/react-native",
+                            "sdk/flutter",
+                            "sdk/ios",
+                            "sdk/android",
+                            "sdk/expo"
                         ]
                     },
                     {
-                        "group": "API Documentation",
+                        "group": "Core Features",
+                        "pages": [
+                            {
+                                "group": "Deep Linking",
+                                "pages": [
+                                    "features/deep-linking-setup",
+                                    "features/deep-linking-verification"
+                                ]
+                            },
+                            "features/deferred-deep-linking",
+                            "features/referral-codes",
+                            "features/custom-store-listing",
+                            "features/uninstall-tracking",
+                            "features/meta-install-referrer",
+                            {
+                                "group": "SKAdNetwork",
+                                "pages": [
+                                    "features/skadnetwork-integration",
+                                    "features/skadnetwork-conversion-values"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "group": "Ad Networks",
+                        "pages": [
+                            "ad-networks/google-ads",
+                            "ad-networks/meta-ads",
+                            "ad-networks/tiktok",
+                            "ad-networks/google-web-to-app",
+                            "ad-networks/meta-web-to-app"
+                        ]
+                    },
+                    {
+                        "group": "API Reference",
                         "pages": [
                             "api-reference/data-apis",
                             "api-reference/revenue-tracking",
                             "api-reference/event-capture",
                             "api-reference/campaign-apis"
                         ]
-                    },
-                    {
-                        "group": "Ad Network Integration",
-                        "pages": ["ad-networks/google-ads"]
-                    },
-                    {
-                        "group": "Features",
-                        "pages": ["feature/custom-store-listing", "web-to-app/google"]
                     }
                 ]
             }
@@ -87,7 +90,101 @@
         "primary": {
             "type": "button",
             "label": "Dashboard",
-            "href": "https://www.linkrunner.io"
+            "href": "https://dashboard.linkrunner.io"
         }
-    }
+    },
+    "redirects": [
+        {
+            "source": "/sdk/web/installation",
+            "destination": "/sdk/web"
+        },
+        {
+            "source": "/sdk/web/framework-integrations",
+            "destination": "/sdk/web"
+        },
+        {
+            "source": "/sdk/react-native/installation",
+            "destination": "/sdk/react-native"
+        },
+        {
+            "source": "/sdk/react-native/usage",
+            "destination": "/sdk/react-native"
+        },
+        {
+            "source": "/sdk/flutter/installation",
+            "destination": "/sdk/flutter"
+        },
+        {
+            "source": "/sdk/flutter/usage",
+            "destination": "/sdk/flutter"
+        },
+        {
+            "source": "/sdk/flutter/uninstall-tracking",
+            "destination": "/sdk/flutter"
+        },
+        {
+            "source": "/sdk/ios/installation",
+            "destination": "/sdk/ios"
+        },
+        {
+            "source": "/sdk/ios/usage",
+            "destination": "/sdk/ios"
+        },
+        {
+            "source": "/sdk/android/installation",
+            "destination": "/sdk/android"
+        },
+        {
+            "source": "/sdk/android/usage",
+            "destination": "/sdk/android"
+        },
+        {
+            "source": "/sdk/expo/installation",
+            "destination": "/sdk/expo"
+        },
+        {
+            "source": "/sdk/expo/migration-guide",
+            "destination": "/sdk/expo"
+        },
+        {
+            "source": "/sdk/deep-linking/setup",
+            "destination": "/features/deep-linking-setup"
+        },
+        {
+            "source": "/sdk/deep-linking/verification",
+            "destination": "/features/deep-linking-verification"
+        },
+        {
+            "source": "/sdk/skadnetwork/integration",
+            "destination": "/features/skadnetwork-integration"
+        },
+        {
+            "source": "/sdk/skadnetwork/conversion-values",
+            "destination": "/features/skadnetwork-conversion-values"
+        },
+        {
+            "source": "/sdk/integration-testing",
+            "destination": "/testing/integration-testing"
+        },
+        {
+            "source": "/feature/custom-store-listing",
+            "destination": "/features/custom-store-listing"
+        },
+        {
+            "source": "/feature/referral-codes",
+            "destination": "/features/referral-codes"
+        },
+        {
+            "source": "/feature/deferred-deep-linking",
+            "destination": "/features/deferred-deep-linking"
+        },
+        {
+            "source": "/feature/uninstall-tracking",
+            "destination": "/features/uninstall-tracking"
+        },
+        {
+            "source": "/web-to-app/google",
+            "destination": "/ad-networks/google-web-to-app"
+        }
+    ]
 }

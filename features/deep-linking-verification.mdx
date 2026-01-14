@@ -1,0 +1,210 @@
+---
+title: "Configure verification objects"
+description: "Learn how to verify your domains for App Links on Android and Universal Links on iOS"
+icon: "check"
+---
+
+For HTTP/HTTPS deep links to work reliably, you need to verify that your app is the legitimate owner of the domain. This verification process is different for Android (App Links) and iOS (Universal Links).
+
+This guide explains how to verify your domains for both platforms and integrate with Linkrunner.
+
+<Tabs>
+  <Tab title="Android">
+    ## Android App Links Verification
+
+    Android App Links allow your app to become the default handler for a specific website's URLs. This requires proper verification of your domain ownership.
+
+    ### Step 1: Create the Digital Asset Links JSON File
+
+    Create a file named `assetlinks.json` with the following content:
+
+    ```json
+    [
+        {
+            "relation": ["delegate_permission/common.handle_all_urls"],
+            "target": {
+                "namespace": "android_app",
+                "package_name": "your.package.name",
+                "sha256_cert_fingerprints": ["SHA-256:XX:XX:XX:..."]
+            }
+        }
+    ]
+    ```
+
+    Replace:
+
+    -   `your.package.name` with your actual Android package name
+    -   `SHA-256:XX:XX:XX:...` with your app's SHA-256 fingerprint
+
+    ### Step 2: Get Your App's SHA-256 Fingerprint
+
+    To obtain your app's SHA-256 fingerprint:
+
+    1. For debug builds, use:
+
+        ```bash
+        keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+        ```
+
+    2. For release builds, use your release keystore:
+
+        ```bash
+        keytool -list -v -keystore your_release_keystore.keystore -alias your_key_alias
+        ```
+
+    3. Look for the "SHA-256 Certificate fingerprint" line in the output
+
+  </Tab>
+  <Tab title="iOS">
+    ## iOS Universal Links Verification
+
+    Universal Links allow iOS to open your app when users tap links to your website.
+
+    ### Step 1: Create an Apple App Site Association File
+
+    Create a file named `apple-app-site-association` (with no file extension) with the following content:
+
+    ```json
+    {
+        "applinks": {
+            "apps": [],
+            "details": [
+                {
+                    "appID": "TEAM_ID.BUNDLE_ID",
+                    "paths": ["*"]
+                }
+            ]
+        }
+    }
+    ```
+
+    Replace:
+
+    -   `TEAM_ID` with your Apple Developer Team ID
+    -   `BUNDLE_ID` with your app's bundle identifier
+
+    The `paths` array can be customized to include only specific paths that your app should handle. Use `*` to handle all paths.
+
+    ### Step 2: Find Your Team ID and Bundle ID
+
+    1. Your Team ID can be found in the [Apple Developer Portal](https://developer.apple.com/account) under Membership Details
+    2. Your Bundle ID is in your Xcode project settings
+
+    ### Step 3: Host the JSON File
+
+    Upload the `apple-app-site-association` file to your server at:
+
+    ```
+    https://your-domain.com/.well-known/apple-app-site-association
+    ```
+
+    Make sure it's accessible via HTTPS and has the correct Content-Type header (`application/json`).
+
+    ### Step 4: Configure Your App
+
+    In Xcode:
+
+    1. Open your project settings
+    2. Go to "Signing & Capabilities"
+    3. Add the "Associated Domains" capability
+    4. Add `applinks:your-domain.com` to the domains list
+
+    For more details, see the [official Apple documentation](https://developer.apple.com/documentation/xcode/supporting-associated-domains).
+
+  </Tab>
+</Tabs>
+
+## Setting Up Verification with Linkrunner
+
+Linkrunner provides a simplified way to manage your domain verification files through the project settings dashboard.
+
+### Step 1: Access Domain Verification in Linkrunner
+
+1. Log in to your [Linkrunner dashboard](https://dashboard.linkrunner.io/settings?sort_by=activity-1&s=store-verification)
+2. Go to "Project settings" from the navigation menu
+
+### Step 2: Configure Your Verification Objects
+
+1. Prepare your verification JSON objects:
+
+    - For iOS: Create the apple-app-site-association JSON content
+    - For Android: Create the assetlinks.json content
+
+2. In the Domain Verification section:
+
+    - Paste your iOS JSON in the "iOS (Only JSON allowed)" text area
+    - Paste your Android JSON in the "Android (Only JSON allowed)" text area
+
+    Linkrunner will automatically host these files at:
+
+    - iOS: `https://your-domain.io/.well-known/apple-app-site-association`
+    - Android: `https://your-domain.io/.well-known/assetlinks.json`
+
+3. Click the "Save" button to store your configuration
+
+### Step 3: Verify Your App Configuration
+
+After configuring in Linkrunner, you need to:
+
+1. For iOS: Ensure your app has the Associated Domains capability with `applinks:your-domain.io` in Xcode
+2. For Android: Verify your app's intent filters are properly configured for App Links
+
+<Tabs>
+  <Tab title="Android">
+    ## Testing Deep Link Verification for Android
+
+    1. Install the app on a device
+    2. Open a link to your verified domain in a browser
+    3. The app should open automatically without prompting
+
+    Alternatively, use `adb` to test:
+
+    ```bash
+    adb shell am start -a android.intent.action.VIEW -d "https://your-domain.com/path" your.package.name
+    ```
+
+    ### Troubleshooting for Android
+
+    1. **App doesn't open automatically**:
+
+        - Ensure your `assetlinks.json` file is correctly formatted
+        - Verify the SHA-256 fingerprint matches your app signing key
+        - Make sure the file is accessible via HTTPS
+
+    2. **Verification warnings in logcat**:
+        - Look for "IntentFilterIntentSvc" messages in logcat for details on verification failures
+
+  </Tab>
+  <Tab title="iOS">
+    ## Testing Deep Link Verification for iOS
+
+    1. Install the app on a device
+    2. Open Safari and navigate to your verified domain
+    3. The app should open automatically
+
+    Alternatively, use the iOS Simulator:
+
+    ```bash
+    xcrun simctl openurl booted "https://your-domain.com/path"
+    ```
+
+    ### Troubleshooting for iOS
+
+    1. **App doesn't open with Universal Links**:
+
+        - Ensure your `apple-app-site-association` file is correctly formatted
+        - Verify Team ID and Bundle ID are correct
+        - Make sure the file is accessible via HTTPS
+        - Check that the Associated Domains capability is enabled
+
+    2. **Debug Universal Links**:
+        - Connect your device to a Mac
+        - Open Console.app and filter for "swcd" to see Universal Links logs
+
+  </Tab>
+</Tabs>
+
+## Related Pages
+
+-   [Deep Linking with Subdomains](subdomain)
+-   [Custom URI Schemes for Deep Linking](custom-uri)

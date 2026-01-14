@@ -1,0 +1,91 @@
+---
+title: "Quickstart Guide"
+description: "Get started with Linkrunner in minutes"
+icon: "rocket"
+---
+
+## Choose Your Platform
+
+Get up and running with Linkrunner in just a few minutes. Select your platform below:
+
+<CardGroup cols={2}>
+    <Card title="Web SDK" icon="globe" href="/sdk/web">
+        JavaScript/TypeScript for web applications
+    </Card>
+    <Card title="React Native" icon="react" href="/sdk/react-native">
+        For React Native mobile apps
+    </Card>
+    <Card title="Flutter" icon="flutter" href="/sdk/flutter">
+        For Flutter mobile apps
+    </Card>
+    <Card title="iOS" icon="apple" href="/sdk/ios">
+        Native iOS Swift/Objective-C
+    </Card>
+    <Card title="Android" icon="android" href="/sdk/android">
+        Native Android Kotlin/Java
+    </Card>
+    <Card title="Expo" icon="rocket" href="/sdk/expo">
+        For Expo React Native apps
+    </Card>
+</CardGroup>
+
+## Quick Setup Overview
+
+All Linkrunner SDKs follow the same simple pattern:
+
+### 1. Install the SDK
+
+```bash
+# Example for React Native
+npm install rn-linkrunner
+```
+
+### 2. Initialize in Your App
+
+```javascript
+// Find your project token at: https://dashboard.linkrunner.io/dashboard?s=members&m=documentation
+await linkrunner.init("YOUR_PROJECT_TOKEN");
+```
+
+### 3. Track User Signup
+
+```javascript
+await linkrunner.signup({
+    user_data: {
+        id: "user_123",
+        email: "user@example.com"
+    }
+});
+```
+
+### 4. Get Attribution Data
+
+```javascript
+const attribution = await linkrunner.getAttributionData();
+console.log(attribution);
+```
+
+## What's Next?
+
+<CardGroup cols={2}>
+    <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
+        Validate your setup end-to-end
+    </Card>
+    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+        Direct users to specific in-app content
+    </Card>
+    <Card title="Connect Ad Networks" icon="rectangle-ad" href="/ad-networks/google-ads">
+        Track conversions from your ad campaigns
+    </Card>
+    <Card title="Use the API" icon="database" href="/api-reference/data-apis">
+        Access attribution data programmatically
+    </Card>
+</CardGroup>
+
+## Get Your Project Token
+
+Find your project token in the [Linkrunner Dashboard](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
+
+## Need Help?
+
+Contact our team at [darshil@linkrunner.io](mailto:darshil@linkrunner.io)

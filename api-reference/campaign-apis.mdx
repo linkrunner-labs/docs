@@ -28,7 +28,7 @@ Replace `YOUR_API_KEY` with your actual API key.
 
 You can find your API key on the Linkrunner settings page:
 
-1. Go to https://www.linkrunner.io/settings?s=data-apis
+1. Go to https://dashboard.linkrunner.io/settings?s=data-apis
 2. Locate your Server key on this page
 3. Use this key in the `linkrunner-key` header for all API requests
 
@@ -67,6 +67,7 @@ POST /create-campaign
 #### Request Body Examples
 
 **Creating Campaign:**
+
 ```json
 {
     "name": "Summer Sale 2023",
@@ -79,21 +80,22 @@ POST /create-campaign
 
 #### Request Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `name` | string | Yes | The display name of your campaign. This helps you identify the campaign in your dashboard. |
-| `deeplink` | string | No | The URL that mobile app users will be directed to when they click your campaign link. Should be a valid deep link URL for your mobile application. |
-| `link_for_desktop_users` | string | No | The fallback URL for desktop users who click your campaign link. Typically points to your website or web application. |
-| `android_web_redirect` | string | No | Provide this only if you want the user to be explicitly redirected to a specific web URL on Android. |
-| `ios_web_redirect` | string | No | Provide this only if you want the user to be explicitly redirected to a specific web URL on iOS. |
-| `custom_display_id` | string | No | A custom identifier for your campaign. Must be unique across your account. If not provided, a random ID will be generated. |
-| `is_shortlink` | boolean | No | Set to `true` to create a shortened campaign link. When enabled, creates a compact URL format suitable for sharing. |
+| Parameter                | Type    | Required | Description                                                                                                                                        |
+| ------------------------ | ------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                   | string  | Yes      | The display name of your campaign. This helps you identify the campaign in your dashboard.                                                         |
+| `deeplink`               | string  | No       | The URL that mobile app users will be directed to when they click your campaign link. Should be a valid deep link URL for your mobile application. |
+| `link_for_desktop_users` | string  | No       | The fallback URL for desktop users who click your campaign link. Typically points to your website or web application.                              |
+| `android_web_redirect`   | string  | No       | Provide this only if you want the user to be explicitly redirected to a specific web URL on Android.                                               |
+| `ios_web_redirect`       | string  | No       | Provide this only if you want the user to be explicitly redirected to a specific web URL on iOS.                                                   |
+| `custom_display_id`      | string  | No       | A custom identifier for your campaign. Must be unique across your account. If not provided, a random ID will be generated.                         |
+| `is_shortlink`           | boolean | No       | Set to `true` to create a shortened campaign link. When enabled, creates a compact URL format suitable for sharing.                                |
 
 ##### Note: If `android_web_redirect` or `ios_web_redirect` is provided, it will override the default store listing link for that platform within the campaign and redirect users to the specified URL instead.
 
 #### Response
 
 **Standard Campaign Response:**
+
 ```json
 {
     "msg": "Campaign created successfully!",
@@ -110,6 +112,7 @@ POST /create-campaign
 ```
 
 **Short Link Campaign Response:**
+
 ```json
 {
     "msg": "Campaign created successfully!",
@@ -127,14 +130,14 @@ POST /create-campaign
 
 #### Response Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `id` | number | Unique numerical identifier for the campaign in the system. |
-| `name` | string | The campaign name as provided in the request. |
-| `link` | string | The generated shareable campaign URL. For short links, this will be in format `https://app.domain.com/?c={display_id}`. |
-| `website` | string\|null | The desktop fallback URL. Will be `null` for short link campaigns. |
-| `display_id` | string | The campaign's display identifier (custom or auto-generated). |
-| `created_at` | string | ISO 8601 timestamp of when the campaign was created. |
+| Property     | Type         | Description                                                                                                             |
+| ------------ | ------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `id`         | number       | Unique numerical identifier for the campaign in the system.                                                             |
+| `name`       | string       | The campaign name as provided in the request.                                                                           |
+| `link`       | string       | The generated shareable campaign URL. For short links, this will be in format `https://app.domain.com/?c={display_id}`. |
+| `website`    | string\|null | The desktop fallback URL. Will be `null` for short link campaigns.                                                      |
+| `display_id` | string       | The campaign's display identifier (custom or auto-generated).                                                           |
+| `created_at` | string       | ISO 8601 timestamp of when the campaign was created.                                                                    |
 
 ### 3. Edit Campaign
 

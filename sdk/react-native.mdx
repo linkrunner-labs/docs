@@ -1,0 +1,350 @@
+---
+title: "React Native SDK"
+description: "Complete guide for integrating Linkrunner in React Native apps"
+icon: "react"
+---
+
+## Installation
+
+### Step 1: Install the Package
+
+```bash
+# Using npm
+npm install rn-linkrunner
+
+# Using yarn
+yarn add rn-linkrunner
+```
+
+### Step 2: iOS Configuration
+
+If you're developing for iOS, follow these additional steps:
+
+1. Install pods for the package:
+
+```bash
+cd ios && pod install
+```
+
+2. Add the following code to your `info.plist` file:
+
+```xml
+<key>NSUserTrackingUsageDescription</key>
+<string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
+```
+
+### Step 3: SKAdNetwork Configuration
+
+To enable SKAdNetwork postback copies to be sent to Linkrunner, add the following keys to your `Info.plist` file:
+
+```xml
+<key>NSAdvertisingAttributionReportEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+<key>AttributionCopyEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+```
+
+For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork).
+
+### Step 4: Android Backup Configuration
+
+For Android apps, the SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
+
+For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android#backup-configuration).
+
+### Expo Support
+
+If you are using Expo, follow the above steps to install the required packages. After this, you will need to use development builds since the Linkrunner SDK relies on native libraries. Follow the [Expo Development Builds Documentation](https://docs.expo.dev/develop/development-builds/introduction/) to get started.
+
+## Initialization
+
+To initialize the Linkrunner SDK, add this code to your `App.tsx` component:
+
+You can find your project token [here](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
+
+### SDK Signing Parameters (Optional)
+
+For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+
+-   **`secretKey`**: A unique secret key used for request signing and authentication
+-   **`keyId`**: A unique identifier for the key pair used in the signing process
+
+You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
+
+Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
+
+```javascript
+import linkrunner from "rn-linkrunner";
+
+// Inside your React component
+useEffect(() => {
+    init();
+}, []); // Empty dependency array ensures it runs only once
+
+const init = async () => {
+    await linkrunner.init(
+        "YOUR_PROJECT_TOKEN",
+        "YOUR_SECRET_KEY", // Optional: Required for SDK signing
+        "YOUR_KEY_ID", // Optional: Required for SDK signing
+        false, // Optional: Set to true to disable IDFA collection for iOS devices (defaults to false)
+        true // Optional: Enable debug mode for development (defaults to false)
+    );
+    console.log("Linkrunner initialized");
+};
+```
+
+## User Registration
+
+Call the `signup` method once after the user has completed your app's onboarding process:
+
+It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
+
+-   [Mixpanel - ID Management & User Identification](https://docs.mixpanel.com/docs/tracking-methods/id-management/identifying-users-simplified)
+-   [PostHog - How User Identification Works](https://posthog.com/docs/product-analytics/identify#how-identify-works)
+-   [Amplitude - Identify Users Documentation](https://amplitude.com/docs/get-started/identify-users)
+
+If the platform's identifier function is not called, you must provide a user identifier for Mixpanel, PostHog, and Amplitude integration.
+
+-   mixpanel_distinct_id for Mixpanel
+-   posthog_distinct_id for PostHog
+-   amplitude_device_id for Amplitude
+
+```javascript
+const onSignup = async () => {
+    try {
+        await linkrunner.signup({
+            user_data: {
+                id: "123", // Required: User ID
+                name: "John Doe", // Optional
+                phone: "9876543210", // Optional
+                email: "user@example.com", // Optional
+                // These properties are used to track reinstalls
+                user_created_at: "2024-01-01T00:00:00Z", // Optional
+                is_first_time_user: true, // Optional
+                mixpanel_distinct_id: "mixpanel_distinct_id", // Optional - Mixpanel Distinct ID
+                amplitude_device_id: "amplitude_device_id", // Optional - Amplitude User ID
+                posthog_distinct_id: "posthog_distinct_id", // Optional - PostHog Distinct ID
+            },
+            data: {}, // Optional: Any additional data
+        });
+        console.log("Signup successful");
+    } catch (error) {
+        console.error("Error during signup:", error);
+    }
+};
+```
+
+## Getting Attribution Data
+
+To get attribution data and deeplink information for the current installation, use the `getAttributionData` function:
+
+```javascript
+const getAttributionInfo = async () => {
+    try {
+        const attributionData = await linkrunner.getAttributionData();
+        console.log("Attribution data:", attributionData);
+    } catch (error) {
+        console.error("Error getting attribution data:", error);
+    }
+};
+```
+
+The `getAttributionData` function returns:
+
+```typescript
+{
+    deeplink: string | null;
+    campaign_data: {
+        id: string;
+        name: string;
+        type: string; // "ORGANIC" | "INORGANIC"
+        ad_network: string | null; // "META" | "GOOGLE" | null
+        installed_at: string;
+        store_click_at: string | null;
+        group_name: string;
+        asset_name: string;
+        asset_group_name: string;
+    }
+    attribution_source: string;
+}
+```
+
+## Setting User Data
+
+Call `setUserData` each time the app opens and the user is logged in:
+
+```javascript
+const setUserData = async () => {
+    await linkrunner.setUserData({
+        id: "123", // Required: User ID
+        name: "John Doe", // Optional
+        phone: "9876543210", // Optional
+        email: "user@example.com", // Optional
+        mixpanel_distinct_id: "mixpanel_distinct_id", // Optional - Mixpanel Distinct ID
+        amplitude_device_id: "amplitude_device_id", // Optional - Amplitude User ID
+        posthog_distinct_id: "posthog_distinct_id", // Optional - PostHog Distinct ID
+    });
+};
+```
+
+## Setting CleverTap ID
+
+Use the `setAdditionalData` method to set CleverTap ID:
+
+```javascript
+const setIntegrationData = async () => {
+    await linkrunner.setAdditionalData({
+        clevertapId: "YOUR_CLEVERTAP_USER_ID", // CleverTap user identifier
+    });
+};
+```
+
+### Parameters for `linkrunner.setAdditionalData`
+
+-   `clevertapId`: string (optional) - CleverTap user identifier
+
+This method allows you to connect user identities across different analytics and marketing platforms.
+
+## Tracking Custom Events
+
+Track custom events in your app:
+
+```javascript
+import { v4 as uuidv4 } from 'uuid'; // or use crypto.randomUUID() if available
+
+const trackEvent = async () => {
+    await linkrunner.trackEvent(
+        "purchase_initiated", // Event name
+        { product_id: "12345", category: "electronics", amount: 99.99 }, // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
+        uuidv4() // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
+    );
+};
+```
+
+<Note>
+    The `eventId` parameter should be a unique String identifier for each event. It's recommended to use a UUID library (like `uuid`) or `crypto.randomUUID()` to generate a unique identifier. This helps track and deduplicate events on the server side.
+</Note>
+
+### Revenue Sharing with Ad Networks
+
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+
+```javascript
+import { v4 as uuidv4 } from 'uuid'; // or use crypto.randomUUID() if available
+
+const trackPurchaseEvent = async () => {
+    await linkrunner.trackEvent(
+        "purchase_completed",
+        {
+            product_id: "12345",
+            category: "electronics",
+            amount: 149.99, // Revenue amount as a number
+        },
+        uuidv4() // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
+    );
+};
+```
+
+<Note>
+    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number, not as a
+    string.
+</Note>
+
+## Revenue Tracking
+
+### Capture Payment
+
+Use this method to capture payment information:
+
+```js
+const capturePayment = async () => {
+    await linkrunner.capturePayment({
+        amount: 100, // Payment amount
+        userId: "user123", // User identifier
+        paymentId: "payment456", // Optional: Unique payment identifier
+        type: "FIRST_PAYMENT", // Optional: Payment type
+        // type: "SECOND_PAYMENT", // Optional: Payment type
+        status: "PAYMENT_COMPLETED", // Optional: Payment status
+    });
+};
+```
+
+#### Parameters for `linkrunner.capturePayment`
+
+-   `amount`: number (required) - The payment amount
+-   `userId`: string (required) - Identifier for the user making the payment
+-   `paymentId`: string (optional) - Unique identifier for the payment
+-   `type`: string (optional) - Type of payment. Available options:
+    -   `FIRST_PAYMENT` - First payment made by the user
+    -   `SECOND_PAYMENT` - Second payment made by the user
+    -   `WALLET_TOPUP` - Adding funds to a wallet
+    -   `FUNDS_WITHDRAWAL` - Withdrawing funds
+    -   `SUBSCRIPTION_CREATED` - New subscription created
+    -   `SUBSCRIPTION_RENEWED` - Subscription renewal
+    -   `ONE_TIME` - One-time payment
+    -   `RECURRING` - Recurring payment
+    -   `DEFAULT` - Default type (used if not specified)
+-   `status`: string (optional) - Status of the payment. Available options:
+    -   `PAYMENT_INITIATED` - Payment has been initiated
+    -   `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
+    -   `PAYMENT_FAILED` - Payment attempt failed
+    -   `PAYMENT_CANCELLED` - Payment was cancelled
+
+### Removing Payments
+
+Remove payment records (for refunds or cancellations):
+
+```javascript
+const removePayment = async () => {
+    await linkrunner.removePayment({
+        userId: "user123", // User identifier
+        paymentId: "payment456", // Optional: Unique payment identifier
+    });
+};
+```
+
+#### Parameters for `Linkrunner.removePayment`
+
+-   `userId`: String (required) - Identifier for the user whose payment is being removed
+-   `paymentId`: String (optional) - Unique identifier for the payment to be removed
+
+Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If only `userId` is provided, all payments for that user will be removed.
+
+## Enhanced Privacy Controls
+
+The SDK offers options to enhance user privacy:
+
+```javascript
+// Enable PII (Personally Identifiable Information) hashing
+linkrunner.enablePIIHashing(true);
+```
+
+When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
+
+## Function Placement Guide
+
+| Function                        | Where to Place                 | When to Call                                   |
+| ------------------------------- | ------------------------------ | ---------------------------------------------- |
+| `linkrunner.init`               | App.tsx within useEffect       | Once when app starts                           |
+| `linkrunner.getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed        |
+| `linkrunner.setAdditionalData`  | Integration code               | When third-party integration IDs are available |
+| `linkrunner.signup`             | Onboarding flow                | Once after user completes onboarding           |
+| `linkrunner.setUserData`        | Authentication logic           | Every time app opens with logged-in user       |
+| `linkrunner.trackEvent`         | Throughout app                 | When specific user actions occur               |
+| `linkrunner.capturePayment`     | Payment processing             | When user makes a payment                      |
+| `linkrunner.removePayment`      | Refund flow                    | When payment needs to be removed               |
+
+## Next Steps
+
+<CardGroup cols={2}>
+    <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
+        Validate your setup end-to-end
+    </Card>
+    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+        Configure deep links for your app
+    </Card>
+</CardGroup>
+
+## Support
+
+If you encounter issues during integration, contact us at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).

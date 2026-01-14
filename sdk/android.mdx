@@ -1,0 +1,643 @@
+---
+title: "Android SDK"
+description: "Complete guide for integrating Linkrunner in native Android apps"
+icon: "android"
+---
+
+## Requirements
+
+- Android 5.0 (API level 21) or higher
+- Android Studio Flamingo (2022.2.1) or newer
+- Gradle 8.0+
+
+## Installation
+
+### Step 1: Gradle Setup
+
+Add the Linkrunner SDK to your app's `build.gradle` file:
+
+```gradle
+dependencies {
+    implementation 'io.linkrunner:android-sdk:2.1.5'
+}
+```
+
+Make sure you have the Maven Central repository in your project's `settings.gradle` file:
+
+```gradle
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
+
+### Step 2: Required Permissions
+
+Add the following permissions to your `AndroidManifest.xml` file:
+
+```xml
+<!-- Required for the SDK to make network requests -->
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+```
+
+> **Note:** The `AD_ID` permission (`<uses-permission android:name="com.google.android.gms.permission.AD_ID" />`) is already included in the SDK and is required for collecting device identifiers (GAID). If your app participates in [Designed for Families](https://support.google.com/googleplay/android-developer/topic/9877766?hl=en&ref_topic=9858052), you should revoke AAID and disable AAID collection. See the [Disabling AAID Collection](#disabling-aaid-collection) section for more details.
+
+### Step 3: Backup Configuration
+
+The SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
+
+<Note>
+    This backup configuration works similarly for all SDKs (React Native, Flutter, and native Android). The same Android backup rules apply regardless of which SDK you're using.
+</Note>
+
+#### Adding Backup Rules to Your App
+
+**Add to your `AndroidManifest.xml`**:
+
+```xml
+<application
+    android:fullBackupContent="@xml/linkrunner_backup_descriptor"
+    android:dataExtractionRules="@xml/linkrunner_backup_rules">
+    <!-- Your app content -->
+</application>
+```
+
+-   `android:fullBackupContent` - Used for Android 6-11
+-   `android:dataExtractionRules` - Used for Android 12+
+
+#### Merging Backup Rules
+
+If you already have your own backup rules specified (e.g., `android:fullBackupContent="@xml/my_backup_descriptor"` or `android:dataExtractionRules="@xml/my_rules"`), then manually add the following rules to your existing files:
+
+**For legacy backup** (Android 6-11) in `res/xml/my_backup_descriptor`:
+
+```xml
+<full-backup-content>
+    <!-- Exclude LinkRunner SDK SharedPreferences from legacy backup -->
+    <exclude domain="sharedpref" path="io.linkrunner.sdk_prefs"/>
+</full-backup-content>
+```
+
+**For modern backup** (Android 12+) in `res/xml/my_backup_rules.xml`:
+
+```xml
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Exclude LinkRunner SDK SharedPreferences from cloud backup -->
+        <exclude domain="sharedpref" path="io.linkrunner.sdk_prefs"/>
+    </cloud-backup>
+    <device-transfer>
+        <!-- Exclude LinkRunner SDK SharedPreferences from device transfer -->
+        <exclude domain="sharedpref" path="io.linkrunner.sdk_prefs"/>
+    </device-transfer>
+</data-extraction-rules>
+```
+
+### Step 4: Revoking the AD_ID Permission (Optional)
+
+According to [Google's Policy](https://support.google.com/googleplay/android-developer/answer/11043825?hl=en), apps that target children must not transmit the Advertising ID.
+
+To revoke the AD_ID permission, use SDK version 3.5.0 and above. Children apps targeting Android 13 (API 33) and above must prevent the permission from getting merged into their app by adding a revoke declaration to their Manifest. Use the [`setDisableAaidCollection()`](#disabling-aaid-collection) and [`isAaidCollectionDisabled()`](#disabling-aaid-collection) functions to disable AAID collection programmatically:
+
+**AndroidManifest.xml**
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Remove AD_ID permission that comes from the SDK -->
+    <uses-permission
+        android:name="com.google.android.gms.permission.AD_ID"
+        tools:node="remove" />
+
+    <!-- Your other permissions -->
+</manifest>
+```
+
+<Note>
+    Make sure to add `xmlns:tools="http://schemas.android.com/tools"` to your manifest tag to use the `tools:node="remove"` attribute. If you disable AAID collection, you should also remove the AD_ID permission from your manifest to fully comply with Google Play's Family Policy requirements.
+</Note>
+
+For more information, see [Google Play Services documentation](https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info#public-string-getid).
+
+### Importing in Kotlin/Java
+
+After installation, you can import the SDK in your Kotlin or Java files:
+
+```kotlin
+// Kotlin
+import io.linkrunner.sdk.LinkRunner
+```
+
+```java
+// Java
+import io.linkrunner.sdk.LinkRunner;
+```
+
+## Initialization
+
+Initialize the Linkrunner SDK in your application, typically in your `Application` class or main activity:
+
+You can find your project token [here](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
+
+Note: This method returns a void. To get attribution data and deeplink information, use the `getAttributionData` method.
+
+```kotlin
+import android.app.Application
+import io.linkrunner.sdk.LinkRunner
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+
+        // Initialize LinkRunner with SDK signing
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                LinkRunner.getInstance().init(
+                    context = applicationContext,
+                    token = "YOUR_PROJECT_TOKEN",
+                    secretKey = "YOUR_SECRET_KEY", // Optional: Required for SDK signing
+                    keyId = "YOUR_KEY_ID", // Optional: Required for SDK signing
+                    debug = true // Optional: Enable debug mode for development (defaults to false)
+                )
+
+                println("LinkRunner initialized successfully")
+            } catch (e: Exception) {
+                println("Exception during initialization: ${e.message}")
+            }
+        }
+    }
+}
+```
+
+### SDK Signing Parameters (Optional)
+
+For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+
+-   **`secretKey`**: A unique secret key used for request signing and authentication
+-   **`keyId`**: A unique identifier for the key pair used in the signing process
+-   **`debug`** (optional): Boolean flag to enable debug mode for development (defaults to false)
+
+You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
+
+## User Registration
+
+Call the `signup` method once after the user has completed your app's onboarding process:
+
+It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
+
+-   [Mixpanel - ID Management & User Identification](https://docs.mixpanel.com/docs/tracking-methods/id-management/identifying-users-simplified)
+-   [PostHog - How User Identification Works](https://posthog.com/docs/product-analytics/identify#how-identify-works)
+-   [Amplitude - Identify Users Documentation](https://amplitude.com/docs/get-started/identify-users)
+
+If the platform's identifier function is not called, you must provide a user identifier for Mixpanel, PostHog, and Amplitude integration.
+
+-   mixpanelDistinctId for Mixpanel
+-   posthogDistinctId for PostHog
+-   amplitudeDeviceId for Amplitude
+
+```kotlin
+private fun onSignup() {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val userData = UserDataRequest(
+                id = "123", // Required: User ID
+                name = "John Doe", // Optional
+                phone = "9876543210", // Optional
+                email = "user@example.com", // Optional
+                mixpanelDistinctId = "mixpanel_distinct_id", // Optional - Mixpanel Distinct ID
+                amplitudeDeviceId = "amplitude_device_id", // Optional - Amplitude User ID
+                posthogDistinctId = "posthog_distinct_id" // Optional - PostHog Distinct ID
+                userCreatedAt = "2024-01-01T00:00:00Z", // Optional
+                isFirstTimeUser = true, // Optional
+            )
+
+            LinkRunner.getInstance().signup(
+                userData = userData,
+                additionalData = mapOf("custom_field" to "custom_value") // Optional: Any additional data
+            )
+            println("Signup successful")
+        } catch (e: Exception) {
+            println("Exception during signup: ${e.message}")
+        }
+    }
+}
+```
+
+## Getting Attribution Data
+
+To get attribution data and deeplink information for the current installation, use the `getAttributionData` function:
+
+```kotlin
+val attributionDataResult = LinkRunner.getInstance().getAttributionData()
+attributionDataResult.onSuccess { attributionData ->
+    println("Attribution data: $attributionData")
+    // Attribution data includes:
+    // - deeplink: The deep link URL that led to app installation
+    // - campaignData: Campaign information
+}
+```
+
+```kotlin
+data class AttributionData(
+    val deeplink: String?,
+    val campaignData: CampaignData,
+    val attributionSource: String
+)
+
+data class CampaignData(
+    val id: String,
+    val name: String,
+    val adNetwork: String?,
+    val type: String,
+    val installedAt: String,
+    val storeClickAt: String?,
+    val groupName: String,
+    val assetName: String,
+    val assetGroupName: String
+)
+```
+
+## Setting User Data
+
+Call `setUserData` each time the app opens and the user is logged in:
+
+```kotlin
+private fun setUserData() {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val userData = UserDataRequest(
+                id = "123", // Required: User ID
+                name = "John Doe", // Optional
+                phone = "9876543210", // Optional
+                email = "user@example.com", // Optional
+                mixpanelDistinctId = "mixpanel_distinct_id", // Optional - Mixpanel Distinct ID
+                amplitudeDeviceId = "amplitude_device_id", // Optional - Amplitude User ID
+                posthogDistinctId = "posthog_distinct_id" // Optional - PostHog Distinct ID
+            )
+
+            val result = LinkRunner.getInstance().setUserData(userData)
+
+            result.onSuccess {
+                println("User data set successfully")
+            }.onFailure { error ->
+                println("Error setting user data: ${error.message}")
+            }
+        } catch (e: Exception) {
+            println("Exception setting user data: ${e.message}")
+        }
+    }
+}
+```
+
+## Setting CleverTap ID
+
+Use the `setAdditionalData` method to set CleverTap ID:
+
+```kotlin
+private fun setIntegrationData() {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val integrationData: IntegrationData = IntegrationData(clevertapId="YOUR_CLEVERTAP_ID")
+
+            val result = LinkRunner.getInstance().setAdditionalData(integrationData)
+
+            result.onSuccess {
+                println("CleverTap ID set successfully")
+            }.onFailure { error ->
+                println("Error setting CleverTap ID: ${error.message}")
+            }
+        } catch (e: Exception) {
+            println("Exception setting CleverTap ID: ${e.message}")
+        }
+    }
+}
+```
+
+## Tracking Custom Events
+
+Track custom events in your app:
+
+```kotlin
+import java.util.UUID
+
+private fun trackEvent() {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val result = LinkRunner.getInstance().trackEvent(
+                eventName = "purchase_initiated", // Event name
+                eventData = mapOf( // Optional: Event data
+                    "product_id" to "12345",
+                    "category" to "electronics",
+                    "amount" to 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
+                ),
+                eventId = UUID.randomUUID().toString() // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
+            )
+
+            result.onSuccess {
+                println("Event tracked successfully")
+            }.onFailure { error ->
+                println("Error tracking event: ${error.message}")
+            }
+        } catch (e: Exception) {
+            println("Exception tracking event: ${e.message}")
+        }
+    }
+}
+```
+
+<Note>
+    The `eventId` parameter should be a unique String identifier for each event. It's recommended to use `UUID.randomUUID().toString()` to generate a unique identifier. This helps track and deduplicate events on the server side.
+</Note>
+
+### Revenue Sharing with Ad Networks
+
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+
+```kotlin
+import java.util.UUID
+
+private fun trackPurchaseEvent() {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val result = LinkRunner.getInstance().trackEvent(
+                eventName = "purchase_completed",
+                eventData = mapOf(
+                    "product_id" to "12345",
+                    "category" to "electronics",
+                    "amount" to 149.99 // Revenue amount as a number
+                ),
+                eventId = UUID.randomUUID().toString() // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness
+            )
+
+            result.onSuccess {
+                println("Purchase event with revenue tracked successfully")
+            }.onFailure { error ->
+                println("Error tracking purchase event: ${error.message}")
+            }
+        } catch (e: Exception) {
+            println("Exception tracking purchase event: ${e.message}")
+        }
+    }
+}
+```
+
+<Note>
+    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number (Double
+    or Int), not as a string.
+</Note>
+
+## Revenue Tracking
+
+### Capturing Payments
+
+Track payment information with the following details:
+
+```kotlin
+private fun capturePayment() {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val paymentData = CapturePaymentRequest(
+                paymentId = "payment_123",  // Optional: Unique payment identifier
+                userId = "user123",         // Required: User identifier
+                amount = 99.99,              // Required: Payment amount
+                type = PaymentType.FIRST_PAYMENT,  // Optional: Defaults to DEFAULT
+                // type = PaymentType.SECOND_PAYMENT,  // Optional: Defaults to DEFAULT
+                status = PaymentStatus.PAYMENT_COMPLETED  // Optional: Defaults to PAYMENT_COMPLETED
+            )
+
+            val result = LinkRunner.getInstance().capturePayment(paymentData)
+
+            result.onSuccess {
+                println("Payment captured successfully")
+            }.onFailure { error ->
+                println("Error capturing payment: ${error.message}")
+            }
+        } catch (e: Exception) {
+            println("Exception capturing payment: ${e.message}")
+        }
+    }
+}
+```
+
+#### Available Payment Types
+
+| Type                   | Description              |
+| ---------------------- | ------------------------ |
+| `FIRST_PAYMENT`        | User's first payment     |
+| `SECOND_PAYMENT`       | User's second payment    |
+| `WALLET_TOPUP`         | Adding funds to wallet   |
+| `FUNDS_WITHDRAWAL`     | Withdrawing funds        |
+| `SUBSCRIPTION_CREATED` | New subscription created |
+| `SUBSCRIPTION_RENEWED` | Subscription renewal     |
+| `ONE_TIME`             | One-time payment         |
+| `RECURRING`            | Recurring payment        |
+| `DEFAULT`              | Default payment type     |
+
+#### Available Payment Statuses
+
+| Status              | Description                    |
+| ------------------- | ------------------------------ |
+| `PAYMENT_INITIATED` | Payment process started        |
+| `PAYMENT_COMPLETED` | Payment successfully completed |
+| `PAYMENT_FAILED`    | Payment failed                 |
+| `PAYMENT_CANCELLED` | Payment was cancelled          |
+
+### Removing Payments
+
+To remove or refund a payment:
+
+```kotlin
+private fun removePayment() {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            // Either paymentId or userId must be provided
+            val removeRequest = RemovePaymentRequest(
+                paymentId = "payment_123",  // Optional: Payment ID to remove
+                userId = "user123"           // Optional: User ID to remove payments for
+            )
+
+            val result = LinkRunner.getInstance().removePayment(removeRequest)
+
+            result.onSuccess {
+                println("Payment removed successfully")
+            }.onFailure { error ->
+                println("Error removing payment: ${error.message}")
+            }
+        } catch (e: Exception) {
+            println("Exception removing payment: ${e.message}")
+        }
+    }
+}
+```
+
+## Enhanced Privacy Controls
+
+The SDK offers options to enhance user privacy:
+
+```kotlin
+// Enable PII (Personally Identifiable Information) hashing
+LinkRunner.getInstance().enablePIIHashing(true)
+
+// Check if PII hashing is enabled
+val isHashingEnabled = LinkRunner.getInstance().isPIIHashingEnabled()
+```
+
+When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
+
+## Disabling AAID Collection
+
+<Note>
+    **SDK Version Requirement:** The AAID collection disable functionality requires Android SDK version 3.5.0 or higher.
+</Note>
+
+The SDK provides options to disable AAID (Google Advertising ID) collection. This is useful for apps targeting children or families to comply with Google Play's Family Policy.
+
+### Disable AAID Collection
+
+To disable AAID collection, call `setDisableAaidCollection` before SDK initialization:
+
+```kotlin
+// Disable AAID collection
+LinkRunner.getInstance().setDisableAaidCollection(true)
+
+// Check if AAID collection is disabled
+val isDisabled = LinkRunner.getInstance().isAaidCollectionDisabled()
+```
+
+When AAID collection is disabled, the SDK will not collect or send the Google Advertising ID (GAID) to Linkrunner servers.
+
+### Removing AD_ID Permission
+
+If you want to completely remove the `AD_ID` permission from your app's manifest (for example, for apps targeting children), you can override the SDK's permission declaration in your `AndroidManifest.xml`. For detailed instructions on revoking the AD_ID permission, including Google's policy requirements for apps targeting children and Android 13+ (API 33+), see the [Revoking the AD_ID Permission](#step-4-revoking-the-ad_id-permission-optional) section above.
+
+## Function Placement Guide
+
+| Function                                      | Where to Place                 | When to Call                                   |
+| --------------------------------------------- | ------------------------------ | ---------------------------------------------- |
+| `LinkRunner.getInstance().init`               | Application class              | Once when app starts                           |
+| `LinkRunner.getInstance().getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed        |
+| `LinkRunner.getInstance().setAdditionalData`  | Integration code               | When third-party integration IDs are available |
+| `LinkRunner.getInstance().signup`             | Onboarding flow                | Once after user completes onboarding           |
+| `LinkRunner.getInstance().setUserData`        | Authentication logic           | Every time app opens with logged-in user       |
+| `LinkRunner.getInstance().trackEvent`         | Throughout app                 | When specific user actions occur               |
+| `LinkRunner.getInstance().capturePayment`     | Payment processing             | When user makes a payment                      |
+| `LinkRunner.getInstance().removePayment`      | Refund flow                    | When payment needs to be removed               |
+| `LinkRunner.getInstance().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection |
+| `LinkRunner.getInstance().isAaidCollectionDisabled` | Privacy settings or compliance checks | When you need to check AAID collection status |
+
+## Complete Example
+
+Here's a simplified example showing how to integrate Linkrunner in a native Android app:
+
+You can find your project token [here](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
+
+```kotlin
+import android.app.Application
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import io.linkrunner.sdk.LinkRunner
+import io.linkrunner.sdk.models.request.UserDataRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.UUID
+
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+
+        // Initialize LinkRunner with SDK signing
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                LinkRunner.getInstance().init(
+                    context = applicationContext,
+                    token = "YOUR_PROJECT_TOKEN",
+                    secretKey = "YOUR_SECRET_KEY", // Required for SDK signing
+                    keyId = "YOUR_KEY_ID" // Required for SDK signing
+                )
+            } catch (e: Exception) {
+                println("Error initializing LinkRunner: ${e.message}")
+            }
+        }
+    }
+}
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // Button to track an event
+        findViewById<android.widget.Button>(R.id.trackEventButton).setOnClickListener {
+            trackCustomEvent()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Set user data if user is logged in
+        if (isUserLoggedIn()) {
+            setUserData()
+        }
+    }
+
+    private fun isUserLoggedIn(): Boolean {
+        // Your login check logic
+        return true
+    }
+
+    private fun setUserData() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val userData = UserDataRequest(
+                    id = "123",
+                    name = "John Doe",
+                    email = "user@example.com"
+                )
+
+                LinkRunner.getInstance().setUserData(userData)
+            } catch (e: Exception) {
+                println("Error setting user data: ${e.message}")
+            }
+        }
+    }
+
+    private fun trackCustomEvent() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                LinkRunner.getInstance().trackEvent(
+                    eventName = "button_clicked",
+                    eventData = mapOf("screen" to "main"),
+                    eventId = UUID.randomUUID().toString() // Optional: Unique event identifier (String). Recommended to use UUID for uniqueness.
+                )
+            } catch (e: Exception) {
+                println("Error tracking event: ${e.message}")
+            }
+        }
+    }
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+    <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
+        Validate your setup end-to-end
+    </Card>
+    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+        Configure deep links for your app
+    </Card>
+</CardGroup>
+
+## Support
+
+If you encounter issues during integration, contact us at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).
