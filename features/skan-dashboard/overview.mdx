@@ -1,0 +1,110 @@
+---
+title: 'SKAN Dashboard Overview'
+description: 'Track and analyze your SKAdNetwork conversion data with detailed insights'
+---
+
+## SKAN Dashboard?
+
+All data in this dashboard comes directly from SKAN postbacks that Apple sends to Linkrunner through user devices.These postbacks report app installs and post-install activity in an aggregated, privacy-preserving way, without exposing any user-level data.
+
+<Note>
+**What are SKAN postbacks?** When someone installs your app from an ad, Apple waits a bit (to protect privacy), then sends a postback to Linkrunner with limited information about that install and what the user did in your app, without identifying the user. This is Apple's way of helping you measure ad performance while keeping user data private.
+</Note>
+
+## Dashboard Components
+
+The SKAN Dashboard consists of five main components:
+
+### 1. Stats Overview Cards
+
+Quick snapshot metrics showing total installs, conversion value null counts, and null rates. These cards give you an at-a-glance view of your overall SKAN performance.
+
+[Learn more about Stats Cards →](/features/skan-dashboard/stats-cards)
+
+### 2. Privacy Tier Breakdown
+
+Visualizes how your installs are distributed across Apple's four privacy tiers.
+
+[Learn more about Privacy Tiers →](/features/skan-dashboard/privacy-tiers)
+
+### 3. Conversion Value Distribution
+
+Shows which conversion values you're receiving and helps you understand what actions users are taking in your app after installing.
+
+[Learn more about Conversion Values →](/features/skan-dashboard/conversion-values)
+
+### 4. Install Trends Over Time
+
+Line chart showing daily install volume broken down by ad channel. Filter by events to see which channels drive specific user actions.
+
+[Learn more about Trend Analysis →](/features/skan-dashboard/trend-graph)
+
+### 5. All Conversion Values Table
+
+Detailed breakdown of every event in your SKAN configuration, showing installs, reinstalls, click-through, and view-through metrics.
+
+[Learn more about the Conversion Table →](/features/skan-dashboard/conversion-table)
+
+## Dashboard Filters
+
+### Date Range Filter
+
+Choose how far back to look at your data:
+- Last 7 days
+- Last 30 days (default)
+- Last 60 days
+- Last 90 days
+
+### Channel Filter
+
+Filter data by ad network:
+- **All Channels** (default): Shows combined data from all sources
+- **Meta Ads**
+- **Google Ads**
+- **TikTok**
+- **Snapchat**
+
+You can select multiple channels to compare performance across networks.
+
+
+## FAQs
+
+<AccordionGroup>
+  <Accordion title="Why are my conversion values null?">
+    Null conversion values happen because of Apple's **crowd anonymity** requirements.
+
+    To protect user privacy, Apple only shares conversion value data when enough installs occur to make individual users unidentifiable. Apple assigns each install to a privacy tier (0-3) based on crowd size:
+
+    - **Tier 0-1**: Low install volume → No fine-grained conversion value, only coarse or nothing
+    - **Tier 2-3**: Higher install volume → Full conversion value data
+
+    If you're seeing many null values, your campaigns likely aren't hitting the volume thresholds needed for higher tiers.
+
+    **How to reduce null rates:**
+    - Consolidate smaller campaigns into fewer, larger ones
+    - Increase budget on well-performing campaigns
+    - Focus spend on channels where you can achieve higher volume
+
+    [Learn more about Privacy Tiers →](/features/skan-dashboard/privacy-tiers)
+  </Accordion>
+
+  <Accordion title="Can I see SKAN dashboard even if SKAN configuration is not done on Linkrunner?">
+    Yes, you can see the SKAN dashboard without completing SKAN configuration on Linkrunner.
+
+    Linkrunner analyzes the postbacks received from Apple for the SKAN dashboard. If you've [configured your app to send postbacks to Linkrunner](/features/skadnetwork-integration), data will be shown on the SKAN dashboard.
+
+    However, without SKAN configuration on Linkrunner, the analysis of conversion values cannot be done. You'll see raw conversion value numbers, but won't have the event mapping that explains what those numbers mean.
+
+    To get full insights, complete your [SKAN configuration](https://dashboard.linkrunner.io/dashboard/settings/skan-setup) to map events to conversion values.
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+- [SKAdNetwork Integration Guide](/features/skadnetwork-integration) - Set up SKAN tracking in your app
+- [SKAN Conversion Values Configuration](/features/skadnetwork-conversion-values) - Map events to conversion values
+- [Apple's SKAdNetwork Documentation](https://developer.apple.com/documentation/storekit/skadnetwork) - Technical details from Apple
+
+## Need Help?
+
+If you have questions about your SKAN data or need help optimizing your setup, reach out to our support team at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).

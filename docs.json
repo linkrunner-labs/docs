@@ -48,7 +48,18 @@
                                 "group": "SKAdNetwork",
                                 "pages": [
                                     "features/skadnetwork-integration",
-                                    "features/skadnetwork-conversion-values"
+                                    "features/skadnetwork-conversion-values",
+                                    {
+                                        "group": "SKAN Dashboard",
+                                        "pages": [
+                                            "features/skan-dashboard/overview",
+                                            "features/skan-dashboard/stats-cards",
+                                            "features/skan-dashboard/privacy-tiers",
+                                            "features/skan-dashboard/conversion-values",
+                                            "features/skan-dashboard/trend-graph",
+                                            "features/skan-dashboard/conversion-table"
+                                        ]
+                                    }
                                 ]
                             }
                         ]

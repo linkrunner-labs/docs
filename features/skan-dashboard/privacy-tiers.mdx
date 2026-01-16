@@ -1,0 +1,58 @@
+---
+title: 'Privacy Tier Breakdown'
+description: 'Understand how Apple assigns privacy tiers and what data you receive at each tier level'
+---
+
+## What is Crowd Anonymity?
+
+To protect user privacy, Apple limits the data in SKAdNetwork postbacks based on **crowd anonymity**. The idea is simple: the more installs a campaign generates, the harder it is to identify any individual user, so Apple shares more data.
+
+Apple assigns each app download a **postback data tier** (0-3). Higher tiers = more data.
+
+## How Apple Determines Your Privacy Tier
+
+Apple calculates your tier based on:
+
+- **Crowd size** of the app/domain displaying the ad
+- **Crowd size** of the advertised app
+- **Country** where the app was installed
+- **Hierarchical source identifier** provided by the ad network
+
+## What Data You Receive at Each Tier
+
+| Field | Tier 0 | Tier 1 | Tier 2 | Tier 3 |
+|-------|--------|--------|--------|--------|
+| **source-identifier** | 2 digits | 2 digits | 3 digits | 4 digits |
+| **conversion-value** (fine) | ❌ | ❌ | ✅ | ✅ |
+| **coarse-conversion-value** | ❌ | ✅ | ✅ | ✅ |
+| **source-app-id** / **source-domain** | ❌ | ❌ | ❌ | ✅ |
+| **country-code** | ❌ | ❌ | ❌ | ✅ (if crowd size qualifies) |
+
+### Tier 3 (Best Data)
+- Full 4-digit source identifier
+- Fine-grained conversion value (0-63) in first postback
+- Coarse conversion value in all postbacks
+- Source app ID or source domain
+- Country code (if crowd size qualifies)
+
+### Tier 2
+- 3-digit source identifier
+- Fine-grained conversion value (0-63) in first postback
+- Coarse conversion value in all postbacks
+
+### Tier 1
+- 2-digit source identifier
+- Coarse conversion value only (Low/Medium/High)
+- No fine-grained conversion value
+
+### Tier 0 (Minimal Data)
+- 2-digit source identifier
+- No conversion value data
+- Only confirms an install happened
+
+
+## Related
+
+- [Stats Overview Cards](/features/skan-dashboard/stats-cards)
+- [Conversion Value Distribution](/features/skan-dashboard/conversion-values)
+- [Install Trends Over Time](/features/skan-dashboard/trend-graph)
