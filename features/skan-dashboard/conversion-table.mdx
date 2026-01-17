@@ -99,6 +99,18 @@ Use the postback toggle to compare the same event across different time windows:
 - Which channels get users that complete events quickly (high quality within few days)
 - How many users convert immediately vs. over time
 
+## Common Questions
+
+<AccordionGroup>
+  <Accordion title="Why do I not have data in 2nd and 3rd Postback filters?">
+    Second and third postbacks are only available in **SKAdNetwork 4.0**. If the ad network is using SKAN versions below 4.0, only a single postback is sent.
+
+    Even in SKAN 4.0, additional postbacks are sent only if Apple's privacy tier thresholds are met. If an install does not meet the required privacy thresholds, Apple may limit reporting and only send the first postback.
+
+    [Learn more about Privacy Tiers →](/features/skan-dashboard/privacy-tiers)
+  </Accordion>
+</AccordionGroup>
+
 ## Related Components
 
 - [Stats Overview Cards](/features/skan-dashboard/stats-cards) - See aggregated metrics

@@ -91,11 +91,19 @@ You can select multiple channels to compare performance across networks.
   <Accordion title="Can I see SKAN dashboard even if SKAN configuration is not done on Linkrunner?">
     Yes, you can see the SKAN dashboard without completing SKAN configuration on Linkrunner.
 
-    Linkrunner analyzes the postbacks received from Apple for the SKAN dashboard. If you've [configured your app to send postbacks to Linkrunner](/features/skadnetwork-integration), data will be shown on the SKAN dashboard.
+    Linkrunner analyzes the postbacks received from Apple for the SKAN dashboard. If you've [configured your app to send postbacks to Linkrunner](/features/skadnetwork-integration#configuring-postback-copies-to-linkrunner), data will be shown on the SKAN dashboard.
 
     However, without SKAN configuration on Linkrunner, the analysis of conversion values cannot be done. You'll see raw conversion value numbers, but won't have the event mapping that explains what those numbers mean.
 
     To get full insights, complete your [SKAN configuration](https://dashboard.linkrunner.io/dashboard/settings/skan-setup) to map events to conversion values.
+  </Accordion>
+
+  <Accordion title="I have set up conversion values but still there is no data on the SKAN dashboard">
+    The SKAN dashboard shows data via the postbacks received from Apple. Setting up conversion values alone is not enough.
+
+    Make sure you've completed the [postback configuration to send data to Linkrunner](/features/skadnetwork-integration#configuring-postback-copies-to-linkrunner). Without this setup, Apple won't send postbacks to Linkrunner, and the dashboard will remain empty.
+
+    Once postback copies are configured correctly, data will start appearing in the dashboard as Apple sends postbacks (typically 1-3 days after installs occur).
   </Accordion>
 </AccordionGroup>
 

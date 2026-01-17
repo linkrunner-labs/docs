@@ -97,6 +97,14 @@ The values shown here are based on your SKAN configuration. To modify your mappi
 
     You define what events map to each tier in your SKAN configuration. The categories help you understand user quality even when fine-grained data isn't available.
   </Accordion>
+
+  <Accordion title="Why do I not have data in 2nd and 3rd Postback filters?">
+    Second and third postbacks are only available in **SKAdNetwork 4.0**. If the ad network is using SKAN versions below 4.0, only a single postback is sent.
+
+    Even in SKAN 4.0, additional postbacks are sent only if Apple's privacy tier thresholds are met. If an install does not meet the required privacy thresholds, Apple may limit reporting and only send the first postback.
+
+    [Learn more about Privacy Tiers →](/features/skan-dashboard/privacy-tiers)
+  </Accordion>
 </AccordionGroup>
 
 ## Related
