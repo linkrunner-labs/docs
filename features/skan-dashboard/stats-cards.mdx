@@ -1,0 +1,59 @@
+---
+title: 'Stats Overview Cards'
+description: 'Understand your key SKAN metrics at a glance with total installs, CV null counts, and null rates'
+---
+
+## Overview
+
+The Stats Overview Cards display four key metrics that provide a snapshot of your SKAN performance. Each card shows data for your selected time period as well as lifetime totals, along with a trend graph to visualize changes over time.
+
+<Note>
+**Important note**: The install date shown is when the postback was received, not when the actual install happened. Apple does not send postbacks immediately after an install. After a user installs and launches an app, Apple delivers attribution postbacks on a delayed schedule (within ~48-72 hours).
+</Note>
+
+## Metrics
+
+The widget displays data for the following metrics:
+
+### Installs (SKAN)
+
+Returns the count of valid SKAN postbacks.
+
+**What you'll see:**
+- **Filtered Period**: Number of installs within your selected date range
+- **Lifetime**: Total installs since you started using Linkrunner
+- **Trend Graph**: Daily install volume over the selected period
+
+### Reinstalls (SKAN)
+
+For reinstall events, Apple includes redownload=true in the SKAN postbacks sent to Linkrunner. The Reinstalls metric reflects the number of reinstalls during the selected period, as reported by these postbacks.
+
+**What you'll see:**
+- **Filtered Period**: Number of reinstalls within your selected date range
+- **Lifetime**: Total reinstalls since you started using Linkrunner
+- **Trend Graph**: Daily reinstall volume over the selected period
+
+### Conversion Value Null Count
+
+This metric counts SKAN postbacks with a null conversion value, meaning no post-install actions were reported. This may happen when Apple limits reporting due to privacy tier requirements.
+
+**What you'll see:**
+- **Filtered Period**: Number of null conversion values in your selected date range
+- **Lifetime**: Total null conversion values since you started using Linkrunner
+- **Trend Graph**: Daily null count over the selected period
+
+
+### Conversion Value Null Rate
+
+The number of postbacks received with a conversion value of null divided by the number of SKAN installs.
+
+**What you'll see:**
+- **Filtered Period**: Percentage of null conversion values in your selected date range
+- **Lifetime**: Overall null rate since you started using Linkrunner
+- **Trend Graph**: Daily null rate percentage over the selected period
+
+## Related Components
+
+- [Privacy Tier Breakdown](/features/skan-dashboard/privacy-tiers) - See how privacy tiers affect your data quality
+- [Conversion Value Distribution](/features/skan-dashboard/conversion-values) - Understand which events users are performing
+- [Install Trends Over Time](/features/skan-dashboard/trend-graph) - Analyze install patterns by channel

@@ -1,0 +1,114 @@
+---
+title: 'Conversion Value Distribution'
+description: 'Analyze which conversion values you receive and understand user actions through fine and coarse conversion values'
+---
+
+## Overview
+
+The Conversion Value Distribution visualization shows which conversion values you're receiving from SKAN postbacks. This helps you understand what actions users are taking in your app after installing.
+
+<Note>
+Multiple postbacks are only available in **SKAdNetwork 4.0+**. Earlier versions only support a single postback.
+</Note>
+
+## Postback Sequences
+
+SKAN 4.0 can send up to three postbacks per install, each covering a different time window:
+
+### Postback 1 (P1): Days 0-2
+
+- **Conversion window**: Ends 2 days after the user first launches the app
+- **Postback sent**: After conversion window ends + random delay
+- **Data available**: Fine conversion values (0-63) OR coarse values (Low/Medium/High)
+
+### Postback 2 (P2): Days 3-7
+
+- **Conversion window**: Ends 7 days after the user first launches the app
+- **Postback sent**: After conversion window ends + random 24-144 hour delay
+- **Data available**: Coarse values only (Low/Medium/High)
+
+### Postback 3 (P3): Days 8-35
+
+- **Conversion window**: Ends 35 days after the user first launches the app
+- **Postback sent**: After conversion window ends + random 24-144 hour delay
+- **Data available**: Coarse values only (Low/Medium/High)
+
+## Conversion Value Types
+
+### Fine Conversion Values (0-63)
+
+- **Available in**: Postback 1 only
+- **Number of values**: 64 (0 through 63)
+- **Visualization**: 8x8 grid of numbered squares
+
+**How to read the grid:**
+- Each square represents one conversion value
+- Color intensity shows install volume (darker = more installs)
+- Hover over any square to see exact counts and mapped events
+
+### Coarse Conversion Values (Low/Medium/High)
+
+- **Available in**: All three postbacks (P1, P2, P3)
+- **Number of values**: 3
+
+## Switching Between Views
+
+**Postback toggle (P1, P2, P3)**: Switch between time windows to see user behavior at different stages.
+
+**Fine/Coarse toggle**: For P1 only, switch between the detailed 64-value grid and the simplified 3-value pie chart. P2 and P3 only support coarse values.
+
+**Channel filter**: Use the channel filter at the top of the dashboard to see the distribution of conversion values across different ad networks (Meta Ads, Google Ads, TikTok, Snapchat).
+
+## Setting Up Conversion Values
+
+The values shown here are based on your SKAN configuration. To modify your mapping:
+
+1. Navigate to [SKAN settings in the Linkrunner dashboard](https://dashboard.linkrunner.io/dashboard/settings/skan-setup)
+2. Define the priority of events, and Linkrunner will configure the corresponding fine and coarse conversion values.
+
+[Learn more about configuring conversion values →](/features/skadnetwork-conversion-values)
+
+## Common Questions
+
+<AccordionGroup>
+  <Accordion title="Why are there no fine conversion values in P2 and P3?">
+    Apple only provides fine-grained conversion values (0-63) in the first postback. This is by design in SKAdNetwork 4.0.
+
+    For P2 and P3, Apple only sends coarse conversion values (Low/Medium/High) to maintain user privacy over longer time windows. The longer the measurement period, the more restrictive the data to prevent user identification.
+  </Accordion>
+
+  <Accordion title="What do the numbers (0-63) in the grid mean?">
+    These numbers represent the SKAN conversion value configuration you've set up with your ad network or Linkrunner.
+
+    Each number maps to specific in-app events. For example:
+    - 0 might mean "app opened"
+    - 15 might mean "completed registration"
+    - 63 might mean "made a purchase"
+
+    The exact mapping depends on how you configured your conversion values in your SKAN setup.
+  </Accordion>
+
+  <Accordion title="What do High, Medium, and Low mean?">
+    These are coarse conversion values that represent user engagement tiers:
+
+    - **High**: Users who performed your most valuable actions (e.g., purchases, subscriptions)
+    - **Medium**: Users with moderate engagement (e.g., completed onboarding, added to cart)
+    - **Low**: Users with minimal engagement (e.g., only opened the app)
+
+    You define what events map to each tier in your SKAN configuration. The categories help you understand user quality even when fine-grained data isn't available.
+  </Accordion>
+
+  <Accordion title="Why do I not have data in 2nd and 3rd Postback filters?">
+    Second and third postbacks are only available in **SKAdNetwork 4.0**. If the ad network is using SKAN versions below 4.0, only a single postback is sent.
+
+    Even in SKAN 4.0, additional postbacks are sent only if Apple's privacy tier thresholds are met. If an install does not meet the required privacy thresholds, Apple may limit reporting and only send the first postback.
+
+    [Learn more about Privacy Tiers →](/features/skan-dashboard/privacy-tiers)
+  </Accordion>
+</AccordionGroup>
+
+## Related
+
+- [Stats Overview Cards](/features/skan-dashboard/stats-cards)
+- [Privacy Tier Breakdown](/features/skan-dashboard/privacy-tiers)
+- [Conversion Values Table](/features/skan-dashboard/conversion-table)
