@@ -61,7 +61,8 @@
                                         ]
                                     }
                                 ]
-                            }
+                            },
+                            "features/webhooks"
                         ]
                     },
                     {

@@ -1,0 +1,217 @@
+---
+title: "Webhooks"
+description: "Receive real-time notifications when attribution events occur"
+icon: "webhook"
+---
+
+## Overview
+
+Webhooks allow you to receive real-time HTTP notifications when attribution events occur in your app. When a user installs your app or signs up, Linkrunner sends a POST request to your configured endpoint with detailed attribution data.
+
+**Common use cases:**
+- Server-side analytics and reporting
+- CRM integration for user onboarding
+- Real-time Slack notifications
+- Custom attribution pipelines
+
+## Configuration
+
+### Setting Up Your Webhook URL
+
+1. Go to [Linkrunner Settings → Webhooks](https://dashboard.linkrunner.io/settings?s=webhooks)
+2. Enter your webhook endpoint URL
+3. Save the configuration
+
+<Note>
+Your endpoint must be publicly accessible and respond with a 2xx status code to acknowledge receipt.
+</Note>
+
+### Testing Your Endpoint
+
+Before going live, verify your endpoint can:
+1. Accept POST requests with JSON body
+2. Respond within a reasonable time (recommended under 5 seconds)
+3. Return a 2xx status code on success
+
+## Webhook Events
+
+Linkrunner sends webhooks for the following events:
+
+| Event | Description |
+|-------|-------------|
+| `install` | Triggered when an app install is attributed to a campaign or organic source |
+| `signup` | Triggered when a user signup event is recorded via the SDK |
+
+### Install Webhook
+
+The `install` webhook is triggered immediately when Linkrunner attributes an app installation. At this point, your app has just been opened for the first time and the user hasn't had a chance to sign up or log in yet. Because of this, the `user_id` field will be `null` in install webhooks.
+
+However, the install webhook does include device identifiers (`gaid` for Android, `idfa` for iOS) when available. You can use these to match the install with the user later when they sign up.
+
+Use the install webhook for:
+- Tracking install counts by campaign
+- Analyzing attribution data (network, ad creative, etc.)
+- Monitoring app store conversion rates
+- Storing device IDs to link with user accounts later
+
+### Signup Webhook
+
+The `signup` webhook is triggered when you call the `.signup()` method in your app via the Linkrunner SDK. This happens after the user has signed up or logged in, so the `user_id` field will contain the ID you passed to the SDK.
+
+The signup webhook also includes device identifiers (`gaid`/`idfa`) along with the `user_id`, giving you a complete picture of both the device and the user.
+
+Use the signup webhook for:
+- Linking attribution data to your user records
+- CRM integration and user onboarding flows
+- Calculating signup conversion rates from installs
+
+<Note>
+To receive signup webhooks, you must call `.signup()` in your app after the user signs up or logs in. See your SDK's usage guide for implementation details.
+</Note>
+
+## Payload Structure
+
+All webhooks are sent as POST requests with a JSON body.
+
+### Headers
+
+| Header | Description |
+|--------|-------------|
+| `Content-Type` | `application/json` |
+| `linkrunner-key` | Your project's private key for authentication |
+
+### Body Parameters
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event_type` | `"install"` \| `"signup"` | The type of attribution event |
+| `user_id` | `string` \| `null` | Customer user ID (if provided via SDK) |
+| `campaign_id` | `string` | Unique identifier for the campaign |
+| `campaign_name` | `string` \| `null` | Human-readable campaign name |
+| `network_name` | `string` \| `null` | Attribution network: `ORGANIC`, `META`, or `GOOGLE` |
+| `ad_channel` | `string` \| `null` | Ad channel identifier |
+| `attributed_on` | `ISO 8601 date` | Timestamp when attribution occurred |
+| `installed_at` | `ISO 8601 date` \| `null` | Timestamp of app installation |
+| `store_click_at` | `ISO 8601 date` \| `null` | Timestamp of store redirect click |
+| `link` | `string` | The campaign link URL |
+| `app_version` | `string` \| `null` | Installed app version |
+| `gaid` | `string` \| `null` | Google Advertising ID (Android) |
+| `idfa` | `string` \| `null` | Identifier for Advertisers (iOS) |
+| `meta_campaign_details` | `object` \| `null` | Meta Ads campaign details (see below) |
+| `google_campaign_details` | `object` \| `null` | Google Ads campaign details (see below) |
+
+### Meta Campaign Details
+
+When the attribution is from Meta Ads, `meta_campaign_details` contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ad_creative_id` | `string` \| `null` | Meta ad creative ID |
+| `ad_creative_name` | `string` \| `null` | Ad creative name |
+| `ad_set_id` | `string` \| `null` | Ad set ID |
+| `ad_set_name` | `string` \| `null` | Ad set name |
+| `campaign_group_id` | `string` \| `null` | Campaign group ID |
+| `campaign_group_name` | `string` \| `null` | Campaign group name |
+| `account_id` | `string` \| `null` | Meta Ads account ID |
+| `ad_objective_name` | `string` \| `null` | Campaign objective (e.g., `APP_INSTALLS`) |
+| `is_instagram` | `boolean` \| `null` | Whether the ad was on Instagram |
+| `publisher_platform` | `string` \| `null` | Platform where ad was shown |
+| `platform_position` | `string` \| `null` | Placement position |
+
+### Google Campaign Details
+
+When the attribution is from Google Ads, `google_campaign_details` contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `gclid` | `string` \| `null` | Google Click ID |
+| `gbraid` | `string` \| `null` | Google app campaign tracking parameter |
+| `ga_source` | `string` \| `null` | Google Analytics source |
+| `ad_group_id` | `string` \| `null` | Ad group ID |
+| `ad_group_name` | `string` \| `null` | Ad group name |
+
+## Authentication
+
+Every webhook request includes a `linkrunner-key` header containing your project's private key. Use this to verify that requests are genuinely from Linkrunner.
+
+```javascript
+// Example: Verifying the webhook signature
+const PRIVATE_KEY = process.env.LINKRUNNER_PRIVATE_KEY;
+
+app.post('/webhook', (req, res) => {
+  const receivedKey = req.headers['linkrunner-key'];
+
+  if (receivedKey !== PRIVATE_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  // Process the webhook...
+  res.status(200).json({ received: true });
+});
+```
+
+<Warning>
+Never expose your private key in client-side code. Store it securely as an environment variable.
+</Warning>
+
+## Slack Integration
+
+Linkrunner automatically formats webhook payloads for Slack when your URL contains `hooks.slack.com`. Instead of raw JSON, Slack receives a rich Block Kit formatted message displaying:
+
+- Event type and user ID
+- App version and network
+- Campaign name
+- Attribution timestamps
+- Device identifiers (GAID/IDFA)
+- Meta campaign details (if applicable)
+
+To set up Slack notifications:
+1. Create an [Incoming Webhook](https://api.slack.com/messaging/webhooks) in your Slack workspace
+2. Copy the webhook URL (format: `https://hooks.slack.com/services/...`)
+3. Paste it as your webhook URL in Linkrunner settings
+
+## Retry Behavior
+
+If your endpoint fails to respond with a 2xx status code, Linkrunner retries the webhook with exponential backoff:
+
+| Attempt | Delay |
+|---------|-------|
+| 1st retry | 1 second |
+| 2nd retry | 2 seconds |
+| 3rd retry | 4 seconds |
+
+After 3 failed attempts, the webhook is marked as failed. Ensure your endpoint is reliable to avoid missing events.
+
+## Best Practices
+
+<Steps>
+  <Step title="Respond quickly">
+    Return a 2xx status code as fast as possible. Process the webhook data asynchronously to avoid timeouts.
+  </Step>
+  <Step title="Implement idempotency">
+    Store processed `campaign_id` + `user_id` combinations to handle potential duplicate deliveries gracefully.
+  </Step>
+  <Step title="Validate authentication">
+    Always verify the `linkrunner-key` header matches your private key before processing.
+  </Step>
+  <Step title="Handle failures gracefully">
+    Log failed webhook processing for debugging and implement alerting for critical failures.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+**Webhooks not being received?**
+- Verify your endpoint URL is correct and publicly accessible
+- Check that your server accepts POST requests with JSON body
+- Ensure your firewall allows incoming requests from Linkrunner
+
+**Getting 401 errors?**
+- Verify the `linkrunner-key` header validation in your code
+- Check your private key matches the one in your [dashboard settings](https://dashboard.linkrunner.io/settings)
+
+**Missing data in payload?**
+- Some fields like `user_id` require SDK configuration to be passed
+- Device identifiers (`gaid`/`idfa`) depend on user consent and SDK implementation
+
+**Need help?** Contact [darshil@linkrunner.io](mailto:darshil@linkrunner.io)
