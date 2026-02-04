@@ -207,11 +207,12 @@ When a new install occurs, Linkrunner sends the touchpoint details (media source
 
       <Tab title="React Native">
         ```javascript
+        import analytics from "@react-native-firebase/analytics";
         import linkrunner from "rn-linkrunner";
 
         const onSignup = async () => {
             try {
-                const gaSessionId = /* Retrieve GA4 session ID from your tracking layer */ null;
+                const gaSessionId = await analytics().getSessionId();
 
                 await linkrunner.signup({
                     user_data: {
