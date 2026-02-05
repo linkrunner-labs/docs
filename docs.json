@@ -76,6 +76,12 @@
                         ]
                     },
                     {
+                        "group": "Analytics Integrations",
+                        "pages": [
+                            "analytics-integrations/ga4"
+                        ]
+                    },
+                    {
                         "group": "API Reference",
                         "pages": [
                             "api-reference/data-apis",
