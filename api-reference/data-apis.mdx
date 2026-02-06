@@ -164,7 +164,20 @@ GET /campaigns?channel=google&filter=ACTIVE&page=1&limit=50
                 "default_link": true,
                 "attributed_users": 491,
                 "link": "https://yourdomain.com?c=XYZ123",
-                "shareable_link": "https://yourdomain.com/XYZ123"
+                "shareable_link": "https://yourdomain.com/XYZ123",
+                "domain": "yourdomain.com",
+                "store_listings": [
+                    {
+                        "store_listing_id": "ios-store-v1",
+                        "name": "iOS Main Listing",
+                        "platform": "IOS"
+                    },
+                    {
+                        "store_listing_id": "android-promo-v2",
+                        "name": "Android Promo Listing",
+                        "platform": "ANDROID"
+                    }
+                ]
             }
             // ... more campaigns
         ],
@@ -191,6 +204,12 @@ GET /campaigns?channel=google&filter=ACTIVE&page=1&limit=50
 #### TypeScript Types
 
 ```tsx
+interface StoreListing {
+    store_listing_id: string;
+    name: string;
+    platform: "IOS" | "ANDROID";
+}
+
 interface Campaign {
     display_id: string;
     name: string;
@@ -205,6 +224,8 @@ interface Campaign {
     attributed_users: number;
     link: string;
     shareable_link: string;
+    domain: string | null;
+    store_listings: StoreListing[];
 }
 
 interface PaginationInfo {
@@ -425,6 +446,35 @@ interface AttributedUsersResponse {
 }
 ```
 
+## Campaign Domain and Store Listings
+
+### Domain Field
+
+Each campaign response now includes a `domain` field that indicates which domain is being used for the campaign links:
+
+-   **Type**: `string | null`
+-   **Description**: The domain name used to generate campaign links
+-   **Behavior**: If the campaign has a specific domain assigned, it will be shown. Otherwise, it falls back to the project's primary domain.
+-   **Example**: `"yourdomain.com"` or `"promo.example.com"`
+
+### Store Listings Array
+
+Campaigns can now include multiple store listings in the response. Each store listing represents a different App Store or Play Store configuration.
+
+**Store Listing Object Structure**:
+
+| Field              | Type               | Description                                           |
+| ------------------ | ------------------ | ----------------------------------------------------- |
+| `store_listing_id` | string             | Unique identifier for the store listing               |
+| `name`             | string             | Display name of the store listing                     |
+| `platform`         | "IOS" \| "ANDROID" | Platform this store listing is for (iOS or Android)   |
+
+**Managing Store Listings**:
+
+-   Create and manage store listings in your [Dashboard Settings](https://dashboard.linkrunner.io/dashboard/settings/store-listings)
+-   Each store listing has a unique `store_listing_id` that you use when creating campaigns
+-   Store listings allow you to configure different App Store/Play Store parameters per campaign
+
 ## Notes
 
 -   All timestamps are in ISO 8601 format.
@@ -433,5 +483,8 @@ interface AttributedUsersResponse {
 -   The `attributed_users` field in the campaign data shows the number of users attributed to that campaign.
 -   User data provided in this documentation is randomized for privacy reasons. Actual API responses will contain real user data.
 -   The TypeScript types provided are based on the example responses
+-   The `domain` field shows which domain is being used for campaign link generation
+-   The `store_listings` array contains store listing configurations associated with the campaign
+-   Store listings can be created and managed in the [Dashboard Settings](https://dashboard.linkrunner.io/dashboard/settings/store-listings)
 
 For any help please reach out to [darshil@linkrunner.io](mailto:darshil@linkrunner.io)
