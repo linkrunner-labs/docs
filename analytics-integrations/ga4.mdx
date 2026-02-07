@@ -4,32 +4,65 @@ description: "Connect Linkrunner with Google Analytics 4 to analyze install and 
 icon: "analytics"
 ---
 
+<iframe
+    width="100%"
+    height="420"
+    src="https://www.youtube.com/embed/I8TZAoImPt0"
+    title="Google Analytics (GA4) Integration with Linkrunner"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+/>
+
 ## How does it work?
 
 When a new install occurs, Linkrunner sends the touchpoint details (media source and campaign ID) to GA4.
 
+## Minimum SDK versions
+
+<CardGroup cols={2}>
+  <Card title="React Native" icon="react" href="/sdk/react-native">
+    rn-linkrunner `2.6.3`
+  </Card>
+  <Card title="Flutter" icon="flutter" href="/sdk/flutter">
+    linkrunner `^3.6.3`
+  </Card>
+  <Card title="iOS" icon="apple" href="/sdk/ios">
+    `3.7.1`
+  </Card>
+  <Card title="Android" icon="android" href="/sdk/android">
+    `3.5.3`
+  </Card>
+</CardGroup>
+
 ## Steps to setup
 
-<AccordionGroup>
-  <Accordion title="Set GA4 Integration in Linkrunner">
+<Steps>
+  <Step title="Set GA4 Integration in Linkrunner">
     In the **Integrations** tab, under **Analytics**, click **Configure** under **Google Analytics**. Firebase App ID and a Measurement Protocol API secret will be required. These are different for iOS and Android.
 
     To retrieve the **Firebase App ID** and **Measurement Protocol API secret**:
 
-    1. Open **Admin** (settings icon) from the bottom-left of the Google Analytics interface.  
+    1. Open **Admin** (settings icon) from the bottom-left of the Google Analytics interface.
        ![GA4 Admin](/images/ga4/ga_integration_1.png)
-    2. Under **Property** → **Data collection and modification** → **Data streams**, click your **app data stream** (iOS or Android).  
+
+    2. Under **Property** → **Data collection and modification** → **Data streams**, click your **app data stream** (iOS or Android).
        ![GA4 Data streams](/images/ga4/ga_integration_2.png)
-    3. In the **App stream details** panel, copy the **Firebase App ID**.  
+
+    3. In the **App stream details** panel, copy the **Firebase App ID**.
        ![GA4 App stream details](/images/ga4/ga_integration_3.png)
-    4. Under **Events**, click **Measurement Protocol API secrets**.  
+
+    4. Under **Events**, click **Measurement Protocol API secrets**.
        ![GA4 Measurement Protocol API secrets](/images/ga4/ga_integration_4.png)
+
     5. Create (or reuse) an API secret and copy its value.
 
-    The Firebase App ID and API secret will be different for your iOS and Android apps, so repeat these steps for each platform.
-  </Accordion>
+    <Note>
+      The Firebase App ID and API secret will be different for your iOS and Android apps, so repeat these steps for each platform.
+    </Note>
+  </Step>
 
-  <Accordion title="Retrieve app instance ID in Linkrunner SDK">
+  <Step title="Retrieve app instance ID in Linkrunner SDK">
     The app instance ID uniquely identifies a specific installation of a Firebase app. This value needs to be retrieved from the Firebase SDK. After collecting this ID, pass it to `linkrunner.signup` so that Linkrunner can associate GA4 app instance IDs with installs and campaigns.
 
     Use the following examples to pass the app instance ID:
@@ -141,9 +174,9 @@ When a new install occurs, Linkrunner sends the touchpoint details (media source
         ```
       </Tab>
     </Tabs>
-  </Accordion>
+  </Step>
 
-  <Accordion title="Retrieve GA4 session ID in Linkrunner SDK">
+  <Step title="Retrieve GA4 session ID in Linkrunner SDK">
     The GA4 session ID uniquely identifies a session of a Firebase app. Similar to the app instance ID, this value is retrieved from the Firebase SDK and should be passed to `linkrunner.signup` so that session-level engagement can be connected to installs and campaigns.
 
     Use the following examples to pass the session ID (for example, `ga_session_id` or `gaSessionId`, depending on the SDK's naming convention):
@@ -254,40 +287,17 @@ When a new install occurs, Linkrunner sends the touchpoint details (media source
         ```
       </Tab>
     </Tabs>
-  </Accordion>
+  </Step>
 
-  <Accordion title="Validate the GA4 Integration">
+  <Step title="Validate the GA4 Integration">
     To validate that data is flowing correctly between Linkrunner and GA4:
 
     - Use [BigQuery Export](https://support.google.com/analytics/answer/9823238#zippy=%2Cin-this-article) to explore the raw event data with all associated parameters.
     - Using [GA4 Explorations](https://support.google.com/analytics/answer/7579450?hl=en&ref_topic=12153537,12153943,2986333,&sjid=20462331341270448-EU&visit_id=638532662145815538-1056226594&rd=1#access-analysis&zippy=%2Cin-this-article).
     - The Traffic acquisition report helps you understand where your app visitors are coming from. You can find this under Reports > Lifecycle > Acquisition > Traffic acquisition. For more information on the Traffic acquisition report, see the [Google documentation](https://support.google.com/analytics/answer/12923437?hl=en&sjid=5454549956257318969-NC#zippy=%2Chow-do-i-filter-out-traffic-sources-from-the-report).
 
-    <div
-        className="video-container"
-        style={{
-            borderRadius: "12px",
-            overflow: "hidden",
-            width: "100%",
-            maxWidth: "100%",
-            marginTop: "16px",
-        }}
-    >
-        <iframe
-            style={{
-                width: "100%",
-                height: "min(410px, 50vh)",
-                display: "block",
-            }}
-            src="https://www.loom.com/embed/028510c9db364c5aa3f135fcb544dd80"
-            title="Validate GA4 Integration with Linkrunner"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-        ></iframe>
-    </div>
-  </Accordion>
-</AccordionGroup>
-
-BigQuery data is visible as soon as the event is received by GA4, while it can take 24–48 hours for data to reflect in GA4 reports. [Read more here](https://support.google.com/analytics/answer/11198161?hl=en).
-
+    <Info>
+      BigQuery data is visible as soon as the event is received by GA4, while it can take 24–48 hours for data to reflect in GA4 reports. [Read more here](https://support.google.com/analytics/answer/11198161?hl=en).
+    </Info>
+  </Step>
+</Steps>
