@@ -1,0 +1,111 @@
+---
+title: "Subdomain Setup"
+description: "Learn how to configure a custom subdomain for tracking link clicks and deep linking with Linkrunner"
+icon: "globe"
+---
+
+Subdomains let you use your own domain (e.g. `link.yourdomain.com`) for Linkrunner tracking links and deep links instead of a generic URL. This makes your links more branded and trustworthy to users.
+
+**What you need:**
+- A domain you own
+- Access to your domain's DNS settings
+
+## Step 1 — Choose a subdomain
+
+From the [Linkrunner dashboard](https://dashboard.linkrunner.io), go to **Settings > Subdomains** and click **Add Subdomain**. Enter a subdomain prefix (e.g. `link`, `app`, `get`, `open`) and your domain name.
+
+Your subdomain will look like: `subdomain.yourdomain.com`
+
+## Step 2 — Add a CNAME record
+
+Go to your domain registrar's DNS settings and add a **CNAME** record with these values:
+
+| Name | Type | Value |
+|------|------|-------|
+| `your-subdomain` | CNAME | `api.linkrunner.io` |
+
+For example, if your subdomain is `link.example.com`, set:
+- **Name:** `link`
+- **Type:** CNAME
+- **Value:** `api.linkrunner.io`
+
+### Provider-specific guides
+
+<Tabs>
+  <Tab title="GoDaddy">
+    1. Log in to your [GoDaddy account](https://account.godaddy.com/) and go to **My Products**
+    2. Find your domain and click **DNS** (or **Manage DNS**)
+    3. Click **Add New Record**
+    4. Select **CNAME** as the record type
+    5. In the **Name** field, enter your subdomain prefix (e.g. `link`)
+    6. In the **Value** field, enter `api.linkrunner.io`
+    7. Leave **TTL** as the default (or set to 1 hour)
+    8. Click **Save**
+  </Tab>
+  <Tab title="AWS Route 53">
+    1. Open the [Route 53 console](https://console.aws.amazon.com/route53/) and go to **Hosted zones**
+    2. Click on your domain name
+    3. Click **Create record**
+    4. Enter your subdomain prefix in the **Record name** field (e.g. `link`)
+    5. Set **Record type** to **CNAME**
+    6. In the **Value** field, enter `api.linkrunner.io`
+    7. Leave **TTL** as `300` (or your preferred value)
+    8. Click **Create records**
+  </Tab>
+  <Tab title="Namecheap">
+    1. Log in to your [Namecheap account](https://www.namecheap.com/) and go to **Domain List**
+    2. Click **Manage** next to your domain
+    3. Go to the **Advanced DNS** tab
+    4. Click **Add New Record**
+    5. Select **CNAME Record** as the type
+    6. In the **Host** field, enter your subdomain prefix (e.g. `link`)
+    7. In the **Target** field, enter `api.linkrunner.io`
+    8. Leave **TTL** as **Automatic**
+    9. Click the **checkmark** to save
+  </Tab>
+  <Tab title="Cloudflare">
+    <Warning>
+      You **must** turn off Cloudflare's proxy for this record. Set the **Proxy status** to **DNS only** (grey cloud icon). The orange cloud (proxied) mode will interfere with SSL certificate provisioning and cause verification to fail.
+    </Warning>
+
+    1. Log in to your [Cloudflare dashboard](https://dash.cloudflare.com/) and select your domain
+    2. Go to **DNS > Records**
+    3. Click **Add record**
+    4. Set **Type** to **CNAME**
+    5. In the **Name** field, enter your subdomain prefix (e.g. `link`)
+    6. In the **Target** field, enter `api.linkrunner.io`
+    7. Set the **Proxy status** to **DNS only** (grey cloud icon)
+    8. Click **Save**
+  </Tab>
+</Tabs>
+
+## Step 3 — Verification
+
+After adding the CNAME record, Linkrunner automatically checks your DNS configuration and provisions an SSL certificate.
+
+- **CNAME Not Verified** — DNS record hasn't been detected yet. This can take a few minutes to propagate.
+- **CNAME Verified** — Your DNS record is correctly pointing to `api.linkrunner.io`.
+- **SSL Active** — Your SSL certificate has been provisioned. Your subdomain is fully ready to use.
+
+You can click the **refresh** button next to your subdomain in the dashboard to manually re-check the status.
+
+## Troubleshooting
+
+**DNS propagation delay**
+DNS changes can take up to 24–48 hours to propagate globally, though most providers update within a few minutes. If your CNAME isn't verified after adding it, wait and try refreshing later.
+
+**Wrong CNAME value**
+Make sure the CNAME value is exactly `api.linkrunner.io` — not your subdomain URL, not an IP address.
+
+**Cloudflare proxy interference**
+If you use Cloudflare, ensure the proxy status is set to **DNS only** (grey cloud). The orange cloud (proxied) mode will interfere with SSL certificate provisioning.
+
+**SSL still pending**
+SSL provisioning happens automatically after CNAME verification and usually takes a few minutes. If it remains inactive after 30 minutes with a verified CNAME, contact support.
+
+## Managing subdomains
+
+From the **Settings > Subdomains** page in the dashboard, you can:
+- **Add** new subdomains to your project
+- **Delete** subdomains you no longer need
+- **Monitor** the CNAME and SSL status of each subdomain

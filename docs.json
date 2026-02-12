@@ -32,12 +32,10 @@
                     {
                         "group": "Core Features",
                         "pages": [
+                            "features/subdomain-setup",
                             {
                                 "group": "Deep Linking",
-                                "pages": [
-                                    "features/deep-linking-setup",
-                                    "features/deep-linking-verification"
-                                ]
+                                "pages": ["features/deep-linking-setup", "features/deep-linking-verification"]
                             },
                             "features/deferred-deep-linking",
                             "features/referral-codes",
@@ -77,9 +75,7 @@
                     },
                     {
                         "group": "Analytics Integrations",
-                        "pages": [
-                            "analytics-integrations/ga4"
-                        ]
+                        "pages": ["analytics-integrations/ga4"]
                     },
                     {
                         "group": "API Reference",
