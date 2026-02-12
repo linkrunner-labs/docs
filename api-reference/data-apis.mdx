@@ -172,7 +172,20 @@ GET /campaigns?channel=google&filter=ACTIVE&page=1&limit=50
                 "default_link": true,
                 "attributed_users": 491,
                 "link": "https://yourdomain.com?c=XYZ123",
-                "shareable_link": "https://yourdomain.com/XYZ123"
+                "shareable_link": "https://yourdomain.com/XYZ123",
+                "domain": "yourdomain.com",
+                "store_listings": [
+                    {
+                        "store_listing_id": "ios-store-v1",
+                        "name": "iOS Main Listing",
+                        "platform": "IOS"
+                    },
+                    {
+                        "store_listing_id": "android-promo-v2",
+                        "name": "Android Promo Listing",
+                        "platform": "ANDROID"
+                    }
+                ]
             }
             // ... more campaigns
         ],
@@ -201,6 +214,12 @@ GET /campaigns?channel=google&filter=ACTIVE&page=1&limit=50
 #### TypeScript Types
 
 ```tsx
+interface StoreListing {
+    store_listing_id: string;
+    name: string;
+    platform: "IOS" | "ANDROID";
+}
+
 interface Campaign {
     display_id: string;
     name: string;
@@ -215,6 +234,8 @@ interface Campaign {
     attributed_users: number;
     link: string;
     shareable_link: string;
+    domain: string | null;
+    store_listings: StoreListing[];
 }
 
 interface PaginationInfo {
