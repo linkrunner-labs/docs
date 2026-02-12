@@ -71,6 +71,7 @@
                             "ad-networks/google-ads",
                             "ad-networks/meta-ads",
                             "ad-networks/tiktok",
+                            "ad-networks/snapchat",
                             "ad-networks/google-web-to-app",
                             "ad-networks/meta-web-to-app"
                         ]
