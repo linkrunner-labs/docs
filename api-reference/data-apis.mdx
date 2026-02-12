@@ -68,19 +68,27 @@ GET /campaigns
 | Parameter | Type   | Required | Description                                                                                             |
 | --------- | ------ | -------- | ------------------------------------------------------------------------------------------------------- |
 | filter    | string | No       | Filter campaigns by status. Options: `ACTIVE`, `INACTIVE`, `ALL` (default: `ALL`)                       |
-| channel   | string | No       | Filter campaigns by advertising channel/network. Options: `GOOGLE`, `META`, `TIKTOK` (case-insensitive) |
+| channel   | string | No       | Filter campaigns by advertising channel/network. Options: `GOOGLE`, `META`, `TIKTOK`, `APPLE_SEARCH_ADS`, or any affiliate name (case-insensitive). For affiliates, use underscores for spaces (e.g., `AFFILIATE_EXAMPLE` for "affiliate example") |
+| domain    | string | No       | Filter campaigns by domain name (e.g., `app.example.com`). Only returns campaigns associated with the specified domain. |
 | link      | string | No       | Filter campaigns by a specific link URL. The system will extract the campaign from the provided link.   |
 | page      | number | No       | The page number to retrieve. Must be a positive integer. (default: `1`)                                 |
 | limit     | number | No       | The number of campaigns to return per page. Must be between 1 and 1000. (default: `100`, max: `1000`)   |
 
 #### Channel Filter Behavior
 
-| Value             | Behavior                                         |
-| ----------------- | ------------------------------------------------ |
-| `GOOGLE`          | Returns campaigns where `google = true`          |
-| `META`            | Returns campaigns where `meta = true`            |
-| `TIKTOK`          | Returns campaigns linked to a TikTok ad network  |
-| _(empty/invalid)_ | No channel filter applied (returns all channels) |
+| Value               | Behavior                                         |
+| ------------------- | ------------------------------------------------ |
+| `GOOGLE`            | Returns campaigns where `google = true`          |
+| `META`              | Returns campaigns where `meta = true`            |
+| `TIKTOK`            | Returns campaigns linked to a TikTok ad network  |
+| `APPLE_SEARCH_ADS`  | Returns campaigns linked to Apple Search Ads ad network |
+| `AFFILIATE_EXAMPLE` | Returns campaigns linked to an affiliate named "affiliate example". Replace spaces with underscores. |
+| _(empty/invalid)_   | No channel filter applied (returns all channels) |
+
+**Affiliate Channel Naming**:
+- Affiliate names should use underscores instead of spaces
+- Example: If the affiliate is named "affiliate example", use `channel=AFFILIATE_EXAMPLE`
+- Channel names are case-insensitive
 
 #### Pagination
 
@@ -196,6 +204,8 @@ GET /campaigns?channel=google&filter=ACTIVE&page=1&limit=50
 | Status Code | Error Message                                                      | Description                                           |
 | ----------- | ------------------------------------------------------------------ | ----------------------------------------------------- |
 | 400         | "Invalid request parameters."                                      | Invalid link, domain not found, or campaign not found |
+| 400         | "Invalid domain '{domain}'. Domain not found for this project."    | Specified domain does not exist or doesn't belong to your project |
+| 400         | "Invalid channel '{channel}'. Channel not found."                  | Specified channel/ad network does not exist           |
 | 401         | "Unauthorized access."                                             | Missing or invalid API key                            |
 | 422         | "Invalid page number '{page}'. Page must be a positive integer..." | Page parameter is not a positive integer              |
 | 422         | "Invalid limit '{limit}'. Limit must be between 1 and 1000..."     | Limit parameter is not between 1 and 1000             |
@@ -475,6 +485,128 @@ Campaigns can now include multiple store listings in the response. Each store li
 -   Each store listing has a unique `store_listing_id` that you use when creating campaigns
 -   Store listings allow you to configure different App Store/Play Store parameters per campaign
 
+### 3. Get Attribution Result
+
+Retrieve attribution data for a specific user or device. This endpoint returns campaign and ad network information for attributed installs.
+
+#### Request
+
+```
+GET /get-attribution-result
+```
+
+#### Query Parameters
+
+| Parameter           | Type   | Required | Description                                                                                              |
+| ------------------- | ------ | -------- | -------------------------------------------------------------------------------------------------------- |
+| device_identifier   | string | Conditional | The unique device ID to look up. For Android, this is the GAID (Google Advertising ID). For iOS, this is the IDFA (Identifier for Advertisers). Required if `user_id` is not provided. |
+| user_id             | string | Conditional | The user ID to look up. Required if `device_identifier` is not provided.                             |
+
+**Note**: At least one of `device_identifier` or `user_id` must be provided. If both are provided and they match different installs, the `user_id` based result will be returned as it's more reliable.
+
+#### Example Requests
+
+1. **Get Attribution by Device Identifier**:
+
+```
+GET /get-attribution-result?device_identifier=550e8400-e29b-41d4-a716-446655440000
+```
+
+2. **Get Attribution by User ID**:
+
+```
+GET /get-attribution-result?user_id=user123456
+```
+
+3. **Get Attribution with Both Identifiers**:
+
+```
+GET /get-attribution-result?device_identifier=550e8400-e29b-41d4-a716-446655440000&user_id=user123456
+```
+
+#### Response
+
+**Success Response (200)**:
+
+```json
+{
+    "msg": "Attribution result retrieved successfully.",
+    "status": 200,
+    "data": {
+        "campaign_name": "Summer Sale 2024",
+        "display_id": "XYZ123",
+        "deeplink": "https://app.domain.com/promo/summer",
+        "domain_name": "app.domain.com",
+        "ad_set_id": "138726384957162840",
+        "ad_set_name": "Engagement Campaign",
+        "ad_creative_id": "138726495084763210",
+        "ad_creative_name": "Creative Variation 1",
+        "keyword_id": "",
+        "keyword_name": "",
+        "ad_network": "META",
+        "attribution_type": "INORGANIC"
+    }
+}
+```
+
+**No Attribution Data (204)**:
+
+If no attribution data is found for the provided identifier, the API returns a `204 No Content` status with an empty response body.
+
+#### Response Properties
+
+| Property           | Type                  | Description                                                                                             |
+| ------------------ | --------------------- | ------------------------------------------------------------------------------------------------------- |
+| `campaign_name`    | string\|null          | The name of the campaign that the user was attributed to                                                |
+| `display_id`       | string\|null          | The campaign's display identifier                                                                       |
+| `deeplink`         | string\|null          | The deeplink URL associated with the campaign                                                           |
+| `domain_name`      | string\|null          | The domain name used for the campaign                                                                   |
+| `ad_set_id`        | string\|null          | The ad set ID from the advertising platform (e.g., Meta Ad Set ID)                                      |
+| `ad_set_name`      | string\|null          | The ad set name from the advertising platform                                                           |
+| `ad_creative_id`   | string\|null          | The ad creative ID from the advertising platform                                                        |
+| `ad_creative_name` | string\|null          | The ad creative name from the advertising platform                                                      |
+| `keyword_id`       | string\|null          | The keyword ID (primarily for Apple Search Ads campaigns)                                               |
+| `keyword_name`     | string\|null          | The keyword name (primarily for Apple Search Ads campaigns)                                             |
+| `ad_network`       | string\|null          | The advertising network. Can be `GOOGLE`, `META`, `TIKTOK`, `APPLE_SEARCH_ADS`, or other network codes |
+| `attribution_type` | "ORGANIC"\|"INORGANIC"|         |
+
+
+#### Error Responses
+
+| Status Code | Error Message                                        | Description                                           |
+| ----------- | ---------------------------------------------------- | ----------------------------------------------------- |
+| 400         | "Either device_identifier or user_id is required."   | Neither device_identifier nor user_id was provided    |
+| 401         | "Unauthorized access."                               | Missing or invalid API key                            |
+| 204         | No Content                                           | No attribution data found for the provided identifier |
+
+#### TypeScript Types
+
+```tsx
+type AdNetwork = "GOOGLE" | "META" | "TIKTOK" | "APPLE_SEARCH_ADS" | string;
+type AttributionType = "ORGANIC" | "INORGANIC";
+
+interface AttributionResult {
+    campaign_name: string | null;
+    display_id: string | null;
+    deeplink: string | null;
+    domain_name: string | null;
+    ad_set_id: string | null;
+    ad_set_name: string | null;
+    ad_creative_id: string | null;
+    ad_creative_name: string | null;
+    keyword_id: string | null;
+    keyword_name: string | null;
+    ad_network: AdNetwork | null;
+    attribution_type: AttributionType;
+}
+
+interface AttributionResultResponse {
+    msg: string;
+    status: number;
+    data: AttributionResult;
+}
+```
+
 ## Notes
 
 -   All timestamps are in ISO 8601 format.
@@ -486,5 +618,6 @@ Campaigns can now include multiple store listings in the response. Each store li
 -   The `domain` field shows which domain is being used for campaign link generation
 -   The `store_listings` array contains store listing configurations associated with the campaign
 -   Store listings can be created and managed in the [Dashboard Settings](https://dashboard.linkrunner.io/dashboard/settings/store-listings)
+-   The `get-attribution-result` endpoint returns a 204 status code with no body when no attribution data is found
 
 For any help please reach out to [darshil@linkrunner.io](mailto:darshil@linkrunner.io)
