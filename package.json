@@ -4,7 +4,7 @@
     "description": "Linkrunner documentation built with Mintlify",
     "main": "index.js",
     "scripts": {
-        "dev": "mintlify dev",
+        "dev": "mintlify dev --port 3001",
         "build": "mintlify build",
         "preview": "mintlify preview",
         "install-mintlify": "npm install -g mintlify",
