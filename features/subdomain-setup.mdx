@@ -7,6 +7,7 @@ icon: "globe"
 Subdomains let you use your own domain (e.g. `link.yourdomain.com`) for Linkrunner tracking links and deep links instead of a generic URL. This makes your links more branded and trustworthy to users.
 
 **What you need:**
+
 - A domain you own
 - Access to your domain's DNS settings
 
@@ -20,11 +21,12 @@ Your subdomain will look like: `subdomain.yourdomain.com`
 
 Go to your domain registrar's DNS settings and add a **CNAME** record with these values:
 
-| Name | Type | Value |
-|------|------|-------|
+| Name             | Type  | Value               |
+| ---------------- | ----- | ------------------- |
 | `your-subdomain` | CNAME | `api.linkrunner.io` |
 
 For example, if your subdomain is `link.example.com`, set:
+
 - **Name:** `link`
 - **Type:** CNAME
 - **Value:** `api.linkrunner.io`
@@ -65,7 +67,7 @@ For example, if your subdomain is `link.example.com`, set:
   </Tab>
   <Tab title="Cloudflare">
     <Warning>
-      You **must** turn off Cloudflare's proxy for this record. Set the **Proxy status** to **DNS only** (grey cloud icon). The orange cloud (proxied) mode will interfere with SSL certificate provisioning and cause verification to fail.
+      You **must** turn off Cloudflare's proxy for this record.
     </Warning>
 
     1. Log in to your [Cloudflare dashboard](https://dash.cloudflare.com/) and select your domain
@@ -76,6 +78,7 @@ For example, if your subdomain is `link.example.com`, set:
     6. In the **Target** field, enter `api.linkrunner.io`
     7. Set the **Proxy status** to **DNS only** (grey cloud icon)
     8. Click **Save**
+
   </Tab>
 </Tabs>
 
@@ -106,6 +109,7 @@ SSL provisioning happens automatically after CNAME verification and usually take
 ## Managing subdomains
 
 From the **Settings > Subdomains** page in the dashboard, you can:
+
 - **Add** new subdomains to your project
 - **Delete** subdomains you no longer need
 - **Monitor** the CNAME and SSL status of each subdomain
