@@ -76,7 +76,7 @@
                     },
                     {
                         "group": "Analytics Integrations",
-                        "pages": ["analytics-integrations/ga4"]
+                        "pages": ["analytics-integrations/ga4", "analytics-integrations/braze"]
                     },
                     {
                         "group": "API Reference",
