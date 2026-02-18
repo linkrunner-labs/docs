@@ -32,24 +32,24 @@ POST: /capture-event
 
 ```json
 {
-    "event_name": "product_viewed",
+    "event_name": "purchase_completed",
     "event_data": {
         "product_id": "ABC123",
-        "category": "electronics",
-        "amount": 249.99,
-        "currency": "USD",
-        "is_featured": true
+        "order_id": "ORD-12345",
+        "content_type": "product",
+        "num_items": 2,
+        "amount": 149.99,
+        "currency": "USD"
     },
-    "user_id": "user_12345",
-    "event_id": "550e8400-e29b-41d4-a716-446655440000"
+    "user_id": "user_12345"
 }
 ```
 
-| Parameter  | Type   | Description                                               |
-| ---------- | ------ | --------------------------------------------------------- |
-| event_name | string | **Required**. Name of the event to track                  |
-| event_data | object | **Optional**. Additional data associated with the event   |
-| user_id    | string | **Required**. User identifier to associate with the event |
+| Parameter  | Type   | Description                                                                                                                                    |
+| ---------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| event_name | string | **Required**. Name of the event to track                                                                                                       |
+| event_data | object | **Optional**. Event parameters — standard keys are mapped to ad networks automatically, custom keys are passed through as-is                   |
+| user_id    | string | **Required**. User identifier to associate with the event                                                                                      |
 | event_id   | string | **Optional**. Unique event identifier (String) for deduplication. If you're tracking the same event from both your app (SDK) and backend (API), make sure to send the same `event_id` from both sources |
 
 ### Responses
@@ -87,31 +87,31 @@ Here are some common event names you might want to track:
 | `achievement_unlocked` | User unlocks an achievement        |
 | `user_referred`        | User refers someone                |
 
-## Revenue Sharing with Ad Networks
-
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
-
-```json
-{
-    "event_name": "purchase_completed",
-    "event_data": {
-        "product_id": "ABC123",
-        "category": "electronics",
-        "amount": 149.99
-    },
-    "user_id": "user_12345",
-    "event_id": "550e8400-e29b-41d4-a716-446655440000"
-}
-```
+## Event Data Parameters
 
 <Note>
-    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number, not as a
-    string.
+    The `event_data` field accepts a flat key-value map. Standard parameters are recognized and automatically mapped to each ad network's expected format. Any additional keys are passed through as custom parameters.
 </Note>
 
-<Note>
-    The `event_id` parameter is optional and should be a unique String identifier for each event. It's used for deduplication on the server side. If you're tracking the same event from both your app (SDK) and backend (API), make sure to send the same `event_id` from both sources to prevent duplicate event tracking.
-</Note>
+**Standard parameters:**
+
+| Parameter        | Type              | Description                                                    |
+| ---------------- | ----------------- | -------------------------------------------------------------- |
+| product_id       | string or string[] | Product SKU/identifier                                        |
+| order_id         | string            | Transaction/order identifier                                   |
+| content_type     | string            | "product" or "product_group"                                   |
+| num_items        | number            | Number of items in the transaction                             |
+| contents         | array             | Array of `{ id, quantity, item_price }` for multi-product events |
+| search_string    | string            | Search query text                                              |
+| content_name     | string            | Name of the content/product                                    |
+| content_category | string            | Category of the content/product                                |
+| description      | string            | Description of the event or product                            |
+| amount           | number            | Revenue value for the event                                    |
+| currency         | string            | ISO 4217 currency code                                         |
+
+Any keys not listed above (e.g. `coupon_code`, `payment_plan`, `subscription_tier`) are passed through to ad networks that support custom properties (currently Meta).
+
+For the full parameter mapping across ad networks, see [Custom Event Parameters](/api-reference/custom-event-parameters).
 
 ## Best Practices
 
@@ -134,19 +134,66 @@ fetch("https://api.linkrunner.io/api/v1/capture-event", {
     body: JSON.stringify({
         event_name: "purchase_completed",
         event_data: {
+            product_id: "P-001",
             order_id: "ORD-12345",
-            product_ids: ["P-001", "P-002"],
-            total_amount: 125.99,
+            content_type: "product",
+            num_items: 1,
+            amount: 125.99,
             currency: "USD",
-            payment_method: "credit_card",
+            coupon_code: "SAVE20",
         },
         user_id: "user_12345",
-        event_id: "550e8400-e29b-41d4-a716-446655440000", // Optional: Unique event identifier for deduplication. Use the same event_id if tracking from both SDK and API
     }),
 })
     .then((response) => response.json())
     .then((data) => console.log(data))
     .catch((error) => console.error("Error:", error));
+```
+
+### Add to Cart
+
+```json
+{
+    "event_name": "cart_added",
+    "event_data": {
+        "product_id": "SKU-789",
+        "content_type": "product",
+        "num_items": 1,
+        "currency": "USD",
+        "amount": 29.99
+    },
+    "user_id": "user_12345"
+}
+```
+
+### Search
+
+```json
+{
+    "event_name": "search_performed",
+    "event_data": {
+        "search_string": "running shoes",
+        "content_type": "product"
+    },
+    "user_id": "user_12345"
+}
+```
+
+### Subscription
+
+```json
+{
+    "event_name": "subscription_started",
+    "event_data": {
+        "product_id": "plan_premium_monthly",
+        "order_id": "sub_abc123",
+        "amount": 9.99,
+        "currency": "USD",
+        "payment_plan": "monthly",
+        "trial_period_days": 7
+    },
+    "user_id": "user_12345"
+}
 ```
 
 ## Error Handling

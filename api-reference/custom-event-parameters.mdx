@@ -1,0 +1,139 @@
+---
+title: "Custom Event Parameters"
+description: "Standard and custom event parameters for ad network data forwarding"
+icon: "list"
+---
+
+Both `capture-event` and `capture-payment` APIs accept an `event_data` field — a flat key-value map of event parameters. Standard parameters are automatically mapped to each ad network's expected format. Custom parameters are passed through as-is.
+
+## How It Works
+
+1. Your SDK or server sends `event_data` with your event or payment
+2. LinkRunner stores the full `event_data` in the database
+3. Standard parameters are mapped to each ad network's field names
+4. Custom parameters are passed through as-is to networks that support them
+5. Revenue parameters (`amount`, `currency`) are handled automatically
+
+## Ad Network Parameter Mapping
+
+| You Send         | Meta CAPI        | Google Ads                  | TikTok                                  | Snapchat       |
+| ---------------- | ---------------- | --------------------------- | ---------------------------------------- | -------------- |
+| product_id       | content_ids      | item_id                     | content_ids                              | item_ids       |
+| order_id         | order_id         | order_id                    | order_id (purchase only)                 | transaction_id |
+| content_type     | content_type     | category                    | auto-derived from content_ids            | —              |
+| num_items        | num_items        | —                           | —                                        | number_items   |
+| contents         | contents         | —                           | —                                        | —              |
+| search_string    | search_string    | search_string               | search_string (custom events only)       | —              |
+| description      | —                | —                           | description                              | —              |
+| content_name     | content_name     | —                           | —                                        | —              |
+| content_category | content_category | —                           | —                                        | —              |
+| amount / value   | value            | value (query param)         | value                                    | value          |
+| currency         | currency         | currency_code (query param) | currency                                 | currency       |
+| *any other key*  | custom property  | —                           | —                                        | —              |
+
+## Best Practices
+
+- Always include `product_id` for purchase events — Meta requires it for product catalog matching
+- Include `order_id` for deduplication across ad networks
+- Use `content_type: "product"` when `product_id` refers to a specific SKU, or `"product_group"` for product variants
+- For `capture-payment`, the top-level `amount` and `currency` are used for revenue tracking — don't duplicate them in `event_data`
+- Custom keys like `coupon_code`, `payment_plan`, `subscription_tier` are passed through to networks that support custom properties (currently Meta)
+
+## Examples
+
+### Purchase event (via capture-event)
+
+```json
+{
+    "event_name": "purchase_completed",
+    "event_data": {
+        "product_id": "sku_12345",
+        "order_id": "order_98765",
+        "content_type": "product",
+        "num_items": 2,
+        "amount": 49.99,
+        "currency": "USD",
+        "coupon_code": "SAVE20"
+    },
+    "user_id": "user_12345"
+}
+```
+
+### Payment with product details (via capture-payment)
+
+```json
+{
+    "user_id": "user_12345",
+    "payment_id": "pay_abc123",
+    "amount": 49.99,
+    "currency": "USD",
+    "type": "ONE_TIME",
+    "event_data": {
+        "product_id": "sku_12345",
+        "order_id": "order_98765",
+        "content_type": "product",
+        "num_items": 2
+    }
+}
+```
+
+### Add to cart
+
+```json
+{
+    "event_name": "cart_added",
+    "event_data": {
+        "product_id": "SKU-789",
+        "content_type": "product",
+        "num_items": 1,
+        "currency": "USD",
+        "amount": 29.99
+    },
+    "user_id": "user_12345"
+}
+```
+
+### Search
+
+```json
+{
+    "event_name": "search_performed",
+    "event_data": {
+        "search_string": "running shoes",
+        "content_type": "product"
+    },
+    "user_id": "user_12345"
+}
+```
+
+### Subscription
+
+```json
+{
+    "user_id": "user_12345",
+    "payment_id": "sub_xyz789",
+    "amount": 9.99,
+    "currency": "USD",
+    "type": "SUBSCRIPTION_CREATED",
+    "event_data": {
+        "product_id": "plan_premium",
+        "order_id": "sub_xyz789",
+        "payment_plan": "monthly"
+    }
+}
+```
+
+### Custom event with arbitrary params
+
+```json
+{
+    "event_name": "level_completed",
+    "event_data": {
+        "level_number": 5,
+        "score": 12500,
+        "time_spent_seconds": 180,
+        "difficulty": "hard"
+    },
+    "user_id": "user_12345"
+}
+```

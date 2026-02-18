@@ -69,6 +69,7 @@
                             "api-reference/data-apis",
                             "api-reference/revenue-tracking",
                             "api-reference/event-capture",
+                            "api-reference/custom-event-parameters",
                             "api-reference/campaign-apis"
                         ]
                     }
