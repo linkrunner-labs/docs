@@ -49,7 +49,7 @@ POST: /capture-payment
 | ---------- | ------ | ---------------------------------------------------------------------------------------------------------------------------- |
 | user_id    | string | **Required**. User identifier                                                                                                |
 | payment_id | string | Optional but recommended. Unique payment identifier for deduplication                                                        |
-| amount     | number | Payment amount. Send in one currency only                                                                                    |
+| amount     | number | Optional. Payment amount. Send in one currency only                                                                          |
 | currency   | string | Optional. ISO 4217 currency code (e.g. "USD", "INR")                                                                        |
 | type       | string | Optional. Payment type (defaults to DEFAULT)                                                                                 |
 | status     | string | Optional. Payment status (defaults to PAYMENT_COMPLETED)                                                                     |
