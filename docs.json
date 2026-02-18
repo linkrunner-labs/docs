@@ -32,12 +32,10 @@
                     {
                         "group": "Core Features",
                         "pages": [
+                            "features/subdomain-setup",
                             {
                                 "group": "Deep Linking",
-                                "pages": [
-                                    "features/deep-linking-setup",
-                                    "features/deep-linking-verification"
-                                ]
+                                "pages": ["features/deep-linking-setup", "features/deep-linking-verification"]
                             },
                             "features/deferred-deep-linking",
                             "features/referral-codes",
@@ -48,9 +46,22 @@
                                 "group": "SKAdNetwork",
                                 "pages": [
                                     "features/skadnetwork-integration",
-                                    "features/skadnetwork-conversion-values"
+                                    "features/skadnetwork-conversion-values",
+                                    {
+                                        "group": "SKAN Dashboard",
+                                        "pages": [
+                                            "features/skan-dashboard/overview",
+                                            "features/skan-dashboard/stats-cards",
+                                            "features/skan-dashboard/privacy-tiers",
+                                            "features/skan-dashboard/conversion-values",
+                                            "features/skan-dashboard/trend-graph",
+                                            "features/skan-dashboard/conversion-table"
+                                        ]
+                                    }
                                 ]
-                            }
+                            },
+                            "features/webhooks",
+                            "features/social-media-intermediary-page"
                         ]
                     },
                     {
@@ -59,9 +70,14 @@
                             "ad-networks/google-ads",
                             "ad-networks/meta-ads",
                             "ad-networks/tiktok",
+                            "ad-networks/snapchat",
                             "ad-networks/google-web-to-app",
                             "ad-networks/meta-web-to-app"
                         ]
+                    },
+                    {
+                        "group": "Analytics Integrations",
+                        "pages": ["analytics-integrations/ga4", "analytics-integrations/braze"]
                     },
                     {
                         "group": "API Reference",

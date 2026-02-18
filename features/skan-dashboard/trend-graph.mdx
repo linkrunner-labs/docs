@@ -1,0 +1,70 @@
+---
+title: 'Install Trends Over Time'
+description: 'Analyze daily install patterns by channel and filter by events to understand which campaigns drive specific user actions'
+---
+
+## Overview
+
+The Install Trends Over Time graph shows your daily install volume broken down by ad channel. Each channel is represented by a different colored line, making it easy to compare performance across networks and identify trends over time.
+
+## Filtering by Events
+
+One of the most powerful features of this graph is the ability to filter by specific events. This shows you which channels drive installs where users performed particular actions.
+
+### How to Filter by Events
+
+1. Click the **"Add Event"** button in the top right
+2. A dropdown appears showing all events from your SKAN configuration
+3. Select one or more events to filter by
+4. The graph updates to show only installs where those events occurred within 0-2 days
+
+### Understanding Event Filters
+
+When you filter by an event, the graph shows:
+- **Only installs** where the user performed that event within the first 0-2 days
+- **Conversion value data** from Postback 1 (P1)
+- **Channel breakdown** of which networks drive that specific behavior
+
+**Example use case:**
+
+**Filter by "completed_purchase"**:
+- See which channels drive buyers, not just installers
+- Identify your highest-quality traffic sources
+- Optimize budget toward channels with best conversion rates
+
+### Multiple Event Selection
+
+You can select multiple events to see installs where users performed of those events:
+
+1. Click "Add Event" and select your first event
+2. Click "Add Event" again and select additional events
+3. The graph shows installs where users performed both of the selected events
+
+**Example use case:**
+
+**Filter by "signup" and "completed_purchase"**:
+- See which channels drive users who both signed up and made a purchase
+- Compare this to filtering only "completed_purchase" to understand how many buyers also created accounts
+- Identify channels that drive more complete user journeys vs. quick purchases
+
+### Special Filter: "INSTALL" Event
+
+If you filter by the "INSTALL" event specifically, you'll see something different:
+- Installs where the user did NOT perform any of your other configured events
+- Users who installed but didn't engage within 0-2 days
+- Helps identify campaigns bringing in low-quality or unengaged users
+
+### Removing Event Filters
+
+To remove an event filter:
+1. Find the event chip (colored pill) next to the "Add Event" button
+2. Click the X icon on the chip
+3. The graph updates to remove that filter
+
+To see all installs again, remove all event filters.
+
+## Related Components
+
+- [Stats Overview Cards](/features/skan-dashboard/stats-cards) - See overall install volumes and trends
+- [Conversion Values Table](/features/skan-dashboard/conversion-table) - Detailed event-level breakdown
+- [Privacy Tier Breakdown](/features/skan-dashboard/privacy-tiers) - Understand data quality by channel

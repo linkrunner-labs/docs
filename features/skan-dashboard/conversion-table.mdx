@@ -1,0 +1,122 @@
+---
+title: 'All Conversion Values Table'
+description: 'Detailed breakdown of every SKAN event showing installs, reinstalls, click-through, and view-through metrics'
+---
+
+## Overview
+
+The All Conversion Values Table provides a detailed, event-by-event breakdown of your SKAN performance. Unlike the other dashboard components that show aggregated data, this table lets you see exactly how many installs performed each specific event in your SKAN configuration.
+
+## Table Structure
+
+### Column Descriptions
+
+**Events**
+- Lists every event you've configured in your SKAN setup
+- Shows event names and ranges
+- Events are ordered by your SKAN configuration priority
+
+**Channel Icon**
+- Visual indicator showing which ad network(s) the data represents
+- Specific icons = Individual channel data (Meta, Google, TikTok, Snapchat)
+
+**Installs**
+- Total number of installs that performed this event
+- Includes both new installs and reinstalls
+
+**Re-Installs**
+- Number of reinstalls (users who previously had your app) that performed this event
+
+**Click Through**
+- Installs from users who clicked on an ad before installing
+- Indicates direct response to your advertising
+
+**View Through**
+- Installs from users who saw an ad but didn't click before installing
+- Shows the value of impression-based advertising
+
+
+## Postback Sequence Toggle
+
+At the top right of the table, you'll see three toggle options:
+
+### Postback 1 (0-2 days)
+
+- **Conversion window**: Ends 2 days after the user first launches the app
+- **Postback sent**: After conversion window ends + random 24-48 hour delay
+- **Events tracked**: Actions performed within the first 0-2 days after install
+
+### Postback 2 (3-7 days)
+
+- **Conversion window**: Ends 7 days after the user first launches the app
+- **Postback sent**: After conversion window ends + random 24-144 hour delay
+- **Events tracked**: Actions performed within days 3-7 after install
+
+### Postback 3 (8-35 days)
+
+- **Conversion window**: Ends 35 days after the user first launches the app
+- **Postback sent**: After conversion window ends + random 24-144 hour delay
+- **Events tracked**: Actions performed within days 8-35 after install
+
+
+## How to Read the Table
+
+The table shows installs which performed the SKAN configured events.
+
+### Simple Event Names
+
+**Example**: "completed_tutorial"
+- Straightforward event name
+- Installs that completed the tutorial
+
+### Events with Ranges
+
+**Example**: "purchase [10-50]"
+
+**For revenue events:**
+- Indicates installs which did that payment event within the range given
+- Example: Users who made purchases between $10-$50
+
+**For custom events:**
+- Indicates installs which performed that event that many times
+- Example: Users who completed a level 10-50 times
+
+### Special Case: INSTALL Event
+
+If a row shows the "INSTALL" event:
+- Users who installed but didn't engage
+- Did not perform any other configured events within the time window
+
+## Comparing Across Postbacks
+
+Use the postback toggle to compare the same event across different time windows:
+
+1. **Select P1** - Shows installs which performed the event within 0-2 days
+2. **Switch to P2** - Shows installs which performed the event within 3-7 days
+3. **Switch to P3** - Shows installs which performed the event within 8-35 days
+
+**What this tells you**:
+- Which channels get users that complete events quickly (high quality within few days)
+- How many users convert immediately vs. over time
+
+## Common Questions
+
+<AccordionGroup>
+  <Accordion title="Why do I not have data in 2nd and 3rd Postback filters?">
+    Second and third postbacks are only available in **SKAdNetwork 4.0**. If the ad network is using SKAN versions below 4.0, only a single postback is sent.
+
+    Even in SKAN 4.0, additional postbacks are sent only if Apple's privacy tier thresholds are met. If an install does not meet the required privacy thresholds, Apple may limit reporting and only send the first postback.
+
+    [Learn more about Privacy Tiers →](/features/skan-dashboard/privacy-tiers)
+  </Accordion>
+</AccordionGroup>
+
+## Related Components
+
+- [Stats Overview Cards](/features/skan-dashboard/stats-cards) - See aggregated metrics
+- [Conversion Value Distribution](/features/skan-dashboard/conversion-values) - Visual representation of conversion values
+- [Install Trends Over Time](/features/skan-dashboard/trend-graph) - See daily patterns by channel
+
+## Need Help?
+
+If you're seeing unexpected patterns in your conversion table or need help interpreting your event data, reach out to our support team at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).
