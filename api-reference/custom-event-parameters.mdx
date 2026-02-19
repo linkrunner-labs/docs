@@ -1,47 +1,95 @@
 ---
 title: "Custom Event Parameters"
-description: "Standard and custom event parameters for ad network data forwarding"
+description: "Send product and event details with your events so Linkrunner can forward them to ad networks automatically"
 icon: "list"
 ---
 
-Both `capture-event` and `capture-payment` APIs accept an `event_data` field — a flat key-value map of event parameters. Standard parameters are automatically mapped to each ad network's expected format. Custom parameters are passed through as-is.
+When you track events or payments through Linkrunner, you can include an `event_data` object with additional details like product IDs, order IDs, and item counts. Linkrunner automatically translates these parameters into the format each ad network expects, so you only need to send them once.
 
-## How It Works
+## Why send event parameters?
 
-1. Your SDK or server sends `event_data` with your event or payment
-2. LinkRunner stores the full `event_data` in the database
-3. Standard parameters are mapped to each ad network's field names
-4. Custom parameters are passed through as-is to networks that support them
-5. Revenue parameters (`amount`, `currency`) are handled automatically
+Ad networks like Meta, Google, TikTok, and Snapchat use event parameters to:
 
-## Ad Network Parameter Mapping
+- **Match conversions to product catalogs** — Meta uses `product_id` to connect purchases to your product feed
+- **Deduplicate events** — `order_id` prevents the same purchase from being counted twice
+- **Optimize ad delivery** — richer event data helps ad networks find higher-value users
+- **Power reporting** — parameters like `content_type` and `content_category` improve breakdown reports
 
-| You Send         | Meta CAPI        | Google Ads                  | TikTok                                  | Snapchat       |
-| ---------------- | ---------------- | --------------------------- | ---------------------------------------- | -------------- |
-| product_id       | content_ids      | item_id                     | content_ids                              | item_ids       |
-| order_id         | order_id         | order_id                    | order_id (purchase only)                 | transaction_id |
-| content_type     | content_type     | category                    | auto-derived from content_ids            | —              |
-| num_items        | num_items        | —                           | —                                        | number_items   |
-| contents         | contents         | —                           | —                                        | —              |
-| search_string    | search_string    | search_string               | search_string (custom events only)       | —              |
-| description      | —                | —                           | description                              | —              |
-| content_name     | content_name     | —                           | —                                        | —              |
-| content_category | content_category | —                           | —                                        | —              |
-| amount / value   | value            | value (query param)         | value                                    | value          |
-| currency         | currency         | currency_code (query param) | currency                                 | currency       |
-| *any other key*  | custom property  | —                           | —                                        | —              |
+## How it works
 
-## Best Practices
+<Steps>
+  <Step title="Send event_data with your event or payment">
+    Include an `event_data` object in your [`capture-event`](/api-reference/event-capture) or [`capture-payment`](/api-reference/revenue-tracking) API call.
+  </Step>
+  <Step title="Linkrunner stores the data">
+    The full `event_data` object is saved alongside the event in your Linkrunner dashboard.
+  </Step>
+  <Step title="Parameters are mapped to each ad network">
+    Standard parameters (like `product_id`, `order_id`) are automatically translated to each network's field names. Custom parameters are passed through as-is to networks that support them.
+  </Step>
+  <Step title="Revenue is handled automatically">
+    The `amount` and `currency` fields are used for revenue reporting across all networks.
+  </Step>
+</Steps>
 
-- Always include `product_id` for purchase events — Meta requires it for product catalog matching
-- Include `order_id` for deduplication across ad networks
-- Use `content_type: "product"` when `product_id` refers to a specific SKU, or `"product_group"` for product variants
-- For `capture-payment`, the top-level `amount` and `currency` are used for revenue tracking — don't duplicate them in `event_data`
-- Custom keys like `coupon_code`, `payment_plan`, `subscription_tier` are passed through to networks that support custom properties (currently Meta)
+## Standard parameters
+
+These parameters are recognized by Linkrunner and automatically mapped to each ad network's expected format.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `product_id` | `string` or `string[]` | Product SKU or identifier. Required by Meta for product catalog matching. |
+| `order_id` | `string` | Transaction or order identifier. Used for deduplication across ad networks. |
+| `content_type` | `string` | Set to `"product"` for a specific SKU or `"product_group"` for product variants. |
+| `num_items` | `number` | Number of items in the transaction. |
+| `contents` | `array` | Array of `{ id, quantity, item_price }` objects for multi-product events. |
+| `search_string` | `string` | The user's search query text. |
+| `content_name` | `string` | Name of the content or product. |
+| `content_category` | `string` | Category of the content or product. |
+| `description` | `string` | Description of the event or product. |
+| `amount` | `number` | Revenue value for the event. |
+| `currency` | `string` | ISO 4217 currency code (e.g. `"USD"`, `"EUR"`). |
+
+<Note>
+  Any key not listed above (e.g. `coupon_code`, `payment_plan`, `subscription_tier`) is treated as a custom parameter and passed through to ad networks that support custom properties. Currently, only Meta accepts custom parameters.
+</Note>
+
+## Ad network parameter mapping
+
+When you send a standard parameter, Linkrunner translates it to the field name each ad network expects. A dash (`—`) means that network does not support the parameter.
+
+| Linkrunner parameter | Meta CAPI | Google Ads | TikTok | Snapchat |
+|----------------------|-----------|------------|--------|----------|
+| `product_id` | `content_ids` | `item_id` | `content_ids` | `item_ids` |
+| `order_id` | `order_id` | `order_id` | `order_id` (purchase only) | `transaction_id` |
+| `content_type` | `content_type` | `category` | Auto-derived from `content_ids` | — |
+| `num_items` | `num_items` | — | — | `number_items` |
+| `contents` | `contents` | — | — | — |
+| `search_string` | `search_string` | `search_string` | `search_string` (custom events only) | — |
+| `description` | — | — | `description` | — |
+| `content_name` | `content_name` | — | — | — |
+| `content_category` | `content_category` | — | — | — |
+| `amount` / `value` | `value` | `value` (query param) | `value` | `value` |
+| `currency` | `currency` | `currency_code` (query param) | `currency` | `currency` |
+| *any custom key* | Custom property | — | — | — |
+
+<Tip>
+  You don't need to worry about these mappings. Just send your parameters using the names in the "Linkrunner parameter" column and Linkrunner handles the rest.
+</Tip>
+
+## Best practices
+
+- **Always include `product_id` for purchase events.** Meta requires it for product catalog matching. If you skip it, Meta can't connect the purchase to a product in your catalog.
+- **Include `order_id` for deduplication.** Ad networks use this to ensure the same transaction isn't counted twice, especially when events are sent from both your app and server.
+- **Use `content_type` to describe what `product_id` refers to.** Set it to `"product"` for a specific SKU, or `"product_group"` when the ID covers multiple variants.
+- **Don't duplicate `amount` and `currency` inside `event_data` for payments.** When using [`capture-payment`](/api-reference/revenue-tracking), the top-level `amount` and `currency` fields are used for revenue tracking. Putting them in `event_data` as well can cause double-counting.
+- **Custom keys are forwarded to Meta only.** Parameters like `coupon_code` or `subscription_tier` are passed through as custom properties to Meta CAPI. Other networks do not receive them.
 
 ## Examples
 
 ### Purchase event (via capture-event)
+
+Send product details alongside a purchase event tracked from your backend.
 
 ```json
 {
@@ -61,6 +109,8 @@ Both `capture-event` and `capture-payment` APIs accept an `event_data` field —
 
 ### Payment with product details (via capture-payment)
 
+When using the payment API, put product details in `event_data` and keep `amount`/`currency` at the top level.
+
 ```json
 {
     "user_id": "user_12345",
@@ -76,6 +126,10 @@ Both `capture-event` and `capture-payment` APIs accept an `event_data` field —
     }
 }
 ```
+
+<Warning>
+  Notice that `amount` and `currency` are **not** inside `event_data` here. For `capture-payment`, always use the top-level fields for revenue.
+</Warning>
 
 ### Add to cart
 
@@ -123,7 +177,9 @@ Both `capture-event` and `capture-payment` APIs accept an `event_data` field —
 }
 ```
 
-### Custom event with arbitrary params
+### Custom event with arbitrary parameters
+
+Any event can include custom key-value pairs. These are stored by Linkrunner and forwarded to Meta as custom properties.
 
 ```json
 {
@@ -137,3 +193,16 @@ Both `capture-event` and `capture-payment` APIs accept an `event_data` field —
     "user_id": "user_12345"
 }
 ```
+
+## Related
+
+<CardGroup cols={2}>
+    <Card title="Event Capture API" icon="shuffle" href="/api-reference/event-capture">
+        Track custom events from your backend
+    </Card>
+    <Card title="Revenue Tracking API" icon="money-bill" href="/api-reference/revenue-tracking">
+        Capture payments and revenue data
+    </Card>
+</CardGroup>
+
+For any help please reach out to [darshil@linkrunner.io](mailto:darshil@linkrunner.io)
