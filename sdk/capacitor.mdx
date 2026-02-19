@@ -58,6 +58,28 @@ For Android apps, the SDK provides backup rules to exclude Shared Preferences da
 
 For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android#backup-configuration).
 
+### Step 6: Android Kotlin Configuration
+
+The Capacitor Linkrunner SDK requires the Kotlin Gradle plugin. Add the following to your root `build.gradle` file under `dependencies`:
+
+```groovy
+buildscript {
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+```
+
+For example, with Kotlin version 1.9.22:
+
+```groovy
+buildscript {
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22"
+    }
+}
+```
+
 ## Initialization
 
 To initialize the Linkrunner SDK, add this code to your app's initialization:
