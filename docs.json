@@ -24,6 +24,7 @@
                             "sdk/web",
                             "sdk/react-native",
                             "sdk/flutter",
+                            "sdk/capacitor",
                             "sdk/ios",
                             "sdk/android",
                             "sdk/expo"

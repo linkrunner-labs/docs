@@ -1,7 +1,7 @@
 ---
-title: "React Native SDK"
-description: "Complete guide for integrating Linkrunner in React Native apps"
-icon: "react"
+title: "Capacitor SDK"
+description: "Complete guide for integrating Linkrunner in Capacitor apps"
+icon: "/images/icons/capacitor.svg"
 ---
 
 ## Installation
@@ -10,30 +10,36 @@ icon: "react"
 
 ```bash
 # Using npm
-npm install rn-linkrunner
+npm install capacitor-linkrunner
 
 # Using yarn
-yarn add rn-linkrunner
+yarn add capacitor-linkrunner
 ```
 
-### Step 2: iOS Configuration
+### Step 2: Sync Native Projects
+
+```bash
+npx cap sync
+```
+
+### Step 3: iOS Configuration
 
 If you're developing for iOS, follow these additional steps:
 
 1. Install pods for the package:
 
 ```bash
-cd ios && pod install
+cd ios/App && pod install
 ```
 
-2. Add the following code to your `info.plist` file:
+2. Add the following code to your `Info.plist` file:
 
 ```xml
 <key>NSUserTrackingUsageDescription</key>
 <string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
 ```
 
-### Step 3: SKAdNetwork Configuration
+### Step 4: SKAdNetwork Configuration
 
 To enable SKAdNetwork postback copies to be sent to Linkrunner, add the following keys to your `Info.plist` file:
 
@@ -46,25 +52,21 @@ To enable SKAdNetwork postback copies to be sent to Linkrunner, add the followin
 
 For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
 
-### Step 4: Android Backup Configuration
+### Step 5: Android Backup Configuration
 
 For Android apps, the SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
 
 For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android#backup-configuration).
 
-### Expo Support
-
-If you are using Expo, follow the above steps to install the required packages. After this, you will need to use development builds since the Linkrunner SDK relies on native libraries. Follow the [Expo Development Builds Documentation](https://docs.expo.dev/develop/development-builds/introduction/) to get started.
-
 ## Initialization
 
-To initialize the Linkrunner SDK, add this code to your `App.tsx` component:
+To initialize the Linkrunner SDK, add this code to your app's initialization:
 
 You can find your project token [here](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
 
 ### SDK Signing Parameters (Optional)
 
-For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+For enhanced security, the Linkrunner SDK accepts the following signing parameters during initialization:
 
 -   **`secretKey`**: A unique secret key used for request signing and authentication
 -   **`keyId`**: A unique identifier for the key pair used in the signing process
@@ -73,14 +75,10 @@ You can find your project token, secret key, and key ID [here](https://dashboard
 
 Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
 
-```javascript
-import linkrunner from "rn-linkrunner";
+```typescript
+import linkrunner from "capacitor-linkrunner";
 
-// Inside your React component
-useEffect(() => {
-    init();
-}, []); // Empty dependency array ensures it runs only once
-
+// Inside your app initialization
 const init = async () => {
     await linkrunner.init(
         "YOUR_PROJECT_TOKEN",
@@ -91,7 +89,11 @@ const init = async () => {
     );
     console.log("Linkrunner initialized");
 };
+
+// Call init when app starts
+init();
 ```
+
 
 ## User Registration
 
@@ -109,7 +111,9 @@ If the platform's identifier function is not called, you must provide a user ide
 -   posthog_distinct_id for PostHog
 -   amplitude_device_id for Amplitude
 
-```javascript
+```typescript
+import linkrunner from "capacitor-linkrunner";
+
 const onSignup = async () => {
     try {
         await linkrunner.signup({
@@ -138,7 +142,9 @@ const onSignup = async () => {
 
 To get attribution data and deeplink information for the current installation, use the `getAttributionData` function:
 
-```javascript
+```typescript
+import linkrunner from "capacitor-linkrunner";
+
 const getAttributionInfo = async () => {
     try {
         const attributionData = await linkrunner.getAttributionData();
@@ -154,18 +160,17 @@ The `getAttributionData` function returns:
 ```typescript
 {
     deeplink: string | null;
-    campaign_data: {
+    campaignData: {
         id: string;
         name: string;
         type: string; // "ORGANIC" | "INORGANIC"
-        ad_network: string | null; // "META" | "GOOGLE" | null
-        installed_at: string;
-        store_click_at: string | null;
-        group_name: string;
-        asset_name: string;
-        asset_group_name: string;
+        adNetwork: string | null; // "META" | "GOOGLE" | null
+        installedAt: string;
+        storeClickAt: string | null;
+        groupName: string;
+        assetName: string;
+        assetGroupName: string;
     }
-    attribution_source: string;
 }
 ```
 
@@ -173,7 +178,9 @@ The `getAttributionData` function returns:
 
 Call `setUserData` each time the app opens and the user is logged in:
 
-```javascript
+```typescript
+import linkrunner from "capacitor-linkrunner";
+
 const setUserData = async () => {
     await linkrunner.setUserData({
         id: "123", // Required: User ID
@@ -191,7 +198,9 @@ const setUserData = async () => {
 
 Use the `setAdditionalData` method to set CleverTap ID:
 
-```javascript
+```typescript
+import linkrunner from "capacitor-linkrunner";
+
 const setIntegrationData = async () => {
     await linkrunner.setAdditionalData({
         clevertapId: "YOUR_CLEVERTAP_USER_ID", // CleverTap user identifier
@@ -209,7 +218,9 @@ This method allows you to connect user identities across different analytics and
 
 Track custom events in your app:
 
-```javascript
+```typescript
+import linkrunner from "capacitor-linkrunner";
+
 const trackEvent = async () => {
     await linkrunner.trackEvent(
         "purchase_initiated", // Event name
@@ -222,7 +233,7 @@ const trackEvent = async () => {
 
 To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
 
-```javascript
+```typescript
 const trackPurchaseEvent = async () => {
     await linkrunner.trackEvent("purchase_completed", {
         product_id: "12345",
@@ -237,13 +248,16 @@ const trackPurchaseEvent = async () => {
     string.
 </Note>
 
+
 ## Revenue Tracking
 
 ### Capture Payment
 
 Use this method to capture payment information:
 
-```js
+```typescript
+import linkrunner from "capacitor-linkrunner";
+
 const capturePayment = async () => {
     await linkrunner.capturePayment({
         amount: 100, // Payment amount
@@ -263,7 +277,6 @@ const capturePayment = async () => {
 -   `paymentId`: string (optional) - Unique identifier for the payment
 -   `type`: string (optional) - Type of payment. Available options:
     -   `FIRST_PAYMENT` - First payment made by the user
-    -   `SECOND_PAYMENT` - Second payment made by the user
     -   `WALLET_TOPUP` - Adding funds to a wallet
     -   `FUNDS_WITHDRAWAL` - Withdrawing funds
     -   `SUBSCRIPTION_CREATED` - New subscription created
@@ -281,7 +294,9 @@ const capturePayment = async () => {
 
 Remove payment records (for refunds or cancellations):
 
-```javascript
+```typescript
+import linkrunner from "capacitor-linkrunner";
+
 const removePayment = async () => {
     await linkrunner.removePayment({
         userId: "user123", // User identifier
@@ -290,18 +305,20 @@ const removePayment = async () => {
 };
 ```
 
-#### Parameters for `Linkrunner.removePayment`
+#### Parameters for `linkrunner.removePayment`
 
--   `userId`: String (required) - Identifier for the user whose payment is being removed
--   `paymentId`: String (optional) - Unique identifier for the payment to be removed
+-   `userId`: string (optional) - Identifier for the user whose payment is being removed. If only `userId` is provided, all payments for that user will be removed.
+-   `paymentId`: string (optional) - Unique identifier for the payment to be removed
 
-Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If only `userId` is provided, all payments for that user will be removed.
+Note: At least one of `paymentId` or `userId` must be provided when calling `removePayment`.
 
 ## Enhanced Privacy Controls
 
 The SDK offers options to enhance user privacy:
 
-```javascript
+```typescript
+import linkrunner from "capacitor-linkrunner";
+
 // Enable PII (Personally Identifiable Information) hashing
 linkrunner.enablePIIHashing(true);
 ```
@@ -312,7 +329,7 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 
 | Function                        | Where to Place                 | When to Call                                   |
 | ------------------------------- | ------------------------------ | ---------------------------------------------- |
-| `linkrunner.init`               | App.tsx within useEffect       | Once when app starts                           |
+| `linkrunner.init`               | App initialization             | Once when app starts                           |
 | `linkrunner.getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed        |
 | `linkrunner.setAdditionalData`  | Integration code               | When third-party integration IDs are available |
 | `linkrunner.signup`             | Onboarding flow                | Once after user completes onboarding           |
@@ -327,7 +344,7 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
     <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
         Validate your setup end-to-end
     </Card>
-    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking-setup">
         Configure deep links for your app
     </Card>
 </CardGroup>
