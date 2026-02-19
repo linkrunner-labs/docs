@@ -1,7 +1,7 @@
 ---
 title: "Capacitor SDK"
 description: "Complete guide for integrating Linkrunner in Capacitor apps"
-icon: "bolt"
+icon: "/images/icons/capacitor.svg"
 ---
 
 ## Installation
@@ -50,7 +50,7 @@ To enable SKAdNetwork postback copies to be sent to Linkrunner, add the followin
 <string>https://linkrunner-skan.com</string>
 ```
 
-For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork).
+For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
 
 ### Step 5: Android Backup Configuration
 
@@ -66,7 +66,7 @@ You can find your project token [here](https://dashboard.linkrunner.io/dashboard
 
 ### SDK Signing Parameters (Optional)
 
-For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+For enhanced security, the Linkrunner SDK accepts the following signing parameters during initialization:
 
 -   **`secretKey`**: A unique secret key used for request signing and authentication
 -   **`keyId`**: A unique identifier for the key pair used in the signing process
@@ -307,10 +307,10 @@ const removePayment = async () => {
 
 #### Parameters for `linkrunner.removePayment`
 
--   `userId`: string (required) - Identifier for the user whose payment is being removed
+-   `userId`: string (optional) - Identifier for the user whose payment is being removed. If only `userId` is provided, all payments for that user will be removed.
 -   `paymentId`: string (optional) - Unique identifier for the payment to be removed
 
-Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If only `userId` is provided, all payments for that user will be removed.
+Note: At least one of `paymentId` or `userId` must be provided when calling `removePayment`.
 
 ## Enhanced Privacy Controls
 
@@ -344,7 +344,7 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
     <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
         Validate your setup end-to-end
     </Card>
-    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking-setup">
         Configure deep links for your app
     </Card>
 </CardGroup>

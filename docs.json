@@ -23,8 +23,8 @@
                             "testing/integration-testing",
                             "sdk/web",
                             "sdk/react-native",
-                            "sdk/capacitor",
                             "sdk/flutter",
+                            "sdk/capacitor",
                             "sdk/ios",
                             "sdk/android",
                             "sdk/expo"
