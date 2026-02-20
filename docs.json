@@ -38,6 +38,7 @@
                                 "pages": ["features/deep-linking-setup", "features/deep-linking-verification"]
                             },
                             "features/deferred-deep-linking",
+                            "features/link-redirection",
                             "features/referral-codes",
                             "features/custom-store-listing",
                             "features/uninstall-tracking",
