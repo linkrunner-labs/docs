@@ -102,6 +102,8 @@ _Note: **Default** event should be mapped with **Payment** in linkrunner dashboa
 
 While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events to correctly attribute catalog sales. Your `event_data` object should include the following fields:
 
+For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event_data) documentation.
+
 ```json
 {
   "user_id": "666",
@@ -127,4 +129,4 @@ While you can include any custom attributes in the `event_data` object, Meta req
 }
 ```
 
-For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager) documentation.
+To verify your events are being correctly received by Meta, please follow our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.

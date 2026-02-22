@@ -89,3 +89,20 @@ When sending events via the [Capture Event API](/api-reference/event-capture) or
 ---
 
 > **Note:** For full integration details and request examples, refer to the [Capture Event API](/api-reference/event-capture) and [Capture Payment API](/api-reference/revenue-tracking) documentation.
+
+---
+
+## Testing Ecommerce Events
+
+After you have integrated the APIs and started sending events, you will naturally want to verify everything is working correctly.
+
+1. **Send a Test Event:** Trigger an event using the [Capture Event API](/api-reference/event-capture) (e.g., `add_to_cart`) or the [Capture Payment API](/api-reference/revenue-tracking) (e.g., `Purchase`).
+2. **Check the Meta Events Manager:** Navigate to your **Commerce Manager > Events** section.
+3. **Wait for Status Updates:** Within **15 minutes** of sending your event, you should start seeing the status reflect that you are successfully hitting the Meta Commerce dataset.
+
+<img
+  src="/images/ecommerce-event-meta/ecommerce-5.png"
+  alt="Commerce Manager Events Testing Verification"
+/>
+
+_Note: While the real-time hits will show up in Events Manager within 15 minutes, please be aware that **it can take a few days for the actual data to fully reflect and populate** across all Commerce Manager dashboards._
