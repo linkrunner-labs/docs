@@ -69,20 +69,20 @@ When sending events via the [Capture Event API](/api-reference/event-capture) or
 ```json
 "event_data": {
     "content_ids": [
-        "whshct4mwc" // should be item_group_ids or content_ids
+        "whshct4mwc"
     ],
     "contents": [
         {
-            "id": "whshct4mwc", // matches what you passed above
-            "quantity": 2, // number of items
-            "item_price": 1000 // unit price for a single item
+            "id": "whshct4mwc",
+            "quantity": 2,
+            "item_price": 1000
         }
     ],
-    "content_type": "product", // "product" or "product_group"
-    "currency": "INR", // 3-letter currency code
-    "value": 2000.00, // total value (item_price * quantity)
-    "num_items": 2, // total quantity of all items
-    "order_id": "order_id_1234" // unique string identifier
+    "content_type": "product",
+    "currency": "INR",
+    "value": 2000.00,
+    "num_items": 2,
+    "order_id": "order_id_1234"
 }
 ```
 
