@@ -1,0 +1,91 @@
+---
+title: "Meta Commerce Manager"
+description: "Setting up Ecommerce manager events for Meta to ensure proper tracking and attribution."
+icon: "cart-shopping"
+---
+
+## Overview
+
+Ecommerce manager events allow you to track and optimize your Meta catalog sales campaigns. By sending events such as purchases, add to cart, and content views, Meta can better understand user interactions with your products. This enables you to optimize your ad spend and target the right audiences. Linkrunner helps seamlessly sync these events with your connected Meta dataset.
+
+## Step 1: Select Catalogue Products
+
+To begin, you need to select your catalogue products within the Meta Commerce Manager. Ensure your product feed is active and products are properly categorized.
+
+<img
+  src="/images/ecommerce-event-meta/ecommerce-1.png"
+  alt="Select your catalogue products"
+/>
+
+## Step 2: Verify Dataset ID Connection
+
+Once your catalogue is set up, navigate to the events section. Check if the Dataset ID connected with Linkrunner is present and active.
+
+If the Dataset ID is not linked:
+
+1. Press on **Manage Connections**.
+2. Find the Dataset ID that is linked with Linkrunner.
+3. Turn the connection **ON**.
+
+_Make sure the linking part is successfully completed before proceeding._
+
+<img
+  src="/images/ecommerce-event-meta/ecommerce-2.png"
+  alt="Manage connections and turn on Dataset ID"
+/>
+
+## Step 3: Required Events
+
+View the dataset ID and check the events list. There are **3 essential events** we actually need to send:
+
+- `Purchase` (processed via the [Capture Payment API](/api-reference/revenue-tracking) or SDK)
+- `AddToCart` and `ViewContent` (processed via the [Event Capture API](/api-reference/event-capture) or SDK)
+
+Make sure you have integrated the appropriate APIs in your application to send these events.
+
+<img
+  src="/images/ecommerce-event-meta/ecommerce-3.png"
+  alt="View Dataset ID Events"
+/>
+
+## Understanding `event_data`
+
+When sending events via the [Capture Event API](/api-reference/event-capture) or [Capture Payment API](/api-reference/revenue-tracking), you must include specific fields in your `event_data` payload for Meta to correctly attribute and optimize your catalogue sales.
+
+### Required Fields for Ecommerce Events
+
+| Parameter                        | Type             | Description                                                                                                                                                                                                                                                |
+| -------------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `content_ids` / `item_group_ids` | array            | **Required for `Purchase`, `AddToCart`, `ViewContent`.** <br/> `content_ids`: Use an array of single product IDs for variants. Example: `['id1', 'id2']`. <br/> `item_group_ids`: Use for full product groups to boost the entire group.                   |
+| `contents`                       | array of objects | **Required for `Purchase`, `AddToCart`, `ViewContent`.** <br/> Array detailing items included: <br/> `id`: Matches `content_ids` / `item_group_ids`. <br/> `quantity`: Number of items. <br/> `item_price`: Unit price (must match Meta Products catalog). |
+| `content_type`                   | string           | **Required for `Purchase`, `AddToCart`, `ViewContent`.** <br/> Set to `"product"` for `content_ids`, or `"product_group"` for `item_group_ids`.                                                                                                            |
+| `value`                          | number           | **Required for `Purchase`, `AddToCart`.** <br/> Total numeric value (e.g., `item_price` \* `quantity`). No currency symbols.                                                                                                                               |
+| `currency`                       | string           | **Required when `value` is sent.** <br/> The 3-letter ISO currency code (e.g., `"USD"`, `"INR"`).                                                                                                                                                          |
+| `num_items`                      | number           | **Required for `Purchase`, `AddToCart`.** <br/> Total quantity of items in the `contents` array.                                                                                                                                                           |
+| `order_id`                       | string           | **Required for `Purchase`.** <br/> Backend-generated unique purchase order ID.                                                                                                                                                                             |
+
+**Example `event_data` Payload:**
+
+```json
+"event_data": {
+    "content_ids": [
+        "whshct4mwc" // should be item_group_ids or content_ids
+    ],
+    "contents": [
+        {
+            "id": "whshct4mwc", // matches what you passed above
+            "quantity": 2, // number of items
+            "item_price": 1000 // unit price for a single item
+        }
+    ],
+    "content_type": "product", // "product" or "product_group"
+    "currency": "INR", // 3-letter currency code
+    "value": 2000.00, // total value (item_price * quantity)
+    "num_items": 2, // total quantity of all items
+    "order_id": "order_id_1234" // unique string identifier
+}
+```
+
+---
+
+> **Note:** For full integration details and request examples, refer to the [Capture Event API](/api-reference/event-capture) and [Capture Payment API](/api-reference/revenue-tracking) documentation.

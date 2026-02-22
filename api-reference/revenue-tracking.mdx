@@ -30,12 +30,12 @@ POST: /capture-payment
 
 ```json
 {
-    "user_id": "666",
-    "payment_id": "ABC", // optional but recommended
-    "amount": 25096, // Send amount in one currency only
-    "type": "FIRST_PAYMENT", // optional
-    // "type": "SECOND_PAYMENT", // optional
-    "status": "PAYMENT_COMPLETED" // optional
+  "user_id": "666",
+  "payment_id": "ABC", // optional but recommended
+  "amount": 25096, // Send amount in one currency only
+  "type": "FIRST_PAYMENT", // optional
+  // "type": "SECOND_PAYMENT", // optional
+  "status": "PAYMENT_COMPLETED" // optional
 }
 ```
 
@@ -45,24 +45,24 @@ POST: /capture-payment
 
 ### Payment types
 
--   **FIRST_PAYMENT**: User's first payment
--   **SECOND_PAYMENT**: User's second payment
--   **WALLET_TOPUP**: Adding funds to a wallet
--   **FUNDS_WITHDRAWAL**: Withdrawing funds
--   **SUBSCRIPTION_CREATED**: Subscription started
--   **SUBSCRIPTION_RENEWED**: Subscription renewed
--   **ONE_TIME**: One-time payment
--   **RECURRING**: Recurring payment
--   **DEFAULT**: Generic/unspecified payment type
+- **FIRST_PAYMENT**: User's first payment
+- **SECOND_PAYMENT**: User's second payment
+- **WALLET_TOPUP**: Adding funds to a wallet
+- **FUNDS_WITHDRAWAL**: Withdrawing funds
+- **SUBSCRIPTION_CREATED**: Subscription started
+- **SUBSCRIPTION_RENEWED**: Subscription renewed
+- **ONE_TIME**: One-time payment
+- **RECURRING**: Recurring payment
+- **DEFAULT**: Generic/unspecified payment type
 
 If `type` is omitted, it defaults to **DEFAULT**.
 
 ### Payment status
 
--   **PAYMENT_INITIATED**: Payment has been initiated
--   **PAYMENT_COMPLETED**: Payment completed successfully
--   **PAYMENT_FAILED**: Payment attempt failed
--   **PAYMENT_CANCELLED**: Payment was cancelled
+- **PAYMENT_INITIATED**: Payment has been initiated
+- **PAYMENT_COMPLETED**: Payment completed successfully
+- **PAYMENT_FAILED**: Payment attempt failed
+- **PAYMENT_CANCELLED**: Payment was cancelled
 
 If `status` is omitted, it defaults to **PAYMENT_COMPLETED**.
 
@@ -81,8 +81,8 @@ POST: /remove-payment
 
 ```json
 {
-    "user_id": "666",
-    "payment_id": "ABC"
+  "user_id": "666",
+  "payment_id": "ABC"
 }
 ```
 
@@ -93,3 +93,40 @@ POST: /remove-payment
 1. **200** Payment entry/entries deleted
 2. **400** No payment found with the given payment id or user id
 3. **401** Invalid server key
+
+## Meta Ecommerce Events
+
+If you are tracking `Purchase` events to sync with Meta Catalog Sales, **you must first map the purchase event with the standard commerce event in the Linkrunner Dashboard** before sending it.
+
+_Note: **Default** event should be mapped with **Payment** in linkrunner dashboard_
+
+While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events to correctly attribute catalog sales. Your `event_data` object should include the following fields:
+
+```json
+{
+  "user_id": "666",
+  "payment_id": "ABC", // optional but recommended
+  "amount": 25096, // Send amount in one currency only
+  "type": "DEFAULT", // optional
+  "status": "PAYMENT_COMPLETED", // optional
+  "event_data": {
+    "content_ids": [
+      "whshct4mwc" // should be item_group_ids or content_ids
+    ],
+    "contents": [
+      {
+        "id": "whshct4mwc", // matches what you passed above
+        "quantity": 2, // number of items
+        "item_price": 1000 // unit price for a single item
+      }
+    ],
+    "content_type": "product", // "product" or "product_group"
+    "currency": "INR", // 3-letter currency code
+    "value": 2000.0, // total value (item_price * quantity)
+    "num_items": 2, // total quantity of all items
+    "order_id": "order_id_1234" // unique string identifier
+  }
+}
+```
+
+For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager) documentation.

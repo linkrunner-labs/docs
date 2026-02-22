@@ -82,6 +82,12 @@
                         "pages": ["analytics-integrations/ga4", "analytics-integrations/braze"]
                     },
                     {
+                        "group": "Ecommerce Manager",
+                        "pages": [
+                            "ecommerce-manager/meta-commerce-manager"
+                        ]
+                    },
+                    {
                         "group": "API Reference",
                         "pages": [
                             "api-reference/data-apis",
