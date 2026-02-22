@@ -105,26 +105,24 @@ While you can include any custom attributes in the `event_data` object, Meta req
 ```json
 {
   "user_id": "666",
-  "payment_id": "ABC", // optional but recommended
-  "amount": 25096, // Send amount in one currency only
-  "type": "DEFAULT", // optional
-  "status": "PAYMENT_COMPLETED", // optional
+  "payment_id": "ABC",
+  "amount": 25096,
+  "type": "DEFAULT",
+  "status": "PAYMENT_COMPLETED",
   "event_data": {
-    "content_ids": [
-      "whshct4mwc" // should be item_group_ids or content_ids
-    ],
+    "content_ids": ["whshct4mwc"],
     "contents": [
       {
-        "id": "whshct4mwc", // matches what you passed above
-        "quantity": 2, // number of items
-        "item_price": 1000 // unit price for a single item
+        "id": "whshct4mwc",
+        "quantity": 2,
+        "item_price": 1000
       }
     ],
-    "content_type": "product", // "product" or "product_group"
-    "currency": "INR", // 3-letter currency code
-    "value": 2000.0, // total value (item_price * quantity)
-    "num_items": 2, // total quantity of all items
-    "order_id": "order_id_1234" // unique string identifier
+    "content_type": "product",
+    "currency": "INR",
+    "value": 2000.0,
+    "num_items": 2,
+    "order_id": "order_id_1234"
   }
 }
 ```
