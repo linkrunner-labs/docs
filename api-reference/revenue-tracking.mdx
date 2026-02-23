@@ -98,7 +98,7 @@ POST: /remove-payment
 
 If you are tracking `Purchase` events to sync with Meta Catalog Sales, **you must first map the purchase event with the standard commerce event in the Linkrunner Dashboard** before sending it.
 
-_Note: **Default** event should be mapped with **Payment** in linkrunner dashboard_
+_Note: Any Payment event you send should be mapped with **Purchase** for Commerce Event Manager. For example, map **FIRST_PAYMENT** with **Purchase** or **DEFAULT** with **Purchase**._
 
 While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events to correctly attribute catalog sales. Your `event_data` object should include the following fields:
 
@@ -109,7 +109,7 @@ For comprehensive details on each field requirement, refer to our [Meta Commerce
   "user_id": "666",
   "payment_id": "ABC",
   "amount": 25096,
-  "type": "DEFAULT",
+  "type": "DEFAULT", // Event is mapped with the Purchase in the Linkrunner Meta Integration Settings
   "status": "PAYMENT_COMPLETED",
   "event_data": {
     "content_ids": ["whshct4mwc"],
@@ -128,5 +128,7 @@ For comprehensive details on each field requirement, refer to our [Meta Commerce
   }
 }
 ```
+
+_Note: In the example above, the `type` field is omitted from the request body, which means it defaults to **DEFAULT**. Ensure this default payment type is properly mapped with **Purchase** in your Linkrunner dashboard._
 
 To verify your events are being correctly received by Meta, please follow our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
