@@ -157,7 +157,9 @@ For any help please reach out to [darshil@linkrunner.io](mailto:darshil@linkrunn
 
 If you are tracking Ecommerce events (like `add_to_cart` or `view_content`) to sync with Meta Catalog Sales, **you must first map your custom event with the standard commerce event in the Linkrunner Dashboard** before sending the event.
 
-For example, if you send the event `add_to_cart`, make sure you have mapped your `add_to_cart` event with Meta's **AddToCart** event in the Linkrunner Meta integration settings.
+_Note: Any event you want to send for an add to cart action should be mapped with **AddToCart** for Commerce Event Manager. For example, map **add_to_cart** with **AddToCart**._
+
+_Similarly, any event you want to send for viewing a product should be mapped with **ViewContent**. For example, map **item_viewed** with **ViewContent** or **view_content** with **ViewContent**._
 
 While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events in order to correctly attribute catalog sales and optimize campaigns.
 
