@@ -95,6 +95,39 @@
                         "pages": ["billing/overview"]
                     }
                 ]
+            },
+            {
+                "tab": "CLI",
+                "groups": [
+                    {
+                        "group": "Getting Started",
+                        "pages": [
+                            "cli/overview",
+                            "cli/installation"
+                        ]
+                    },
+                    {
+                        "group": "Commands",
+                        "pages": [
+                            "cli/commands/login",
+                            "cli/commands/init",
+                            "cli/commands/doctor",
+                            "cli/commands/test",
+                            "cli/commands/analyze",
+                            "cli/commands/events",
+                            "cli/commands/deeplink",
+                            "cli/commands/suggest",
+                            "cli/commands/status"
+                        ]
+                    },
+                    {
+                        "group": "Guides",
+                        "pages": [
+                            "cli/ci-cd",
+                            "cli/troubleshooting"
+                        ]
+                    }
+                ]
             }
         ]
     },
