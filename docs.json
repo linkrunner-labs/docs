@@ -89,6 +89,10 @@
                             "api-reference/event-capture",
                             "api-reference/campaign-apis"
                         ]
+                    },
+                    {
+                        "group": "Billing",
+                        "pages": ["billing/overview"]
                     }
                 ]
             }
