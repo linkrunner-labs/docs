@@ -1,0 +1,168 @@
+---
+title: "CI/CD Integration"
+description: "Use the Linkrunner CLI in your CI/CD pipelines"
+icon: "rotate"
+---
+
+## Overview
+
+The Linkrunner CLI supports CI/CD workflows through two key features:
+
+- **`--ci` flag** -- commands exit with code 0 (pass) or 1 (fail) instead of remaining interactive
+- **`--json` flag** -- structured JSON output for machine parsing
+
+These flags are available on `lr doctor`, `lr validate`, `lr analyze`, and `lr test`.
+
+## Exit Codes
+
+| Code | Meaning |
+|---|---|
+| `0` | All checks passed (no errors) |
+| `1` | One or more errors found |
+
+By default, warnings do not cause a non-zero exit. Add `--fail-on-warn` to treat warnings as failures.
+
+## Commands for CI
+
+### lr doctor --ci
+
+Validates platform configuration and source code:
+
+```bash
+# Fail on errors only
+lr doctor --ci
+
+# Fail on errors AND warnings
+lr doctor --ci --fail-on-warn
+```
+
+### lr test --ci
+
+Verifies API connectivity and token validity:
+
+```bash
+lr test --ci
+```
+
+### lr analyze --ci
+
+Runs standard checks plus AI-powered deep analysis:
+
+```bash
+lr analyze --ci --fail-on-warn
+```
+
+## Pipeline Examples
+
+### GitHub Actions
+
+```yaml
+name: Linkrunner SDK Check
+on: [push, pull_request]
+
+jobs:
+  sdk-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Linkrunner CLI
+        run: npm install -g linkrunner-cli
+
+      - name: Validate SDK integration
+        run: lr doctor --ci --fail-on-warn
+
+      - name: Test API connectivity
+        run: lr test --ci
+```
+
+### GitLab CI
+
+```yaml
+sdk-check:
+  image: node:20
+  script:
+    - npm install -g linkrunner-cli
+    - lr doctor --ci --fail-on-warn
+    - lr test --ci
+```
+
+### Bitbucket Pipelines
+
+```yaml
+pipelines:
+  default:
+    - step:
+        name: SDK Validation
+        image: node:20
+        script:
+          - npm install -g linkrunner-cli
+          - lr doctor --ci --fail-on-warn
+```
+
+## JSON Output
+
+Use `--json` to get machine-readable output for custom processing:
+
+```bash
+lr doctor --json | jq '.summary.errors'
+```
+
+The JSON structure for `lr doctor --json`:
+
+```json
+{
+  "project": {
+    "type": "flutter",
+    "sdkVersion": "3.2.1",
+    "root": "/path/to/project"
+  },
+  "results": [
+    {
+      "id": "check-id",
+      "name": "Check name",
+      "status": "pass",
+      "severity": "error",
+      "message": "Description",
+      "fix": "Suggested fix",
+      "autoFixable": false,
+      "docsUrl": "https://..."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "warnings": 1,
+    "errors": 0
+  }
+}
+```
+
+## Combining Flags
+
+You can combine `--ci` and `--json` for both structured output and exit codes:
+
+```bash
+# Get JSON output AND exit code
+lr doctor --ci --json > results.json
+echo "Exit code: $?"
+```
+
+## Requirements
+
+- The project must contain a `.linkrunner.json` file (for `lr test`) or recognizable project files (for `lr doctor`)
+- No interactive prompts are shown when `--ci` or `--json` is used
+- `lr test` and `lr status` require a `.linkrunner.json` file created by `lr init`
+
+<Note>
+For CI environments, run `lr init` locally first and commit the `.linkrunner.json` file to your repository. The CLI reads this file to identify your project during CI runs.
+</Note>
+
+## Related
+
+- [lr doctor](/cli/commands/doctor) -- full diagnostics reference
+- [lr test](/cli/commands/test) -- API connectivity checks
+- [lr analyze](/cli/commands/analyze) -- AI-powered analysis

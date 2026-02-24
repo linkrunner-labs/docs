@@ -1,0 +1,127 @@
+---
+title: "lr suggest"
+description: "Get SDK feature integration suggestions"
+icon: "lightbulb"
+---
+
+## Usage
+
+```bash
+lr suggest [options]
+```
+
+## Description
+
+Scans your source code to determine which Linkrunner SDK features you are using and which ones are missing. Provides examples and documentation links for unintegrated features. Optionally includes AI-powered recommendations tailored to your specific project.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--json` | Output results as JSON |
+| `--no-ai` | Skip AI-powered recommendations |
+
+## Checked Features
+
+The CLI scans your source files for these SDK features:
+
+| Feature | Description | Severity |
+|---|---|---|
+| `init()` | SDK initialization | Error (required) |
+| `signup()` | User registration tracking | Warning |
+| `setUserData()` | User data enrichment | Warning |
+| `trackEvent()` | Custom event tracking | Warning |
+| `capturePayment()` | Revenue tracking | Warning |
+| Deep links | Deep link handling | Warning |
+
+Each feature is checked using platform-specific patterns. For example, Flutter looks for `LinkRunner().init(`, while React Native looks for `linkrunner.init(`.
+
+## Output
+
+For each missing feature, the CLI shows:
+
+- Why it matters
+- A code example for your platform
+- A link to the documentation
+
+```
+── Feature Integration Status ──
+  ✔ init() — SDK initialization
+  ✔ signup() — User registration tracking
+  ⚠ setUserData() — User data enrichment
+       Enables user-level analytics and segmentation
+       Example:
+         await linkrunner.setUserData({ id: 'USER_ID' });
+       Docs: https://docs.linkrunner.io/sdk/react-native
+  ⚠ trackEvent() — Custom event tracking
+       Track in-app events for campaign optimization
+       Example:
+         await linkrunner.trackEvent({ name: 'event_name', data: {} });
+       Docs: https://docs.linkrunner.io/sdk/react-native
+  ✔ capturePayment() — Revenue tracking
+  ⚠ Deep links — Deep link handling
+       Enable deferred deep links and attribution
+       Example:
+         const initData = await linkrunner.getInitData();
+       Docs: https://docs.linkrunner.io/sdk/react-native
+
+Score: 3/6 features integrated
+```
+
+## AI Recommendations
+
+When you are authenticated and `--no-ai` is not set, the CLI sends your project context to an AI model for personalized suggestions. These go beyond the standard feature checks:
+
+```
+── AI Recommendations ──
+  * Deferred Deep Linking
+    Your app has onboarding screens — consider routing users to specific
+    content after install using deferred deep links.
+    Example:
+      const initData = await linkrunner.getInitData();
+```
+
+## JSON Output
+
+```bash
+lr suggest --json
+```
+
+```json
+{
+  "platform": "react-native",
+  "sdkVersion": "2.3.0",
+  "root": "/path/to/project",
+  "features": [
+    {
+      "key": "init",
+      "name": "init()",
+      "description": "SDK initialization",
+      "found": true,
+      "example": "await linkrunner.init({ token: 'YOUR_TOKEN' });",
+      "docsUrl": "https://docs.linkrunner.io/sdk/react-native"
+    },
+    {
+      "key": "signup",
+      "name": "signup()",
+      "description": "User registration tracking",
+      "found": false,
+      "example": "await linkrunner.signup({ userId: 'USER_ID' });",
+      "docsUrl": "https://docs.linkrunner.io/sdk/react-native"
+    }
+  ],
+  "score": { "integrated": 3, "total": 6 },
+  "aiSuggestions": [
+    {
+      "feature": "Deferred Deep Linking",
+      "reason": "Your app has onboarding screens...",
+      "example": "const initData = await linkrunner.getInitData();"
+    }
+  ]
+}
+```
+
+## Related
+
+- [lr doctor](/cli/commands/doctor) -- validate configuration and code
+- [lr events add](/cli/commands/events) -- generate event tracking code

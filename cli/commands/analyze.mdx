@@ -1,0 +1,105 @@
+---
+title: "lr analyze"
+description: "Run AI-powered deep analysis of your SDK integration"
+icon: "robot"
+---
+
+## Usage
+
+```bash
+lr analyze [options]
+```
+
+## Description
+
+Runs all standard `lr doctor` checks plus an AI-powered deep analysis of your codebase. This is equivalent to running `lr doctor --deep`.
+
+The AI analysis inspects your source code for subtle integration issues, incorrect usage patterns, missing best practices, and platform-specific problems that pattern-based checks cannot catch.
+
+<Note>Requires authentication. Run `lr login` first.</Note>
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--json` | Output results as JSON |
+| `--ci` | Exit with code 0 (pass) or 1 (fail) |
+| `--fail-on-warn` | Treat warnings as failures in CI mode |
+
+## What It Does
+
+1. Runs all standard platform configuration checks (same as `lr doctor`)
+2. Runs source code pattern scanning (same as `lr doctor`)
+3. Sends project context to an AI model for deep analysis
+4. Reports any additional issues found by the AI, including:
+   - File path and line number of the issue
+   - Severity level (error, warn, or info)
+   - Suggested fix
+
+## Examples
+
+### Basic analysis
+
+```bash
+lr analyze
+```
+
+```
+Linkrunner Doctor
+Diagnosing your SDK integration...
+
+  Project: react-native (SDK v2.3.0)
+  Root: /path/to/project
+
+── Platform Configuration ──
+  ✔ rn-linkrunner found in package.json
+  ...
+
+── Source Code ──
+  ✔ init() call found
+  ...
+
+── Deep Analysis (AI-powered) ──
+  ✘ [src/App.tsx:15] init() called outside useEffect - may run on every render
+    Fix: Move init() inside a useEffect with an empty dependency array
+  ⚠ [src/screens/Payment.tsx:42] capturePayment amount is hardcoded
+    Fix: Use the actual transaction amount from your payment provider
+  ✔ No additional issues found by AI analysis.
+```
+
+### JSON output for scripting
+
+```bash
+lr analyze --json
+```
+
+The JSON output includes a `deepAnalysis` array in addition to the standard `results`:
+
+```json
+{
+  "project": { "type": "react-native", "sdkVersion": "2.3.0", "root": "..." },
+  "results": [...],
+  "summary": { "passed": 5, "warnings": 1, "errors": 1 },
+  "deepAnalysis": [
+    {
+      "file": "src/App.tsx",
+      "line": 15,
+      "severity": "error",
+      "message": "init() called outside useEffect",
+      "fix": "Move init() inside a useEffect with an empty dependency array"
+    }
+  ]
+}
+```
+
+### In CI
+
+```bash
+lr analyze --ci --fail-on-warn
+```
+
+## Related
+
+- [lr doctor](/cli/commands/doctor) -- standard diagnostics without AI analysis
+- [lr suggest](/cli/commands/suggest) -- AI-powered feature suggestions
+- [CI/CD Integration](/cli/ci-cd) -- pipeline examples

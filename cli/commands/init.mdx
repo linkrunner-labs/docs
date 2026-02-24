@@ -1,0 +1,140 @@
+---
+title: "lr init"
+description: "Initialize the Linkrunner SDK in your project"
+icon: "play"
+---
+
+## Usage
+
+```bash
+lr init
+```
+
+## Description
+
+Interactive setup wizard that configures the Linkrunner SDK in your project. Run this from your project root directory. The command walks through the full setup process: detecting your platform, authenticating, selecting a project, installing the SDK, configuring native files, generating code snippets, and saving a config file.
+
+## Setup Steps
+
+### Step 1: Detect Project Type
+
+The CLI auto-detects your project type by examining files in the current directory:
+
+- `pubspec.yaml` -- Flutter
+- `package.json` with `expo` dependency -- Expo
+- `package.json` with `react-native` dependency -- React Native
+- `package.json` with `@capacitor/core` dependency -- Capacitor
+- `.xcodeproj` or `.xcworkspace` -- iOS
+- `build.gradle` or `build.gradle.kts` -- Android
+- `package.json` (fallback) -- Web
+
+If detection succeeds, you are asked to confirm. If it fails, you select your platform manually from the list.
+
+### Step 2: Authenticate
+
+If you are not already logged in, the CLI triggers the `lr login` flow. See [lr login](/cli/commands/login).
+
+### Step 3: Select or Create a Project
+
+The CLI fetches your existing Linkrunner projects and lets you choose one, or create a new project. When creating a new project, you provide:
+
+- Project name
+- Company name
+- App Store link (optional)
+- Play Store link (optional)
+- Billing account
+
+<Note>At least one store link (App Store or Play Store) is required when creating a new project.</Note>
+
+### Step 4: Fetch Credentials
+
+The CLI retrieves your project token and SDK credentials. If your platform needs Android or iOS credentials and they don't exist yet, they are created automatically.
+
+### Step 5: Install SDK
+
+Based on your platform, the CLI offers to run the appropriate install command:
+
+| Platform | Install Command |
+|---|---|
+| Flutter | `flutter pub add linkrunner` |
+| React Native | `npm install rn-linkrunner` |
+| Expo | `npm install rn-linkrunner && npx expo install expo-linkrunner` |
+| Web | `npm install @linkrunner/web-sdk` |
+| Capacitor | `npm install capacitor-linkrunner && npx cap sync` |
+| iOS / Android | Manual setup (instructions provided) |
+
+You can skip the automatic install and run the command yourself later.
+
+### Step 6: Platform Configuration
+
+The CLI detects and offers to apply platform-specific configuration changes:
+
+**Android** (Flutter, React Native, Expo, Capacitor):
+- Adds `INTERNET` and `ACCESS_NETWORK_STATE` permissions to `AndroidManifest.xml`
+
+**iOS** (Flutter, React Native, Expo, Capacitor):
+- Adds `NSUserTrackingUsageDescription` to `Info.plist` for App Tracking Transparency
+
+**Expo**:
+- Adds the `expo-linkrunner` plugin to `app.json`
+
+Each change is shown before applying, and a `.bak` backup file is created automatically.
+
+### Step 7: Code Snippets
+
+The CLI generates platform-specific code snippets for:
+
+1. **Initialization** -- add to your app startup
+2. **User Registration (Signup)** -- call once after user onboarding
+3. **Set User Data** -- call each time the app opens with a logged-in user
+
+For each snippet, you can optionally let the CLI auto-insert the code into your source files using AI-powered file analysis.
+
+### Step 8: Save Config
+
+A `.linkrunner.json` file is saved in your project root containing your project token, project ID, platform settings, and credentials.
+
+### Step 9: Run Doctor
+
+You are offered the option to run `lr doctor` to verify the setup. See [lr doctor](/cli/commands/doctor).
+
+## Example Output
+
+```
+── Linkrunner SDK Setup ──
+
+  Detected project type: flutter
+
+? Is this a flutter project? Yes
+? Select a project: My App (My Company)
+✔ Credentials fetched
+
+  Install command: flutter pub add linkrunner
+
+? Run "flutter pub add linkrunner"? Yes
+✔ Install Flutter SDK complete
+
+── Platform Configuration ──
+✔ Add INTERNET and ACCESS_NETWORK_STATE permissions (already present)
+✔ Add NSUserTrackingUsageDescription for App Tracking Transparency (already present)
+
+── Code Snippets ──
+  1. Initialization
+  ...
+
+✔ .linkrunner.json saved at /path/to/project/.linkrunner.json
+
+  Setup complete!
+
+  Project: My App
+  Platform: flutter
+  Config: /path/to/project/.linkrunner.json
+
+  Run `lr doctor` anytime to verify your integration.
+```
+
+## Related
+
+- [lr doctor](/cli/commands/doctor) -- verify your setup after init
+- [lr login](/cli/commands/login) -- authentication details
+- [lr deeplink setup](/cli/commands/deeplink) -- configure deep linking after init

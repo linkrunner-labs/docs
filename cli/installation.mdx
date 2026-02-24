@@ -1,0 +1,86 @@
+---
+title: "Installation"
+description: "Install and set up the Linkrunner CLI"
+icon: "download"
+---
+
+## Requirements
+
+- Node.js 18+ or [Bun](https://bun.sh) runtime
+- A Linkrunner account ([sign up](https://dashboard.linkrunner.io))
+
+## Install via npm
+
+```bash
+npm install -g linkrunner-cli
+```
+
+## Install via Bun
+
+```bash
+bun install -g linkrunner-cli
+```
+
+## Verify Installation
+
+```bash
+lr --version
+```
+
+You should see output like:
+
+```
+0.1.0
+```
+
+## Authenticate
+
+After installing, log in with your Linkrunner account:
+
+```bash
+lr login
+```
+
+This sends a magic link to your email. Paste the token or URL from the email to complete authentication. See [lr login](/cli/commands/login) for details.
+
+## Initialize a Project
+
+Navigate to your project directory and run:
+
+```bash
+cd your-app/
+lr init
+```
+
+This walks you through:
+
+1. Detecting your project type (Flutter, React Native, Expo, iOS, Android, Capacitor, or Web)
+2. Selecting or creating a Linkrunner project
+3. Installing the appropriate SDK package
+4. Configuring native platform files
+5. Generating initialization code snippets
+6. Saving a `.linkrunner.json` config file
+
+See [lr init](/cli/commands/init) for the full walkthrough.
+
+## Update
+
+To update to the latest version:
+
+```bash
+npm update -g linkrunner-cli
+```
+
+## Uninstall
+
+```bash
+npm uninstall -g linkrunner-cli
+```
+
+This removes the CLI binary. Your `.linkrunner.json` project config and global auth credentials are not affected.
+
+To also clear stored credentials:
+
+```bash
+lr logout
+```

@@ -1,0 +1,91 @@
+---
+title: "CLI Overview"
+description: "The Linkrunner CLI helps you set up, validate, and debug your SDK integration from the terminal"
+icon: "terminal"
+---
+
+The `lr` CLI is a developer tool for integrating and maintaining the Linkrunner SDK in your mobile and web projects. It automates setup, validates configuration, generates code snippets, and provides real-time project diagnostics.
+
+## Key Features
+
+- **Project initialization** -- guided setup wizard that detects your platform, installs the SDK, configures native files, and generates initialization code
+- **Integration diagnostics** -- validates platform configuration, source code patterns, and deep link setup with actionable fix suggestions
+- **AI-powered analysis** -- optional deep analysis that uses an LLM to inspect your codebase for subtle integration issues
+- **Event code generation** -- interactive generator for custom events, payment tracking, and signup code with auto-insertion into your source files
+- **Deep link configuration** -- sets up Android App Links and iOS Universal Links with intent filters and verification files
+- **Project dashboard** -- view installs, signups, events, revenue, and active campaigns from the terminal
+- **CI/CD support** -- JSON output and exit codes for automated pipelines
+
+## Supported Platforms
+
+The CLI auto-detects your project type and tailors its behavior accordingly:
+
+| Platform | Detection Method |
+|---|---|
+| Flutter | `pubspec.yaml` in project root |
+| React Native | `react-native` in `package.json` dependencies |
+| Expo | `expo` in `package.json` dependencies |
+| iOS | `.xcodeproj` or `.xcworkspace` in project root |
+| Android | `build.gradle` or `build.gradle.kts` in project root |
+| Capacitor | `@capacitor/core` in `package.json` dependencies |
+| Web | `package.json` present (fallback) |
+
+## Commands
+
+| Command | Description |
+|---|---|
+| [`lr login`](/cli/commands/login) | Authenticate with your Linkrunner account |
+| `lr logout` | Log out from the CLI |
+| [`lr init`](/cli/commands/init) | Initialize the SDK in your project |
+| [`lr doctor`](/cli/commands/doctor) | Diagnose SDK integration issues |
+| `lr validate` | Alias for `lr doctor` |
+| [`lr analyze`](/cli/commands/analyze) | Run AI-powered deep analysis |
+| [`lr test`](/cli/commands/test) | Verify token validity and API connectivity |
+| [`lr events add`](/cli/commands/events) | Generate event tracking code |
+| [`lr deeplink setup`](/cli/commands/deeplink) | Configure deep linking |
+| [`lr suggest`](/cli/commands/suggest) | Get SDK feature suggestions |
+| [`lr status`](/cli/commands/status) | View project dashboard |
+
+## Quick Start
+
+```bash
+# Install the CLI
+npm install -g linkrunner-cli
+
+# Authenticate
+lr login
+
+# Initialize in your project directory
+cd your-app/
+lr init
+
+# Check your integration
+lr doctor
+```
+
+## Configuration Files
+
+The CLI uses two configuration locations:
+
+- **Global config** -- stored in your system config directory (managed by [conf](https://github.com/sindresorhus/conf)). Contains your auth token and email.
+- **Project config** -- `.linkrunner.json` in your project root. Created by `lr init` and contains your project token, platform settings, and deep link domain.
+
+Example `.linkrunner.json`:
+
+```json
+{
+  "project_token": "your_token_here",
+  "project_id": "12345",
+  "project_name": "My App",
+  "platforms": ["android", "ios"],
+  "deep_link_domain": "links.myapp.com",
+  "android": {
+    "package_name": "com.myapp.android",
+    "sha256_cert_fingerprints": ["AB:CD:EF:..."]
+  },
+  "ios": {
+    "bundle_id": "com.myapp.ios",
+    "team_id": "ABCDE12345"
+  }
+}
+```

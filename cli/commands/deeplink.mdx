@@ -1,0 +1,138 @@
+---
+title: "lr deeplink setup"
+description: "Configure deep linking for Android App Links and iOS Universal Links"
+icon: "link"
+---
+
+## Usage
+
+```bash
+lr deeplink setup [options]
+```
+
+## Description
+
+Guides you through configuring deep linking for your project. It modifies your Android `AndroidManifest.xml` with the required intent filter and generates the verification files (`assetlinks.json` for Android and `apple-app-site-association` for iOS) that need to be hosted on your deep link domain.
+
+Requires a `.linkrunner.json` file. Run `lr init` first if you don't have one.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--domain <domain>` | Deep link domain (overrides the value in `.linkrunner.json`) |
+| `--skip-android` | Skip Android configuration |
+| `--skip-ios` | Skip iOS configuration |
+
+## What It Does
+
+### Android Configuration
+
+1. **Intent filter** -- adds an `autoVerify` intent filter to the main activity in your `AndroidManifest.xml`:
+
+```xml
+<intent-filter android:autoVerify="true">
+    <action android:name="android.intent.action.VIEW" />
+    <category android:name="android.intent.category.DEFAULT" />
+    <category android:name="android.intent.category.BROWSABLE" />
+    <data android:scheme="https" android:host="links.myapp.com" />
+    <data android:scheme="http" android:host="links.myapp.com" />
+</intent-filter>
+```
+
+If the intent filter is already present, it is skipped. Before applying, the change is shown and you are asked to confirm. A `.bak` backup is created automatically.
+
+2. **Digital Asset Links** -- generates an `assetlinks.json` file that you need to host at `https://{domain}/.well-known/assetlinks.json`:
+
+```json
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.myapp.android",
+      "sha256_cert_fingerprints": ["AB:CD:EF:..."]
+    }
+  }
+]
+```
+
+<Warning>
+If no `sha256_cert_fingerprints` are configured in your `.linkrunner.json`, the CLI warns you. Add them to the `android` section of your config.
+</Warning>
+
+### iOS Configuration
+
+1. **Associated Domains** -- displays the Associated Domain entitlement you need to add in Xcode:
+
+```
+applinks:links.myapp.com
+```
+
+2. **Apple App Site Association** -- generates an AASA file to host at `https://{domain}/.well-known/apple-app-site-association`:
+
+```json
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "ABCDE12345.com.myapp.ios",
+        "paths": ["*"]
+      }
+    ]
+  }
+}
+```
+
+<Note>
+The `appID` is constructed from your `team_id` (or `app_prefix`) and `bundle_id` in `.linkrunner.json`. If `team_id` is missing, the CLI warns you to add it.
+</Note>
+
+## Domain Resolution
+
+The deep link domain is resolved in this order:
+
+1. `--domain` flag value
+2. `deep_link_domain` from `.linkrunner.json`
+3. Interactive prompt if neither is available
+
+## Examples
+
+### Full setup
+
+```bash
+lr deeplink setup
+```
+
+### Specify domain
+
+```bash
+lr deeplink setup --domain links.myapp.com
+```
+
+### iOS only
+
+```bash
+lr deeplink setup --skip-android
+```
+
+### Android only
+
+```bash
+lr deeplink setup --skip-ios
+```
+
+## Verifying Your Setup
+
+After hosting the verification files, use `lr test --deep` to confirm they are accessible:
+
+```bash
+lr test --deep
+```
+
+## Related
+
+- [Deep Linking Setup](/features/deep-linking-setup) -- dashboard configuration guide
+- [Deep Linking Verification](/features/deep-linking-verification) -- verification file details
+- [lr test](/cli/commands/test) -- verify deep link domain and files
