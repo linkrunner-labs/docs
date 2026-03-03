@@ -202,4 +202,106 @@ Running **web-to-app ads** with TikTok gives you more flexibility and control ov
     like purchases. This helps TikTok's algorithm gather initial data.
 </Tip>
 
+## Frequently Asked Questions
+
+<AccordionGroup>
+
+<Accordion title="Why are my TikTok campaigns not showing up on Linkrunner?">
+
+Unlike Meta campaigns, TikTok campaigns **do not appear automatically** on the Linkrunner dashboard. They only show up when users click on the Linkrunner campaign links you set up as destination URLs in your TikTok ads.
+
+**Checklist to fix this:**
+
+1. **Verify your campaign links are set up correctly** — Each TikTok ad must have a unique Linkrunner campaign link as the destination URL ([see Step 5](#step-5-add-destination-urls))
+2. **Ensure your ads are active and receiving traffic** — Campaigns only appear after at least one click comes through the tracking link
+3. **Check that the Linkrunner SDK is integrated in your app** — Your app must be live with the Linkrunner SDK for installs to be attributed
+4. **Confirm your TikTok pixel is configured** — Without a properly configured pixel ([see Part 1](#1-configuring-pixel-in-tiktok-events-manager)), event postbacks to TikTok won't work
+
+</Accordion>
+
+<Accordion title="Why are my events not showing up in TikTok Events Manager?">
+
+If installs or other events are not appearing in TikTok Events Manager, check the following:
+
+1. **Pixel credentials are correct** — Verify that the **Pixel ID** and **Access Token** you pasted into Linkrunner match the ones in TikTok Events Manager ([see Step 12](#step-12-copy-credentials))
+2. **Access token hasn't expired** — TikTok access tokens can expire or be revoked. Regenerate the token in TikTok Events Manager and update it in Linkrunner if needed
+3. **Wait for propagation** — It can take up to 45 minutes to 1 hour for initial events to appear in TikTok Events Manager
+4. **Users are clicking the campaign link** — Events are only sent to TikTok for installs that came through a Linkrunner campaign link with a valid TikTok click ID (`ttclid`)
+
+</Accordion>
+
+<Accordion title="Do TikTok campaigns appear automatically like Meta campaigns?">
+
+**No.** This is a key difference between the two integrations:
+
+- **Meta Ads** — Campaigns are detected and appear automatically on the Linkrunner dashboard once they generate installs
+- **TikTok Ads** — You must create individual Linkrunner campaign links and use them as destination URLs in your TikTok ads. Campaigns only appear on the dashboard when users click through these links
+
+This is because TikTok uses a web-to-app flow where the campaign link acts as the tracking mechanism.
+
+</Accordion>
+
+<Accordion title="What is ttclid and why is it important?">
+
+`ttclid` is TikTok's **Click ID** — a unique identifier that TikTok appends to your destination URL when a user clicks on your ad. It is essential for attribution.
+
+**Why it matters:**
+- Without `ttclid`, Linkrunner cannot attribute an install back to a specific TikTok ad click
+- If `ttclid` is missing, event postbacks (installs, purchases, etc.) will **not** be sent back to TikTok, which means TikTok cannot optimize your campaigns
+
+**How to ensure it works:**
+- Use Linkrunner campaign links as destination URLs — `ttclid` is automatically captured when a user clicks through
+- Do not modify or strip URL parameters from your campaign links
+
+</Accordion>
+
+<Accordion title="Can I use the same campaign link for multiple TikTok ads?">
+
+**You can, but it's not recommended.** Using a unique Linkrunner campaign link for each ad creative allows you to:
+
+- Track performance per creative separately
+- See which specific ad is driving the most installs and conversions
+- Make better optimization decisions based on granular data
+
+You can quickly duplicate campaigns in Linkrunner to create multiple links ([see Step 4](#step-4-create-linkrunner-campaign-links)).
+
+</Accordion>
+
+<Accordion title="Can I track revenue and purchase events from TikTok campaigns?">
+
+**Yes.** Linkrunner supports sending purchase and revenue events back to TikTok, which enables TikTok to optimize your campaigns for value.
+
+To set this up:
+1. Ensure your app sends revenue events with amount and currency through the Linkrunner SDK
+2. Select **Purchase** as the optimization event when creating your TikTok campaign ([see Step 3](#step-3-configure-optimization-and-bidding))
+
+Revenue data is sent in the currency your app provides (ISO 4217 format, e.g., USD, INR).
+
+<Warning>
+    Start with optimizing on installs or sign-ups first. Once TikTok's algorithm has gathered enough conversion data, you can switch to optimizing on purchases for better ROAS.
+</Warning>
+
+</Accordion>
+
+<Accordion title="Why should I select 'Website' instead of 'App' as the destination type?">
+
+Linkrunner uses a **web-to-app** flow for TikTok campaigns. Selecting **Website** as the destination lets you use Linkrunner campaign links as destination URLs, which enables:
+
+- **Deferred deep linking** — Users land on the right in-app content after install
+- **Cross-platform consistency** — One unified tracking flow for both Android and iOS
+- **Better attribution** — Linkrunner captures the TikTok click ID for accurate attribution
+- **In-app event optimization** — Events are sent back to TikTok via the Events API for campaign optimization
+
+Selecting "App" would bypass Linkrunner's tracking entirely.
+
+</Accordion>
+
+<Accordion title="Do I need to create a new pixel for every campaign?">
+
+**No.** You only need one TikTok pixel per ad account. The same pixel can be used across all your TikTok campaigns. The pixel is configured once during the initial setup ([see Part 1](#1-configuring-pixel-in-tiktok-events-manager)) and is then shared across all campaigns running under that ad account.
+
+</Accordion>
+
+</AccordionGroup>
+
 For any questions or assistance with TikTok Ads integration, please contact us at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).
