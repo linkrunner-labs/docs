@@ -245,37 +245,54 @@ Use this method to capture payment information:
 
 ```js
 const capturePayment = async () => {
-    await linkrunner.capturePayment({
-        amount: 100, // Payment amount
-        userId: "user123", // User identifier
-        paymentId: "payment456", // Optional: Unique payment identifier
-        type: "FIRST_PAYMENT", // Optional: Payment type
-        // type: "SECOND_PAYMENT", // Optional: Payment type
-        status: "PAYMENT_COMPLETED", // Optional: Payment status
-    });
+  await linkrunner.capturePayment({
+    amount: 100, // Payment amount
+    userId: "user123", // User identifier
+    paymentId: "payment456", // Optional: Unique payment identifier
+    type: "FIRST_PAYMENT", // Optional: Payment type
+    // type: "SECOND_PAYMENT", // Optional: Payment type
+    status: "PAYMENT_COMPLETED", // Optional: Payment status
+    eventData: {
+      // Optional: Ecommerce/custom event data
+      content_ids: ["product_123"],
+      content_type: "product",
+      currency: "USD",
+      value: 99.99,
+      num_items: 1,
+      order_id: "order_12345",
+      contents: [
+        {
+          id: "product_123",
+          quantity: 1,
+          item_price: 99.99,
+        },
+      ],
+    },
+  });
 };
 ```
 
 #### Parameters for `linkrunner.capturePayment`
 
--   `amount`: number (required) - The payment amount
--   `userId`: string (required) - Identifier for the user making the payment
--   `paymentId`: string (optional) - Unique identifier for the payment
--   `type`: string (optional) - Type of payment. Available options:
-    -   `FIRST_PAYMENT` - First payment made by the user
-    -   `SECOND_PAYMENT` - Second payment made by the user
-    -   `WALLET_TOPUP` - Adding funds to a wallet
-    -   `FUNDS_WITHDRAWAL` - Withdrawing funds
-    -   `SUBSCRIPTION_CREATED` - New subscription created
-    -   `SUBSCRIPTION_RENEWED` - Subscription renewal
-    -   `ONE_TIME` - One-time payment
-    -   `RECURRING` - Recurring payment
-    -   `DEFAULT` - Default type (used if not specified)
--   `status`: string (optional) - Status of the payment. Available options:
-    -   `PAYMENT_INITIATED` - Payment has been initiated
-    -   `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
-    -   `PAYMENT_FAILED` - Payment attempt failed
-    -   `PAYMENT_CANCELLED` - Payment was cancelled
+- `amount`: number (required) - The payment amount
+- `userId`: string (required) - Identifier for the user making the payment
+- `paymentId`: string (optional) - Unique identifier for the payment
+- `type`: string (optional) - Type of payment. Available options:
+  - `FIRST_PAYMENT` - First payment made by the user
+  - `SECOND_PAYMENT` - Second payment made by the user
+  - `WALLET_TOPUP` - Adding funds to a wallet
+  - `FUNDS_WITHDRAWAL` - Withdrawing funds
+  - `SUBSCRIPTION_CREATED` - New subscription created
+  - `SUBSCRIPTION_RENEWED` - Subscription renewal
+  - `ONE_TIME` - One-time payment
+  - `RECURRING` - Recurring payment
+  - `DEFAULT` - Default type (used if not specified)
+- `status`: string (optional) - Status of the payment. Available options:
+  - `PAYMENT_INITIATED` - Payment has been initiated
+  - `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
+  - `PAYMENT_FAILED` - Payment attempt failed
+  - `PAYMENT_CANCELLED` - Payment was cancelled
+- `eventData`: object (optional) - Key-value pairs for additional event data, including Meta ecommerce properties.
 
 ### Removing Payments
 
@@ -296,6 +313,112 @@ const removePayment = async () => {
 -   `paymentId`: String (optional) - Unique identifier for the payment to be removed
 
 Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If only `userId` is provided, all payments for that user will be removed.
+
+## Ecommerce Events
+
+If you are tracking Ecommerce events to sync with Meta Catalog Sales, you must format your `eventData` to include Meta's required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
+
+For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event_data).
+
+### Add To Cart Example
+
+Use the `trackEvent` method to send an `AddToCart` event:
+
+```javascript
+const trackAddToCart = async () => {
+  try {
+    await linkrunner.trackEvent(
+      "add_to_cart", // Map this custom event to "AddToCart" in the Linkrunner Dashboard
+      {
+        content_ids: ["product_123"],
+        contents: [
+          {
+            id: "product_123", // Matches content_ids
+            quantity: 1,
+            item_price: 49.99,
+          },
+        ],
+        content_type: "product",
+        currency: "USD",
+        value: 49.99,
+        num_items: 1,
+      },
+    );
+    console.log("Add To Cart event tracked successfully");
+  } catch (error) {
+    console.error("Error tracking Add To Cart event:", error);
+  }
+};
+```
+
+### View Content Example
+
+Use the `trackEvent` method to send a `ViewContent` event:
+
+```javascript
+const trackViewContent = async () => {
+  try {
+    await linkrunner.trackEvent(
+      "view_item", // Map this custom event to "ViewContent" in the Linkrunner Dashboard
+      {
+        content_ids: ["product_123"],
+        contents: [
+          {
+            id: "product_123", // Matches content_ids
+            quantity: 1,
+            item_price: 49.99,
+          },
+        ],
+        content_type: "product",
+        currency: "USD",
+        value: 49.99,
+        num_items: 1,
+      },
+    );
+    console.log("View Content event tracked successfully");
+  } catch (error) {
+    console.error("Error tracking View Content event:", error);
+  }
+};
+```
+
+### Payment / Purchase Example
+
+Use the `capturePayment` method to send a `Purchase` event containing the ecommerce payload:
+
+```javascript
+const capturePurchase = async () => {
+  try {
+    await linkrunner.capturePayment({
+      amount: 49.99,
+      userId: "user123",
+      paymentId: "payment_456",
+      type: "FIRST_PAYMENT", // Map this payment type to "Purchase" in the Linkrunner Dashboard
+      status: "PAYMENT_COMPLETED",
+      eventData: {
+        content_ids: ["product_123"],
+        contents: [
+          {
+            id: "product_123", // Matches content_ids
+            quantity: 1,
+            item_price: 49.99,
+          },
+        ],
+        content_type: "product",
+        currency: "USD",
+        value: 49.99,
+        num_items: 1,
+        order_id: "order_abc123", // Required for Purchase events
+      },
+    });
+    console.log("Purchase captured successfully");
+  } catch (error) {
+    console.error("Error capturing purchase:", error);
+  }
+};
+```
+
+> **Note:** For more information on testing and verifying your ecommerce events, please see our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
 
 ## Enhanced Privacy Controls
 
@@ -324,12 +447,16 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 ## Next Steps
 
 <CardGroup cols={2}>
-    <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
-        Validate your setup end-to-end
-    </Card>
-    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
-        Configure deep links for your app
-    </Card>
+  <Card
+    title="Test Your Integration"
+    icon="flask"
+    href="/testing/integration-testing"
+  >
+    Validate your setup end-to-end
+  </Card>
+  <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+    Configure deep links for your app
+  </Card>
 </CardGroup>
 
 ## Support

@@ -51,7 +51,9 @@ Add the following permissions to your `AndroidManifest.xml` file:
 The SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
 
 <Note>
-    This backup configuration works similarly for all SDKs (React Native, Flutter, and native Android). The same Android backup rules apply regardless of which SDK you're using.
+  This backup configuration works similarly for all SDKs (React Native, Flutter,
+  and native Android). The same Android backup rules apply regardless of which
+  SDK you're using.
 </Note>
 
 #### Adding Backup Rules to Your App
@@ -397,10 +399,25 @@ private fun capturePayment() {
             val paymentData = CapturePaymentRequest(
                 paymentId = "payment_123",  // Optional: Unique payment identifier
                 userId = "user123",         // Required: User identifier
-                amount = 99.99,              // Required: Payment amount
+                amount = 99.99,             // Required: Payment amount
                 type = PaymentType.FIRST_PAYMENT,  // Optional: Defaults to DEFAULT
                 // type = PaymentType.SECOND_PAYMENT,  // Optional: Defaults to DEFAULT
-                status = PaymentStatus.PAYMENT_COMPLETED  // Optional: Defaults to PAYMENT_COMPLETED
+                status = PaymentStatus.PAYMENT_COMPLETED,  // Optional: Defaults to PAYMENT_COMPLETED
+                eventData = mapOf(          // Optional: Ecommerce/custom event data
+                    "content_ids" to listOf("product_123"),
+                    "content_type" to "product",
+                    "currency" to "USD",
+                    "value" to 99.99,
+                    "num_items" to 1,
+                    "order_id" to "order_12345",
+                    "contents" to listOf(
+                        mapOf(
+                            "id" to "product_123",
+                            "quantity" to 1,
+                            "item_price" to 99.99
+                        )
+                    )
+                )
             )
 
             val result = LinkRunner.getInstance().capturePayment(paymentData)
@@ -468,6 +485,108 @@ private fun removePayment() {
 }
 ```
 
+## Ecommerce Events
+
+If you are tracking Ecommerce events to sync with Meta Catalog Sales, you must format your `eventData` to include Meta's required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
+
+For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event_data).
+
+### Add To Cart Example
+
+Use the `trackEvent` method to send an `AddToCart` event:
+
+```kotlin
+private fun trackAddToCart() {
+    CoroutineScope(Dispatchers.IO).launch {
+        LinkRunner.getInstance().trackEvent(
+            eventName = "add_to_cart", // Map this custom event to "AddToCart" in the Linkrunner Dashboard
+            eventData = mapOf(
+                "content_ids" to listOf("product_123"),
+                "contents" to listOf(
+                    mapOf(
+                        "id" to "product_123", // Matches content_ids
+                        "quantity" to 1,
+                        "item_price" to 49.99
+                    )
+                ),
+                "content_type" to "product",
+                "currency" to "USD",
+                "value" to 49.99,
+                "num_items" to 1
+            )
+        )
+    }
+}
+```
+
+### View Content Example
+
+Use the `trackEvent` method to send a `ViewContent` event:
+
+```kotlin
+private fun trackViewContent() {
+    CoroutineScope(Dispatchers.IO).launch {
+        LinkRunner.getInstance().trackEvent(
+            eventName = "view_item", // Map this custom event to "ViewContent" in the Linkrunner Dashboard
+            eventData = mapOf(
+                "content_ids" to listOf("product_123"),
+                "contents" to listOf(
+                    mapOf(
+                        "id" to "product_123", // Matches content_ids
+                        "quantity" to 1,
+                        "item_price" to 49.99
+                    )
+                ),
+                "content_type" to "product",
+                "currency" to "USD",
+                "value" to 49.99,
+                "num_items" to 1
+            )
+        )
+    }
+}
+```
+
+### Payment / Purchase Example
+
+Use the `capturePayment` method to send a `Purchase` event containing the ecommerce payload:
+
+```kotlin
+private fun capturePurchase() {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val paymentData = CapturePaymentRequest(
+                paymentId = "payment_456",
+                userId = "user123",
+                amount = 49.99,
+                type = PaymentType.FIRST_PAYMENT, // Map this payment type to "Purchase" in the Linkrunner Dashboard
+                status = PaymentStatus.PAYMENT_COMPLETED,
+                eventData = mapOf(
+                    "content_ids" to listOf("product_123"),
+                    "contents" to listOf(
+                        mapOf(
+                            "id" to "product_123", // Matches content_ids
+                            "quantity" to 1,
+                            "item_price" to 49.99
+                        )
+                    ),
+                    "content_type" to "product",
+                    "currency" to "USD",
+                    "value" to 49.99,
+                    "num_items" to 1,
+                    "order_id" to "order_abc123" // Required for Purchase events
+                )
+            )
+            LinkRunner.getInstance().capturePayment(paymentData)
+        } catch (e: Exception) {
+            println("Exception capturing purchase: ${e.message}")
+        }
+    }
+}
+```
+
+> **Note:** For more information on testing and verifying your ecommerce events, please see our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
+
 ## Enhanced Privacy Controls
 
 The SDK offers options to enhance user privacy:
@@ -485,7 +604,8 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 ## Disabling AAID Collection
 
 <Note>
-    **SDK Version Requirement:** The AAID collection disable functionality requires Android SDK version 3.5.0 or higher.
+  **SDK Version Requirement:** The AAID collection disable functionality
+  requires Android SDK version 3.5.0 or higher.
 </Note>
 
 The SDK provides options to disable AAID (Google Advertising ID) collection. This is useful for apps targeting children or families to comply with Google Play's Family Policy.
@@ -510,18 +630,18 @@ If you want to completely remove the `AD_ID` permission from your app's manifest
 
 ## Function Placement Guide
 
-| Function                                      | Where to Place                 | When to Call                                   |
-| --------------------------------------------- | ------------------------------ | ---------------------------------------------- |
-| `LinkRunner.getInstance().init`               | Application class              | Once when app starts                           |
-| `LinkRunner.getInstance().getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed        |
-| `LinkRunner.getInstance().setAdditionalData`  | Integration code               | When third-party integration IDs are available |
-| `LinkRunner.getInstance().signup`             | Onboarding flow                | Once after user completes onboarding           |
-| `LinkRunner.getInstance().setUserData`        | Authentication logic           | Every time app opens with logged-in user       |
-| `LinkRunner.getInstance().trackEvent`         | Throughout app                 | When specific user actions occur               |
-| `LinkRunner.getInstance().capturePayment`     | Payment processing             | When user makes a payment                      |
-| `LinkRunner.getInstance().removePayment`      | Refund flow                    | When payment needs to be removed               |
-| `LinkRunner.getInstance().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection |
-| `LinkRunner.getInstance().isAaidCollectionDisabled` | Privacy settings or compliance checks | When you need to check AAID collection status |
+| Function                                            | Where to Place                         | When to Call                                   |
+| --------------------------------------------------- | -------------------------------------- | ---------------------------------------------- |
+| `LinkRunner.getInstance().init`                     | Application class                      | Once when app starts                           |
+| `LinkRunner.getInstance().getAttributionData`       | Attribution data handling flow         | Whenever the attribution data is needed        |
+| `LinkRunner.getInstance().setAdditionalData`        | Integration code                       | When third-party integration IDs are available |
+| `LinkRunner.getInstance().signup`                   | Onboarding flow                        | Once after user completes onboarding           |
+| `LinkRunner.getInstance().setUserData`              | Authentication logic                   | Every time app opens with logged-in user       |
+| `LinkRunner.getInstance().trackEvent`               | Throughout app                         | When specific user actions occur               |
+| `LinkRunner.getInstance().capturePayment`           | Payment processing                     | When user makes a payment                      |
+| `LinkRunner.getInstance().removePayment`            | Refund flow                            | When payment needs to be removed               |
+| `LinkRunner.getInstance().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection       |
+| `LinkRunner.getInstance().isAaidCollectionDisabled` | Privacy settings or compliance checks  | When you need to check AAID collection status  |
 
 ## Complete Example
 
@@ -618,12 +738,16 @@ class MainActivity : AppCompatActivity() {
 ## Next Steps
 
 <CardGroup cols={2}>
-    <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
-        Validate your setup end-to-end
-    </Card>
-    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
-        Configure deep links for your app
-    </Card>
+  <Card
+    title="Test Your Integration"
+    icon="flask"
+    href="/testing/integration-testing"
+  >
+    Validate your setup end-to-end
+  </Card>
+  <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+    Configure deep links for your app
+  </Card>
 </CardGroup>
 
 ## Support
