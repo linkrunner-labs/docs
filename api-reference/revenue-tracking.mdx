@@ -31,11 +31,74 @@ POST: /capture-payment
 ```json
 {
     "user_id": "666",
-    "payment_id": "ABC", // optional but recommended
-    "amount": 25096, // Send amount in one currency only
-    "type": "FIRST_PAYMENT", // optional
-    // "type": "SECOND_PAYMENT", // optional
-    "status": "PAYMENT_COMPLETED" // optional
+    "payment_id": "ABC",
+    "amount": 25096,
+    "currency": "USD",
+    "type": "FIRST_PAYMENT",
+    "status": "PAYMENT_COMPLETED",
+    "event_data": {
+        "product_id": "sku_12345",
+        "order_id": "order_98765",
+        "content_type": "product",
+        "num_items": 1
+    }
+}
+```
+
+| Parameter  | Type   | Description                                                                                                                  |
+| ---------- | ------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| user_id    | string | **Required**. User identifier                                                                                                |
+| payment_id | string | Optional but recommended. Unique payment identifier for deduplication                                                        |
+| amount     | number | Optional. Payment amount. Send in one currency only                                                                          |
+| currency   | string | Optional. ISO 4217 currency code (e.g. "USD", "INR")                                                                        |
+| type       | string | Optional. Payment type (defaults to DEFAULT)                                                                                 |
+| status     | string | Optional. Payment status (defaults to PAYMENT_COMPLETED)                                                                     |
+| event_data | object | Optional. Product and event parameters forwarded to ad networks (see [Standard Parameters](/api-reference/custom-event-parameters)) |
+
+### Event Data for Payments
+
+<Note>
+    The `event_data` field lets you send product-level details alongside your payment. Standard parameters are automatically mapped to each ad network's format. Custom keys are passed through as-is.
+</Note>
+
+<Warning>
+    `amount` and `currency` from the top-level request body are used for revenue tracking. Do not duplicate them inside `event_data`.
+</Warning>
+
+**Purchase with product details:**
+
+```json
+{
+    "user_id": "user_12345",
+    "payment_id": "pay_abc123",
+    "amount": 49.99,
+    "currency": "USD",
+    "type": "ONE_TIME",
+    "event_data": {
+        "product_id": "sku_12345",
+        "order_id": "order_98765",
+        "content_type": "product",
+        "num_items": 2,
+        "coupon_code": "SAVE20"
+    }
+}
+```
+
+**Subscription with custom params:**
+
+```json
+{
+    "user_id": "user_12345",
+    "payment_id": "sub_xyz789",
+    "amount": 9.99,
+    "currency": "USD",
+    "type": "SUBSCRIPTION_CREATED",
+    "event_data": {
+        "product_id": "plan_premium",
+        "order_id": "sub_xyz789",
+        "payment_plan": "monthly",
+        "trial_converted": true
+    }
 }
 ```
 

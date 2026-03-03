@@ -126,7 +126,7 @@ You'll need your [project token](https://dashboard.linkrunner.io/dashboard?m=doc
 
 ### SDK Signing Parameters (Optional)
 
-For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+For enhanced security, the Linkrunner SDK requires the following signing parameters during initialization:
 
 -   **`secretKey`**: A unique secret key used for request signing and authentication
 -   **`keyId`**: A unique identifier for the key pair used in the signing process
@@ -347,6 +347,7 @@ Future<void> trackEvent() async {
         'category': 'electronics',
         'amount': 99.99, // Include amount as a number for revenue sharing with ad networks like Google and Meta
       },
+      eventId: '550e8400-e29b-41d4-a716-446655440000', // Optional: Unique event identifier (String) for deduplication
     );
     print('Event tracked successfully');
   } catch (e) {
@@ -354,6 +355,10 @@ Future<void> trackEvent() async {
   }
 }
 ```
+
+<Note>
+    The `eventId` parameter is optional and should be a unique String identifier for each event. It's used for deduplication on the server side. If you're tracking the same event from both your app and backend, make sure to send the same `eventId` from the [Event Capture API](/api-reference/event-capture) as well.
+</Note>
 
 ### Revenue Sharing with Ad Networks
 
@@ -369,6 +374,7 @@ Future<void> trackPurchaseEvent() async {
         'category': 'electronics',
         'amount': 149.99, // Revenue amount as a number
       },
+      eventId: '550e8400-e29b-41d4-a716-446655440000', // Optional: Unique event identifier (String) for deduplication
     );
     print('Purchase event with revenue tracked successfully');
   } catch (e) {
@@ -737,7 +743,10 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
-                await LinkRunner().trackEvent(eventName: 'button_clicked');
+                await LinkRunner().trackEvent(
+                  eventName: 'button_clicked',
+                  eventId: '550e8400-e29b-41d4-a716-446655440000', // Optional: Unique event identifier (String) for deduplication
+                );
               },
               child: Text('Track Custom Event'),
             ),

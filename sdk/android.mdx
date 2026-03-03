@@ -179,7 +179,7 @@ class MyApplication : Application() {
 
 ### SDK Signing Parameters (Optional)
 
-For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+For enhanced security, the Linkrunner SDK requires the following signing parameters during initialization:
 
 -   **`secretKey`**: A unique secret key used for request signing and authentication
 -   **`keyId`**: A unique identifier for the key pair used in the signing process
@@ -335,7 +335,8 @@ private fun trackEvent() {
                     "product_id" to "12345",
                     "category" to "electronics",
                     "amount" to 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
-                )
+                ),
+                eventId = "550e8400-e29b-41d4-a716-446655440000" // Optional: Unique event identifier (String) for deduplication
             )
 
             result.onSuccess {
@@ -349,6 +350,10 @@ private fun trackEvent() {
     }
 }
 ```
+
+<Note>
+    The `eventId` parameter is optional and should be a unique String identifier for each event. It's used for deduplication on the server side. If you're tracking the same event from both your app and backend, make sure to send the same `eventId` from the [Event Capture API](/api-reference/event-capture) as well.
+</Note>
 
 ### Revenue Sharing with Ad Networks
 
@@ -364,7 +369,8 @@ private fun trackPurchaseEvent() {
                     "product_id" to "12345",
                     "category" to "electronics",
                     "amount" to 149.99 // Revenue amount as a number
-                )
+                ),
+                eventId = "550e8400-e29b-41d4-a716-446655440000" // Optional: Unique event identifier (String) for deduplication
             )
 
             result.onSuccess {
@@ -605,7 +611,8 @@ class MainActivity : AppCompatActivity() {
             try {
                 LinkRunner.getInstance().trackEvent(
                     eventName = "button_clicked",
-                    eventData = mapOf("screen" to "main")
+                    eventData = mapOf("screen" to "main"),
+                    eventId = "550e8400-e29b-41d4-a716-446655440000" // Optional: Unique event identifier (String) for deduplication
                 )
             } catch (e: Exception) {
                 println("Error tracking event: ${e.message}")

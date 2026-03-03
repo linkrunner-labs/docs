@@ -64,7 +64,7 @@ You can find your project token [here](https://dashboard.linkrunner.io/dashboard
 
 ### SDK Signing Parameters (Optional)
 
-For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+For enhanced security, the Linkrunner SDK requires the following signing parameters during initialization:
 
 -   **`secretKey`**: A unique secret key used for request signing and authentication
 -   **`keyId`**: A unique identifier for the key pair used in the signing process
@@ -213,10 +213,15 @@ Track custom events in your app:
 const trackEvent = async () => {
     await linkrunner.trackEvent(
         "purchase_initiated", // Event name
-        { product_id: "12345", category: "electronics", amount: 99.99 } // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
+        { product_id: "12345", category: "electronics", amount: 99.99 }, // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
+        "550e8400-e29b-41d4-a716-446655440000" // Optional: Unique event identifier (String) for deduplication
     );
 };
 ```
+
+<Note>
+    The `eventId` parameter is optional and should be a unique String identifier for each event. It's used for deduplication on the server side. If you're tracking the same event from both your app and backend, make sure to send the same `eventId` from the [Event Capture API](/api-reference/event-capture) as well.
+</Note>
 
 ### Revenue Sharing with Ad Networks
 
@@ -224,11 +229,15 @@ To enable revenue sharing with ad networks like Google Ads and Meta, include an 
 
 ```javascript
 const trackPurchaseEvent = async () => {
-    await linkrunner.trackEvent("purchase_completed", {
-        product_id: "12345",
-        category: "electronics",
-        amount: 149.99, // Revenue amount as a number
-    });
+    await linkrunner.trackEvent(
+        "purchase_completed",
+        {
+            product_id: "12345",
+            category: "electronics",
+            amount: 149.99, // Revenue amount as a number
+        },
+        "550e8400-e29b-41d4-a716-446655440000" // Optional: Unique event identifier (String) for deduplication
+    );
 };
 ```
 
