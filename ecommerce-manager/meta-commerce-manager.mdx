@@ -6,7 +6,16 @@ icon: "cart-shopping"
 
 ## Overview
 
-Ecommerce manager events allow you to track and optimize your Meta catalog sales campaigns. By sending events such as purchases, add to cart, and content views, Meta can better understand user interactions with your products. This enables you to optimize your ad spend and target the right audiences. Linkrunner helps seamlessly sync these events with your connected Meta dataset.
+Meta Catalog Sales campaigns dynamically show products from your catalog to users based on their browsing and purchase behavior — for example, retargeting someone who viewed a product but didn't buy. For these campaigns to work, Meta needs real-time signals about how users interact with your products.
+
+By sending ecommerce events (purchases, add to cart, content views) through Linkrunner, you feed Meta the data it needs to match users to the right products and optimize your ad spend. Linkrunner seamlessly syncs these events with your connected Meta dataset.
+
+<Note>
+**Before you begin, make sure you have:**
+- A product catalog set up in [Meta Commerce Manager](https://business.facebook.com/commerce)
+- Meta Ads integration configured in Linkrunner (see [Meta Ads setup](/ad-networks/meta-ads))
+- Events integrated in your app via the Linkrunner SDK or API
+</Note>
 
 ## Step 1: Select Catalogue Products
 
@@ -15,6 +24,13 @@ To begin, you need to select your catalogue products within the Meta Commerce Ma
 <img
   src="/images/ecommerce-event-meta/ecommerce-1.png"
   alt="Select your catalogue products"
+/>
+
+Each product in your catalog has a **Content ID** and an **Item group ID**. These are the values you'll use in the `content_ids` or `item_group_ids` fields when sending events — they're how Meta matches your events back to the correct catalog products.
+
+<img
+  src="/images/ecommerce-event-meta/ecommerce-4.png"
+  alt="Content ID and Item group ID fields in Commerce Manager"
 />
 
 ## Step 2: Verify Dataset ID Connection
@@ -50,6 +66,8 @@ Make sure you have integrated the appropriate APIs in your application to send t
   alt="View Dataset ID Events"
 />
 
+The **Catalogue match rate** shown in Commerce Manager measures the percentage of product IDs in your events that successfully match products in your catalog. Meta recommends maintaining a match rate of **90% or higher** for optimal ad targeting and delivery. If your match rate is low, double-check that the `content_ids` or `item_group_ids` in your events exactly match the IDs in your catalog.
+
 ## Understanding `event_data`
 
 When sending events via the [Capture Event API](/api-reference/event-capture) or [Capture Payment API](/api-reference/revenue-tracking), you must include specific fields in your `event_data` payload for Meta to correctly attribute and optimize your catalogue sales.
@@ -65,6 +83,10 @@ When sending events via the [Capture Event API](/api-reference/event-capture) or
 | `currency`                       | string           | **Required when `value` is sent.** <br/> The 3-letter ISO currency code (e.g., `"USD"`, `"INR"`).                                                                                                                                                          |
 | `num_items`                      | number           | **Required for `Purchase`, `AddToCart`.** <br/> Total quantity of items in the `contents` array.                                                                                                                                                           |
 | `order_id`                       | string           | **Required for `Purchase`.** <br/> Backend-generated unique purchase order ID.                                                                                                                                                                             |
+
+<Tip>
+The `item_price` in the `contents` array should match the product price in your Meta catalog. Mismatched prices can lower your catalogue match rate and affect ad optimization.
+</Tip>
 
 **Example `event_data` Payload:**
 
@@ -108,3 +130,18 @@ After you have integrated the APIs and started sending events, you will naturall
 />
 
 _Note: While the real-time hits will show up in Events Manager within 15 minutes, please be aware that **it can take a few days for the actual data to fully reflect and populate** across all Commerce Manager dashboards._
+
+## Creating a Catalog Sales Campaign
+
+Once your events are flowing and your catalogue match rate is healthy, you can create a Catalog Sales campaign in Meta Ads Manager:
+
+1. Go to **Meta Ads Manager** → **Create Campaign** → select the **Sales** objective and choose your catalog.
+2. Select the catalog that is connected to your Linkrunner dataset.
+3. Under ad set, choose your targeting strategy:
+   - **Broad audience** — Meta finds new customers likely to purchase from your catalog.
+   - **Retargeting** — target users who have already interacted with your products (e.g., viewed content or added to cart but didn't purchase).
+4. Configure your budget, placements, and creative, then publish.
+
+<Note>
+Retargeting audiences are automatically built from the `ViewContent`, `AddToCart`, and `Purchase` events you send through Linkrunner. The more event data Meta receives, the better it can optimize delivery.
+</Note>
