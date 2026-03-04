@@ -1,0 +1,113 @@
+---
+title: "lr test"
+description: "Test SDK connectivity and token validity"
+icon: "flask-vial"
+---
+
+## Usage
+
+```bash
+lr test [options]
+```
+
+## Description
+
+Verifies that your project token is valid and the Linkrunner API is reachable. With the `--deep` flag, it also checks that your deep link domain and verification files (`assetlinks.json` and `apple-app-site-association`) are correctly hosted.
+
+Requires a `.linkrunner.json` file in your project. Run `lr init` first if you don't have one.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--json` | Output results as JSON |
+| `--deep` | Also verify deep link domain and verification files |
+| `--ci` | Exit with code 0 (pass) or 1 (fail) |
+
+## What It Checks
+
+### Token Verification
+
+- Sends your project token to the Linkrunner API
+- Confirms the token is valid and the project exists
+- Reports API response time
+
+### Deep Link Verification (`--deep`)
+
+When your `.linkrunner.json` includes a `deep_link_domain`, the `--deep` flag checks:
+
+| Check | URL |
+|---|---|
+| Domain reachability | `https://{domain}` |
+| Android assetlinks.json | `https://{domain}/.well-known/assetlinks.json` |
+| iOS apple-app-site-association | `https://{domain}/.well-known/apple-app-site-association` |
+
+Each check has a 10-second timeout.
+
+## Examples
+
+### Basic token test
+
+```bash
+lr test
+```
+
+```
+Linkrunner SDK Test
+
+  Environment: production
+  Project: My App (ID: 12345)
+
+── Token Verification ──
+  ✔ Project token is valid
+  ✔ API responded in 142ms
+
+Summary: 2 passed, 0 warnings, 0 errors
+```
+
+### With deep link checks
+
+```bash
+lr test --deep
+```
+
+```
+── Token Verification ──
+  ✔ Project token is valid
+  ✔ API responded in 142ms
+
+── Deep Link Verification ──
+  ✔ Domain links.myapp.com is reachable
+  ✔ /.well-known/assetlinks.json returns valid response
+  ✔ /.well-known/apple-app-site-association returns valid response
+
+Summary: 5 passed, 0 warnings, 0 errors
+```
+
+### JSON output
+
+```bash
+lr test --json
+```
+
+### CI mode
+
+```bash
+lr test --ci
+```
+
+Returns exit code 1 if any errors are found.
+
+## Error Handling
+
+| HTTP Status | Meaning | Suggested Fix |
+|---|---|---|
+| 401 | Invalid project token | Check `.linkrunner.json` or run `lr init` |
+| 404 | Project not found | Project may have been deleted; run `lr init` |
+| Network error | Cannot reach API | Check network connection |
+
+## Related
+
+- [lr doctor](/cli/commands/doctor) -- full integration diagnostics
+- [lr init](/cli/commands/init) -- create `.linkrunner.json`
+- [lr deeplink setup](/cli/commands/deeplink) -- configure deep link verification files

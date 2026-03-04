@@ -1,0 +1,77 @@
+---
+title: "lr login"
+description: "Authenticate with your Linkrunner account"
+icon: "right-to-bracket"
+---
+
+## Usage
+
+```bash
+lr login
+```
+
+## Description
+
+Authenticates you with Linkrunner using a magic link sent to your email. Authentication is required for commands that interact with the Linkrunner API, including `lr init`, `lr test`, `lr status`, `lr suggest` (AI features), and `lr analyze`.
+
+## Authentication Flow
+
+1. The CLI prompts for your email address
+2. A magic link is sent to your inbox (expires in 15 minutes)
+3. You choose how to verify:
+   - **Paste the token or URL** from the email directly into the terminal
+   - **Open the link** in your browser manually
+4. The CLI verifies the token and stores your session
+
+```
+? Enter your email: you@example.com
+✔ Magic link sent!
+
+  Check your inbox at you@example.com
+  The link expires in 15 minutes
+
+? How would you like to verify?
+  > Paste the token or URL from the email
+    I'll open the link in my email myself
+
+? Paste your token or magic link URL: https://...?token=abc123
+✔ Logged in successfully!
+
+  Welcome, you@example.com!
+```
+
+<Note>
+You can paste either the full URL from the email or just the token value. The CLI extracts the token automatically.
+</Note>
+
+## Re-authentication
+
+If you are already logged in, the CLI shows your current email and asks if you want to switch accounts:
+
+```
+  Currently logged in as you@example.com
+
+? Login with a different account? (y/N)
+```
+
+## Credential Storage
+
+Your auth token and email are stored in a global config file managed by [conf](https://github.com/sindresorhus/conf), typically located at:
+
+- **macOS:** `~/Library/Preferences/linkrunner-nodejs/config.json`
+- **Linux:** `~/.config/linkrunner-nodejs/config.json`
+- **Windows:** `%APPDATA%/linkrunner-nodejs/config.json`
+
+## Logout
+
+To clear your stored credentials:
+
+```bash
+lr logout
+```
+
+## Related
+
+- [lr init](/cli/commands/init) -- requires authentication
+- [lr status](/cli/commands/status) -- requires authentication
+- [lr analyze](/cli/commands/analyze) -- requires authentication for AI features

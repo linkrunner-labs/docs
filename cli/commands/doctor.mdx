@@ -1,0 +1,167 @@
+---
+title: "lr doctor"
+description: "Diagnose and validate your SDK integration"
+icon: "stethoscope"
+---
+
+## Usage
+
+```bash
+lr doctor [options]
+```
+
+## Description
+
+Runs a comprehensive diagnostic check on your Linkrunner SDK integration. It detects your project type, validates platform-specific configuration, scans your source code for correct SDK usage, and optionally runs an AI-powered deep analysis.
+
+`lr validate` is an alias for this command with the same options.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--json` | Output results as JSON instead of formatted text |
+| `--fix` | Attempt to auto-fix detected issues |
+| `--deep` | Run AI-powered deep analysis in addition to standard checks |
+| `--ci` | Exit with code 0 (pass) or 1 (fail) for CI pipelines |
+| `--fail-on-warn` | Treat warnings as failures when using `--ci` |
+
+## What It Checks
+
+### Platform Configuration
+
+Platform-specific validators run based on your detected project type:
+
+- **Flutter** -- `pubspec.yaml` dependencies, Android/iOS native configuration
+- **React Native** -- `package.json` dependencies, native module setup
+- **Expo** -- `app.json` plugin configuration, native setup
+- **Capacitor** -- Capacitor plugin setup, native configuration
+- **iOS** -- Info.plist, entitlements, Podfile/SPM setup
+- **Android** -- AndroidManifest.xml, build.gradle, permissions
+- **Web** -- package.json dependencies, SDK initialization
+
+### Source Code
+
+Scans your source files for common integration patterns:
+
+- SDK initialization (`init()`)
+- User signup tracking (`signup()`)
+- Event tracking (`trackEvent()`)
+- Payment capture (`capturePayment()`)
+- Deep link handling
+
+### Deep Analysis (AI-powered)
+
+When `--deep` is passed, the CLI sends your project context to an AI model that analyzes your code for:
+
+- Subtle integration issues not caught by pattern matching
+- Incorrect SDK usage patterns
+- Missing best practices
+- Platform-specific gotchas
+
+<Note>Deep analysis requires authentication. Run `lr login` first to enable AI-powered features.</Note>
+
+## Validation Results
+
+Each check produces a result with one of three statuses:
+
+| Status | Meaning |
+|---|---|
+| **pass** | Check passed successfully |
+| **warn** | Potential issue found, but not blocking |
+| **error** | Critical issue that needs to be fixed |
+
+Results include a message describing the finding and, when applicable, a suggested fix.
+
+## Examples
+
+### Basic diagnostics
+
+```bash
+lr doctor
+```
+
+```
+Linkrunner Doctor
+Diagnosing your SDK integration...
+
+  Project: flutter (SDK v3.2.1)
+  Root: /path/to/project
+
+── Platform Configuration ──
+  ✔ linkrunner package found in pubspec.yaml
+  ✔ Android minSdkVersion >= 21
+  ✔ INTERNET permission present
+  ⚠ NSUserTrackingUsageDescription not found in Info.plist
+    Fix: Add NSUserTrackingUsageDescription to your Info.plist
+
+── Source Code ──
+  ✔ init() call found
+  ✔ signup() call found
+  ⚠ capturePayment() not found
+    Fix: Add payment tracking for revenue attribution
+
+Summary: 4 passed, 2 warnings, 0 errors
+```
+
+### With auto-fix
+
+```bash
+lr doctor --fix
+```
+
+### JSON output
+
+```bash
+lr doctor --json
+```
+
+```json
+{
+  "project": {
+    "type": "flutter",
+    "sdkVersion": "3.2.1",
+    "root": "/path/to/project"
+  },
+  "results": [
+    {
+      "id": "flutter-pubspec",
+      "name": "linkrunner in pubspec.yaml",
+      "status": "pass",
+      "severity": "error",
+      "message": "linkrunner package found in pubspec.yaml",
+      "autoFixable": false
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "warnings": 2,
+    "errors": 0
+  }
+}
+```
+
+### Deep analysis
+
+```bash
+lr doctor --deep
+```
+
+### CI mode
+
+```bash
+# Fail only on errors
+lr doctor --ci
+
+# Fail on errors AND warnings
+lr doctor --ci --fail-on-warn
+```
+
+See [CI/CD Integration](/cli/ci-cd) for pipeline examples.
+
+## Related
+
+- [`lr analyze`](/cli/commands/analyze) -- shorthand for `lr doctor --deep`
+- [`lr test`](/cli/commands/test) -- verify token validity and API connectivity
+- [`lr suggest`](/cli/commands/suggest) -- get feature integration suggestions
+- [CI/CD Integration](/cli/ci-cd) -- using doctor in automated pipelines

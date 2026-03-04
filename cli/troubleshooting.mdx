@@ -1,0 +1,175 @@
+---
+title: "Troubleshooting"
+description: "Common CLI issues and how to resolve them"
+icon: "wrench"
+---
+
+## Authentication Issues
+
+### "Not authenticated" error
+
+```
+✘ Not authenticated
+  Fix: Run `lr login` to authenticate
+```
+
+Run `lr login` and complete the magic link flow. Your auth token is stored globally and persists across sessions.
+
+### Magic link expired
+
+```
+✘ Verification failed
+  The link may have expired. Run `lr login` to try again.
+```
+
+Magic links expire after 15 minutes. Run `lr login` again to request a new one.
+
+### Cannot receive magic link email
+
+- Check your spam/junk folder
+- Verify you are using the email associated with your Linkrunner account
+- Contact [darshil@linkrunner.io](mailto:darshil@linkrunner.io) if the issue persists
+
+## Project Detection Issues
+
+### "Could not detect project type"
+
+```
+✘ Could not detect project type. Run this command from your project root.
+```
+
+The CLI detects project type by looking for marker files in the current directory:
+
+| File | Detected As |
+|---|---|
+| `pubspec.yaml` | Flutter |
+| `package.json` with `expo` | Expo |
+| `package.json` with `react-native` | React Native |
+| `package.json` with `@capacitor/core` | Capacitor |
+| `.xcodeproj` / `.xcworkspace` | iOS |
+| `build.gradle` / `build.gradle.kts` | Android |
+| `package.json` (any) | Web |
+
+Make sure you are running the command from your project root directory where these files exist.
+
+### Wrong project type detected
+
+During `lr init`, if the wrong type is detected, choose "No" when asked to confirm and select the correct type from the list.
+
+For `lr events add`, use the `--platform` flag to override:
+
+```bash
+lr events add --platform react-native
+```
+
+## Configuration Issues
+
+### "No .linkrunner.json found"
+
+```
+✘ No .linkrunner.json found
+  Fix: Run `lr init` to set up your project
+```
+
+Commands like `lr test`, `lr status`, and `lr deeplink setup` require a `.linkrunner.json` file. Run `lr init` from your project root to create one.
+
+The CLI searches up to 10 parent directories for this file, so you can run commands from subdirectories.
+
+### Invalid project token
+
+```
+✘ Invalid project token
+  Fix: Check your .linkrunner.json or run `lr init` to reconfigure
+```
+
+Your project token may have been rotated or the project deleted. Run `lr init` again to re-fetch credentials.
+
+## Deep Link Issues
+
+### "Domain not reachable"
+
+```
+⚠ Domain links.myapp.com is not reachable
+  Fix: Verify your deep link domain is correctly configured
+```
+
+- Confirm your domain DNS is configured correctly
+- Check that HTTPS is working on the domain
+- Verify the domain in your [Linkrunner dashboard](https://dashboard.linkrunner.io/settings?s=domains)
+
+### "assetlinks.json not found" or "apple-app-site-association not found"
+
+```
+⚠ /.well-known/assetlinks.json not found
+  Fix: Upload assetlinks.json to your deep link domain for Android App Links
+```
+
+Use `lr deeplink setup` to generate the verification files, then host them at:
+
+- **Android:** `https://{domain}/.well-known/assetlinks.json`
+- **iOS:** `https://{domain}/.well-known/apple-app-site-association`
+
+See [Deep Linking Verification](/features/deep-linking-verification) for hosting details.
+
+### "No SHA-256 certificate fingerprints configured"
+
+Add your signing certificate fingerprints to `.linkrunner.json`:
+
+```json
+{
+  "android": {
+    "package_name": "com.myapp.android",
+    "sha256_cert_fingerprints": ["AB:CD:EF:..."]
+  }
+}
+```
+
+You can get your fingerprint with:
+
+```bash
+keytool -list -v -keystore your-keystore.jks
+```
+
+## AI Features
+
+### "Deep analysis unavailable"
+
+```
+ℹ Deep analysis unavailable. Run 'lr login' to enable AI-powered features.
+```
+
+AI features (`lr analyze`, `lr doctor --deep`, `lr suggest` with AI) require authentication. Run `lr login` first.
+
+### "Deep analysis could not be completed"
+
+The AI service may be temporarily unavailable. Standard diagnostics still run. Try again later.
+
+## SDK Install Issues
+
+### Install command fails during lr init
+
+If the automatic install fails:
+
+```
+⚠ Install may have issues. Run manually: flutter pub add linkrunner
+```
+
+Run the install command manually. Common causes:
+
+- Network issues
+- Package manager not installed or not in PATH
+- Incompatible SDK version
+
+## Getting Help
+
+If you cannot resolve an issue:
+
+1. Run `lr doctor --json` and save the output
+2. Run `lr test --json` and save the output
+3. Contact [darshil@linkrunner.io](mailto:darshil@linkrunner.io) with both outputs
+
+## Related
+
+- [lr doctor](/cli/commands/doctor) -- diagnose integration issues
+- [lr test](/cli/commands/test) -- test API connectivity
+- [lr init](/cli/commands/init) -- set up or reconfigure your project

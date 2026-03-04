@@ -1,0 +1,132 @@
+---
+title: "lr status"
+description: "View your project dashboard and recent activity"
+icon: "chart-line"
+---
+
+## Usage
+
+```bash
+lr status [options]
+```
+
+## Description
+
+Displays a dashboard summary for your Linkrunner project, including project info, recent activity metrics (installs, signups, events, revenue), active campaigns, and integration health. Requires authentication and a `.linkrunner.json` file.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--json` | Output results as JSON |
+| `--days <n>` | Activity window in days (default: `7`) |
+
+## Dashboard Sections
+
+### Project Info
+
+Shows your project name, ID, configured platforms, deep link domain, and current environment (production or staging).
+
+### Recent Activity
+
+Displays metrics for the specified time window:
+
+- **Installs** -- total new installs
+- **Signups** -- total user signups
+- **Events** -- total tracked events
+- **Revenue** -- total revenue with currency
+
+### Active Campaigns
+
+Lists your active campaigns with name, platform, and status.
+
+### Integration Health
+
+Quick health checks on your local configuration:
+
+| Check | Pass Condition |
+|---|---|
+| Config found | `.linkrunner.json` exists |
+| Token configured | `project_token` is set |
+| Platforms | At least one platform configured |
+| Deep link domain | `deep_link_domain` is set |
+
+## Examples
+
+### Default (last 7 days)
+
+```bash
+lr status
+```
+
+```
+Linkrunner Status
+
+── Project Info ──
+  Name:         My App
+  ID:           12345
+  Platforms:    android, ios
+  Domain:       links.myapp.com
+  Environment:  production
+
+── Recent Activity (last 7 days) ──
+  Installs:     1,234
+  Signups:      567
+  Events:       8,901
+  Revenue:      $2,345.67
+
+── Active Campaigns ──
+  - Summer Sale (meta) — active
+  - App Launch (google) — active
+
+── Integration Health ──
+  ✔ .linkrunner.json found
+  ✔ Project token configured
+  ✔ Platforms: android, ios
+  ✔ Deep link domain configured
+```
+
+### Custom time window
+
+```bash
+lr status --days 30
+```
+
+### JSON output
+
+```bash
+lr status --json
+```
+
+```json
+{
+  "project": {
+    "name": "My App",
+    "id": "12345",
+    "platforms": ["android", "ios"],
+    "deep_link_domain": "links.myapp.com",
+    "environment": "production"
+  },
+  "activity": {
+    "days": 7,
+    "installs": 1234,
+    "signups": 567,
+    "events": 8901,
+    "revenue": 2345.67,
+    "currency": "USD"
+  },
+  "campaigns": [
+    { "id": 1, "name": "Summer Sale", "status": "active", "platform": "meta" }
+  ],
+  "health": [
+    { "check": "config_found", "status": "pass", "message": ".linkrunner.json found" },
+    { "check": "token_configured", "status": "pass", "message": "Project token configured" }
+  ]
+}
+```
+
+## Related
+
+- [lr doctor](/cli/commands/doctor) -- detailed integration diagnostics
+- [lr test](/cli/commands/test) -- verify API connectivity
+- [lr login](/cli/commands/login) -- authenticate before using status

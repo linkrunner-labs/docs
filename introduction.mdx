@@ -18,10 +18,42 @@ Linkrunner is a Mobile Measurement Partner (MMP) that helps you track user journ
     <Card title="Test Your Setup" icon="flask" href="/testing/integration-testing">
         Validate your integration end-to-end
     </Card>
-    <Card title="API Reference" icon="database" href="/api-reference/data-apis">
-        Access attribution data programmatically
+    <Card title="CLI Tool" icon="terminal" href="/cli/overview">
+        Automate SDK setup and validation from the terminal
     </Card>
 </CardGroup>
+
+## Linkrunner CLI
+
+The `lr` CLI automates SDK integration end-to-end — from installing packages and configuring native files to generating tracking code and validating your setup. What typically takes hours of reading docs, editing config files, and debugging platform-specific issues can be done in minutes with a single command.
+
+<CardGroup cols={3}>
+    <Card title="Automated Setup" icon="wand-magic-sparkles">
+        Detects your platform, installs the SDK, configures native files, and generates initialization code — all from `lr init`
+    </Card>
+    <Card title="Built-in Diagnostics" icon="stethoscope">
+        `lr doctor` validates your configuration, source code patterns, and deep link setup with actionable fix suggestions before you ship
+    </Card>
+    <Card title="AI-Powered Analysis" icon="robot">
+        `lr analyze` uses AI to inspect your codebase for subtle integration issues that manual reviews miss
+    </Card>
+</CardGroup>
+
+<CardGroup cols={3}>
+    <Card title="Code Generation" icon="code">
+        Generate event tracking, payment, and signup code with `lr events add` — auto-inserted into your source files
+    </Card>
+    <Card title="CI/CD Ready" icon="rotate">
+        JSON output and exit codes let you catch integration regressions automatically in every build
+    </Card>
+    <Card title="Deep Link Config" icon="link">
+        Set up Android App Links and iOS Universal Links with `lr deeplink setup` — no manual file editing
+    </Card>
+</CardGroup>
+
+<Card title="Get Started with the CLI" icon="terminal" href="/cli/overview">
+    Install the CLI and integrate your SDK in under 5 minutes
+</Card>
 
 ## Key Capabilities
 

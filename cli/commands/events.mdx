@@ -1,0 +1,117 @@
+---
+title: "lr events add"
+description: "Generate event tracking code snippets for your platform"
+icon: "bolt"
+---
+
+## Usage
+
+```bash
+lr events add [options]
+```
+
+## Description
+
+Interactive code generator that produces platform-specific event tracking snippets. Supports custom events, payment/revenue tracking, and signup events. The generated code can be copied to clipboard or auto-inserted into your source files using AI-powered file analysis.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--platform <type>` | Override the auto-detected platform (`flutter`, `react-native`, `expo`, `ios`, `android`, `capacitor`, `web`) |
+| `--type <eventType>` | Skip the event type prompt (`custom`, `payment`, `signup`) |
+
+## Event Types
+
+### Custom Event
+
+Tracks any in-app event with a name and optional key-value properties.
+
+```
+? Event name: add_to_cart
+? Add a property? Yes
+? Property key: item_id
+? Property value: SKU-123
+? Add another property? No
+```
+
+### Payment / Revenue
+
+Tracks a payment with amount, currency, optional transaction ID, and optional properties.
+
+```
+? Payment amount: 9.99
+? Currency code: USD
+? Transaction ID (optional): txn_abc123
+? Add a property? No
+```
+
+### Signup
+
+Tracks user registration with user ID, optional name, and optional email.
+
+```
+? User ID: user_456
+? User name (optional): Jane Doe
+? User email (optional): jane@example.com
+```
+
+<Note>The Web SDK does not have a `signup` method. Use `trackEvent` for custom events on web.</Note>
+
+## Generated Code Examples
+
+The output is tailored to your platform. For example, a custom event on Flutter:
+
+```dart
+await LinkRunner().trackEvent(
+  name: 'add_to_cart',
+  data: {
+    'item_id': 'SKU-123',
+  },
+);
+```
+
+The same event on React Native:
+
+```typescript
+await linkrunner.trackEvent({
+  name: 'add_to_cart',
+  data: {
+    item_id: 'SKU-123',
+  },
+});
+```
+
+## Auto-insertion
+
+After generating the code, the CLI offers to automatically insert it into the correct location in your source files:
+
+```
+? Would you like me to insert this into your code? Yes
+```
+
+This uses AI to analyze your project and find the appropriate insertion point. If auto-insertion is unavailable or you decline, you can copy the snippet to your clipboard instead.
+
+## Examples
+
+### Interactive mode
+
+```bash
+lr events add
+```
+
+### Skip prompts with flags
+
+```bash
+# Generate a payment event for Flutter
+lr events add --platform flutter --type payment
+
+# Generate a custom event for React Native
+lr events add --platform react-native --type custom
+```
+
+## Related
+
+- [lr suggest](/cli/commands/suggest) -- see which SDK features you're using
+- [lr init](/cli/commands/init) -- generates initial code snippets during setup
+- [Event Capture API](/api-reference/event-capture) -- server-side event tracking
