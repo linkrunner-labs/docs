@@ -154,18 +154,17 @@ The `getAttributionData` function returns:
 ```typescript
 {
     deeplink: string | null;
-    campaign_data: {
+    campaignData: {
         id: string;
         name: string;
         type: string; // "ORGANIC" | "INORGANIC"
-        ad_network: string | null; // "META" | "GOOGLE" | null
-        installed_at: string;
-        store_click_at: string | null;
-        group_name: string;
-        asset_name: string;
-        asset_group_name: string;
+        adNetwork: string | null; // "META" | "GOOGLE" | null
+        installedAt: string;
+        storeClickAt: string | null;
+        groupName: string;
+        assetName: string;
+        assetGroupName: string;
     }
-    attribution_source: string;
 }
 ```
 
