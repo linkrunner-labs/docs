@@ -321,70 +321,11 @@ private fun setIntegrationData() {
 }
 ```
 
-## Tracking Custom Events
-
-Track custom events in your app:
-
-```kotlin
-private fun trackEvent() {
-    CoroutineScope(Dispatchers.IO).launch {
-        try {
-            val result = LinkRunner.getInstance().trackEvent(
-                eventName = "purchase_initiated", // Event name
-                eventData = mapOf( // Optional: Event data
-                    "product_id" to "12345",
-                    "category" to "electronics",
-                    "amount" to 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
-                )
-            )
-
-            result.onSuccess {
-                println("Event tracked successfully")
-            }.onFailure { error ->
-                println("Error tracking event: ${error.message}")
-            }
-        } catch (e: Exception) {
-            println("Exception tracking event: ${e.message}")
-        }
-    }
-}
-```
-
-### Revenue Sharing with Ad Networks
-
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
-
-```kotlin
-private fun trackPurchaseEvent() {
-    CoroutineScope(Dispatchers.IO).launch {
-        try {
-            val result = LinkRunner.getInstance().trackEvent(
-                eventName = "purchase_completed",
-                eventData = mapOf(
-                    "product_id" to "12345",
-                    "category" to "electronics",
-                    "amount" to 149.99 // Revenue amount as a number
-                )
-            )
-
-            result.onSuccess {
-                println("Purchase event with revenue tracked successfully")
-            }.onFailure { error ->
-                println("Error tracking purchase event: ${error.message}")
-            }
-        } catch (e: Exception) {
-            println("Exception tracking purchase event: ${e.message}")
-        }
-    }
-}
-```
+## Revenue Tracking
 
 <Note>
-    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number (Double
-    or Int), not as a string.
+    Revenue data is only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before capturing payments. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
 </Note>
-
-## Revenue Tracking
 
 ### Capturing Payments
 
@@ -467,6 +408,73 @@ private fun removePayment() {
     }
 }
 ```
+
+## Tracking Custom Events
+
+<Note>
+    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+</Note>
+
+Track custom events in your app:
+
+```kotlin
+private fun trackEvent() {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val result = LinkRunner.getInstance().trackEvent(
+                eventName = "purchase_initiated", // Event name
+                eventData = mapOf( // Optional: Event data
+                    "product_id" to "12345",
+                    "category" to "electronics",
+                    "amount" to 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
+                )
+            )
+
+            result.onSuccess {
+                println("Event tracked successfully")
+            }.onFailure { error ->
+                println("Error tracking event: ${error.message}")
+            }
+        } catch (e: Exception) {
+            println("Exception tracking event: ${e.message}")
+        }
+    }
+}
+```
+
+### Revenue Sharing with Ad Networks
+
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+
+```kotlin
+private fun trackPurchaseEvent() {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val result = LinkRunner.getInstance().trackEvent(
+                eventName = "purchase_completed",
+                eventData = mapOf(
+                    "product_id" to "12345",
+                    "category" to "electronics",
+                    "amount" to 149.99 // Revenue amount as a number
+                )
+            )
+
+            result.onSuccess {
+                println("Purchase event with revenue tracked successfully")
+            }.onFailure { error ->
+                println("Error tracking purchase event: ${error.message}")
+            }
+        } catch (e: Exception) {
+            println("Exception tracking purchase event: ${e.message}")
+        }
+    }
+}
+```
+
+<Note>
+    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number (Double
+    or Int), not as a string.
+</Note>
 
 ## Enhanced Privacy Controls
 
