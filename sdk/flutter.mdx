@@ -427,59 +427,6 @@ Future<void> removePayment() async {
 
 Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If only `userId` is provided, all payments for that user will be removed.
 
-## Tracking Custom Events
-
-<Note>
-    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
-</Note>
-
-Track custom events in your app:
-
-```dart
-Future<void> trackEvent() async {
-  try {
-    await LinkRunner().trackEvent(
-      eventName: 'purchase_initiated', // Event name
-      eventData: { // Optional: Event data
-        'product_id': '12345',
-        'category': 'electronics',
-        'amount': 99.99, // Include amount as a number for revenue sharing with ad networks like Google and Meta
-      },
-    );
-    print('Event tracked successfully');
-  } catch (e) {
-    print('Error tracking event: $e');
-  }
-}
-```
-
-### Revenue Sharing with Ad Networks
-
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
-
-```dart
-Future<void> trackPurchaseEvent() async {
-  try {
-    await LinkRunner().trackEvent(
-      eventName: 'purchase_completed',
-      eventData: {
-        'product_id': '12345',
-        'category': 'electronics',
-        'amount': 149.99, // Revenue amount as a number
-      },
-    );
-    print('Purchase event with revenue tracked successfully');
-  } catch (e) {
-    print('Error tracking purchase event: $e');
-  }
-}
-```
-
-<Note>
-    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number (double
-    or int), not as a string.
-</Note>
-
 ## Ecommerce Events
 
 If you are tracking Ecommerce events to sync with Meta Catalog Sales, you must format your `eventData` to include Meta's required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
@@ -587,6 +534,59 @@ Future<void> capturePurchase() async {
 ```
 
 > **Note:** For more information on testing and verifying your ecommerce events, please see our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
+
+## Tracking Custom Events
+
+<Note>
+    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+</Note>
+
+Track custom events in your app:
+
+```dart
+Future<void> trackEvent() async {
+  try {
+    await LinkRunner().trackEvent(
+      eventName: 'purchase_initiated', // Event name
+      eventData: { // Optional: Event data
+        'product_id': '12345',
+        'category': 'electronics',
+        'amount': 99.99, // Include amount as a number for revenue sharing with ad networks like Google and Meta
+      },
+    );
+    print('Event tracked successfully');
+  } catch (e) {
+    print('Error tracking event: $e');
+  }
+}
+```
+
+### Revenue Sharing with Ad Networks
+
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+
+```dart
+Future<void> trackPurchaseEvent() async {
+  try {
+    await LinkRunner().trackEvent(
+      eventName: 'purchase_completed',
+      eventData: {
+        'product_id': '12345',
+        'category': 'electronics',
+        'amount': 149.99, // Revenue amount as a number
+      },
+    );
+    print('Purchase event with revenue tracked successfully');
+  } catch (e) {
+    print('Error tracking purchase event: $e');
+  }
+}
+```
+
+<Note>
+    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number (double
+    or int), not as a string.
+</Note>
 
 ## Enhanced Privacy Controls
 

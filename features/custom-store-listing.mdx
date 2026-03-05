@@ -10,6 +10,42 @@ Custom Store Listings let you create targeted marketing campaigns with tailored 
 
 ![Custom Store Listings](/images/store-listings-dashboard.webp)
 
+## Custom Store Listings
+
+A **custom store listing** is a separate version of your app's store page with different screenshots, descriptions, and promotional content. It is **not** the same as your regular/default Play Store or App Store link.
+
+<Warning>
+Your regular store link (e.g. `https://play.google.com/store/apps/details?id=com.yourapp`) is **not** a custom store listing. Linkrunner already redirects users to your default store link automatically — you don't need to add it here.
+</Warning>
+
+### Google Play - Custom Store Listings
+
+On Google Play, custom store listings are alternate versions of your store page targeted at specific audiences. When you create one in the Google Play Console, it generates a URL with a `listing` parameter:
+
+```
+https://play.google.com/store/apps/details?id=com.yourapp&listing=your-custom-listing-id
+```
+
+The `&listing=your-custom-listing-id` part is what makes it a custom store listing.
+
+<Card title="Google Play Documentation" icon="google" href="https://support.google.com/googleplay/android-developer/answer/9867158?hl=en">
+  Learn how to create custom store listings in the Google Play Console
+</Card>
+
+### App Store - Custom Product Pages
+
+On the App Store, these are called **Custom Product Pages**. When you create one in App Store Connect, it generates a URL with a `ppid` parameter:
+
+```
+https://apps.apple.com/app/your-app/id123456789?ppid=your-custom-page-id
+```
+
+The `?ppid=your-custom-page-id` part is what makes it a custom product page.
+
+<Card title="Apple Documentation" icon="apple" href="https://developer.apple.com/app-store/custom-product-pages/">
+  Learn how to create custom product pages in App Store Connect
+</Card>
+
 ## How It Works
 
 When creating a marketing campaign, you can specify a custom store listing for users to be directed to when they click on your campaign link. The system automatically appends the correct parameters to the store URLs.
@@ -18,22 +54,35 @@ This allows for targeted marketing campaigns with different store presentations 
 
 ## Setting Up Custom Store Listings
 
-### Step 1: Access Store Listings
+### Step 1: Create a Custom Listing on Google Play / App Store
+
+Before adding a custom store listing to Linkrunner, you need to create one on the respective platform first:
+
+- **Google Play**: Go to Google Play Console → Store presence → Custom store listings → [Create custom store listing](https://support.google.com/googleplay/android-developer/answer/9867158?hl=en)
+- **App Store**: Go to App Store Connect → Custom Product Pages → [Create custom product page](https://developer.apple.com/app-store/custom-product-pages/)
+
+Once created, copy the URL of your custom store listing. It should contain a `listing` parameter (Google Play) or `ppid` parameter (App Store).
+
+### Step 2: Access Store Listings in Linkrunner
 
 Navigate to the Store Listings section in your project settings:
 
 1. Go to [https://dashboard.linkrunner.io/settings?s=store-listings](https://dashboard.linkrunner.io/settings?s=store-listings)
 2. Or access it through Settings → Store Listings in the navigation menu
 
-### Step 2: Create a Store Listing
+### Step 3: Add the Custom Store Listing
 
 1. Click on the "+ Add Listing" button
 2. Fill in the required information:
-    - **Name**: A descriptive name for your store listing
-    - **Store Listing Link**: The URL of your custom store listing
+    - **Name**: A descriptive name for your store listing (e.g. "Holiday Campaign - US")
+    - **Store Listing Link**: The full URL of your custom store listing including the `listing` or `ppid` parameter
 3. Click "Create" to save your store listing
 
-### Step 3: Manage Your Store Listings
+<Info>
+Linkrunner will automatically extract the custom listing identifier from the URL. If you see an error, make sure your URL contains the `listing` (Google Play) or `ppid` (App Store) parameter.
+</Info>
+
+### Step 4: Manage Your Store Listings
 
 From the Store Listings dashboard, you can:
 
