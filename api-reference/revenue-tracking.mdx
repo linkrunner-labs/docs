@@ -34,12 +34,12 @@ POST: /capture-payment
 
 ```json
 {
-    "user_id": "666",
-    "payment_id": "ABC", // optional but recommended
-    "amount": 25096, // Send amount in one currency only
-    "type": "FIRST_PAYMENT", // optional
-    // "type": "SECOND_PAYMENT", // optional
-    "status": "PAYMENT_COMPLETED" // optional
+  "user_id": "666",
+  "payment_id": "ABC", // optional but recommended
+  "amount": 25096, // Send amount in one currency only
+  "type": "FIRST_PAYMENT", // optional
+  // "type": "SECOND_PAYMENT", // optional
+  "status": "PAYMENT_COMPLETED" // optional
 }
 ```
 
@@ -49,24 +49,24 @@ POST: /capture-payment
 
 ### Payment types
 
--   **FIRST_PAYMENT**: User's first payment
--   **SECOND_PAYMENT**: User's second payment
--   **WALLET_TOPUP**: Adding funds to a wallet
--   **FUNDS_WITHDRAWAL**: Withdrawing funds
--   **SUBSCRIPTION_CREATED**: Subscription started
--   **SUBSCRIPTION_RENEWED**: Subscription renewed
--   **ONE_TIME**: One-time payment
--   **RECURRING**: Recurring payment
--   **DEFAULT**: Generic/unspecified payment type
+- **FIRST_PAYMENT**: User's first payment
+- **SECOND_PAYMENT**: User's second payment
+- **WALLET_TOPUP**: Adding funds to a wallet
+- **FUNDS_WITHDRAWAL**: Withdrawing funds
+- **SUBSCRIPTION_CREATED**: Subscription started
+- **SUBSCRIPTION_RENEWED**: Subscription renewed
+- **ONE_TIME**: One-time payment
+- **RECURRING**: Recurring payment
+- **DEFAULT**: Generic/unspecified payment type
 
 If `type` is omitted, it defaults to **DEFAULT**.
 
 ### Payment status
 
--   **PAYMENT_INITIATED**: Payment has been initiated
--   **PAYMENT_COMPLETED**: Payment completed successfully
--   **PAYMENT_FAILED**: Payment attempt failed
--   **PAYMENT_CANCELLED**: Payment was cancelled
+- **PAYMENT_INITIATED**: Payment has been initiated
+- **PAYMENT_COMPLETED**: Payment completed successfully
+- **PAYMENT_FAILED**: Payment attempt failed
+- **PAYMENT_CANCELLED**: Payment was cancelled
 
 If `status` is omitted, it defaults to **PAYMENT_COMPLETED**.
 
@@ -85,8 +85,8 @@ POST: /remove-payment
 
 ```json
 {
-    "user_id": "666",
-    "payment_id": "ABC"
+  "user_id": "666",
+  "payment_id": "ABC"
 }
 ```
 
@@ -97,3 +97,42 @@ POST: /remove-payment
 1. **200** Payment entry/entries deleted
 2. **400** No payment found with the given payment id or user id
 3. **401** Invalid server key
+
+## Meta Ecommerce Events
+
+If you are tracking `Purchase` events to sync with Meta Catalog Sales, **you must first map the purchase event with the standard commerce event in the Linkrunner Dashboard** before sending it.
+
+_Note: Any Payment event you send should be mapped with **Purchase** for Commerce Event Manager. For example, map **FIRST_PAYMENT** with **Purchase** or **DEFAULT** with **Purchase**._
+
+While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events to correctly attribute catalog sales. Your `event_data` object should include the following fields:
+
+For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event_data) documentation.
+
+```json
+{
+  "user_id": "666",
+  "payment_id": "ABC",
+  "amount": 25096,
+  "type": "DEFAULT", // Event is mapped with the Purchase in the Linkrunner Meta Integration Settings
+  "status": "PAYMENT_COMPLETED",
+  "event_data": {
+    "content_ids": ["whshct4mwc"],
+    "contents": [
+      {
+        "id": "whshct4mwc",
+        "quantity": 2,
+        "item_price": 1000
+      }
+    ],
+    "content_type": "product",
+    "currency": "INR",
+    "value": 2000.0,
+    "num_items": 2,
+    "order_id": "order_id_1234"
+  }
+}
+```
+
+_Note: In the example above, the `type` field is omitted from the request body, which means it defaults to **DEFAULT**. Ensure this default payment type is properly mapped with **Purchase** in your Linkrunner dashboard._
+
+To verify your events are being correctly received by Meta, please follow our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.

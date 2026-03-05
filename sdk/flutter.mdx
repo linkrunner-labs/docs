@@ -354,6 +354,21 @@ Future<void> capturePayment() async {
         type: PaymentType.FIRST_PAYMENT, // Optional: Payment type
         // type: PaymentType.SECOND_PAYMENT, // Optional: Payment type
         status: PaymentStatus.PAYMENT_COMPLETED, // Optional: Payment status
+        eventData: { // Optional: Ecommerce/custom event data
+          'content_ids': ['product_123'],
+          'content_type': 'product',
+          'currency': 'USD',
+          'value': 99.99,
+          'num_items': 1,
+          'order_id': 'order_12345',
+          'contents': [
+            {
+              'id': 'product_123',
+              'quantity': 1,
+              'item_price': 99.99
+            }
+          ]
+        },
       ),
     );
     print('Payment captured successfully');
@@ -365,24 +380,25 @@ Future<void> capturePayment() async {
 
 #### Parameters for `LRCapturePayment`
 
--   `amount`: double (required) - The payment amount
--   `userId`: String (required) - Identifier for the user making the payment
--   `paymentId`: String (optional) - Unique identifier for the payment
--   `type`: PaymentType (optional) - Type of payment. Available options:
-    -   `PaymentType.FIRST_PAYMENT` - First payment made by the user
-    -   `PaymentType.SECOND_PAYMENT` - Second payment made by the user
-    -   `PaymentType.WALLET_TOPUP` - Adding funds to a wallet
-    -   `PaymentType.FUNDS_WITHDRAWAL` - Withdrawing funds
-    -   `PaymentType.SUBSCRIPTION_CREATED` - New subscription created
-    -   `PaymentType.SUBSCRIPTION_RENEWED` - Subscription renewal
-    -   `PaymentType.ONE_TIME` - One-time payment
-    -   `PaymentType.RECURRING` - Recurring payment
-    -   `PaymentType.DEFAULT_PAYMENT` - Default type (used if not specified)
--   `status`: PaymentStatus (optional) - Status of the payment. Available options:
-    -   `PaymentStatus.PAYMENT_INITIATED` - Payment has been initiated
-    -   `PaymentStatus.PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
-    -   `PaymentStatus.PAYMENT_FAILED` - Payment attempt failed
-    -   `PaymentStatus.PAYMENT_CANCELLED` - Payment was cancelled
+- `amount`: double (required) - The payment amount
+- `userId`: String (required) - Identifier for the user making the payment
+- `paymentId`: String (optional) - Unique identifier for the payment
+- `type`: PaymentType (optional) - Type of payment. Available options:
+  - `PaymentType.FIRST_PAYMENT` - First payment made by the user
+  - `PaymentType.SECOND_PAYMENT` - Second payment made by the user
+  - `PaymentType.WALLET_TOPUP` - Adding funds to a wallet
+  - `PaymentType.FUNDS_WITHDRAWAL` - Withdrawing funds
+  - `PaymentType.SUBSCRIPTION_CREATED` - New subscription created
+  - `PaymentType.SUBSCRIPTION_RENEWED` - Subscription renewal
+  - `PaymentType.ONE_TIME` - One-time payment
+  - `PaymentType.RECURRING` - Recurring payment
+  - `PaymentType.DEFAULT_PAYMENT` - Default type (used if not specified)
+- `status`: PaymentStatus (optional) - Status of the payment. Available options:
+  - `PaymentStatus.PAYMENT_INITIATED` - Payment has been initiated
+  - `PaymentStatus.PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
+  - `PaymentStatus.PAYMENT_FAILED` - Payment attempt failed
+  - `PaymentStatus.PAYMENT_CANCELLED` - Payment was cancelled
+- `eventData`: `Map<String, dynamic>` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties.
 
 ### Removing Payments
 
@@ -410,6 +426,114 @@ Future<void> removePayment() async {
 -   `paymentId`: String (optional) - Unique identifier for the payment to be removed
 
 Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If only `userId` is provided, all payments for that user will be removed.
+
+## Ecommerce Events
+
+If you are tracking Ecommerce events to sync with Meta Catalog Sales, you must format your `eventData` to include Meta's required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
+
+For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event_data).
+
+### Add To Cart Example
+
+Use the `trackEvent` method to send an `AddToCart` event:
+
+```dart
+Future<void> trackAddToCart() async {
+  try {
+    await LinkRunner().trackEvent(
+      eventName: 'add_to_cart', // Map this custom event to "AddToCart" in the Linkrunner Dashboard
+      eventData: {
+        'content_ids': ['product_123'],
+        'contents': [
+          {
+            'id': 'product_123', // Matches content_ids
+            'quantity': 1,
+            'item_price': 49.99
+          }
+        ],
+        'content_type': 'product',
+        'currency': 'USD',
+        'value': 49.99,
+        'num_items': 1
+      },
+    );
+    print('Add To Cart event tracked successfully');
+  } catch (e) {
+    print('Error tracking Add To Cart event: $e');
+  }
+}
+```
+
+### View Content Example
+
+Use the `trackEvent` method to send a `ViewContent` event:
+
+```dart
+Future<void> trackViewContent() async {
+  try {
+    await LinkRunner().trackEvent(
+      eventName: 'view_item', // Map this custom event to "ViewContent" in the Linkrunner Dashboard
+      eventData: {
+        'content_ids': ['product_123'],
+        'contents': [
+          {
+            'id': 'product_123', // Matches content_ids
+            'quantity': 1,
+            'item_price': 49.99
+          }
+        ],
+        'content_type': 'product',
+        'currency': 'USD',
+        'value': 49.99,
+        'num_items': 1
+      },
+    );
+    print('View Content event tracked successfully');
+  } catch (e) {
+    print('Error tracking View Content event: $e');
+  }
+}
+```
+
+### Payment / Purchase Example
+
+Use the `capturePayment` method to send a `Purchase` event containing the ecommerce payload:
+
+```dart
+Future<void> capturePurchase() async {
+  try {
+    await LinkRunner().capturePayment(
+      capturePayment: LRCapturePayment(
+        amount: 49.99,
+        userId: 'user123',
+        paymentId: 'payment_456',
+        type: PaymentType.FIRST_PAYMENT, // Map this payment type to "Purchase" in the Linkrunner Dashboard
+        status: PaymentStatus.PAYMENT_COMPLETED,
+        eventData: {
+          'content_ids': ['product_123'],
+          'contents': [
+            {
+              'id': 'product_123', // Matches content_ids
+              'quantity': 1,
+              'item_price': 49.99
+            }
+          ],
+          'content_type': 'product',
+          'currency': 'USD',
+          'value': 49.99,
+          'num_items': 1,
+          'order_id': 'order_abc123' // Required for Purchase events
+        },
+      ),
+    );
+    print('Purchase captured successfully');
+  } catch (e) {
+    print('Error capturing purchase: $e');
+  }
+}
+```
+
+> **Note:** For more information on testing and verifying your ecommerce events, please see our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
 
 ## Tracking Custom Events
 
@@ -611,6 +735,7 @@ Connect Firebase Cloud Messaging (FCM) with Linkrunner
 
             Custom implementations of FCM's `onMessageReceived` method can unintentionally make uninstall push notifications visible to users, disrupting the intended silent experience. To avoid this, ensure your logic checks if the message contains `lr-uninstall-tracking` and handles it accordingly, as shown in the code example above.
     </Accordion>
+
 </AccordionGroup>
 
 ### iOS
@@ -669,18 +794,18 @@ Connect APNs with Linkrunner
 
 ## Function Placement Guide
 
-| Function                          | Where to Place                 | When to Call                                   |
-| --------------------------------- | ------------------------------ | ---------------------------------------------- |
-| `LinkRunner().init`               | App initialization             | Once when app starts                           |
-| `LinkRunner().getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed        |
-| `LinkRunner().setAdditionalData`  | Integration code               | When third-party integration IDs are available |
-| `LinkRunner().signup`             | Onboarding flow                | Once after user completes onboarding           |
-| `LinkRunner().setUserData`        | Authentication logic           | Every time app opens with logged-in user       |
-| `LinkRunner().trackEvent`         | Throughout app                 | When specific user actions occur               |
-| `LinkRunner().capturePayment`     | Payment processing             | When user makes a payment                      |
-| `LinkRunner().removePayment`      | Refund flow                    | When payment needs to be removed               |
-| `LinkRunner().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection |
-| `LinkRunner().isAaidCollectionDisabled` | Privacy settings or compliance checks | When you need to check AAID collection status |
+| Function                                | Where to Place                         | When to Call                                   |
+| --------------------------------------- | -------------------------------------- | ---------------------------------------------- |
+| `LinkRunner().init`                     | App initialization                     | Once when app starts                           |
+| `LinkRunner().getAttributionData`       | Attribution data handling flow         | Whenever the attribution data is needed        |
+| `LinkRunner().setAdditionalData`        | Integration code                       | When third-party integration IDs are available |
+| `LinkRunner().signup`                   | Onboarding flow                        | Once after user completes onboarding           |
+| `LinkRunner().setUserData`              | Authentication logic                   | Every time app opens with logged-in user       |
+| `LinkRunner().trackEvent`               | Throughout app                         | When specific user actions occur               |
+| `LinkRunner().capturePayment`           | Payment processing                     | When user makes a payment                      |
+| `LinkRunner().removePayment`            | Refund flow                            | When payment needs to be removed               |
+| `LinkRunner().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection       |
+| `LinkRunner().isAaidCollectionDisabled` | Privacy settings or compliance checks  | When you need to check AAID collection status  |
 
 ## Complete Example
 
@@ -760,12 +885,16 @@ class _HomeScreenState extends State<HomeScreen> {
 ## Next Steps
 
 <CardGroup cols={2}>
-    <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
-        Validate your setup end-to-end
-    </Card>
-    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
-        Configure deep links for your app
-    </Card>
+  <Card
+    title="Test Your Integration"
+    icon="flask"
+    href="/testing/integration-testing"
+  >
+    Validate your setup end-to-end
+  </Card>
+  <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+    Configure deep links for your app
+  </Card>
 </CardGroup>
 
 ## Support

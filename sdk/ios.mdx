@@ -276,7 +276,22 @@ func capturePayment() async {
             userId: "user123", // User identifier
             paymentId: "payment456", // Optional: Unique payment identifier
             type: .firstPayment, // optional
-            status: .completed // optional
+            status: .completed, // optional
+            eventData: [        // Optional: Ecommerce/custom event data
+                "content_ids": ["product_123"],
+                "content_type": "product",
+                "currency": "USD",
+                "value": 99.99,
+                "num_items": 1,
+                "order_id": "order_12345",
+                "contents": [
+                    [
+                        "id": "product_123",
+                        "quantity": 1,
+                        "item_price": 99.99
+                    ]
+                ]
+            ]
         )
         print("Payment captured successfully")
     } catch {
@@ -383,6 +398,112 @@ func trackPurchaseEvent() async {
     or Int), not as a string.
 </Note>
 
+## Ecommerce Events
+
+If you are tracking Ecommerce events to sync with Meta Catalog Sales, you must format your `eventData` to include Meta's required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
+
+For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event_data).
+
+### Add To Cart Example
+
+Use the `trackEvent` method to send an `AddToCart` event:
+
+```swift
+func trackAddToCart() async {
+    do {
+        try await LinkrunnerSDK.shared.trackEvent(
+            eventName: "add_to_cart", // Map this custom event to "AddToCart" in the Linkrunner Dashboard
+            eventData: [
+                "content_ids": ["product_123"],
+                "contents": [
+                    [
+                        "id": "product_123", // Matches content_ids
+                        "quantity": 1,
+                        "item_price": 49.99
+                    ]
+                ],
+                "content_type": "product",
+                "currency": "USD",
+                "value": 49.99,
+                "num_items": 1
+            ]
+        )
+        print("Add To Cart event tracked successfully")
+    } catch {
+        print("Error tracking Add To Cart event:", error)
+    }
+}
+```
+
+### View Content Example
+
+Use the `trackEvent` method to send a `ViewContent` event:
+
+```swift
+func trackViewContent() async {
+    do {
+        try await LinkrunnerSDK.shared.trackEvent(
+            eventName: "view_item", // Map this custom event to "ViewContent" in the Linkrunner Dashboard
+            eventData: [
+                "content_ids": ["product_123"],
+                "contents": [
+                    [
+                        "id": "product_123", // Matches content_ids
+                        "quantity": 1,
+                        "item_price": 49.99
+                    ]
+                ],
+                "content_type": "product",
+                "currency": "USD",
+                "value": 49.99,
+                "num_items": 1
+            ]
+        )
+        print("View Content event tracked successfully")
+    } catch {
+        print("Error tracking View Content event:", error)
+    }
+}
+```
+
+### Payment / Purchase Example
+
+Use the `capturePayment` method to send a `Purchase` event containing the ecommerce payload:
+
+```swift
+func capturePurchase() async {
+    do {
+        try await LinkrunnerSDK.shared.capturePayment(
+            amount: 49.99,
+            userId: "user123",
+            paymentId: "payment_456",
+            type: .firstPayment, // Map this payment type to "Purchase" in the Linkrunner Dashboard
+            status: .completed,
+            eventData: [
+                "content_ids": ["product_123"],
+                "contents": [
+                    [
+                        "id": "product_123", // Matches content_ids
+                        "quantity": 1,
+                        "item_price": 49.99
+                    ]
+                ],
+                "content_type": "product",
+                "currency": "USD",
+                "value": 49.99,
+                "num_items": 1,
+                "order_id": "order_abc123" // Required for Purchase events
+            ]
+        )
+        print("Purchase captured successfully")
+    } catch {
+        print("Error capturing purchase:", error)
+    }
+}
+```
+
+> **Note:** For more information on testing and verifying your ecommerce events, please see our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
+
 ## Enhanced Privacy Controls
 
 The SDK offers options to enhance user privacy:
@@ -479,12 +600,16 @@ struct ContentView: View {
 ## Next Steps
 
 <CardGroup cols={2}>
-    <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
-        Validate your setup end-to-end
-    </Card>
-    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
-        Configure deep links for your app
-    </Card>
+  <Card
+    title="Test Your Integration"
+    icon="flask"
+    href="/testing/integration-testing"
+  >
+    Validate your setup end-to-end
+  </Card>
+  <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+    Configure deep links for your app
+  </Card>
 </CardGroup>
 
 ## Support

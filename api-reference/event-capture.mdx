@@ -36,15 +36,15 @@ POST: /capture-event
 
 ```json
 {
-    "event_name": "product_viewed",
-    "event_data": {
-        "product_id": "ABC123",
-        "category": "electronics",
-        "amount": 249.99,
-        "currency": "USD",
-        "is_featured": true
-    },
-    "user_id": "user_12345"
+  "event_name": "product_viewed",
+  "event_data": {
+    "product_id": "ABC123",
+    "category": "electronics",
+    "amount": 249.99,
+    "currency": "USD",
+    "is_featured": true
+  },
+  "user_id": "user_12345"
 }
 ```
 
@@ -66,9 +66,9 @@ Upon successful event capture, the API returns:
 
 ```json
 {
-    "msg": "Event capture request received!",
-    "status": 200,
-    "data": null
+  "msg": "Event capture request received!",
+  "status": 200,
+  "data": null
 }
 ```
 
@@ -95,19 +95,19 @@ To enable revenue sharing with ad networks like Google Ads and Meta, include an 
 
 ```json
 {
-    "event_name": "purchase_completed",
-    "event_data": {
-        "product_id": "ABC123",
-        "category": "electronics",
-        "amount": 149.99
-    },
-    "user_id": "user_12345"
+  "event_name": "purchase_completed",
+  "event_data": {
+    "product_id": "ABC123",
+    "category": "electronics",
+    "amount": 149.99
+  },
+  "user_id": "user_12345"
 }
 ```
 
 <Note>
-    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number, not as a
-    string.
+  For revenue sharing with ad networks to work properly, ensure the `amount`
+  parameter is passed as a number, not as a string.
 </Note>
 
 ## Best Practices
@@ -124,35 +124,75 @@ To enable revenue sharing with ad networks like Google Ads and Meta, include an 
 ```javascript
 // Using fetch API
 fetch("https://api.linkrunner.io/api/v1/capture-event", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        "linkrunner-key": "YOUR-SERVER-KEY",
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "linkrunner-key": "YOUR-SERVER-KEY",
+  },
+  body: JSON.stringify({
+    event_name: "purchase_completed",
+    event_data: {
+      order_id: "ORD-12345",
+      product_ids: ["P-001", "P-002"],
+      total_amount: 125.99,
+      currency: "USD",
+      payment_method: "credit_card",
     },
-    body: JSON.stringify({
-        event_name: "purchase_completed",
-        event_data: {
-            order_id: "ORD-12345",
-            product_ids: ["P-001", "P-002"],
-            total_amount: 125.99,
-            currency: "USD",
-            payment_method: "credit_card",
-        },
-        user_id: "user_12345",
-    }),
+    user_id: "user_12345",
+  }),
 })
-    .then((response) => response.json())
-    .then((data) => console.log(data))
-    .catch((error) => console.error("Error:", error));
+  .then((response) => response.json())
+  .then((data) => console.log(data))
+  .catch((error) => console.error("Error:", error));
 ```
 
 ## Error Handling
 
 The API will return appropriate HTTP status codes along with error messages when issues occur:
 
--   **400 Bad Request**: Check your request parameters
--   **401 Unauthorized**: Verify your server key
--   **429 Too Many Requests**: You've exceeded the rate limit, please try again later
--   **500 Internal Server Error**: Contact support if this persists
+- **400 Bad Request**: Check your request parameters
+- **401 Unauthorized**: Verify your server key
+- **429 Too Many Requests**: You've exceeded the rate limit, please try again later
+- **500 Internal Server Error**: Contact support if this persists
 
 For any help please reach out to [darshil@linkrunner.io](mailto:darshil@linkrunner.io)
+
+## Meta Ecommerce Events
+
+If you are tracking Ecommerce events (like `add_to_cart` or `view_content`) to sync with Meta Catalog Sales, **you must first map your custom event with the standard commerce event in the Linkrunner Dashboard** before sending the event.
+
+_Note: Any event you want to send for an add to cart action should be mapped with **AddToCart** for Commerce Event Manager. For example, map **add_to_cart** with **AddToCart**._
+
+_Similarly, any event you want to send for viewing a product should be mapped with **ViewContent**. For example, map **item_viewed** with **ViewContent** or **view_content** with **ViewContent**._
+
+While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events in order to correctly attribute catalog sales and optimize campaigns.
+
+### Example Ecommerce Payload
+
+Here is an example of the exact `event_data` structure you need to send for Meta Commerce Manager:
+
+For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event_data) documentation.
+
+```json
+{
+  "event_name": "add_to_cart",
+  "event_data": {
+    "content_ids": ["whshct4mwc"],
+    "contents": [
+      {
+        "id": "whshct4mwc",
+        "quantity": 2,
+        "item_price": 1000
+      }
+    ],
+    "content_type": "product",
+    "currency": "INR",
+    "value": 2000.0,
+    "num_items": 2,
+    "order_id": "order_id_1234"
+  },
+  "user_id": "user_12345"
+}
+```
+
+To verify your events are being correctly received by Meta, please follow our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
