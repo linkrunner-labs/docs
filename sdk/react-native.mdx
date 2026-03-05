@@ -205,39 +205,11 @@ const setIntegrationData = async () => {
 
 This method allows you to connect user identities across different analytics and marketing platforms.
 
-## Tracking Custom Events
-
-Track custom events in your app:
-
-```javascript
-const trackEvent = async () => {
-    await linkrunner.trackEvent(
-        "purchase_initiated", // Event name
-        { product_id: "12345", category: "electronics", amount: 99.99 } // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
-    );
-};
-```
-
-### Revenue Sharing with Ad Networks
-
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
-
-```javascript
-const trackPurchaseEvent = async () => {
-    await linkrunner.trackEvent("purchase_completed", {
-        product_id: "12345",
-        category: "electronics",
-        amount: 149.99, // Revenue amount as a number
-    });
-};
-```
+## Revenue Tracking
 
 <Note>
-    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number, not as a
-    string.
+    Revenue data is only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before capturing payments. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
 </Note>
-
-## Revenue Tracking
 
 ### Capture Payment
 
@@ -313,6 +285,42 @@ const removePayment = async () => {
 -   `paymentId`: String (optional) - Unique identifier for the payment to be removed
 
 Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If only `userId` is provided, all payments for that user will be removed.
+
+## Tracking Custom Events
+
+<Note>
+    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+</Note>
+
+Track custom events in your app:
+
+```javascript
+const trackEvent = async () => {
+    await linkrunner.trackEvent(
+        "purchase_initiated", // Event name
+        { product_id: "12345", category: "electronics", amount: 99.99 } // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
+    );
+};
+```
+
+### Revenue Sharing with Ad Networks
+
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+
+```javascript
+const trackPurchaseEvent = async () => {
+    await linkrunner.trackEvent("purchase_completed", {
+        product_id: "12345",
+        category: "electronics",
+        amount: 149.99, // Revenue amount as a number
+    });
+};
+```
+
+<Note>
+    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number, not as a
+    string.
+</Note>
 
 ## Ecommerce Events
 
