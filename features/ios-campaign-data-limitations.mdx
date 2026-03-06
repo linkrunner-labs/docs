@@ -1,0 +1,82 @@
+---
+title: "iOS Campaign Data Limitations"
+description: "Why some campaign metrics show as unavailable for iOS campaigns and where to find iOS data instead"
+icon: "apple"
+---
+
+You may notice an Apple icon next to certain metrics in your campaign dashboard — this means the data isn't measurable for iOS campaigns due to Apple's privacy changes. Here's what changed and where to find iOS data instead.
+
+## What changed with iOS privacy
+
+Apple introduced a series of privacy changes that fundamentally altered how iOS app attribution works:
+
+| Timeline | Change | Impact |
+| --- | --- | --- |
+| **Before 2021** | Apps could freely access device identifiers (IDFA) | Full user-level attribution and tracking |
+| **iOS 14.5 (2021)** | App Tracking Transparency (ATT) required opt-in consent | ~75% of users opted out, breaking deterministic attribution |
+| **iOS 16.1+ (2023)** | SKAdNetwork 4.0 became the primary attribution method | Attribution is now aggregated, delayed, and privacy-thresholded |
+
+<Note>
+These limitations affect **all** mobile attribution tools, not just Linkrunner. Any platform reporting user-level iOS campaign data post-ATT is either using modeled estimates or limited to the small percentage of users who opted in.
+</Note>
+
+## Affected metrics
+
+The following metrics cannot be reliably measured at the campaign level for iOS-only campaigns. When unavailable, they appear as **"-"** with the Apple icon tooltip.
+
+<AccordionGroup>
+  <Accordion title="Revenue & Cost">
+    | Metric | Why it's affected |
+    | --- | --- |
+    | **Revenue** | Cannot attribute revenue back to a specific iOS campaign without user-level identity |
+    | **ROAS** | Requires revenue attribution, which depends on user-level tracking |
+    | **CPI** | Install counts from SKAN are aggregated and delayed, making per-campaign cost calculations unreliable |
+    | **CPS** | Sign-up attribution is unavailable, so cost-per-signup cannot be calculated |
+    | **Spend** | Ad network spend data may still be available, but cannot be matched to Linkrunner attribution data |
+  </Accordion>
+
+  <Accordion title="User Activity">
+    | Metric | Why it's affected |
+    | --- | --- |
+    | **Sign-ups** | Post-install events cannot be attributed to specific campaigns without user-level identity |
+    | **Uninstalls** | Uninstall tracking relies on device tokens that cannot be tied back to campaigns |
+    | **Suspicious Installs** | Fraud detection signals require user-level data that is no longer available |
+  </Accordion>
+
+  <Accordion title="Retention & Engagement">
+    | Metric | Why it's affected |
+    | --- | --- |
+    | **Rolling Retention** | Requires tracking individual users over time, which needs user-level attribution |
+    | **Classic Retention** | Same as rolling retention — day-N return rates need user-level identity |
+    | **Active Users** | Cannot segment active users by acquisition campaign without device-level attribution |
+  </Accordion>
+
+  <Accordion title="Custom Events">
+    Any custom events you track (e.g. `purchase`, `level_complete`, `add_to_cart`) cannot be attributed back to the originating iOS campaign. The events are still recorded — they just can't be tied to a specific campaign source.
+  </Accordion>
+</AccordionGroup>
+
+## What you CAN still measure
+
+Even with these privacy limitations, iOS campaign measurement isn't completely gone — it has shifted to Apple's privacy-preserving framework:
+
+- **SKAN postbacks** — aggregated install and conversion data sent by Apple
+- **Conversion values** — encode post-install behavior (revenue tiers, engagement signals) within Apple's privacy thresholds
+- **Privacy tier distribution** — understand how much data Apple is sharing for your campaigns
+- **Campaign-level install trends** — track install volume patterns over time via SKAN
+
+<CardGroup cols={2}>
+  <Card title="SKAN Dashboard" icon="chart-mixed" href="/features/skan-dashboard/overview">
+    View aggregated iOS attribution data including installs, conversion values, and privacy tiers.
+  </Card>
+  <Card title="SKAN Setup Guide" icon="gear" href="/features/skadnetwork-integration">
+    Configure SKAdNetwork integration to start receiving iOS attribution data.
+  </Card>
+</CardGroup>
+
+## Tips for better iOS measurement
+
+- **Consolidate iOS campaigns** — fewer campaigns means more data per campaign, which helps meet Apple's privacy thresholds and reduces null conversion values.
+- **Set up SKAN conversion values** — define a [conversion value schema](/features/skadnetwork-conversion-values) to capture the post-install signals that matter most (revenue tiers, key events, retention).
+- **Use mixed-platform campaigns** — if your campaign targets both iOS and Android, the Android portion will still provide full user-level metrics alongside the SKAN data for iOS.
+- **Check your SKAN Dashboard regularly** — the [SKAN Dashboard](/features/skan-dashboard/overview) is purpose-built for iOS measurement and shows data that the standard campaign view cannot.

@@ -44,6 +44,7 @@
                             "features/custom-store-listing",
                             "features/uninstall-tracking",
                             "features/meta-install-referrer",
+                            "features/ios-campaign-data-limitations",
                             {
                                 "group": "SKAdNetwork",
                                 "pages": [
