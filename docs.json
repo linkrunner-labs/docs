@@ -101,10 +101,7 @@
                 "groups": [
                     {
                         "group": "Getting Started",
-                        "pages": [
-                            "cli/overview",
-                            "cli/installation"
-                        ]
+                        "pages": ["cli/overview", "cli/installation"]
                     },
                     {
                         "group": "Commands",
@@ -122,10 +119,7 @@
                     },
                     {
                         "group": "Guides",
-                        "pages": [
-                            "cli/ci-cd",
-                            "cli/troubleshooting"
-                        ]
+                        "pages": ["cli/ci-cd", "cli/troubleshooting"]
                     }
                 ]
             }

@@ -48,6 +48,10 @@ This command will automatically:
 -   Add the latest version of `linkrunner` to your `pubspec.yaml`
 -   Download and install the package and its dependencies
 
+<Tip>
+  **CLI shortcut:** Run `lr init` to auto-configure your Flutter project and generate initialization code. [Learn more →](/cli/commands/init)
+</Tip>
+
 ### Step 2: Platform Specific Setup
 
 #### Android Configuration
@@ -163,6 +167,10 @@ void initState() {
 }
 ```
 
+<Tip>
+  **CLI shortcut:** Use `lr init` to generate this initialization code automatically. [Learn more →](/cli/commands/init)
+</Tip>
+
 ### Platform-Specific SDK Signing
 
 For applications requiring different signing keys per platform:
@@ -227,6 +235,10 @@ Future<void> onSignup() async {
   }
 }
 ```
+
+<Tip>
+  **CLI shortcut:** Use `lr events add` to generate signup tracking code. [Learn more →](/cli/commands/events)
+</Tip>
 
 ## Getting Attribution Data
 
@@ -355,6 +367,10 @@ Future<void> trackEvent() async {
 }
 ```
 
+<Tip>
+  **CLI shortcut:** Use `lr events add --type custom` to generate event tracking snippets. [Learn more →](/cli/commands/events)
+</Tip>
+
 ### Revenue Sharing with Ad Networks
 
 To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
@@ -428,6 +444,10 @@ Future<void> capturePayment() async {
     -   `PaymentStatus.PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
     -   `PaymentStatus.PAYMENT_FAILED` - Payment attempt failed
     -   `PaymentStatus.PAYMENT_CANCELLED` - Payment was cancelled
+
+<Tip>
+  **CLI shortcut:** Use `lr events add --type payment` to generate payment tracking code. [Learn more →](/cli/commands/events)
+</Tip>
 
 ### Removing Payments
 
@@ -759,6 +779,10 @@ class _HomeScreenState extends State<HomeScreen> {
         Configure deep links for your app
     </Card>
 </CardGroup>
+
+<Tip>
+  **CLI shortcut:** Run `lr doctor` to validate your full integration, or `lr analyze` for AI-powered analysis. [Learn more →](/cli/commands/doctor)
+</Tip>
 
 ## Support
 

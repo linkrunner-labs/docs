@@ -33,6 +33,10 @@ dependencyResolutionManagement {
 }
 ```
 
+<Tip>
+  **CLI shortcut:** Run `lr init` to auto-configure your Android project and generate initialization code. [Learn more →](/cli/commands/init)
+</Tip>
+
 ### Step 2: Required Permissions
 
 Add the following permissions to your `AndroidManifest.xml` file:
@@ -177,6 +181,10 @@ class MyApplication : Application() {
 }
 ```
 
+<Tip>
+  **CLI shortcut:** Use `lr init` to generate this initialization code automatically. [Learn more →](/cli/commands/init)
+</Tip>
+
 ### SDK Signing Parameters (Optional)
 
 For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
@@ -230,6 +238,10 @@ private fun onSignup() {
     }
 }
 ```
+
+<Tip>
+  **CLI shortcut:** Use `lr events add` to generate signup tracking code. [Learn more →](/cli/commands/events)
+</Tip>
 
 ## Getting Attribution Data
 
@@ -350,6 +362,10 @@ private fun trackEvent() {
 }
 ```
 
+<Tip>
+  **CLI shortcut:** Use `lr events add --type custom` to generate event tracking snippets. [Learn more →](/cli/commands/events)
+</Tip>
+
 ### Revenue Sharing with Ad Networks
 
 To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
@@ -439,6 +455,10 @@ private fun capturePayment() {
 | `PAYMENT_COMPLETED` | Payment successfully completed |
 | `PAYMENT_FAILED`    | Payment failed                 |
 | `PAYMENT_CANCELLED` | Payment was cancelled          |
+
+<Tip>
+  **CLI shortcut:** Use `lr events add --type payment` to generate payment tracking code. [Learn more →](/cli/commands/events)
+</Tip>
 
 ### Removing Payments
 
@@ -625,6 +645,10 @@ class MainActivity : AppCompatActivity() {
         Configure deep links for your app
     </Card>
 </CardGroup>
+
+<Tip>
+  **CLI shortcut:** Run `lr doctor` to validate your full integration, or `lr analyze` for AI-powered analysis. [Learn more →](/cli/commands/doctor)
+</Tip>
 
 ## Support
 

@@ -16,6 +16,10 @@ npm install capacitor-linkrunner
 yarn add capacitor-linkrunner
 ```
 
+<Tip>
+  **CLI shortcut:** Run `lr init` to auto-configure your Capacitor project and generate initialization code. [Learn more →](/cli/commands/init)
+</Tip>
+
 ### Step 2: Sync Native Projects
 
 ```bash
@@ -116,6 +120,9 @@ const init = async () => {
 init();
 ```
 
+<Tip>
+  **CLI shortcut:** Use `lr init` to generate this initialization code automatically. [Learn more →](/cli/commands/init)
+</Tip>
 
 ## User Registration
 
@@ -159,6 +166,10 @@ const onSignup = async () => {
     }
 };
 ```
+
+<Tip>
+  **CLI shortcut:** Use `lr events add` to generate signup tracking code. [Learn more →](/cli/commands/events)
+</Tip>
 
 ## Getting Attribution Data
 
@@ -251,6 +262,10 @@ const trackEvent = async () => {
 };
 ```
 
+<Tip>
+  **CLI shortcut:** Use `lr events add --type custom` to generate event tracking snippets. [Learn more →](/cli/commands/events)
+</Tip>
+
 ### Revenue Sharing with Ad Networks
 
 To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
@@ -312,6 +327,10 @@ const capturePayment = async () => {
     -   `PAYMENT_FAILED` - Payment attempt failed
     -   `PAYMENT_CANCELLED` - Payment was cancelled
 
+<Tip>
+  **CLI shortcut:** Use `lr events add --type payment` to generate payment tracking code. [Learn more →](/cli/commands/events)
+</Tip>
+
 ### Removing Payments
 
 Remove payment records (for refunds or cancellations):
@@ -370,6 +389,10 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
         Configure deep links for your app
     </Card>
 </CardGroup>
+
+<Tip>
+  **CLI shortcut:** Run `lr doctor` to validate your full integration, or `lr analyze` for AI-powered analysis. [Learn more →](/cli/commands/doctor)
+</Tip>
 
 ## Support
 
