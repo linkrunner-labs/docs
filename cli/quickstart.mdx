@@ -1,0 +1,83 @@
+---
+title: "Quickstart"
+description: "Go from zero to a validated Linkrunner integration in under 5 minutes"
+icon: "rocket"
+---
+
+## 1. Authenticate
+
+```bash
+lr login
+```
+
+This sends a magic link to your email. Paste the token or URL from the email to complete authentication.
+
+## 2. Initialize Your Project
+
+Navigate to your project directory and run:
+
+```bash
+cd your-app/
+lr init
+```
+
+The CLI walks you through:
+
+1. Detecting your project type (Flutter, React Native, Expo, iOS, Android, Capacitor, or Web)
+2. Selecting or creating a Linkrunner project
+3. Installing the appropriate SDK package
+4. Configuring native platform files
+5. Generating initialization code snippets
+6. Saving a `.linkrunner.json` config file
+
+## 3. Validate Your Integration
+
+```bash
+lr doctor
+```
+
+This checks your platform configuration, source code patterns, and deep link setup. Fix anything it flags, then run it again until you get a clean report.
+
+## What's Next
+
+<CardGroup cols={2}>
+  <Card title="Set Up Deep Links" icon="link" href="/cli/commands/deeplink">
+    Configure Android App Links and iOS Universal Links.
+  </Card>
+  <Card title="Add Event Tracking" icon="code" href="/cli/commands/events">
+    Generate custom event, payment, and signup tracking code.
+  </Card>
+  <Card title="Run AI Analysis" icon="microchip-ai" href="/cli/commands/analyze">
+    Deep-scan your codebase for subtle integration issues.
+  </Card>
+  <Card title="View Your Dashboard" icon="chart-mixed" href="/cli/commands/status">
+    Check installs, events, revenue, and campaigns from the terminal.
+  </Card>
+</CardGroup>
+
+## Configuration Files
+
+The CLI uses two configuration locations:
+
+- **Global config** -- stored in your system config directory (managed by [conf](https://github.com/sindresorhus/conf)). Contains your auth token and email.
+- **Project config** -- `.linkrunner.json` in your project root. Created by `lr init` and contains your project token, platform settings, and deep link domain.
+
+Example `.linkrunner.json`:
+
+```json
+{
+  "project_token": "your_token_here",
+  "project_id": "12345",
+  "project_name": "My App",
+  "platforms": ["android", "ios"],
+  "deep_link_domain": "links.myapp.com",
+  "android": {
+    "package_name": "com.myapp.android",
+    "sha256_cert_fingerprints": ["AB:CD:EF:..."]
+  },
+  "ios": {
+    "bundle_id": "com.myapp.ios",
+    "team_id": "ABCDE12345"
+  }
+}
+```

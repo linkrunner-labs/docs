@@ -101,7 +101,7 @@
                 "groups": [
                     {
                         "group": "Getting Started",
-                        "pages": ["cli/overview", "cli/installation"]
+                        "pages": ["cli/overview", "cli/installation", "cli/quickstart"]
                     },
                     {
                         "group": "Commands",

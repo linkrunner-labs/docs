@@ -4,17 +4,30 @@ description: "The Linkrunner CLI helps you set up, validate, and debug your SDK 
 icon: "terminal"
 ---
 
-The `lr` CLI is a developer tool for integrating and maintaining the Linkrunner SDK in your mobile and web projects. It automates setup, validates configuration, generates code snippets, and provides real-time project diagnostics.
+The `lr` CLI is a developer tool for integrating and maintaining the Linkrunner SDK in your mobile and web projects. It automates setup, validates configuration, generates code snippets, and provides real-time project diagnostics -- all from the terminal.
 
-## Key Features
+## What You Can Do
 
-- **Project initialization** -- guided setup wizard that detects your platform, installs the SDK, configures native files, and generates initialization code
-- **Integration diagnostics** -- validates platform configuration, source code patterns, and deep link setup with actionable fix suggestions
-- **AI-powered analysis** -- optional deep analysis that uses an LLM to inspect your codebase for subtle integration issues
-- **Event code generation** -- interactive generator for custom events, payment tracking, and signup code with auto-insertion into your source files
-- **Deep link configuration** -- sets up Android App Links and iOS Universal Links with intent filters and verification files
-- **Project dashboard** -- view installs, signups, events, revenue, and active campaigns from the terminal
-- **CI/CD support** -- JSON output and exit codes for automated pipelines
+<CardGroup cols={2}>
+  <Card title="One-Command SDK Setup" icon="wand-magic-sparkles">
+    Run `lr init` and the CLI detects your platform, installs the SDK, configures native files, and generates initialization code. No manual setup required.
+  </Card>
+  <Card title="Catch Issues Before They Ship" icon="stethoscope">
+    `lr doctor` validates your entire integration -- platform config, source code patterns, deep link setup -- and tells you exactly what to fix.
+  </Card>
+  <Card title="AI-Powered Code Analysis" icon="microchip-ai">
+    `lr analyze` uses an LLM to inspect your codebase for subtle integration issues that rule-based checks can miss.
+  </Card>
+  <Card title="Generate Event Tracking Code" icon="code">
+    `lr events add` interactively generates custom events, payment tracking, and signup code -- and inserts it directly into your source files.
+  </Card>
+  <Card title="Deep Linking in Minutes" icon="link">
+    `lr deeplink setup` configures Android App Links and iOS Universal Links with intent filters and verification files.
+  </Card>
+  <Card title="Project Dashboard in Terminal" icon="chart-mixed">
+    `lr status` shows installs, signups, events, revenue, and active campaigns without leaving your terminal.
+  </Card>
+</CardGroup>
 
 ## Supported Platforms
 
@@ -30,7 +43,7 @@ The CLI auto-detects your project type and tailors its behavior accordingly:
 | Capacitor | `@capacitor/core` in `package.json` dependencies |
 | Web | `package.json` present (fallback) |
 
-## Commands
+## All Commands
 
 | Command | Description |
 |---|---|
@@ -46,46 +59,6 @@ The CLI auto-detects your project type and tailors its behavior accordingly:
 | [`lr suggest`](/cli/commands/suggest) | Get SDK feature suggestions |
 | [`lr status`](/cli/commands/status) | View project dashboard |
 
-## Quick Start
+## CI/CD Ready
 
-```bash
-# Install the CLI
-npm install -g linkrunner-cli
-
-# Authenticate
-lr login
-
-# Initialize in your project directory
-cd your-app/
-lr init
-
-# Check your integration
-lr doctor
-```
-
-## Configuration Files
-
-The CLI uses two configuration locations:
-
-- **Global config** -- stored in your system config directory (managed by [conf](https://github.com/sindresorhus/conf)). Contains your auth token and email.
-- **Project config** -- `.linkrunner.json` in your project root. Created by `lr init` and contains your project token, platform settings, and deep link domain.
-
-Example `.linkrunner.json`:
-
-```json
-{
-  "project_token": "your_token_here",
-  "project_id": "12345",
-  "project_name": "My App",
-  "platforms": ["android", "ios"],
-  "deep_link_domain": "links.myapp.com",
-  "android": {
-    "package_name": "com.myapp.android",
-    "sha256_cert_fingerprints": ["AB:CD:EF:..."]
-  },
-  "ios": {
-    "bundle_id": "com.myapp.ios",
-    "team_id": "ABCDE12345"
-  }
-}
-```
+Every command supports `--json` output and meaningful exit codes, so you can plug `lr doctor` or `lr test` into your CI pipeline to catch integration regressions automatically. See the [CI/CD guide](/cli/ci-cd) for setup instructions.
