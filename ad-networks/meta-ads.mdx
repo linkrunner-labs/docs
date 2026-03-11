@@ -20,6 +20,7 @@ Meta Ads integration with Linkrunner enables you to track conversions and optimi
 ### What You'll Get
 
 - **Automatic attribution tracking** — Track installs and conversions from your Meta ad campaigns
+- **View-through attribution** — Attribute installs from users who viewed but didn't click your ads ([setup required](#6-enable-meta-view-through-attribution-android))
 - **Event mapping** — Map your in-app events to Meta events for postback conversion tracking
 - **Revenue tracking** — Share revenue data with Meta to optimize for value
 - **Default events included** — App Install events and Sign up events are captured automatically
@@ -232,6 +233,55 @@ Users who install your app from this specific ad creative will be directed to th
     Use ad creative-level deep links when running A/B tests or promoting multiple products within the same campaign. For
     example, if one ad features a specific product, you can deep link directly to that product page in your app.
 </Tip>
+
+## 6. Enable Meta View-Through Attribution (Android)
+
+By default, Linkrunner attributes installs from Meta ads using click-based attribution. To also attribute installs from users who **viewed** your ad but didn't click on it (view-through conversions), you need to enable Meta Install Referrer support.
+
+Meta Install Referrer allows Linkrunner to receive ad campaign metadata directly from the Facebook or Instagram app installed on the user's device. This enables view-through conversion tracking, giving you a more complete picture of your Meta campaign performance.
+
+### How It Works
+
+1. A user views your Meta ad but doesn't click on it
+2. The user later installs your app organically
+3. The Linkrunner SDK retrieves campaign metadata stored by the Facebook/Instagram app on the device
+4. Linkrunner attributes the install back to the original Meta ad view
+
+### Setup
+
+To enable this, you need to make your Facebook App ID available to the Linkrunner SDK in your Android app's `AndroidManifest.xml`.
+
+<Tabs>
+    <Tab title="Without Facebook SDK">
+        Add the following to your `AndroidManifest.xml`:
+
+        ```xml
+        <meta-data android:name="com.linkrunner.FacebookApplicationId" android:value="@string/facebook_application_id" />
+        ```
+
+        And add your App ID to `strings.xml`:
+
+        ```xml
+        <string name="facebook_application_id" translatable="false">YOUR_FACEBOOK_APP_ID</string>
+        ```
+    </Tab>
+    <Tab title="With Facebook SDK">
+        If you already have the Facebook SDK integrated, the Linkrunner SDK will automatically read the Facebook App ID from the existing `meta-data` tag. No additional configuration is needed.
+    </Tab>
+</Tabs>
+
+### Requirements
+
+- **Android SDK** version 3.5.2 or higher
+- **Flutter SDK** version 3.6.2 or higher
+- **React Native SDK** version 2.6.2 or higher
+- Users must have **Facebook app** version 428.x.x+ or **Instagram app** version 296.x.x+ installed on their device
+
+<Note>
+    View-through attribution requires the Facebook or Instagram app to be installed on the user's device. If neither app is present, only click-based attribution will be available.
+</Note>
+
+For more details, see the [Meta Install Referrer](/features/meta-install-referrer) documentation.
 
 ## Troubleshooting
 
