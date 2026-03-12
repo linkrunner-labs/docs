@@ -37,32 +37,31 @@ When a new install occurs, Linkrunner sends the touchpoint details (media source
 
 ## Steps to setup
 
-<Steps>
-  <Step title="Set GA4 Integration in Linkrunner">
-    In the **Integrations** tab, under **Analytics**, click **Configure** under **Google Analytics**. Firebase App ID and a Measurement Protocol API secret will be required. These are different for iOS and Android.
+### 1. Set GA4 Integration in Linkrunner
 
-    To retrieve the **Firebase App ID** and **Measurement Protocol API secret**:
+In the **Integrations** tab, under **Analytics**, click **Configure** under **Google Analytics**. Firebase App ID and a Measurement Protocol API secret will be required. These are different for iOS and Android.
 
-    1. Open **Admin** (settings icon) from the bottom-left of the Google Analytics interface.
-       ![GA4 Admin](/images/ga4/ga_integration_1.png)
+To retrieve the **Firebase App ID** and **Measurement Protocol API secret**:
 
-    2. Under **Property** → **Data collection and modification** → **Data streams**, click your **app data stream** (iOS or Android).
-       ![GA4 Data streams](/images/ga4/ga_integration_2.png)
+1. Open **Admin** (settings icon) from the bottom-left of the Google Analytics interface.
+   ![GA4 Admin](/images/ga4/ga_integration_1.png)
 
-    3. In the **App stream details** panel, copy the **Firebase App ID**.
-       ![GA4 App stream details](/images/ga4/ga_integration_3.png)
+2. Under **Property** → **Data collection and modification** → **Data streams**, click your **app data stream** (iOS or Android).
+   ![GA4 Data streams](/images/ga4/ga_integration_2.png)
 
-    4. Under **Events**, click **Measurement Protocol API secrets**.
-       ![GA4 Measurement Protocol API secrets](/images/ga4/ga_integration_4.png)
+3. In the **App stream details** panel, copy the **Firebase App ID**.
+   ![GA4 App stream details](/images/ga4/ga_integration_3.png)
 
-    5. Create (or reuse) an API secret and copy its value.
+4. Under **Events**, click **Measurement Protocol API secrets**.
+   ![GA4 Measurement Protocol API secrets](/images/ga4/ga_integration_4.png)
 
-    <Note>
-      The Firebase App ID and API secret will be different for your iOS and Android apps, so repeat these steps for each platform.
-    </Note>
-  </Step>
+5. Create (or reuse) an API secret and copy its value.
 
-  <Step title="Retrieve app instance ID in Linkrunner SDK">
+<Note>
+  The Firebase App ID and API secret will be different for your iOS and Android apps, so repeat these steps for each platform.
+</Note>
+
+### 2. Retrieve app instance ID in Linkrunner SDK
     The app instance ID uniquely identifies a specific installation of a Firebase app. This value needs to be retrieved from the Firebase SDK. After collecting this ID, pass it to `linkrunner.signup` so that Linkrunner can associate GA4 app instance IDs with installs and campaigns.
 
     Use the following examples to pass the app instance ID:
@@ -174,130 +173,128 @@ When a new install occurs, Linkrunner sends the touchpoint details (media source
         ```
       </Tab>
     </Tabs>
-  </Step>
 
-  <Step title="Retrieve GA4 session ID in Linkrunner SDK">
-    The GA4 session ID uniquely identifies a session of a Firebase app. Similar to the app instance ID, this value is retrieved from the Firebase SDK and should be passed to `linkrunner.signup` so that session-level engagement can be connected to installs and campaigns.
+### 3. Retrieve GA4 session ID in Linkrunner SDK
 
-    Use the following examples to pass the session ID (for example, `ga_session_id` or `gaSessionId`, depending on the SDK's naming convention):
+The GA4 session ID uniquely identifies a session of a Firebase app. Similar to the app instance ID, this value is retrieved from the Firebase SDK and should be passed to `linkrunner.signup` so that session-level engagement can be connected to installs and campaigns.
 
-    <Tabs>
-      <Tab title="Android (Kotlin)">
-        ```kotlin
-        import com.google.firebase.analytics.FirebaseAnalytics
-        import io.linkrunner.sdk.LinkRunner
-        import io.linkrunner.sdk.models.request.UserDataRequest
-        import kotlinx.coroutines.CoroutineScope
-        import kotlinx.coroutines.Dispatchers
-        import kotlinx.coroutines.launch
+Use the following examples to pass the session ID (for example, `ga_session_id` or `gaSessionId`, depending on the SDK's naming convention):
 
-        private fun onSignup() {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val firebaseAnalytics = FirebaseAnalytics.getInstance(context)
-                    val sessionId = /* Retrieve GA4 session ID from your tracking layer */
+<Tabs>
+  <Tab title="Android (Kotlin)">
+    ```kotlin
+    import com.google.firebase.analytics.FirebaseAnalytics
+    import io.linkrunner.sdk.LinkRunner
+    import io.linkrunner.sdk.models.request.UserDataRequest
+    import kotlinx.coroutines.CoroutineScope
+    import kotlinx.coroutines.Dispatchers
+    import kotlinx.coroutines.launch
 
-                    val userData = UserDataRequest(
-                        id = "123", // Your user ID
-                        // ...other user fields
-                        gaSessionId = sessionId, // GA4 session ID
-                    )
+    private fun onSignup() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val firebaseAnalytics = FirebaseAnalytics.getInstance(context)
+                val sessionId = /* Retrieve GA4 session ID from your tracking layer */
 
-                    LinkRunner.getInstance().signup(
-                        userData = userData
-                    )
-                } catch (e: Exception) {
-                    println("Error during signup with GA4 session ID: ${e.message}")
-                }
+                val userData = UserDataRequest(
+                    id = "123", // Your user ID
+                    // ...other user fields
+                    gaSessionId = sessionId, // GA4 session ID
+                )
+
+                LinkRunner.getInstance().signup(
+                    userData = userData
+                )
+            } catch (e: Exception) {
+                println("Error during signup with GA4 session ID: ${e.message}")
             }
         }
-        ```
-      </Tab>
+    }
+    ```
+  </Tab>
 
-      <Tab title="iOS (Swift)">
-        ```swift
-        import Linkrunner
+  <Tab title="iOS (Swift)">
+    ```swift
+    import Linkrunner
 
-        func onSignup() async {
-            do {
-                let gaSessionId = /* Retrieve GA4 session ID from your tracking layer */
+    func onSignup() async {
+        do {
+            let gaSessionId = /* Retrieve GA4 session ID from your tracking layer */
 
-                let userData = UserData(
+            let userData = UserData(
+                id: "123", // Your user ID
+                // ...other user fields
+                gaSessionId: gaSessionId // GA4 session ID
+            )
+
+            try await LinkrunnerSDK.shared.signup(
+                userData: userData
+            )
+        } catch {
+            print("Error during signup with GA4 session ID:", error)
+        }
+    }
+    ```
+  </Tab>
+
+  <Tab title="React Native">
+    ```javascript
+    import analytics from "@react-native-firebase/analytics";
+    import linkrunner from "rn-linkrunner";
+
+    const onSignup = async () => {
+        try {
+            const gaSessionId = await analytics().getSessionId();
+
+            await linkrunner.signup({
+                user_data: {
                     id: "123", // Your user ID
                     // ...other user fields
-                    gaSessionId: gaSessionId // GA4 session ID
-                )
-
-                try await LinkrunnerSDK.shared.signup(
-                    userData: userData
-                )
-            } catch {
-                print("Error during signup with GA4 session ID:", error)
-            }
+                    ga_session_id: gaSessionId, // GA4 session ID
+                },
+                data: {},
+            });
+        } catch (error) {
+            console.error("Error during signup with GA4 session ID:", error);
         }
-        ```
-      </Tab>
+    };
+    ```
+  </Tab>
 
-      <Tab title="React Native">
-        ```javascript
-        import analytics from "@react-native-firebase/analytics";
-        import linkrunner from "rn-linkrunner";
+  <Tab title="Flutter">
+    ```dart
+    import 'package:firebase_analytics/firebase_analytics.dart';
+    import 'package:linkrunner/main.dart';
 
-        const onSignup = async () => {
-            try {
-                const gaSessionId = await analytics().getSessionId();
+    Future<void> onSignup() async {
+      try {
+        final analytics = FirebaseAnalytics.instance;
+        int? sessionId = await analytics.getSessionId();
 
-                await linkrunner.signup({
-                    user_data: {
-                        id: "123", // Your user ID
-                        // ...other user fields
-                        ga_session_id: gaSessionId, // GA4 session ID
-                    },
-                    data: {},
-                });
-            } catch (error) {
-                console.error("Error during signup with GA4 session ID:", error);
-            }
-        };
-        ```
-      </Tab>
+        await LinkRunner().signup(
+          userData: LRUserData(
+            id: '123', // Your user ID
+            // ...other user fields
+            gaSessionId: sessionId, // GA4 session ID
+          ),
+          data: {},
+        );
+      } catch (e) {
+        print('Error during signup with GA4 session ID: $e');
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
 
-      <Tab title="Flutter">
-        ```dart
-        import 'package:firebase_analytics/firebase_analytics.dart';
-        import 'package:linkrunner/main.dart';
+### 4. Validate the GA4 Integration
 
-        Future<void> onSignup() async {
-          try {
-            final analytics = FirebaseAnalytics.instance;
-            int? sessionId = await analytics.getSessionId();
+To validate that data is flowing correctly between Linkrunner and GA4:
 
-            await LinkRunner().signup(
-              userData: LRUserData(
-                id: '123', // Your user ID
-                // ...other user fields
-                gaSessionId: sessionId, // GA4 session ID
-              ),
-              data: {},
-            );
-          } catch (e) {
-            print('Error during signup with GA4 session ID: $e');
-          }
-        }
-        ```
-      </Tab>
-    </Tabs>
-  </Step>
+- Use [BigQuery Export](https://support.google.com/analytics/answer/9823238#zippy=%2Cin-this-article) to explore the raw event data with all associated parameters.
+- Using [GA4 Explorations](https://support.google.com/analytics/answer/7579450?hl=en&ref_topic=12153537,12153943,2986333,&sjid=20462331341270448-EU&visit_id=638532662145815538-1056226594&rd=1#access-analysis&zippy=%2Cin-this-article).
+- The Traffic acquisition report helps you understand where your app visitors are coming from. You can find this under Reports > Lifecycle > Acquisition > Traffic acquisition. For more information on the Traffic acquisition report, see the [Google documentation](https://support.google.com/analytics/answer/12923437?hl=en&sjid=5454549956257318969-NC#zippy=%2Chow-do-i-filter-out-traffic-sources-from-the-report).
 
-  <Step title="Validate the GA4 Integration">
-    To validate that data is flowing correctly between Linkrunner and GA4:
-
-    - Use [BigQuery Export](https://support.google.com/analytics/answer/9823238#zippy=%2Cin-this-article) to explore the raw event data with all associated parameters.
-    - Using [GA4 Explorations](https://support.google.com/analytics/answer/7579450?hl=en&ref_topic=12153537,12153943,2986333,&sjid=20462331341270448-EU&visit_id=638532662145815538-1056226594&rd=1#access-analysis&zippy=%2Cin-this-article).
-    - The Traffic acquisition report helps you understand where your app visitors are coming from. You can find this under Reports > Lifecycle > Acquisition > Traffic acquisition. For more information on the Traffic acquisition report, see the [Google documentation](https://support.google.com/analytics/answer/12923437?hl=en&sjid=5454549956257318969-NC#zippy=%2Chow-do-i-filter-out-traffic-sources-from-the-report).
-
-    <Info>
-      BigQuery data is visible as soon as the event is received by GA4, while it can take 24–48 hours for data to reflect in GA4 reports. [Read more here](https://support.google.com/analytics/answer/11198161?hl=en).
-    </Info>
-  </Step>
-</Steps>
+<Info>
+  BigQuery data is visible as soon as the event is received by GA4, while it can take 24–48 hours for data to reflect in GA4 reports. [Read more here](https://support.google.com/analytics/answer/11198161?hl=en).
+</Info>
