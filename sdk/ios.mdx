@@ -520,18 +520,137 @@ let isHashingEnabled = LinkrunnerSDK.shared.isPIIHashingEnabled()
 
 When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
 
+## Uninstall Tracking
+
+### Before you begin
+
+Here's what you need to know before getting started:
+
+**Requirements:**
+- iOS SDK 3.4.0 and later
+- [Registering your app with APNs](https://developer.apple.com/documentation/usernotifications/registering-your-app-with-apns)
+
+### iOS
+
+Connect APNs with Linkrunner
+
+<AccordionGroup>
+    <Accordion title="Apple Developer Portal">
+        Get the required credentials from the Apple Developer Portal:
+
+        **APNs Authentication Key (p8) and Key ID:**
+        - Go to the [Apple Developer Portal](https://developer.apple.com/account).
+        - Select **Identifiers** under **Certificates, IDs & Profiles**.
+        - Click on the app you want to track uninstalls for. Then, under **Capabilities**, search for **Push Notifications** and enable it.
+        - Under **Certificates, IDs & Profiles**, select **Keys** and click on plus (+) icon to create a key. Enable APNs when creating the key and download the key file (p8).
+        - The Key ID can be found in the **Keys** tab.
+
+        **Bundle ID and Team ID:**
+        - Under **Identifiers**, click on your app and you will see the Bundle ID and Team ID (App ID Prefix).
+
+    </Accordion>
+
+    <Accordion title="Linkrunner Dashboard">
+        1. In Linkrunner, go to **Settings** > **Uninstall Tracking**.
+        2. Under the **iOS** tab, upload the APNs Authentication Key (p8) file and enter the Key ID, Bundle ID and Team ID (App ID Prefix) that you copied from the Apple Developer Portal.
+
+        ![Uninstall Tracking](/images/uninstall-tracking-dashboard-ios.png)
+    </Accordion>
+
+    <Accordion title="Integrate with Linkrunner SDK">
+        Follow these instructions to integrate APNs with the Linkrunner SDK:
+
+          1. **Set up Push Notifications:**
+
+            Enable push notifications in your Xcode project by adding the Push Notifications capability.
+
+          2. Configure your app to provide the device's APNs token to the Linkrunner SDK.
+
+            ```swift
+            import UIKit
+            import Linkrunner
+
+            class AppDelegate: UIResponder, UIApplicationDelegate {
+
+                func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+                    // Request push notification permissions
+                    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+                        if granted {
+                            DispatchQueue.main.async {
+                                application.registerForRemoteNotifications()
+                            }
+                        }
+                    }
+                    return true
+                }
+
+                // Called when APNs token is received
+                func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+                    let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+                    Task {
+                        try? await LinkrunnerSDK.shared.setPushToken(tokenString)
+                    }
+                }
+
+                func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+                    print("Failed to register for remote notifications: \(error)")
+                }
+            }
+            ```
+
+            For SwiftUI apps using the new app lifecycle:
+
+            ```swift
+            import SwiftUI
+            import Linkrunner
+
+            @main
+            struct MyApp: App {
+                @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+                var body: some Scene {
+                    WindowGroup {
+                        ContentView()
+                    }
+                }
+            }
+
+            class AppDelegate: NSObject, UIApplicationDelegate {
+                func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+                    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+                        if granted {
+                            DispatchQueue.main.async {
+                                application.registerForRemoteNotifications()
+                            }
+                        }
+                    }
+                    return true
+                }
+
+                func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+                    let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+                    Task {
+                        try? await LinkrunnerSDK.shared.setPushToken(tokenString)
+                    }
+                }
+            }
+            ```
+    </Accordion>
+</AccordionGroup>
+
 ## Function Placement Guide
 
 | Function                                     | Where to Place                 | When to Call                                   |
 | -------------------------------------------- | ------------------------------ | ---------------------------------------------- |
 | `LinkrunnerSDK.shared.initialize`            | App initialization             | Once when app starts                           |
 | `LinkrunnerSDK.shared.getAttributionData`    | Attribution data handling flow | Whenever the attribution data is needed        |
-| `LinkRunner.getInstance().setAdditionalData` | Integration code               | When third-party integration IDs are available |
+| `LinkrunnerSDK.shared.setAdditionalData`     | Integration code               | When third-party integration IDs are available |
 | `LinkrunnerSDK.shared.signup`                | Onboarding flow                | Once after user completes onboarding           |
 | `LinkrunnerSDK.shared.setUserData`           | Authentication logic           | Every time app opens with logged-in user       |
 | `LinkrunnerSDK.shared.trackEvent`            | Throughout app                 | When specific user actions occur               |
 | `LinkrunnerSDK.shared.capturePayment`        | Payment processing             | When user makes a payment                      |
 | `LinkrunnerSDK.shared.removePayment`         | Refund flow                    | When payment needs to be removed               |
+| `LinkrunnerSDK.shared.setPushToken`          | Push notification setup        | When APNs token is available                   |
 
 ## Complete Example
 
