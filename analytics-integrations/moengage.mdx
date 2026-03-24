@@ -1,0 +1,153 @@
+---
+title: "MoEngage"
+description: "Connect Linkrunner with MoEngage to import attribution data and understand your user acquisition campaigns"
+icon: "/images/logos/moengage.png"
+---
+
+Linkrunner integrates with MoEngage to automatically send attribution data, helping you understand which campaigns are driving user acquisition and engagement.
+
+## How it works
+
+Every time a user is attributed by Linkrunner, we automatically send a request to MoEngage to update the corresponding user's profile with custom properties:
+
+- `lr_campaign` - The campaign identifier
+- `lr_ad_network` - The ad network source
+
+### Example
+
+- User ID `24` came from campaign link: `https://app.linkrunner.io/?c=AXb1c2`
+- In MoEngage, for user profile with ID `24`, you'll see `lr_campaign` set to `AXb1c2`
+
+## Prerequisites
+
+| Requirement | Description |
+|---|---|
+| Linkrunner account | A Linkrunner account is required to take advantage of this integration. |
+| MoEngage account | A MoEngage account with API access. |
+| iOS or Android app | This integration supports iOS and Android apps. |
+| Linkrunner SDK | You must have the [Linkrunner SDK](/introduction) installed in your app. |
+
+## Steps to setup
+
+<Steps>
+  <Step title="Get Credentials from MoEngage and Configure in Linkrunner">
+    First, you need to get your credentials from your MoEngage dashboard.
+
+    1. Log in to your MoEngage Dashboard
+    2. Navigate to **Settings** > **Account** > **APIs** using the left navigation menu
+    3. Locate the **Workspace ID**: It is displayed under the Workspace ID (formerly known as App ID) section. You can use the copy icon to grab this unique identifier.
+    4. Locate the **Data API Key**:
+       - Scroll down to the API keys section on the same page
+       - Find the **Data** tile
+       - If you have not generated one yet, click **Generate Key**
+       - Click the copy icon in the Data tile to copy your Data API Key
+
+    5. In Linkrunner, navigate to **Integrations** from the left-hand panel
+    6. Under **Analytics**, click **Configure** for MoEngage
+    7. Enter your **Workspace ID** and **Data API Key**
+  </Step>
+
+  <Step title="Select Your Data Center">
+    To find your data center, look at the URL in your browser tab when you're on the MoEngage dashboard.
+
+    For example, if your URL is `https://dashboard-01.moengage.com/v4/#/settings-v2/accounts/api`, then "01" is your data center.
+
+    Select the appropriate data center based on your URL:
+
+    | Data Center | Region |
+    |---|---|
+    | DC-01 | US |
+    | DC-02 | EU |
+    | DC-03 | India |
+    | DC-04 | US |
+    | DC-05 | Singapore |
+    | DC-06 | Indonesia |
+  </Step>
+
+  <Step title="Map User Identifiers in SDK">
+    To properly link users between Linkrunner and MoEngage, you need to pass the user ID in the `signup` function.
+
+    <Info>
+      **Important:** Make sure to pass the `user_id` in the `userData` parameter of the signup function of the SDK to match with your MoEngage user profiles.
+    </Info>
+
+    <Tabs>
+      <Tab title="Android (Kotlin)">
+        ```kotlin
+        import io.linkrunner.sdk.LinkRunner
+        import io.linkrunner.sdk.models.request.UserDataRequest
+
+        val userData = UserDataRequest(
+            id = "123", // Your user ID (same as MoEngage user ID)
+            // ...other user fields
+        )
+
+        LinkRunner.getInstance().signup(userData = userData)
+        ```
+      </Tab>
+
+      <Tab title="iOS (Swift)">
+        ```swift
+        import Linkrunner
+
+        let userData = UserData(
+            id: "123", // Your user ID (same as MoEngage user ID)
+            // ...other user fields
+        )
+
+        try await LinkrunnerSDK.shared.signup(userData: userData)
+        ```
+      </Tab>
+
+      <Tab title="React Native">
+        ```javascript
+        import linkrunner from "rn-linkrunner";
+
+        await linkrunner.signup({
+            user_data: {
+                id: "123", // Your user ID (same as MoEngage user ID)
+                // ...other user fields
+            },
+            data: {},
+        });
+        ```
+      </Tab>
+
+      <Tab title="Flutter">
+        ```dart
+        import 'package:linkrunner/main.dart';
+
+        await LinkRunner().signup(
+          userData: LRUserData(
+            id: '123', // Your user ID (same as MoEngage user ID)
+            // ...other user fields
+          ),
+          data: {},
+        );
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Sync with MoEngage (Optional)">
+    Use the **Sync** feature in the following scenarios:
+
+    - First time after adding your MoEngage credentials
+    - If you see any discrepancy in attributing profiles on MoEngage
+
+    To sync, click the **Sync with MoEngage** button in the Linkrunner integration settings. This process may take a while depending on the number of users.
+  </Step>
+</Steps>
+
+## Viewing Attribution Data
+
+After the integration is complete, you can view the attribution data in MoEngage:
+
+1. Navigate to a user profile in the MoEngage dashboard
+2. Look for the user attributes section
+3. You'll see `lr_campaign` attribute with the corresponding value
+
+This data can be used to:
+- Create segments based on acquisition source
+- Personalize messaging based on campaign origin
+- Analyze user behavior by acquisition channel

@@ -1,0 +1,138 @@
+---
+title: "Mixpanel"
+description: "Connect Linkrunner with Mixpanel to import attribution data and understand your user acquisition campaigns"
+icon: "/images/logos/mixpanel.png"
+---
+
+Linkrunner integrates with Mixpanel to automatically send attribution data, helping you understand which campaigns are driving user acquisition and engagement.
+
+## How it works
+
+Every time a user is attributed by Linkrunner, we automatically send a request to Mixpanel to update the corresponding user's profile with custom properties:
+
+- `lr_campaign` - The campaign identifier
+- `lr_ad_network` - The ad network source
+
+### Example
+
+- User ID `24` came from campaign link: `https://app.linkrunner.io/?c=AXb1c2`
+- In Mixpanel, for user profile with ID `24`, you'll see `lr_campaign` set to `AXb1c2`
+
+## Prerequisites
+
+| Requirement | Description |
+|---|---|
+| Linkrunner account | A Linkrunner account is required to take advantage of this integration. |
+| Mixpanel account | A Mixpanel account with API access. |
+| iOS or Android app | This integration supports iOS and Android apps. |
+| Linkrunner SDK | You must have the [Linkrunner SDK](/introduction) installed in your app. |
+
+## Steps to setup
+
+<Steps>
+  <Step title="Get Project Token from Mixpanel and Configure in Linkrunner">
+    First, you need to get your project token from your Mixpanel dashboard.
+
+    1. In your Mixpanel dashboard, navigate to **Project Settings** > **Overview** > **Access Keys**
+    2. Copy your **Project Token**
+
+    3. In Linkrunner, navigate to **Integrations** from the left-hand panel
+    4. Under **Analytics**, click **Configure** for Mixpanel
+    5. Enter your **Mixpanel Project Token**
+  </Step>
+
+  <Step title="Map User Identifiers in SDK">
+    To properly link users between Linkrunner and Mixpanel, you need to pass the correct identifier in the `signup` function.
+
+    <Info>
+      **Important:** If you are using the `identify` function of the Mixpanel SDK to set a user ID, pass the same user ID in the `userData` parameter of the Linkrunner `signup` function. If you are not using `identify`, pass the `distinct_id` or `device_id` instead.
+    </Info>
+
+    <Tabs>
+      <Tab title="Android (Kotlin)">
+        ```kotlin
+        import io.linkrunner.sdk.LinkRunner
+        import io.linkrunner.sdk.models.request.UserDataRequest
+
+        val userData = UserDataRequest(
+            id = "123", // Your user ID (same as Mixpanel identify)
+            // ...other user fields
+            mixpanelDistinctId = "MIXPANEL_DISTINCT_ID", // Required if not using identify
+        )
+
+        LinkRunner.getInstance().signup(userData = userData)
+        ```
+      </Tab>
+
+      <Tab title="iOS (Swift)">
+        ```swift
+        import Linkrunner
+
+        let userData = UserData(
+            id: "123", // Your user ID (same as Mixpanel identify)
+            // ...other user fields
+            mixpanelDistinctId: "MIXPANEL_DISTINCT_ID" // Required if not using identify
+        )
+
+        try await LinkrunnerSDK.shared.signup(userData: userData)
+        ```
+      </Tab>
+
+      <Tab title="React Native">
+        ```javascript
+        import linkrunner from "rn-linkrunner";
+
+        await linkrunner.signup({
+            user_data: {
+                id: "123", // Your user ID (same as Mixpanel identify)
+                // ...other user fields
+                mixpanel_distinct_id: "MIXPANEL_DISTINCT_ID", // Required if not using identify
+            },
+            data: {},
+        });
+        ```
+      </Tab>
+
+      <Tab title="Flutter">
+        ```dart
+        import 'package:linkrunner/main.dart';
+
+        await LinkRunner().signup(
+          userData: LRUserData(
+            id: '123', // Your user ID (same as Mixpanel identify)
+            // ...other user fields
+            mixpanelDistinctId: 'MIXPANEL_DISTINCT_ID', // Required if not using identify
+          ),
+          data: {},
+        );
+        ```
+      </Tab>
+    </Tabs>
+
+    <Tip>
+      You can get the `mixpanelDistinctId` from the Mixpanel SDK in your app.
+    </Tip>
+  </Step>
+
+  <Step title="Sync with Mixpanel (Optional)">
+    Use the **Sync** feature in the following scenarios:
+
+    - First time after adding your Mixpanel Project Token
+    - If you see any discrepancy in attributing profiles on Mixpanel
+
+    To sync, click the **Sync with Mixpanel** button in the Linkrunner integration settings. You will receive an email when the sync completes.
+  </Step>
+</Steps>
+
+## Viewing Attribution Data
+
+After the integration is complete, you can view the attribution data in Mixpanel:
+
+1. Navigate to a user profile in the Mixpanel dashboard
+2. Look for the user properties section
+3. You'll see `lr_campaign` attribute with the corresponding value
+
+This data can be used to:
+- Create cohorts based on acquisition source
+- Personalize experiences based on campaign origin
+- Analyze user behavior by acquisition channel
