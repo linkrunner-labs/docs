@@ -1,0 +1,138 @@
+---
+title: "PostHog"
+description: "Connect Linkrunner with PostHog to import attribution data and understand your user acquisition campaigns"
+icon: "/images/logos/posthog.png"
+---
+
+Linkrunner integrates with PostHog to automatically send attribution data, helping you understand which campaigns are driving user acquisition and engagement.
+
+## How it works
+
+Every time a user is attributed by Linkrunner, we automatically send a request to PostHog to update the corresponding user's profile with custom properties:
+
+- `lr_campaign` - The campaign identifier
+- `lr_ad_network` - The ad network source
+
+### Example
+
+- User ID `24` came from campaign link: `https://app.linkrunner.io/?c=AXb1c2`
+- In PostHog, for user profile with ID `24`, you'll see `lr_campaign` set to `AXb1c2` and `lr_ad_network` set to an ad network source
+
+## Prerequisites
+
+| Requirement | Description |
+|---|---|
+| Linkrunner account | A Linkrunner account is required to take advantage of this integration. |
+| PostHog account | A PostHog account with API access. |
+| iOS or Android app | This integration supports iOS and Android apps. |
+| Linkrunner SDK | You must have the [Linkrunner SDK](/introduction) installed in your app. |
+
+## Steps to setup
+
+<Steps>
+  <Step title="Get API Key from PostHog and Configure in Linkrunner">
+    First, you need to get your API key from your PostHog dashboard.
+
+    1. In your PostHog dashboard, navigate to **Project Settings** > **Project API Key**
+    2. Copy your **API Key**
+
+    3. In Linkrunner, navigate to **Integrations** from the left-hand panel
+    4. Under **Analytics**, click **Configure** for PostHog
+    5. Enter your **API Key**
+  </Step>
+
+  <Step title="Map User Identifiers in SDK">
+    To properly link users between Linkrunner and PostHog, you need to pass the correct identifier in the `signup` function.
+
+    <Info>
+      **Important:** If you are using the `identify` function of the PostHog SDK to set a user ID, pass the same user ID in the `userData` parameter of the Linkrunner `signup` function. If you are not using `identify`, pass the `distinct_id` or `device_id` instead.
+    </Info>
+
+    <Tabs>
+      <Tab title="Android (Kotlin)">
+        ```kotlin
+        import io.linkrunner.sdk.LinkRunner
+        import io.linkrunner.sdk.models.request.UserDataRequest
+
+        val userData = UserDataRequest(
+            id = "123", // Your user ID (same as PostHog identify)
+            // ...other user fields
+            posthogDistinctId = "POSTHOG_DISTINCT_ID", // Required if not using identify
+        )
+
+        LinkRunner.getInstance().signup(userData = userData)
+        ```
+      </Tab>
+
+      <Tab title="iOS (Swift)">
+        ```swift
+        import Linkrunner
+
+        let userData = UserData(
+            id: "123", // Your user ID (same as PostHog identify)
+            // ...other user fields
+            posthogDistinctId: "POSTHOG_DISTINCT_ID" // Required if not using identify
+        )
+
+        try await LinkrunnerSDK.shared.signup(userData: userData)
+        ```
+      </Tab>
+
+      <Tab title="React Native">
+        ```javascript
+        import linkrunner from "rn-linkrunner";
+
+        await linkrunner.signup({
+            user_data: {
+                id: "123", // Your user ID (same as PostHog identify)
+                // ...other user fields
+                posthog_distinct_id: "POSTHOG_DISTINCT_ID", // Required if not using identify
+            },
+            data: {},
+        });
+        ```
+      </Tab>
+
+      <Tab title="Flutter">
+        ```dart
+        import 'package:linkrunner/main.dart';
+
+        await LinkRunner().signup(
+          userData: LRUserData(
+            id: '123', // Your user ID (same as PostHog identify)
+            // ...other user fields
+            posthogDistinctId: 'POSTHOG_DISTINCT_ID', // Required if not using identify
+          ),
+          data: {},
+        );
+        ```
+      </Tab>
+    </Tabs>
+
+    <Tip>
+      You can get the `posthogDistinctId` from the PostHog SDK in your app.
+    </Tip>
+  </Step>
+
+  <Step title="Sync with PostHog (Optional)">
+    Use the **Sync** feature in the following scenarios:
+
+    - First time after adding your PostHog API Key
+    - If you see discrepancies in attribution data on PostHog profiles
+
+    To sync, click the **Sync with PostHog** button in the Linkrunner integration settings. This process may take a while depending on the number of users.
+  </Step>
+</Steps>
+
+## Viewing Attribution Data
+
+After the integration is complete, you can view the attribution data in PostHog:
+
+1. Navigate to a user profile in the PostHog dashboard
+2. Look for the person properties section
+3. You'll see `lr_campaign` and `lr_ad_network` attributes with the corresponding values
+
+This data can be used to:
+- Create cohorts based on acquisition source
+- Personalize experiences based on campaign origin
+- Analyze user behavior by acquisition channel

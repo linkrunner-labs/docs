@@ -1,0 +1,140 @@
+---
+title: "Netcore"
+description: "Connect Linkrunner with Netcore to import attribution data and understand your user acquisition campaigns"
+icon: "/images/logos/netcore.png"
+---
+
+Linkrunner integrates with Netcore to automatically send attribution data, helping you understand which campaigns are driving user acquisition and engagement.
+
+## How it works
+
+Every time a user is attributed by Linkrunner, we automatically send a request to Netcore to update the corresponding user's profile with custom properties:
+
+- `lr_campaign` - The campaign identifier
+- `lr_ad_network` - The ad network source
+
+### Example
+
+- User ID `24` came from campaign link: `https://app.linkrunner.io/?c=AXb1c2`
+- In Netcore, for user profile with ID `24`, you'll see `lr_campaign` set to `AXb1c2` and `lr_ad_network` set to an ad network source
+
+## Prerequisites
+
+| Requirement | Description |
+|---|---|
+| Linkrunner account | A Linkrunner account is required to take advantage of this integration. |
+| Netcore account | A Netcore account with API access. |
+| iOS or Android app | This integration supports iOS and Android apps. |
+| Linkrunner SDK | You must have the [Linkrunner SDK](/introduction) installed in your app. |
+
+## Steps to setup
+
+<Steps>
+  <Step title="Get Credentials from Netcore and Configure in Linkrunner">
+    First, you need to get your credentials from Netcore.
+
+    1. Refer to [Netcore's Getting Started guide](https://developer.netcorecloud.com/reference/getting-started) to get the API Key and API Endpoint
+    2. Copy the following credentials:
+       - **API Endpoint** (e.g., `https://netcoreapi-main-prod-us.netcorein.com`)
+       - **API Key**
+
+    3. In Linkrunner, navigate to **Integrations** from the left-hand panel
+    4. Under **Analytics**, click **Configure** for Netcore
+    5. Enter your **API Endpoint** and **API Key**
+  </Step>
+
+  <Step title="Map User Identifiers in SDK">
+    To properly link users between Linkrunner and Netcore, you need to pass the correct identifier in the `signup` function.
+
+    <Info>
+      **Important:** If you are using the `setUserIdentity` function of the Netcore SDK, pass the same user ID in the `userData` parameter of the Linkrunner `signup` function. If you are not using `setUserIdentity`, pass the `netcore_device_guid` instead.
+    </Info>
+
+    <Tabs>
+      <Tab title="Android (Kotlin)">
+        ```kotlin
+        import io.linkrunner.sdk.LinkRunner
+        import io.linkrunner.sdk.models.request.UserDataRequest
+
+        val userData = UserDataRequest(
+            id = "123", // Your user ID (same as Netcore setUserIdentity)
+            // ...other user fields
+            netcoreDeviceGuid = "NETCORE_DEVICE_GUID", // Required if not using setUserIdentity
+        )
+
+        LinkRunner.getInstance().signup(userData = userData)
+        ```
+      </Tab>
+
+      <Tab title="iOS (Swift)">
+        ```swift
+        import Linkrunner
+
+        let userData = UserData(
+            id: "123", // Your user ID (same as Netcore setUserIdentity)
+            // ...other user fields
+            netcoreDeviceGuid: "NETCORE_DEVICE_GUID" // Required if not using setUserIdentity
+        )
+
+        try await LinkrunnerSDK.shared.signup(userData: userData)
+        ```
+      </Tab>
+
+      <Tab title="React Native">
+        ```javascript
+        import linkrunner from "rn-linkrunner";
+
+        await linkrunner.signup({
+            user_data: {
+                id: "123", // Your user ID (same as Netcore setUserIdentity)
+                // ...other user fields
+                netcore_device_guid: "NETCORE_DEVICE_GUID", // Required if not using setUserIdentity
+            },
+            data: {},
+        });
+        ```
+      </Tab>
+
+      <Tab title="Flutter">
+        ```dart
+        import 'package:linkrunner/main.dart';
+
+        await LinkRunner().signup(
+          userData: LRUserData(
+            id: '123', // Your user ID (same as Netcore setUserIdentity)
+            // ...other user fields
+            netcoreDeviceGuid: 'NETCORE_DEVICE_GUID', // Required if not using setUserIdentity
+          ),
+          data: {},
+        );
+        ```
+      </Tab>
+    </Tabs>
+
+    <Tip>
+      You can get the `netcoreDeviceGuid` from the Netcore SDK in your app.
+    </Tip>
+  </Step>
+
+  <Step title="Sync with Netcore (Optional)">
+    Use the **Sync** feature in the following scenarios:
+
+    - First time after adding your Netcore credentials
+    - If you see discrepancies in attribution data on Netcore profiles
+
+    To sync, click the **Sync with Netcore** button in the Linkrunner integration settings. This process may take a while depending on the number of users.
+  </Step>
+</Steps>
+
+## Viewing Attribution Data
+
+After the integration is complete, you can view the attribution data in Netcore:
+
+1. Navigate to a user profile in the Netcore dashboard
+2. Look for the user attributes section
+3. You'll see `lr_campaign` and `lr_ad_network` attributes with the corresponding values
+
+This data can be used to:
+- Create segments based on acquisition source
+- Personalize messaging based on campaign origin
+- Analyze user behavior by acquisition channel

@@ -80,7 +80,16 @@
                     },
                     {
                         "group": "Analytics Integrations",
-                        "pages": ["analytics-integrations/ga4", "analytics-integrations/braze"]
+                        "pages": [
+                            "analytics-integrations/amplitude",
+                            "analytics-integrations/braze",
+                            "analytics-integrations/clevertap",
+                            "analytics-integrations/ga4",
+                            "analytics-integrations/mixpanel",
+                            "analytics-integrations/moengage",
+                            "analytics-integrations/netcore",
+                            "analytics-integrations/posthog"
+                        ]
                     },
                     {
                         "group": "Ecommerce Manager",

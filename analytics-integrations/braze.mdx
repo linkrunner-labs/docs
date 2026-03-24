@@ -1,7 +1,7 @@
 ---
 title: "Braze"
 description: "Connect Linkrunner with Braze to import attribution data and understand your user acquisition campaigns"
-icon: "chart-mixed"
+icon: "/images/logos/braze.png"
 ---
 
 Linkrunner integrates with Braze to automatically send attribution data, helping you understand which campaigns are driving user acquisition and engagement.
@@ -16,7 +16,7 @@ Every time a user is attributed by Linkrunner, we automatically send a request t
 ### Example
 
 - User ID `24` came from campaign link: `https://app.linkrunner.io/?c=AXb1c2`
-- In Braze, for user profile with ID `24`, you'll see `lr_campaign` set to `AXb1c2`
+- In Braze, for user profile with ID `24`, you'll see `lr_campaign` set to `AXb1c2` and `lr_ad_network` set to an ad network source
 
 The data will be visible in the **Custom Attributes** section of the user profile in the Braze dashboard.
 
@@ -128,7 +128,7 @@ The data will be visible in the **Custom Attributes** section of the user profil
     Use the **Sync** feature in the following scenarios:
 
     - First time after adding your Braze credentials
-    - If you see any discrepancy in attributing profiles on Braze
+    - If you see discrepancies in attribution data on Braze profiles
 
     To sync, click the **Sync with Braze** button in the Linkrunner integration settings. This process may take a while depending on the number of users.
   </Step>
