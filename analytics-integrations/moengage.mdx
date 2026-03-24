@@ -16,7 +16,7 @@ Every time a user is attributed by Linkrunner, we automatically send a request t
 ### Example
 
 - User ID `24` came from campaign link: `https://app.linkrunner.io/?c=AXb1c2`
-- In MoEngage, for user profile with ID `24`, you'll see `lr_campaign` set to `AXb1c2`
+- In MoEngage, for user profile with ID `24`, you'll see `lr_campaign` set to `AXb1c2` and `lr_ad_network` set to an ad network source
 
 ## Prerequisites
 
@@ -68,7 +68,7 @@ Every time a user is attributed by Linkrunner, we automatically send a request t
     To properly link users between Linkrunner and MoEngage, you need to pass the user ID in the `signup` function.
 
     <Info>
-      **Important:** Make sure to pass the `user_id` in the `userData` parameter of the signup function of the SDK to match with your MoEngage user profiles.
+      **Important:** Make sure to pass the `id` in the `userData` parameter of the signup function of the SDK to match with your MoEngage user profiles.
     </Info>
 
     <Tabs>
@@ -133,7 +133,7 @@ Every time a user is attributed by Linkrunner, we automatically send a request t
     Use the **Sync** feature in the following scenarios:
 
     - First time after adding your MoEngage credentials
-    - If you see any discrepancy in attributing profiles on MoEngage
+    - If you see discrepancies in attribution data on MoEngage profiles
 
     To sync, click the **Sync with MoEngage** button in the Linkrunner integration settings. This process may take a while depending on the number of users.
   </Step>
@@ -145,7 +145,7 @@ After the integration is complete, you can view the attribution data in MoEngage
 
 1. Navigate to a user profile in the MoEngage dashboard
 2. Look for the user attributes section
-3. You'll see `lr_campaign` attribute with the corresponding value
+3. You'll see `lr_campaign` and `lr_ad_network` attributes with the corresponding values
 
 This data can be used to:
 - Create segments based on acquisition source

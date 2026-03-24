@@ -13,6 +13,11 @@ Every time a user is attributed by Linkrunner, we automatically send a request t
 - `lr_campaign` - The campaign identifier
 - `lr_ad_network` - The ad network source
 
+### Example
+
+- User ID `24` came from campaign link: `https://app.linkrunner.io/?c=AXb1c2`
+- In Netcore, for user profile with ID `24`, you'll see `lr_campaign` set to `AXb1c2` and `lr_ad_network` set to an ad network source
+
 ## Prerequisites
 
 | Requirement | Description |
@@ -115,7 +120,7 @@ Every time a user is attributed by Linkrunner, we automatically send a request t
     Use the **Sync** feature in the following scenarios:
 
     - First time after adding your Netcore credentials
-    - If you see any discrepancy in attributing profiles on Netcore
+    - If you see discrepancies in attribution data on Netcore profiles
 
     To sync, click the **Sync with Netcore** button in the Linkrunner integration settings. This process may take a while depending on the number of users.
   </Step>
@@ -127,7 +132,7 @@ After the integration is complete, you can view the attribution data in Netcore:
 
 1. Navigate to a user profile in the Netcore dashboard
 2. Look for the user attributes section
-3. You'll see `lr_campaign` attribute with the corresponding value
+3. You'll see `lr_campaign` and `lr_ad_network` attributes with the corresponding values
 
 This data can be used to:
 - Create segments based on acquisition source
