@@ -27,7 +27,8 @@
                             "sdk/capacitor",
                             "sdk/ios",
                             "sdk/android",
-                            "sdk/expo"
+                            "sdk/expo",
+                            "sdk/unity"
                         ]
                     },
                     {
