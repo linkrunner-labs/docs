@@ -110,6 +110,10 @@
                     {
                         "group": "Billing",
                         "pages": ["billing/overview"]
+                    },
+                    {
+                        "group": "FAQ",
+                        "pages": ["testing/testing-attribution-troubleshooting"]
                     }
                 ]
             }

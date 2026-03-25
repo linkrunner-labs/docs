@@ -1,0 +1,76 @@
+---
+title: "Why Is My Test Showing Attribution to the Wrong Campaign?"
+description: "Fix the common issue where test installs or signups get attributed to a previously tested campaign link instead of the new one"
+icon: "bug"
+---
+
+## The Problem
+
+You click a new campaign link and test a signup, but the dashboard attributes it to a **different campaign** — usually an older test link with a stale date.
+
+## Why This Happens
+
+The SDK generates a unique **install instance ID** on first launch and persists it on the device. All subsequent activity (installs, signups, events) is tied to this ID. When you test again **without uninstalling**, the SDK reuses the same ID and the backend attributes everything to the original campaign.
+
+**No uninstall = same ID = attribution stuck on the first campaign.**
+
+## How to Fix It
+
+### 1. Uninstall the app before each test
+
+This clears the stored install instance ID so a fresh one is generated on next launch.
+
+<Warning>
+Force-stopping the app is **not enough** — you must fully uninstall it.
+</Warning>
+
+### 2. Enable debug mode
+
+Set `debug = true` in your SDK init to see logs confirming a fresh install.
+
+<Tabs>
+<Tab title="React Native">
+```javascript
+await linkrunner.init("TOKEN", "SECRET", "KEY_ID", false, true);
+```
+</Tab>
+<Tab title="Flutter">
+```dart
+await LinkRunner().init('TOKEN', 'SECRET', 'KEY_ID', false, true);
+```
+</Tab>
+<Tab title="iOS">
+```swift
+await LinkrunnerSDK.shared.initialize(
+    token: "TOKEN", secretKey: "SECRET", keyId: "KEY_ID",
+    disableIdfa: false, debug: true
+)
+```
+</Tab>
+<Tab title="Android">
+```kotlin
+LinkRunner.getInstance().init(
+    context = applicationContext, token = "TOKEN",
+    secretKey = "SECRET", keyId = "KEY_ID", debug = true
+)
+```
+</Tab>
+</Tabs>
+
+### 3. Run the test flow
+
+1. **Click** your new campaign link on the test device
+2. **Install** and **open** the app within 3 minutes of clicking
+3. **Signup** (if testing signup attribution)
+
+<Tip>
+**Multiple tests?** Uninstall between each run for clean attribution.
+</Tip>
+
+## Still seeing issues?
+
+- Confirm you clicked the link **on the same device** where the app is installed
+- Confirm you opened the app **within 3 minutes** of clicking
+- See the full [Integration Testing guide](/testing/integration-testing) for a detailed walkthrough
+
+Need help? Reach out at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).
