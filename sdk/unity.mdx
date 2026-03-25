@@ -1,0 +1,1239 @@
+---
+title: "Unity"
+description: "Guide for integrating Linkrunner in Unity apps using native Android and iOS SDKs"
+icon: "unity"
+---
+
+Linkrunner does not have a dedicated Unity SDK. This guide walks you through integrating the native Android and iOS SDKs into your Unity project using platform bridge plugins.
+
+## Prerequisites
+
+- **Unity 2021.3 LTS** or newer
+- **Android**: Android 5.0+ (API 21), Gradle 8.0+
+- **iOS**: iOS 15.0+, Xcode 14.0+, Swift 5.9+
+- A Linkrunner project token — get it from [Dashboard → Documentation](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation)
+
+<Warning>
+**Important assumptions in this guide:**
+
+1. **iOS requires a Swift bridging layer.** The Linkrunner iOS SDK (`LinkrunnerKit`) is a pure Swift module — it does not inherit from `NSObject` and has no `@objc` annotations. Since Unity's native plugin system uses C/Objective-C, we provide a **Swift wrapper file** (`LinkrunnerUnityBridge.swift`) that exposes `@_cdecl` C-callable functions which internally call the Swift SDK's `async` methods.
+
+2. **Android uses Kotlin coroutine interop from Java.** The Linkrunner Android SDK methods are Kotlin `suspend` functions. The Java bridge calls them using `BuildersKt.runBlocking` on background threads. The Kotlin coroutines library is bundled with the SDK.
+
+3. **iOS SPM dependency must be re-added** each time Unity regenerates the Xcode project. See the [Automation Tips](#automating-ios-dependency-with-a-post-build-script) section for a partial workaround.
+
+4. **The bridge code is reference code**, not a drop-in package. You may need to adjust method signatures or imports based on your Unity version, Xcode version, and SDK version updates.
+</Warning>
+
+## Architecture Overview
+
+The integration uses Unity's native plugin system:
+
+- **Android**: A Java bridge class calls the Linkrunner Android SDK (Kotlin) and communicates results back to Unity via `UnitySendMessage`.
+- **iOS**: A Swift bridge file wraps the Linkrunner iOS SDK's `async` methods into C-callable functions (via `@_cdecl`), which Unity calls through `[DllImport("__Internal")]`.
+- **C#**: A `LinkrunnerSDK.cs` wrapper provides a unified cross-platform API.
+
+```
+C# (LinkrunnerSDK.cs)
+    ├── Android → Java Bridge → io.linkrunner.sdk.LinkRunner (Kotlin)
+    └── iOS → Swift Bridge (@_cdecl) → LinkrunnerSDK.shared (Swift async)
+```
+
+---
+
+## Android Setup
+
+### Step 1: Add the SDK Dependency
+
+In your Unity project, create or edit the file `Assets/Plugins/Android/mainTemplate.gradle` (or your custom Gradle template) and add:
+
+```gradle
+dependencies {
+    implementation 'io.linkrunner:android-sdk:3.6.0'
+}
+```
+
+Make sure Maven Central is included in your repositories. In `Assets/Plugins/Android/settingsTemplate.gradle`:
+
+```gradle
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
+
+<Tip>
+If you're using Unity 2022.2+ with the Gradle template system, you may need to add the dependency in `unityLibrary/build.gradle` instead. Check Unity's documentation for your version.
+</Tip>
+
+### Step 2: Permissions
+
+Add the following to your `Assets/Plugins/Android/AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+```
+
+If your app targets children and you need to disable advertising ID collection, remove the `AD_ID` permission:
+
+```xml
+<uses-permission android:name="com.google.android.gms.permission.AD_ID"
+    tools:node="remove" />
+```
+
+### Step 3: Create the Java Bridge
+
+Create `Assets/Plugins/Android/LinkrunnerBridge.java`:
+
+```java
+package com.linkrunner.unity;
+
+import android.app.Activity;
+import android.util.Log;
+
+import com.unity3d.player.UnityPlayer;
+
+import io.linkrunner.sdk.LinkRunner;
+import io.linkrunner.sdk.models.UserDataRequest;
+import io.linkrunner.sdk.models.CapturePaymentRequest;
+import io.linkrunner.sdk.models.RemovePaymentRequest;
+import io.linkrunner.sdk.models.IntegrationData;
+import io.linkrunner.sdk.models.PaymentType;
+import io.linkrunner.sdk.models.PaymentStatus;
+
+import org.json.JSONObject;
+import org.json.JSONException;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import kotlinx.coroutines.GlobalScope;
+import kotlinx.coroutines.Dispatchers;
+import kotlinx.coroutines.CoroutineScopeKt;
+import kotlinx.coroutines.BuildersKt;
+
+public class LinkrunnerBridge {
+
+    private static final String TAG = "LinkrunnerBridge";
+    private static final String UNITY_GAME_OBJECT = "LinkrunnerCallbackHandler";
+
+    private static void sendToUnity(String method, String message) {
+        UnityPlayer.UnitySendMessage(UNITY_GAME_OBJECT, method, message);
+    }
+
+    private static Map<String, Object> jsonToMap(String json) {
+        Map<String, Object> map = new HashMap<>();
+        if (json == null || json.isEmpty()) return map;
+        try {
+            JSONObject obj = new JSONObject(json);
+            Iterator<String> keys = obj.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                Object value = obj.get(key);
+                map.put(key, value);
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "Failed to parse JSON: " + e.getMessage());
+        }
+        return map;
+    }
+
+    private static PaymentType parsePaymentType(String type) {
+        if (type == null) return PaymentType.DEFAULT;
+        switch (type) {
+            case "FIRST_PAYMENT": return PaymentType.FIRST_PAYMENT;
+            case "SECOND_PAYMENT": return PaymentType.SECOND_PAYMENT;
+            case "WALLET_TOPUP": return PaymentType.WALLET_TOPUP;
+            case "FUNDS_WITHDRAWAL": return PaymentType.FUNDS_WITHDRAWAL;
+            case "SUBSCRIPTION_CREATED": return PaymentType.SUBSCRIPTION_CREATED;
+            case "SUBSCRIPTION_RENEWED": return PaymentType.SUBSCRIPTION_RENEWED;
+            case "ONE_TIME": return PaymentType.ONE_TIME;
+            case "RECURRING": return PaymentType.RECURRING;
+            default: return PaymentType.DEFAULT;
+        }
+    }
+
+    private static PaymentStatus parsePaymentStatus(String status) {
+        if (status == null) return PaymentStatus.PAYMENT_COMPLETED;
+        switch (status) {
+            case "PAYMENT_INITIATED": return PaymentStatus.PAYMENT_INITIATED;
+            case "PAYMENT_COMPLETED": return PaymentStatus.PAYMENT_COMPLETED;
+            case "PAYMENT_FAILED": return PaymentStatus.PAYMENT_FAILED;
+            case "PAYMENT_CANCELLED": return PaymentStatus.PAYMENT_CANCELLED;
+            default: return PaymentStatus.PAYMENT_COMPLETED;
+        }
+    }
+
+    // ---- Public API called from Unity C# ----
+
+    public static void initialize(String token, String secretKey, String keyId, boolean debug) {
+        Activity activity = UnityPlayer.currentActivity;
+        new Thread(() -> {
+            try {
+                LinkRunner lr = LinkRunner.getInstance();
+                Object result = BuildersKt.runBlocking(
+                    Dispatchers.getIO(),
+                    (scope, continuation) -> lr.init(
+                        activity.getApplicationContext(),
+                        token,
+                        null,  // link
+                        null,  // source
+                        secretKey.isEmpty() ? null : secretKey,
+                        keyId.isEmpty() ? null : keyId,
+                        debug,
+                        continuation
+                    )
+                );
+                sendToUnity("OnInitComplete", "success");
+            } catch (Exception e) {
+                Log.e(TAG, "Init failed: " + e.getMessage());
+                sendToUnity("OnInitComplete", "error:" + e.getMessage());
+            }
+        }).start();
+    }
+
+    public static void signup(String userDataJson, String additionalDataJson) {
+        new Thread(() -> {
+            try {
+                JSONObject obj = new JSONObject(userDataJson);
+                UserDataRequest userData = new UserDataRequest(
+                    obj.optString("id", ""),
+                    obj.optString("name", null),
+                    obj.optString("phone", null),
+                    obj.optString("email", null),
+                    obj.optString("mixpanelDistinctId", null),
+                    obj.optString("amplitudeDeviceId", null),
+                    obj.optString("posthogDistinctId", null),
+                    obj.optString("brazeDeviceId", null),
+                    obj.optString("gaAppInstanceId", null),
+                    obj.optString("gaSessionId", null),
+                    obj.optString("userCreatedAt", null),
+                    obj.has("isFirstTimeUser") ? obj.optBoolean("isFirstTimeUser") : null
+                );
+
+                Map<String, Object> additionalData = jsonToMap(additionalDataJson);
+                LinkRunner lr = LinkRunner.getInstance();
+                BuildersKt.runBlocking(
+                    Dispatchers.getIO(),
+                    (scope, continuation) -> lr.signup(
+                        userData,
+                        additionalData.isEmpty() ? null : additionalData,
+                        continuation
+                    )
+                );
+                sendToUnity("OnSignupComplete", "success");
+            } catch (Exception e) {
+                Log.e(TAG, "Signup failed: " + e.getMessage());
+                sendToUnity("OnSignupComplete", "error:" + e.getMessage());
+            }
+        }).start();
+    }
+
+    public static void setUserData(String userDataJson) {
+        new Thread(() -> {
+            try {
+                JSONObject obj = new JSONObject(userDataJson);
+                UserDataRequest userData = new UserDataRequest(
+                    obj.optString("id", ""),
+                    obj.optString("name", null),
+                    obj.optString("phone", null),
+                    obj.optString("email", null),
+                    obj.optString("mixpanelDistinctId", null),
+                    obj.optString("amplitudeDeviceId", null),
+                    obj.optString("posthogDistinctId", null),
+                    obj.optString("brazeDeviceId", null),
+                    obj.optString("gaAppInstanceId", null),
+                    obj.optString("gaSessionId", null),
+                    obj.optString("userCreatedAt", null),
+                    obj.has("isFirstTimeUser") ? obj.optBoolean("isFirstTimeUser") : null
+                );
+
+                LinkRunner lr = LinkRunner.getInstance();
+                BuildersKt.runBlocking(
+                    Dispatchers.getIO(),
+                    (scope, continuation) -> lr.setUserData(userData, continuation)
+                );
+                sendToUnity("OnSetUserDataComplete", "success");
+            } catch (Exception e) {
+                Log.e(TAG, "SetUserData failed: " + e.getMessage());
+                sendToUnity("OnSetUserDataComplete", "error:" + e.getMessage());
+            }
+        }).start();
+    }
+
+    public static void getAttributionData() {
+        new Thread(() -> {
+            try {
+                LinkRunner lr = LinkRunner.getInstance();
+                Object result = BuildersKt.runBlocking(
+                    Dispatchers.getIO(),
+                    (scope, continuation) -> lr.getAttributionData(continuation)
+                );
+                // Result is AttributionData — serialize to JSON
+                JSONObject json = new JSONObject();
+                if (result != null) {
+                    json.put("raw", result.toString());
+                }
+                sendToUnity("OnAttributionDataReceived", json.toString());
+            } catch (Exception e) {
+                Log.e(TAG, "GetAttributionData failed: " + e.getMessage());
+                sendToUnity("OnAttributionDataReceived", "error:" + e.getMessage());
+            }
+        }).start();
+    }
+
+    public static void trackEvent(String eventName, String eventDataJson, String eventId) {
+        new Thread(() -> {
+            try {
+                Map<String, Object> eventData = jsonToMap(eventDataJson);
+                LinkRunner lr = LinkRunner.getInstance();
+                BuildersKt.runBlocking(
+                    Dispatchers.getIO(),
+                    (scope, continuation) -> lr.trackEvent(
+                        eventName,
+                        eventData.isEmpty() ? null : eventData,
+                        eventId.isEmpty() ? null : eventId,
+                        continuation
+                    )
+                );
+                sendToUnity("OnTrackEventComplete", "success");
+            } catch (Exception e) {
+                Log.e(TAG, "TrackEvent failed: " + e.getMessage());
+                sendToUnity("OnTrackEventComplete", "error:" + e.getMessage());
+            }
+        }).start();
+    }
+
+    public static void capturePayment(String userId, double amount, String paymentId,
+                                       String type, String status, String eventDataJson) {
+        new Thread(() -> {
+            try {
+                Map<String, Object> eventData = jsonToMap(eventDataJson);
+                CapturePaymentRequest request = new CapturePaymentRequest(
+                    paymentId.isEmpty() ? null : paymentId,
+                    userId,
+                    amount,
+                    parsePaymentType(type),
+                    parsePaymentStatus(status),
+                    eventData.isEmpty() ? null : eventData
+                );
+                LinkRunner lr = LinkRunner.getInstance();
+                BuildersKt.runBlocking(
+                    Dispatchers.getIO(),
+                    (scope, continuation) -> lr.capturePayment(request, continuation)
+                );
+                sendToUnity("OnCapturePaymentComplete", "success");
+            } catch (Exception e) {
+                Log.e(TAG, "CapturePayment failed: " + e.getMessage());
+                sendToUnity("OnCapturePaymentComplete", "error:" + e.getMessage());
+            }
+        }).start();
+    }
+
+    public static void removePayment(String userId, String paymentId) {
+        new Thread(() -> {
+            try {
+                RemovePaymentRequest request = new RemovePaymentRequest(
+                    paymentId.isEmpty() ? null : paymentId,
+                    userId.isEmpty() ? null : userId
+                );
+                LinkRunner lr = LinkRunner.getInstance();
+                BuildersKt.runBlocking(
+                    Dispatchers.getIO(),
+                    (scope, continuation) -> lr.removePayment(request, continuation)
+                );
+                sendToUnity("OnRemovePaymentComplete", "success");
+            } catch (Exception e) {
+                Log.e(TAG, "RemovePayment failed: " + e.getMessage());
+                sendToUnity("OnRemovePaymentComplete", "error:" + e.getMessage());
+            }
+        }).start();
+    }
+
+    public static void setPushToken(String pushToken) {
+        new Thread(() -> {
+            try {
+                LinkRunner lr = LinkRunner.getInstance();
+                BuildersKt.runBlocking(
+                    Dispatchers.getIO(),
+                    (scope, continuation) -> lr.setPushToken(pushToken, continuation)
+                );
+            } catch (Exception e) {
+                Log.e(TAG, "SetPushToken failed: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    public static void setAdditionalData(String clevertapId) {
+        new Thread(() -> {
+            try {
+                IntegrationData data = new IntegrationData(
+                    clevertapId.isEmpty() ? null : clevertapId
+                );
+                LinkRunner lr = LinkRunner.getInstance();
+                BuildersKt.runBlocking(
+                    Dispatchers.getIO(),
+                    (scope, continuation) -> lr.setAdditionalData(data, continuation)
+                );
+            } catch (Exception e) {
+                Log.e(TAG, "SetAdditionalData failed: " + e.getMessage());
+            }
+        }).start();
+    }
+
+    public static void enablePIIHashing(boolean enabled) {
+        LinkRunner.getInstance().enablePIIHashing(enabled);
+    }
+
+    public static void setDisableAaidCollection(boolean disabled) {
+        LinkRunner.getInstance().setDisableAaidCollection(disabled);
+    }
+}
+```
+
+<Warning>
+The bridge code above uses `kotlinx.coroutines.BuildersKt.runBlocking` to call the SDK's suspend functions from Java. This is executed on a background thread to avoid blocking Unity's main thread. The Kotlin coroutines library is bundled with the Linkrunner Android SDK, so no additional dependencies are needed.
+</Warning>
+
+---
+
+## iOS Setup
+
+### Step 1: Add the SDK
+
+After building your Unity project for iOS and opening the generated Xcode project:
+
+1. In Xcode, select **File** → **Add Package Dependencies...**
+2. Enter the repository URL:
+   ```
+   https://github.com/linkrunner-labs/linkrunner-ios.git
+   ```
+3. Select the latest version (3.8.0+)
+4. Click **Add Package** and choose the **LinkrunnerStatic** library
+
+<Tip>
+You'll need to add the SPM dependency each time you regenerate the Xcode project from Unity. Consider using a post-build script to automate this — see the [Automation Tips](#automating-ios-dependency-with-a-post-build-script) section.
+</Tip>
+
+### Step 2: Info.plist Configuration
+
+Add to your `Info.plist` (can also be done via Unity's `Assets/Plugins/iOS/Info.plist` additions):
+
+```xml
+<!-- App Tracking Transparency (required for IDFA) -->
+<key>NSUserTrackingUsageDescription</key>
+<string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
+
+<!-- SKAdNetwork postback endpoint -->
+<key>NSAdvertisingAttributionReportEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+<key>AttributionCopyEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+```
+
+### Step 3: Create the Swift Bridge
+
+The Linkrunner iOS SDK is a **pure Swift module** — it does not inherit from `NSObject` and has no `@objc` annotations, so it cannot be called directly from Objective-C. We use a Swift bridge file with `@_cdecl` to expose C-callable functions that Unity can invoke via `[DllImport("__Internal")]`.
+
+Create `Assets/Plugins/iOS/LinkrunnerUnityBridge.swift`:
+
+```swift
+import Foundation
+import Linkrunner
+
+// MARK: - Unity interop
+
+// UnitySendMessage is a C function provided by Unity's runtime.
+// We declare it here so Swift can call it.
+@_silgen_name("UnitySendMessage")
+func UnitySendMessage(_ obj: UnsafePointer<CChar>,
+                      _ method: UnsafePointer<CChar>,
+                      _ msg: UnsafePointer<CChar>)
+
+private let unityGameObject = "LinkrunnerCallbackHandler"
+
+private func sendToUnity(_ method: String, _ message: String) {
+    method.withCString { m in
+        message.withCString { msg in
+            unityGameObject.withCString { obj in
+                UnitySendMessage(obj, m, msg)
+            }
+        }
+    }
+}
+
+private func toDict(_ cString: UnsafePointer<CChar>?) -> [String: Any] {
+    guard let cString = cString else { return [:] }
+    let str = String(cString: cString)
+    guard !str.isEmpty,
+          let data = str.data(using: .utf8),
+          let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+    else { return [:] }
+    return dict
+}
+
+private func toOptionalString(_ cString: UnsafePointer<CChar>?) -> String? {
+    guard let cString = cString else { return nil }
+    let str = String(cString: cString)
+    return str.isEmpty ? nil : str
+}
+
+private func parseUserData(_ dict: [String: Any]) -> UserData {
+    return UserData(
+        id: dict["id"] as? String ?? "",
+        name: dict["name"] as? String,
+        phone: dict["phone"] as? String,
+        email: dict["email"] as? String,
+        isFirstTimeUser: dict["isFirstTimeUser"] as? Bool,
+        userCreatedAt: dict["userCreatedAt"] as? String,
+        mixPanelDistinctId: dict["mixpanelDistinctId"] as? String,
+        amplitudeDeviceId: dict["amplitudeDeviceId"] as? String,
+        posthogDistinctId: dict["posthogDistinctId"] as? String,
+        brazeDeviceId: dict["brazeDeviceId"] as? String,
+        gaAppInstanceId: dict["gaAppInstanceId"] as? String,
+        gaSessionId: dict["gaSessionId"] as? String
+    )
+}
+
+private func parsePaymentType(_ str: String?) -> PaymentType {
+    switch str {
+    case "FIRST_PAYMENT": return .firstPayment
+    case "SECOND_PAYMENT": return .secondPayment
+    case "WALLET_TOPUP": return .walletTopup
+    case "FUNDS_WITHDRAWAL": return .fundsWithdrawal
+    case "SUBSCRIPTION_CREATED": return .subscriptionCreated
+    case "SUBSCRIPTION_RENEWED": return .subscriptionRenewed
+    case "ONE_TIME": return .oneTime
+    case "RECURRING": return .recurring
+    default: return .default
+    }
+}
+
+private func parsePaymentStatus(_ str: String?) -> PaymentStatus {
+    switch str {
+    case "PAYMENT_INITIATED": return .initiated
+    case "PAYMENT_COMPLETED": return .completed
+    case "PAYMENT_FAILED": return .failed
+    case "PAYMENT_CANCELLED": return .cancelled
+    default: return .completed
+    }
+}
+
+// MARK: - C-callable functions exposed to Unity
+
+@_cdecl("_LinkrunnerInitialize")
+func linkrunnerInitialize(_ token: UnsafePointer<CChar>,
+                          _ secretKey: UnsafePointer<CChar>?,
+                          _ keyId: UnsafePointer<CChar>?,
+                          _ disableIdfa: Bool,
+                          _ debug: Bool) {
+    let tokenStr = String(cString: token)
+    let secretKeyStr = toOptionalString(secretKey)
+    let keyIdStr = toOptionalString(keyId)
+
+    Task {
+        await LinkrunnerSDK.shared.initialize(
+            token: tokenStr,
+            secretKey: secretKeyStr,
+            keyId: keyIdStr,
+            disableIdfa: disableIdfa,
+            debug: debug
+        )
+        sendToUnity("OnInitComplete", "success")
+    }
+}
+
+@_cdecl("_LinkrunnerSignup")
+func linkrunnerSignup(_ userDataJson: UnsafePointer<CChar>?,
+                      _ additionalDataJson: UnsafePointer<CChar>?) {
+    let userDict = toDict(userDataJson)
+    let additionalDict = toDict(additionalDataJson)
+    let userData = parseUserData(userDict)
+
+    Task {
+        await LinkrunnerSDK.shared.signup(
+            userData: userData,
+            additionalData: additionalDict.isEmpty ? nil : additionalDict
+        )
+        sendToUnity("OnSignupComplete", "success")
+    }
+}
+
+@_cdecl("_LinkrunnerSetUserData")
+func linkrunnerSetUserData(_ userDataJson: UnsafePointer<CChar>?) {
+    let userDict = toDict(userDataJson)
+    let userData = parseUserData(userDict)
+
+    Task {
+        await LinkrunnerSDK.shared.setUserData(userData)
+        sendToUnity("OnSetUserDataComplete", "success")
+    }
+}
+
+@_cdecl("_LinkrunnerGetAttributionData")
+func linkrunnerGetAttributionData() {
+    Task {
+        let response = await LinkrunnerSDK.shared.getAttributionData()
+
+        var result: [String: Any] = [:]
+        if let deeplink = response.deeplink { result["deeplink"] = deeplink }
+        result["attributionSource"] = response.attributionSource
+
+        if let campaign = response.campaignData {
+            var campaignDict: [String: Any] = [:]
+            campaignDict["id"] = campaign.id
+            campaignDict["name"] = campaign.name
+            if let groupName = campaign.groupName { campaignDict["groupName"] = groupName }
+            if let assetName = campaign.assetName { campaignDict["assetName"] = assetName }
+            if let assetGroupName = campaign.assetGroupName { campaignDict["assetGroupName"] = assetGroupName }
+            result["campaignData"] = campaignDict
+        }
+
+        if let jsonData = try? JSONSerialization.data(withJSONObject: result),
+           let jsonStr = String(data: jsonData, encoding: .utf8) {
+            sendToUnity("OnAttributionDataReceived", jsonStr)
+        } else {
+            sendToUnity("OnAttributionDataReceived", "error:serialization_failed")
+        }
+    }
+}
+
+@_cdecl("_LinkrunnerTrackEvent")
+func linkrunnerTrackEvent(_ eventName: UnsafePointer<CChar>,
+                          _ eventDataJson: UnsafePointer<CChar>?,
+                          _ eventId: UnsafePointer<CChar>?) {
+    let name = String(cString: eventName)
+    let eventData = toDict(eventDataJson)
+    let eid = toOptionalString(eventId)
+
+    Task {
+        await LinkrunnerSDK.shared.trackEvent(
+            eventName: name,
+            eventData: eventData.isEmpty ? nil : eventData,
+            eventId: eid
+        )
+        sendToUnity("OnTrackEventComplete", "success")
+    }
+}
+
+@_cdecl("_LinkrunnerCapturePayment")
+func linkrunnerCapturePayment(_ userId: UnsafePointer<CChar>,
+                              _ amount: Double,
+                              _ paymentId: UnsafePointer<CChar>?,
+                              _ type: UnsafePointer<CChar>?,
+                              _ status: UnsafePointer<CChar>?,
+                              _ eventDataJson: UnsafePointer<CChar>?) {
+    let uid = String(cString: userId)
+    let pid = toOptionalString(paymentId)
+    let paymentType = parsePaymentType(toOptionalString(type))
+    let paymentStatus = parsePaymentStatus(toOptionalString(status))
+    let eventData = toDict(eventDataJson)
+
+    Task {
+        await LinkrunnerSDK.shared.capturePayment(
+            amount: amount,
+            userId: uid,
+            paymentId: pid,
+            type: paymentType,
+            status: paymentStatus,
+            eventData: eventData.isEmpty ? nil : eventData
+        )
+        sendToUnity("OnCapturePaymentComplete", "success")
+    }
+}
+
+@_cdecl("_LinkrunnerRemovePayment")
+func linkrunnerRemovePayment(_ userId: UnsafePointer<CChar>,
+                             _ paymentId: UnsafePointer<CChar>?) {
+    let uid = String(cString: userId)
+    let pid = toOptionalString(paymentId)
+
+    Task {
+        await LinkrunnerSDK.shared.removePayment(userId: uid, paymentId: pid)
+        sendToUnity("OnRemovePaymentComplete", "success")
+    }
+}
+
+@_cdecl("_LinkrunnerSetPushToken")
+func linkrunnerSetPushToken(_ pushToken: UnsafePointer<CChar>) {
+    let token = String(cString: pushToken)
+    Task {
+        await LinkrunnerSDK.shared.setPushToken(token)
+    }
+}
+
+@_cdecl("_LinkrunnerSetAdditionalData")
+func linkrunnerSetAdditionalData(_ clevertapId: UnsafePointer<CChar>?) {
+    let ctId = toOptionalString(clevertapId)
+    let data = IntegrationData(clevertapId: ctId)
+    Task {
+        await LinkrunnerSDK.shared.setAdditionalData(data)
+    }
+}
+
+@_cdecl("_LinkrunnerEnablePIIHashing")
+func linkrunnerEnablePIIHashing(_ enabled: Bool) {
+    LinkrunnerSDK.shared.enablePIIHashing(enabled)
+}
+```
+
+<Warning>
+**Swift files in Unity iOS plugins:** Unity does not natively compile `.swift` files in `Assets/Plugins/iOS/`. After Unity generates the Xcode project, you must manually add `LinkrunnerUnityBridge.swift` to the Xcode project's **UnityFramework** target and ensure:
+
+1. The file is added to the **Compile Sources** build phase of the UnityFramework target
+2. A **bridging header** exists (Xcode usually prompts to create one when adding the first Swift file)
+3. **SWIFT_VERSION** is set to 5.0+ in the UnityFramework build settings
+
+Alternatively, you can automate this with a Unity `PostProcessBuild` script — see the [Automation Tips](#automating-ios-dependency-with-a-post-build-script) section.
+</Warning>
+
+---
+
+## C# Wrapper
+
+Create `Assets/Scripts/LinkrunnerSDK.cs` in your Unity project:
+
+```csharp
+using System;
+using System.Runtime.InteropServices;
+using UnityEngine;
+
+/// <summary>
+/// Cross-platform wrapper for Linkrunner native SDKs.
+/// Attach this script to a GameObject named "LinkrunnerCallbackHandler" in your first scene.
+/// </summary>
+public class LinkrunnerSDK : MonoBehaviour
+{
+    public static LinkrunnerSDK Instance { get; private set; }
+
+    // Callbacks
+    public static event Action<bool, string> OnInitialized;
+    public static event Action<bool, string> OnSignedUp;
+    public static event Action<bool, string> OnUserDataSet;
+    public static event Action<string> OnAttributionData;
+    public static event Action<bool, string> OnEventTracked;
+    public static event Action<bool, string> OnPaymentCaptured;
+    public static event Action<bool, string> OnPaymentRemoved;
+
+#if UNITY_IOS && !UNITY_EDITOR
+    [DllImport("__Internal")]
+    private static extern void _LinkrunnerInitialize(string token, string secretKey,
+        string keyId, bool disableIdfa, bool debug);
+    [DllImport("__Internal")]
+    private static extern void _LinkrunnerSignup(string userDataJson, string additionalDataJson);
+    [DllImport("__Internal")]
+    private static extern void _LinkrunnerSetUserData(string userDataJson);
+    [DllImport("__Internal")]
+    private static extern void _LinkrunnerGetAttributionData();
+    [DllImport("__Internal")]
+    private static extern void _LinkrunnerTrackEvent(string eventName, string eventDataJson,
+        string eventId);
+    [DllImport("__Internal")]
+    private static extern void _LinkrunnerCapturePayment(string userId, double amount,
+        string paymentId, string type, string status, string eventDataJson);
+    [DllImport("__Internal")]
+    private static extern void _LinkrunnerRemovePayment(string userId, string paymentId);
+    [DllImport("__Internal")]
+    private static extern void _LinkrunnerSetPushToken(string pushToken);
+    [DllImport("__Internal")]
+    private static extern void _LinkrunnerSetAdditionalData(string clevertapId);
+    [DllImport("__Internal")]
+    private static extern void _LinkrunnerEnablePIIHashing(bool enabled);
+#endif
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+    private static AndroidJavaClass _bridge;
+    private static AndroidJavaClass Bridge
+    {
+        get
+        {
+            if (_bridge == null)
+                _bridge = new AndroidJavaClass("com.linkrunner.unity.LinkrunnerBridge");
+            return _bridge;
+        }
+    }
+#endif
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    // ---- Public API ----
+
+    /// <summary>
+    /// Initialize the Linkrunner SDK. Call once at app startup.
+    /// Get your token from: https://dashboard.linkrunner.io/dashboard?s=members&m=documentation
+    /// </summary>
+    public static void Initialize(string token, string secretKey = "", string keyId = "",
+        bool disableIdfa = false, bool debug = false)
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        Bridge.CallStatic("initialize", token, secretKey ?? "", keyId ?? "", debug);
+#elif UNITY_IOS && !UNITY_EDITOR
+        _LinkrunnerInitialize(token, secretKey, keyId, disableIdfa, debug);
+#else
+        Debug.Log("[Linkrunner] Initialize called (Editor — no-op)");
+        OnInitialized?.Invoke(true, "editor");
+#endif
+    }
+
+    /// <summary>
+    /// Register a user signup. Call once after user completes onboarding.
+    /// </summary>
+    public static void Signup(LinkrunnerUserData userData, string additionalDataJson = "")
+    {
+        string json = JsonUtility.ToJson(userData);
+#if UNITY_ANDROID && !UNITY_EDITOR
+        Bridge.CallStatic("signup", json, additionalDataJson ?? "");
+#elif UNITY_IOS && !UNITY_EDITOR
+        _LinkrunnerSignup(json, additionalDataJson);
+#else
+        Debug.Log("[Linkrunner] Signup: " + json);
+#endif
+    }
+
+    /// <summary>
+    /// Set user data. Call on each app open when the user is logged in.
+    /// </summary>
+    public static void SetUserData(LinkrunnerUserData userData)
+    {
+        string json = JsonUtility.ToJson(userData);
+#if UNITY_ANDROID && !UNITY_EDITOR
+        Bridge.CallStatic("setUserData", json);
+#elif UNITY_IOS && !UNITY_EDITOR
+        _LinkrunnerSetUserData(json);
+#else
+        Debug.Log("[Linkrunner] SetUserData: " + json);
+#endif
+    }
+
+    /// <summary>
+    /// Get attribution data (deeplink, campaign info).
+    /// Result is delivered via the OnAttributionData event.
+    /// </summary>
+    public static void GetAttributionData()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        Bridge.CallStatic("getAttributionData");
+#elif UNITY_IOS && !UNITY_EDITOR
+        _LinkrunnerGetAttributionData();
+#else
+        Debug.Log("[Linkrunner] GetAttributionData called (Editor — no-op)");
+#endif
+    }
+
+    /// <summary>
+    /// Track a custom event.
+    /// </summary>
+    public static void TrackEvent(string eventName, string eventDataJson = "", string eventId = "")
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        Bridge.CallStatic("trackEvent", eventName, eventDataJson ?? "", eventId ?? "");
+#elif UNITY_IOS && !UNITY_EDITOR
+        _LinkrunnerTrackEvent(eventName, eventDataJson, eventId);
+#else
+        Debug.Log("[Linkrunner] TrackEvent: " + eventName);
+#endif
+    }
+
+    /// <summary>
+    /// Track a payment/revenue event.
+    /// </summary>
+    public static void CapturePayment(string userId, double amount, string paymentId = "",
+        string type = "DEFAULT", string status = "PAYMENT_COMPLETED", string eventDataJson = "")
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        Bridge.CallStatic("capturePayment", userId, amount, paymentId ?? "", type, status, eventDataJson ?? "");
+#elif UNITY_IOS && !UNITY_EDITOR
+        _LinkrunnerCapturePayment(userId, amount, paymentId, type, status, eventDataJson);
+#else
+        Debug.Log($"[Linkrunner] CapturePayment: {userId}, {amount}");
+#endif
+    }
+
+    /// <summary>
+    /// Remove a previously tracked payment (e.g. refund).
+    /// </summary>
+    public static void RemovePayment(string userId, string paymentId = "")
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        Bridge.CallStatic("removePayment", userId, paymentId ?? "");
+#elif UNITY_IOS && !UNITY_EDITOR
+        _LinkrunnerRemovePayment(userId, paymentId);
+#else
+        Debug.Log($"[Linkrunner] RemovePayment: {userId}");
+#endif
+    }
+
+    /// <summary>
+    /// Set the push notification token (Firebase/APNs).
+    /// </summary>
+    public static void SetPushToken(string pushToken)
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        Bridge.CallStatic("setPushToken", pushToken);
+#elif UNITY_IOS && !UNITY_EDITOR
+        _LinkrunnerSetPushToken(pushToken);
+#else
+        Debug.Log("[Linkrunner] SetPushToken: " + pushToken);
+#endif
+    }
+
+    /// <summary>
+    /// Set additional integration data (e.g. CleverTap ID).
+    /// </summary>
+    public static void SetAdditionalData(string clevertapId)
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        Bridge.CallStatic("setAdditionalData", clevertapId ?? "");
+#elif UNITY_IOS && !UNITY_EDITOR
+        _LinkrunnerSetAdditionalData(clevertapId);
+#else
+        Debug.Log("[Linkrunner] SetAdditionalData: " + clevertapId);
+#endif
+    }
+
+    /// <summary>
+    /// Enable or disable PII hashing.
+    /// </summary>
+    public static void EnablePIIHashing(bool enabled)
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        Bridge.CallStatic("enablePIIHashing", enabled);
+#elif UNITY_IOS && !UNITY_EDITOR
+        _LinkrunnerEnablePIIHashing(enabled);
+#else
+        Debug.Log("[Linkrunner] EnablePIIHashing: " + enabled);
+#endif
+    }
+
+    /// <summary>
+    /// Disable Google Advertising ID collection (Android only, for COPPA compliance).
+    /// Must be called before Initialize().
+    /// </summary>
+    public static void SetDisableAaidCollection(bool disabled)
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        Bridge.CallStatic("setDisableAaidCollection", disabled);
+#else
+        Debug.Log("[Linkrunner] SetDisableAaidCollection: " + disabled);
+#endif
+    }
+
+    // ---- Native Callbacks (called via UnitySendMessage) ----
+
+    void OnInitComplete(string message)
+    {
+        bool success = message == "success";
+        OnInitialized?.Invoke(success, message);
+    }
+
+    void OnSignupComplete(string message)
+    {
+        bool success = message == "success";
+        OnSignedUp?.Invoke(success, message);
+    }
+
+    void OnSetUserDataComplete(string message)
+    {
+        bool success = message == "success";
+        OnUserDataSet?.Invoke(success, message);
+    }
+
+    void OnAttributionDataReceived(string message)
+    {
+        OnAttributionData?.Invoke(message);
+    }
+
+    void OnTrackEventComplete(string message)
+    {
+        bool success = message == "success";
+        OnEventTracked?.Invoke(success, message);
+    }
+
+    void OnCapturePaymentComplete(string message)
+    {
+        bool success = message == "success";
+        OnPaymentCaptured?.Invoke(success, message);
+    }
+
+    void OnRemovePaymentComplete(string message)
+    {
+        bool success = message == "success";
+        OnPaymentRemoved?.Invoke(success, message);
+    }
+}
+
+/// <summary>
+/// User data model. All fields except id are optional.
+/// </summary>
+[Serializable]
+public class LinkrunnerUserData
+{
+    public string id;
+    public string name;
+    public string phone;
+    public string email;
+    public string mixpanelDistinctId;
+    public string amplitudeDeviceId;
+    public string posthogDistinctId;
+    public string brazeDeviceId;
+    public string gaAppInstanceId;
+    public string gaSessionId;
+    public string userCreatedAt;
+    public bool isFirstTimeUser;
+}
+```
+
+---
+
+## Usage
+
+### Scene Setup
+
+1. Create an empty `GameObject` in your first scene
+2. Name it **`LinkrunnerCallbackHandler`** (must match exactly)
+3. Attach the `LinkrunnerSDK.cs` script to it
+
+### Initialization
+
+Call `Initialize` as early as possible — typically in your startup scene:
+
+```csharp
+void Start()
+{
+    LinkrunnerSDK.OnInitialized += (success, message) =>
+    {
+        Debug.Log($"Linkrunner initialized: {success}");
+    };
+
+    LinkrunnerSDK.Initialize(
+        token: "YOUR_PROJECT_TOKEN",
+        debug: true  // set false in production
+    );
+}
+```
+
+Find your project token at: [Dashboard → Documentation](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation)
+
+### User Signup
+
+Call once after the user completes onboarding:
+
+```csharp
+var userData = new LinkrunnerUserData
+{
+    id = "user_123",
+    name = "Jane Doe",
+    email = "jane@example.com",
+    isFirstTimeUser = true
+};
+
+LinkrunnerSDK.Signup(userData);
+```
+
+### Set User Data on App Open
+
+Call every time the app opens and the user is logged in:
+
+```csharp
+var userData = new LinkrunnerUserData
+{
+    id = "user_123",
+    name = "Jane Doe",
+    email = "jane@example.com"
+};
+
+LinkrunnerSDK.SetUserData(userData);
+```
+
+### Get Attribution Data
+
+```csharp
+LinkrunnerSDK.OnAttributionData += (jsonString) =>
+{
+    Debug.Log($"Attribution data: {jsonString}");
+    // Parse jsonString to access deeplink, campaignData, etc.
+};
+
+LinkrunnerSDK.GetAttributionData();
+```
+
+### Track Events
+
+```csharp
+// Simple event
+LinkrunnerSDK.TrackEvent("level_complete");
+
+// Event with data (pass as JSON string)
+string eventData = JsonUtility.ToJson(new { level = 5, score = 1200, time_seconds = 45 });
+LinkrunnerSDK.TrackEvent("level_complete", eventData);
+
+// Event with deduplication ID
+LinkrunnerSDK.TrackEvent("purchase", eventData, eventId: "purchase_abc123");
+```
+
+<Note>
+When tracking revenue-related events, the `amount` field must be a number (not a string) for ad network revenue optimization to work correctly.
+</Note>
+
+### Capture Payment
+
+```csharp
+LinkrunnerSDK.CapturePayment(
+    userId: "user_123",
+    amount: 9.99,
+    paymentId: "pay_abc123",
+    type: "FIRST_PAYMENT",
+    status: "PAYMENT_COMPLETED"
+);
+
+// With event data
+string eventData = "{\"product_id\": \"prod_456\", \"currency\": \"USD\"}";
+LinkrunnerSDK.CapturePayment(
+    userId: "user_123",
+    amount: 49.99,
+    paymentId: "pay_xyz789",
+    type: "ONE_TIME",
+    status: "PAYMENT_COMPLETED",
+    eventDataJson: eventData
+);
+```
+
+**Payment types:** `FIRST_PAYMENT`, `SECOND_PAYMENT`, `WALLET_TOPUP`, `FUNDS_WITHDRAWAL`, `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `ONE_TIME`, `RECURRING`, `DEFAULT`
+
+**Payment statuses:** `PAYMENT_INITIATED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, `PAYMENT_CANCELLED`
+
+### Remove Payment (Refunds)
+
+```csharp
+LinkrunnerSDK.RemovePayment(userId: "user_123", paymentId: "pay_abc123");
+```
+
+### Push Token
+
+```csharp
+LinkrunnerSDK.SetPushToken("your_firebase_or_apns_token");
+```
+
+### Privacy Controls
+
+```csharp
+// Enable PII hashing (hashes email, phone, etc. before sending)
+LinkrunnerSDK.EnablePIIHashing(true);
+
+// Disable Google Advertising ID collection (Android, call BEFORE Initialize)
+LinkrunnerSDK.SetDisableAaidCollection(true);
+```
+
+---
+
+## Function Placement Guide
+
+| Function | Where to Call | When |
+|---|---|---|
+| `Initialize` | First scene / App startup | Once at launch |
+| `GetAttributionData` | After init completes | When you need campaign/deeplink info |
+| `Signup` | After onboarding | Once per user |
+| `SetUserData` | Auth/session logic | Every app open with logged-in user |
+| `TrackEvent` | Throughout the app | On user actions |
+| `CapturePayment` | Payment flow | When payment succeeds |
+| `RemovePayment` | Refund flow | When payment is reversed |
+| `SetPushToken` | After token refresh | When push token changes |
+
+---
+
+## Automating iOS Dependency with a Post-Build Script
+
+Since Unity regenerates the Xcode project on each build, you can automate the SPM dependency addition using a Unity Editor script:
+
+Create `Assets/Editor/LinkrunnerPostBuild.cs`:
+
+```csharp
+#if UNITY_IOS
+using UnityEditor;
+using UnityEditor.Callbacks;
+using UnityEditor.iOS.Xcode;
+using System.IO;
+
+public class LinkrunnerPostBuild
+{
+    [PostProcessBuild(1)]
+    public static void OnPostProcessBuild(BuildTarget target, string path)
+    {
+        if (target != BuildTarget.iOS) return;
+
+        // Add Info.plist entries
+        string plistPath = Path.Combine(path, "Info.plist");
+        PlistDocument plist = new PlistDocument();
+        plist.ReadFromFile(plistPath);
+
+        plist.root.SetString("NSUserTrackingUsageDescription",
+            "This identifier will be used to deliver personalized ads and improve your app experience.");
+        plist.root.SetString("NSAdvertisingAttributionReportEndpoint",
+            "https://linkrunner-skan.com");
+        plist.root.SetString("AttributionCopyEndpoint",
+            "https://linkrunner-skan.com");
+
+        plist.WriteToFile(plistPath);
+    }
+}
+#endif
+```
+
+<Note>
+Unity's `PBXProject` API does not natively support adding SPM packages. After the Xcode project is generated, you will need to add the LinkrunnerKit SPM dependency manually in Xcode, or use a third-party tool like [unity-spm](https://github.com/nicktention/SwiftPackageManager-for-Unity) to automate it.
+</Note>
+
+---
+
+## Testing
+
+1. Enable debug mode: `LinkrunnerSDK.Initialize(token, debug: true)`
+2. Create a test campaign at [Dashboard → Create Campaign](https://dashboard.linkrunner.io/dashboard?m=create-campaign)
+3. Uninstall the app from your test device
+4. Click the campaign link on the device (opens in browser)
+5. Install and open the app build within 3 minutes
+6. Verify in the dashboard that click count, install count, and signup count increase
+7. Call `GetAttributionData()` to confirm attribution is returned
+
+For detailed testing steps, see the [Integration Testing Guide](/testing/integration-testing).
+
+---
+
+## Troubleshooting
+
+### Android
+
+- **Build errors with Kotlin coroutines**: Ensure your Unity project's Gradle version supports the Kotlin version bundled with the SDK. You may need to add `implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'` explicitly.
+- **ProGuard/R8 issues**: Add to your ProGuard rules:
+  ```
+  -keep class io.linkrunner.sdk.** { *; }
+  -keep class com.linkrunner.unity.** { *; }
+  ```
+- **Duplicate classes**: If another plugin includes Kotlin stdlib, use Gradle's `exclude` to avoid conflicts.
+
+### iOS
+
+- **Swift file not compiling**: Unity does not automatically compile `.swift` files. After generating the Xcode project, add `LinkrunnerUnityBridge.swift` to the **UnityFramework** target's **Compile Sources** build phase manually.
+- **"Use of unresolved identifier 'LinkrunnerSDK'"**: The LinkrunnerKit SPM package hasn't been added to the Xcode project. Add it via File → Add Package Dependencies.
+- **Bridging header issues**: When Xcode prompts to create a bridging header after adding the first Swift file, accept it. Ensure `SWIFT_VERSION` is set to `5.0` or higher in UnityFramework build settings.
+- **Linker errors**: Ensure you selected **LinkrunnerStatic** (not the dynamic variant) when adding the SPM package.
+- **ATT dialog not showing**: The `NSUserTrackingUsageDescription` key must be present in Info.plist. The SDK handles requesting permission automatically during initialization.
+
+### General
+
+- **Callbacks not received**: Verify the `GameObject` is named exactly `LinkrunnerCallbackHandler` and has the `LinkrunnerSDK.cs` script attached. It must exist in the scene when native code calls `UnitySendMessage`.
+- **Editor testing**: All SDK calls are no-ops in the Unity Editor and log to the console instead. Test on actual Android/iOS devices.
