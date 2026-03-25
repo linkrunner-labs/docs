@@ -58,12 +58,13 @@ Use the install webhook for:
 
 The `signup` webhook is triggered when you call the `.signup()` method in your app via the Linkrunner SDK. This happens after the user has signed up or logged in, so the `user_id` field will contain the ID you passed to the SDK.
 
-The signup webhook also includes device identifiers (`gaid`/`idfa`) along with the `user_id`, giving you a complete picture of both the device and the user.
+The signup webhook includes device identifiers (`gaid`/`idfa`) along with the `user_id`, giving you a complete picture of both the device and the user. It also includes user identity fields (`name`, `phone`, `email`) and any custom parameters you passed via `additional_data`, such as referral codes or other custom key-value pairs.
 
 Use the signup webhook for:
 - Linking attribution data to your user records
 - CRM integration and user onboarding flows
 - Calculating signup conversion rates from installs
+- Forwarding custom parameters (e.g., referral codes) to your backend
 
 <Note>
 To receive signup webhooks, you must call `.signup()` in your app after the user signs up or logs in. See your SDK's usage guide for implementation details.
@@ -88,8 +89,8 @@ All webhooks are sent as POST requests with a JSON body.
 | `user_id` | `string` \| `null` | Customer user ID (if provided via SDK) |
 | `campaign_id` | `string` | Unique identifier for the campaign |
 | `campaign_name` | `string` \| `null` | Human-readable campaign name |
-| `network_name` | `string` \| `null` | Attribution network: `ORGANIC`, `META`, or `GOOGLE` |
-| `ad_channel` | `string` \| `null` | Ad channel identifier |
+| `network_name` | `string` \| `null` | Attribution network: `ORGANIC`, `META`, `GOOGLE`, etc. |
+| `ad_channel` | `string` \| `null` | Ad channel: `META`, `GOOGLE`, `TIKTOK`, `APPLE_SEARCH_ADS`, etc. |
 | `attributed_on` | `ISO 8601 date` | Timestamp when attribution occurred |
 | `installed_at` | `ISO 8601 date` \| `null` | Timestamp of app installation |
 | `store_click_at` | `ISO 8601 date` \| `null` | Timestamp of store redirect click |
@@ -97,8 +98,15 @@ All webhooks are sent as POST requests with a JSON body.
 | `app_version` | `string` \| `null` | Installed app version |
 | `gaid` | `string` \| `null` | Google Advertising ID (Android) |
 | `idfa` | `string` \| `null` | Identifier for Advertisers (iOS) |
+| `name` | `string` \| `null` | User's name (from `user_data.name` passed to the SDK) |
+| `phone` | `string` \| `null` | User's phone number (from `user_data.phone` passed to the SDK) |
+| `email` | `string` \| `null` | User's email address (from `user_data.email` passed to the SDK) |
+| `additional_data` | `object` \| `null` | Custom parameters and device data (from the `data` field passed to the SDK) |
 | `meta_campaign_details` | `object` \| `null` | Meta Ads campaign details (see below) |
 | `google_campaign_details` | `object` \| `null` | Google Ads campaign details (see below) |
+<Note>
+The `name`, `phone`, `email`, and `additional_data` fields are populated from the user identity data you pass to the SDK's `.signup()` or `.trigger()` methods. These fields will be `null` for `install` events since no user data is available at install time.
+</Note>
 
 ### Meta Campaign Details
 
@@ -129,6 +137,85 @@ When the attribution is from Google Ads, `google_campaign_details` contains:
 | `ga_source` | `string` \| `null` | Google Analytics source |
 | `ad_group_id` | `string` \| `null` | Ad group ID |
 | `ad_group_name` | `string` \| `null` | Ad group name |
+
+### Additional Data
+
+The `additional_data` object contains custom parameters and device data passed through the SDK. This is useful for forwarding arbitrary key-value pairs like referral codes or custom identifiers through the attribution flow.
+
+Example:
+```json
+{
+  "id": "user_123",
+  "name": "Test User",
+  "email": "test@example.com",
+  "phone": "9876543210",
+  "device_data": {},
+  "referral_code": "ABC123",
+  "custom_param_name": "custom_value"
+}
+```
+
+## Example Payloads
+
+### Install Event
+
+```json
+{
+  "event_type": "install",
+  "user_id": null,
+  "campaign_id": "camp_XYZ123",
+  "ad_channel": "META",
+  "network_name": "META",
+  "app_version": "2.4.1",
+  "campaign_name": "Summer Promotion 2023",
+  "attributed_on": "2026-03-24T08:11:00.464Z",
+  "installed_at": "2026-03-24T08:11:00.464Z",
+  "store_click_at": "2026-03-24T08:11:00.464Z",
+  "link": "https://dl.linkrunner.io/?c=camp_XYZ123",
+  "meta_campaign_details": { ... },
+  "google_campaign_details": null,
+  "gaid": "bk9384xs-p449-96ds-r132",
+  "idfa": null,
+  "name": null,
+  "phone": null,
+  "email": null,
+  "additional_data": null
+}
+```
+
+### Signup Event
+
+```json
+{
+  "event_type": "signup",
+  "user_id": "test_user_webhook_002",
+  "campaign_id": "OgWmhiSXhG",
+  "ad_channel": "META",
+  "network_name": "ORGANIC",
+  "app_version": "1.0.0",
+  "campaign_name": "TOF - Free trial - AAA - DSDT - 17/12",
+  "attributed_on": "2026-03-25T15:52:00.007Z",
+  "installed_at": "2025-12-30T12:34:29.742Z",
+  "store_click_at": null,
+  "link": "https://dl.linkrunner.io/?c=OgWmhiSXhG&utm_source=meta_ads",
+  "meta_campaign_details": null,
+  "google_campaign_details": null,
+  "gaid": "5faa2433-d7e1-4a8e-9a1c-a5880c26ab5c",
+  "idfa": null,
+  "name": "Test User",
+  "phone": "9876543210",
+  "email": "test@example.com",
+  "additional_data": {
+    "id": "test_user_webhook_002",
+    "name": "Test User",
+    "email": "test@example.com",
+    "phone": "9876543210",
+    "device_data": {},
+    "referral_code": "ABC123",
+    "custom_param_name": "custom_value"
+  }
+}
+```
 
 ## Authentication
 
@@ -163,6 +250,7 @@ Linkrunner automatically formats webhook payloads for Slack when your URL contai
 - Campaign name
 - Attribution timestamps
 - Device identifiers (GAID/IDFA)
+- User identity (name, phone, email)
 - Meta campaign details (if applicable)
 
 To set up Slack notifications:
@@ -211,7 +299,9 @@ After 3 failed attempts, the webhook is marked as failed. Ensure your endpoint i
 - Check your private key matches the one in your [dashboard settings](https://dashboard.linkrunner.io/settings)
 
 **Missing data in payload?**
-- Some fields like `user_id` require SDK configuration to be passed
+- `name`, `phone`, `email`, and `additional_data` require you to pass user identity data to the SDK's `.signup()` or `.trigger()` methods
+- `user_id` requires SDK configuration to be passed
 - Device identifiers (`gaid`/`idfa`) depend on user consent and SDK implementation
+- `additional_data` contains custom parameters from the `data` field passed to the SDK
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
