@@ -104,8 +104,11 @@ All webhooks are sent as POST requests with a JSON body.
 | `additional_data` | `object` \| `null` | Custom parameters and device data (from the `data` field passed to the SDK) |
 | `meta_campaign_details` | `object` \| `null` | Meta Ads campaign details (see below) |
 | `google_campaign_details` | `object` \| `null` | Google Ads campaign details (see below) |
+
 <Note>
-The `name`, `phone`, `email`, and `additional_data` fields are populated from the user identity data you pass to the SDK's `.signup()` or `.trigger()` methods. These fields will be `null` for `install` events since no user data is available at install time.
+  The `name`, `phone`, and `email` fields are populated from `user_data` passed to the SDK's `.signup()` or `.trigger()` methods.  
+  The `additional_data` field is populated from the SDK `data` object.  
+  For `install` events, these fields are `null` since user-level signup data is not yet available.
 </Note>
 
 ### Meta Campaign Details
@@ -299,9 +302,9 @@ After 3 failed attempts, the webhook is marked as failed. Ensure your endpoint i
 - Check your private key matches the one in your [dashboard settings](https://dashboard.linkrunner.io/settings)
 
 **Missing data in payload?**
-- `name`, `phone`, `email`, and `additional_data` require you to pass user identity data to the SDK's `.signup()` or `.trigger()` methods
+- `name`, `phone`, and `email` require you to pass `user_data` to the SDK's `.signup()` or `.trigger()` methods
 - `user_id` requires SDK configuration to be passed
 - Device identifiers (`gaid`/`idfa`) depend on user consent and SDK implementation
-- `additional_data` contains custom parameters from the `data` field passed to the SDK
+- `additional_data` requires passing a `data` object to the SDK and contains those custom parameters
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
