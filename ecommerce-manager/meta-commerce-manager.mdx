@@ -26,6 +26,28 @@ To begin, you need to select your catalogue products within the Meta Commerce Ma
   alt="Select your catalogue products"
 />
 
+Make sure to add products with the correct `content_ids` and `item_group_ids`. There are various ways to add products — for example, manually or via CSV upload.
+
+Click the **+ Add** button to add products to the catalogue. From the Products Manager, you can either add products manually or upload a CSV file to add products with specific content IDs.
+
+<img
+  src="/images/ecommerce-event-meta/ecommerce-6.png"
+  alt="Add products to catalogue via manual entry or CSV upload"
+/>
+
+<Warning>
+Make sure that whenever you add a product to the Meta catalogue, it includes a **content ID**. This content ID should match the product ID on your side, and it must be the same ID you send through the Linkrunner SDK.
+
+When uploading products via CSV, use the `item_group_id` column to assign group IDs to your products. This is how Meta groups product variants together ensure these match the `item_group_ids` you send in your events.
+</Warning>
+
+The screenshot below shows exactly where to add the content ID when adding or uploading a product to your Meta catalogue:
+
+<img
+  src="/images/ecommerce-event-meta/ecommerce-7.png"
+  alt="Where to add content ID when uploading products to Meta catalogue"
+/>
+
 Each product in your catalog has a **Content ID** and an **Item group ID**. These are the values you'll use in the `content_ids` or `item_group_ids` fields when sending events — they're how Meta matches your events back to the correct catalog products.
 
 <img
@@ -88,27 +110,94 @@ When sending events via the [Capture Event API](/api-reference/event-capture) or
 The `item_price` in the `contents` array should match the product price in your Meta catalog. Mismatched prices can lower your catalogue match rate and affect ad optimization.
 </Tip>
 
-**Example `event_data` Payload:**
+**Example 1: Using `content_ids` (individual product variants)**
+
+Use `content_ids` when you want to target specific product variants (e.g., a particular size or color). Set `content_type` to `"product"`.
 
 ```json
 "event_data": {
+    // Use content_ids for individual product variants.
+    // These IDs must exactly match the Content ID in your Meta catalogue.
+    // For example, "sku_blue_tshirt_m" is the Content ID of a medium blue t-shirt
+    // and "sku_black_jeans_32" is the Content ID of size-32 black jeans.
     "content_ids": [
-        "whshct4mwc"
+        "sku_blue_tshirt_m",
+        "sku_black_jeans_32"
     ],
+
+    // Each entry in contents must have an "id" that matches one of the content_ids above.
+    // "quantity" is how many units the user interacted with.
+    // "item_price" is the unit price — this should match the price in your Meta catalogue.
     "contents": [
         {
-            "id": "whshct4mwc",
-            "quantity": 2,
-            "item_price": 1000
+            "id": "sku_blue_tshirt_m",
+            "quantity": 1,
+            "item_price": 799
+        },
+        {
+            "id": "sku_black_jeans_32",
+            "quantity": 1,
+            "item_price": 1499
         }
     ],
+
+    // Set to "product" when using content_ids (individual variants).
     "content_type": "product",
+
+    // ISO 4217 currency code.
     "currency": "INR",
-    "value": 2000.00,
+
+    // Total value = sum of (item_price * quantity) for all items.
+    // 799 * 1 + 1499 * 1 = 2298
+    "value": 2298.00,
+
+    // Total number of items across all entries in contents.
     "num_items": 2,
-    "order_id": "order_id_1234"
+
+    // Unique order ID from your backend (required for Purchase events).
+    "order_id": "order_98765"
 }
 ```
+
+**Example 2: Using `item_group_ids` (product groups)**
+
+Use `item_group_ids` when you want to boost an entire product group rather than a specific variant. For example, if a user views "Blue T-Shirt" (which comes in S, M, L), you send the group ID so Meta can optimize across all variants. Set `content_type` to `"product_group"`.
+
+```json
+"event_data": {
+    // Use item_group_ids to target entire product groups.
+    // "tshirt_blue" is the Item Group ID in your Meta catalogue that groups
+    // all size variants (S, M, L, XL) of the blue t-shirt.
+    // This must match the item_group_id column in your CSV upload
+    // or the Item Group ID field in Commerce Manager.
+    "item_group_ids": [
+        "tshirt_blue"
+    ],
+
+    // When using item_group_ids, the "id" in contents should match the group ID.
+    "contents": [
+        {
+            "id": "tshirt_blue",
+            "quantity": 1,
+            "item_price": 799
+        }
+    ],
+
+    // Set to "product_group" when using item_group_ids.
+    "content_type": "product_group",
+
+    "currency": "INR",
+    "value": 799.00,
+    "num_items": 1,
+    "order_id": "order_10234"
+}
+```
+
+<Tip>
+**When to use which?**
+- Use `content_ids` + `content_type: "product"` when you know the exact variant the user interacted with (e.g., they added "Blue T-Shirt Size M" to cart).
+- Use `item_group_ids` + `content_type: "product_group"` when you want Meta to optimize across all variants in a group (e.g., the user viewed the "Blue T-Shirt" product page without selecting a size).
+</Tip>
 
 ---
 
