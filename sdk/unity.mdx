@@ -18,7 +18,7 @@ Linkrunner does not have a dedicated Unity SDK. This guide walks you through int
 
 1. **iOS requires a Swift bridging layer.** The Linkrunner iOS SDK (`LinkrunnerKit`) is a pure Swift module — it does not inherit from `NSObject` and has no `@objc` annotations. Since Unity's native plugin system uses C/Objective-C, we provide a **Swift wrapper file** (`LinkrunnerUnityBridge.swift`) that exposes `@_cdecl` C-callable functions which internally call the Swift SDK's `async` methods.
 
-2. **Android uses Kotlin coroutine interop from Java.** The Linkrunner Android SDK methods are Kotlin `suspend` functions. The Java bridge calls them using `BuildersKt.runBlocking` on background threads. The Kotlin coroutines library is bundled with the SDK.
+2. **Android uses a Java-friendly callback wrapper.** The Linkrunner Android SDK provides `LinkrunnerJava`, a callback-based wrapper around the Kotlin SDK. This avoids Kotlin coroutine interop issues (Result\<T\> mangling, Continuation type mismatches, Kotlin version conflicts) that prevent Java callers from using the suspend-based API directly.
 
 3. **iOS SPM dependency must be re-added** each time Unity regenerates the Xcode project. See the [Automation Tips](#automating-ios-dependency-with-a-post-build-script) section for a partial workaround.
 
@@ -29,13 +29,13 @@ Linkrunner does not have a dedicated Unity SDK. This guide walks you through int
 
 The integration uses Unity's native plugin system:
 
-- **Android**: A Java bridge class calls the Linkrunner Android SDK (Kotlin) and communicates results back to Unity via `UnitySendMessage`.
+- **Android**: A Java bridge class calls `LinkrunnerJava` (the SDK's callback-based Java API) and communicates results back to Unity via `UnitySendMessage`.
 - **iOS**: A Swift bridge file wraps the Linkrunner iOS SDK's `async` methods into C-callable functions (via `@_cdecl`), which Unity calls through `[DllImport("__Internal")]`.
 - **C#**: A `LinkrunnerSDK.cs` wrapper provides a unified cross-platform API.
 
 ```
 C# (LinkrunnerSDK.cs)
-    ├── Android → Java Bridge → io.linkrunner.sdk.LinkRunner (Kotlin)
+    ├── Android → Java Bridge → io.linkrunner.sdk.LinkrunnerJava (callback API)
     └── iOS → Swift Bridge (@_cdecl) → LinkrunnerSDK.shared (Swift async)
 ```
 
@@ -97,13 +97,15 @@ import android.util.Log;
 
 import com.unity3d.player.UnityPlayer;
 
-import io.linkrunner.sdk.LinkRunner;
-import io.linkrunner.sdk.models.UserDataRequest;
-import io.linkrunner.sdk.models.CapturePaymentRequest;
-import io.linkrunner.sdk.models.RemovePaymentRequest;
+import io.linkrunner.sdk.LinkrunnerJava;
+import io.linkrunner.sdk.LinkRunnerCallback;
+import io.linkrunner.sdk.models.request.UserDataRequest;
+import io.linkrunner.sdk.models.request.CapturePaymentRequest;
+import io.linkrunner.sdk.models.request.RemovePaymentRequest;
 import io.linkrunner.sdk.models.IntegrationData;
 import io.linkrunner.sdk.models.PaymentType;
 import io.linkrunner.sdk.models.PaymentStatus;
+import io.linkrunner.sdk.models.response.AttributionData;
 
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -111,11 +113,6 @@ import org.json.JSONException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import kotlinx.coroutines.GlobalScope;
-import kotlinx.coroutines.Dispatchers;
-import kotlinx.coroutines.CoroutineScopeKt;
-import kotlinx.coroutines.BuildersKt;
 
 public class LinkrunnerBridge {
 
@@ -173,232 +170,217 @@ public class LinkrunnerBridge {
 
     public static void initialize(String token, String secretKey, String keyId, boolean debug) {
         Activity activity = UnityPlayer.currentActivity;
-        new Thread(() -> {
-            try {
-                LinkRunner lr = LinkRunner.getInstance();
-                Object result = BuildersKt.runBlocking(
-                    Dispatchers.getIO(),
-                    (scope, continuation) -> lr.init(
-                        activity.getApplicationContext(),
-                        token,
-                        null,  // link
-                        null,  // source
-                        secretKey.isEmpty() ? null : secretKey,
-                        keyId.isEmpty() ? null : keyId,
-                        debug,
-                        continuation
-                    )
-                );
-                sendToUnity("OnInitComplete", "success");
-            } catch (Exception e) {
-                Log.e(TAG, "Init failed: " + e.getMessage());
-                sendToUnity("OnInitComplete", "error:" + e.getMessage());
+        LinkrunnerJava lr = LinkrunnerJava.getInstance();
+        lr.init(
+            activity.getApplicationContext(),
+            token,
+            null,  // link
+            null,  // source
+            secretKey.isEmpty() ? null : secretKey,
+            keyId.isEmpty() ? null : keyId,
+            debug,
+            new LinkRunnerCallback<Void>() {
+                public void onSuccess(Void result) {
+                    sendToUnity("OnInitComplete", "success");
+                }
+                public void onError(String error) {
+                    Log.e(TAG, "Init failed: " + error);
+                    sendToUnity("OnInitComplete", "error:" + error);
+                }
             }
-        }).start();
+        );
     }
 
     public static void signup(String userDataJson, String additionalDataJson) {
-        new Thread(() -> {
-            try {
-                JSONObject obj = new JSONObject(userDataJson);
-                UserDataRequest userData = new UserDataRequest(
-                    obj.optString("id", ""),
-                    obj.optString("name", null),
-                    obj.optString("phone", null),
-                    obj.optString("email", null),
-                    obj.optString("mixpanelDistinctId", null),
-                    obj.optString("amplitudeDeviceId", null),
-                    obj.optString("posthogDistinctId", null),
-                    obj.optString("brazeDeviceId", null),
-                    obj.optString("gaAppInstanceId", null),
-                    obj.optString("gaSessionId", null),
-                    obj.optString("userCreatedAt", null),
-                    obj.has("isFirstTimeUser") ? obj.optBoolean("isFirstTimeUser") : null
-                );
+        try {
+            JSONObject obj = new JSONObject(userDataJson);
+            UserDataRequest userData = new UserDataRequest(
+                obj.optString("id", ""),
+                obj.optString("name", null),
+                obj.optString("phone", null),
+                obj.optString("email", null),
+                obj.optString("mixpanelDistinctId", null),
+                obj.optString("amplitudeDeviceId", null),
+                obj.optString("posthogDistinctId", null),
+                obj.optString("brazeDeviceId", null),
+                obj.optString("gaAppInstanceId", null),
+                obj.optString("gaSessionId", null),
+                obj.optString("userCreatedAt", null),
+                obj.has("isFirstTimeUser") ? obj.optBoolean("isFirstTimeUser") : null
+            );
 
-                Map<String, Object> additionalData = jsonToMap(additionalDataJson);
-                LinkRunner lr = LinkRunner.getInstance();
-                BuildersKt.runBlocking(
-                    Dispatchers.getIO(),
-                    (scope, continuation) -> lr.signup(
-                        userData,
-                        additionalData.isEmpty() ? null : additionalData,
-                        continuation
-                    )
-                );
-                sendToUnity("OnSignupComplete", "success");
-            } catch (Exception e) {
-                Log.e(TAG, "Signup failed: " + e.getMessage());
-                sendToUnity("OnSignupComplete", "error:" + e.getMessage());
-            }
-        }).start();
+            Map<String, Object> additionalData = jsonToMap(additionalDataJson);
+            LinkrunnerJava lr = LinkrunnerJava.getInstance();
+            lr.signup(
+                userData,
+                additionalData.isEmpty() ? null : additionalData,
+                new LinkRunnerCallback<Void>() {
+                    public void onSuccess(Void result) {
+                        sendToUnity("OnSignupComplete", "success");
+                    }
+                    public void onError(String error) {
+                        Log.e(TAG, "Signup failed: " + error);
+                        sendToUnity("OnSignupComplete", "error:" + error);
+                    }
+                }
+            );
+        } catch (JSONException e) {
+            Log.e(TAG, "Signup JSON parse failed: " + e.getMessage());
+            sendToUnity("OnSignupComplete", "error:" + e.getMessage());
+        }
     }
 
     public static void setUserData(String userDataJson) {
-        new Thread(() -> {
-            try {
-                JSONObject obj = new JSONObject(userDataJson);
-                UserDataRequest userData = new UserDataRequest(
-                    obj.optString("id", ""),
-                    obj.optString("name", null),
-                    obj.optString("phone", null),
-                    obj.optString("email", null),
-                    obj.optString("mixpanelDistinctId", null),
-                    obj.optString("amplitudeDeviceId", null),
-                    obj.optString("posthogDistinctId", null),
-                    obj.optString("brazeDeviceId", null),
-                    obj.optString("gaAppInstanceId", null),
-                    obj.optString("gaSessionId", null),
-                    obj.optString("userCreatedAt", null),
-                    obj.has("isFirstTimeUser") ? obj.optBoolean("isFirstTimeUser") : null
-                );
+        try {
+            JSONObject obj = new JSONObject(userDataJson);
+            UserDataRequest userData = new UserDataRequest(
+                obj.optString("id", ""),
+                obj.optString("name", null),
+                obj.optString("phone", null),
+                obj.optString("email", null),
+                obj.optString("mixpanelDistinctId", null),
+                obj.optString("amplitudeDeviceId", null),
+                obj.optString("posthogDistinctId", null),
+                obj.optString("brazeDeviceId", null),
+                obj.optString("gaAppInstanceId", null),
+                obj.optString("gaSessionId", null),
+                obj.optString("userCreatedAt", null),
+                obj.has("isFirstTimeUser") ? obj.optBoolean("isFirstTimeUser") : null
+            );
 
-                LinkRunner lr = LinkRunner.getInstance();
-                BuildersKt.runBlocking(
-                    Dispatchers.getIO(),
-                    (scope, continuation) -> lr.setUserData(userData, continuation)
-                );
-                sendToUnity("OnSetUserDataComplete", "success");
-            } catch (Exception e) {
-                Log.e(TAG, "SetUserData failed: " + e.getMessage());
-                sendToUnity("OnSetUserDataComplete", "error:" + e.getMessage());
-            }
-        }).start();
+            LinkrunnerJava lr = LinkrunnerJava.getInstance();
+            lr.setUserData(
+                userData,
+                new LinkRunnerCallback<Void>() {
+                    public void onSuccess(Void result) {
+                        sendToUnity("OnSetUserDataComplete", "success");
+                    }
+                    public void onError(String error) {
+                        Log.e(TAG, "SetUserData failed: " + error);
+                        sendToUnity("OnSetUserDataComplete", "error:" + error);
+                    }
+                }
+            );
+        } catch (JSONException e) {
+            Log.e(TAG, "SetUserData JSON parse failed: " + e.getMessage());
+            sendToUnity("OnSetUserDataComplete", "error:" + e.getMessage());
+        }
     }
 
     public static void getAttributionData() {
-        new Thread(() -> {
-            try {
-                LinkRunner lr = LinkRunner.getInstance();
-                Object result = BuildersKt.runBlocking(
-                    Dispatchers.getIO(),
-                    (scope, continuation) -> lr.getAttributionData(continuation)
-                );
-                // Result is AttributionData — serialize to JSON
-                JSONObject json = new JSONObject();
-                if (result != null) {
-                    json.put("raw", result.toString());
+        LinkrunnerJava lr = LinkrunnerJava.getInstance();
+        lr.getAttributionData(
+            new LinkRunnerCallback<AttributionData>() {
+                public void onSuccess(AttributionData result) {
+                    try {
+                        JSONObject json = new JSONObject();
+                        if (result != null) {
+                            json.put("raw", result.toString());
+                        }
+                        sendToUnity("OnAttributionDataReceived", json.toString());
+                    } catch (JSONException e) {
+                        sendToUnity("OnAttributionDataReceived", "error:" + e.getMessage());
+                    }
                 }
-                sendToUnity("OnAttributionDataReceived", json.toString());
-            } catch (Exception e) {
-                Log.e(TAG, "GetAttributionData failed: " + e.getMessage());
-                sendToUnity("OnAttributionDataReceived", "error:" + e.getMessage());
+                public void onError(String error) {
+                    Log.e(TAG, "GetAttributionData failed: " + error);
+                    sendToUnity("OnAttributionDataReceived", "error:" + error);
+                }
             }
-        }).start();
+        );
     }
 
     public static void trackEvent(String eventName, String eventDataJson, String eventId) {
-        new Thread(() -> {
-            try {
-                Map<String, Object> eventData = jsonToMap(eventDataJson);
-                LinkRunner lr = LinkRunner.getInstance();
-                BuildersKt.runBlocking(
-                    Dispatchers.getIO(),
-                    (scope, continuation) -> lr.trackEvent(
-                        eventName,
-                        eventData.isEmpty() ? null : eventData,
-                        eventId.isEmpty() ? null : eventId,
-                        continuation
-                    )
-                );
-                sendToUnity("OnTrackEventComplete", "success");
-            } catch (Exception e) {
-                Log.e(TAG, "TrackEvent failed: " + e.getMessage());
-                sendToUnity("OnTrackEventComplete", "error:" + e.getMessage());
+        Map<String, Object> eventData = jsonToMap(eventDataJson);
+        LinkrunnerJava lr = LinkrunnerJava.getInstance();
+        lr.trackEvent(
+            eventName,
+            eventData.isEmpty() ? null : eventData,
+            eventId.isEmpty() ? null : eventId,
+            new LinkRunnerCallback<Void>() {
+                public void onSuccess(Void result) {
+                    sendToUnity("OnTrackEventComplete", "success");
+                }
+                public void onError(String error) {
+                    Log.e(TAG, "TrackEvent failed: " + error);
+                    sendToUnity("OnTrackEventComplete", "error:" + error);
+                }
             }
-        }).start();
+        );
     }
 
     public static void capturePayment(String userId, double amount, String paymentId,
                                        String type, String status, String eventDataJson) {
-        new Thread(() -> {
-            try {
-                Map<String, Object> eventData = jsonToMap(eventDataJson);
-                CapturePaymentRequest request = new CapturePaymentRequest(
-                    paymentId.isEmpty() ? null : paymentId,
-                    userId,
-                    amount,
-                    parsePaymentType(type),
-                    parsePaymentStatus(status),
-                    eventData.isEmpty() ? null : eventData
-                );
-                LinkRunner lr = LinkRunner.getInstance();
-                BuildersKt.runBlocking(
-                    Dispatchers.getIO(),
-                    (scope, continuation) -> lr.capturePayment(request, continuation)
-                );
-                sendToUnity("OnCapturePaymentComplete", "success");
-            } catch (Exception e) {
-                Log.e(TAG, "CapturePayment failed: " + e.getMessage());
-                sendToUnity("OnCapturePaymentComplete", "error:" + e.getMessage());
+        Map<String, Object> eventData = jsonToMap(eventDataJson);
+        CapturePaymentRequest request = new CapturePaymentRequest(
+            paymentId.isEmpty() ? null : paymentId,
+            userId,
+            amount,
+            parsePaymentType(type),
+            parsePaymentStatus(status),
+            eventData.isEmpty() ? null : eventData
+        );
+        LinkrunnerJava lr = LinkrunnerJava.getInstance();
+        lr.capturePayment(
+            request,
+            new LinkRunnerCallback<Void>() {
+                public void onSuccess(Void result) {
+                    sendToUnity("OnCapturePaymentComplete", "success");
+                }
+                public void onError(String error) {
+                    Log.e(TAG, "CapturePayment failed: " + error);
+                    sendToUnity("OnCapturePaymentComplete", "error:" + error);
+                }
             }
-        }).start();
+        );
     }
 
     public static void removePayment(String userId, String paymentId) {
-        new Thread(() -> {
-            try {
-                RemovePaymentRequest request = new RemovePaymentRequest(
-                    paymentId.isEmpty() ? null : paymentId,
-                    userId.isEmpty() ? null : userId
-                );
-                LinkRunner lr = LinkRunner.getInstance();
-                BuildersKt.runBlocking(
-                    Dispatchers.getIO(),
-                    (scope, continuation) -> lr.removePayment(request, continuation)
-                );
-                sendToUnity("OnRemovePaymentComplete", "success");
-            } catch (Exception e) {
-                Log.e(TAG, "RemovePayment failed: " + e.getMessage());
-                sendToUnity("OnRemovePaymentComplete", "error:" + e.getMessage());
+        RemovePaymentRequest request = new RemovePaymentRequest(
+            paymentId.isEmpty() ? null : paymentId,
+            userId.isEmpty() ? null : userId
+        );
+        LinkrunnerJava lr = LinkrunnerJava.getInstance();
+        lr.removePayment(
+            request,
+            new LinkRunnerCallback<Void>() {
+                public void onSuccess(Void result) {
+                    sendToUnity("OnRemovePaymentComplete", "success");
+                }
+                public void onError(String error) {
+                    Log.e(TAG, "RemovePayment failed: " + error);
+                    sendToUnity("OnRemovePaymentComplete", "error:" + error);
+                }
             }
-        }).start();
+        );
     }
 
     public static void setPushToken(String pushToken) {
-        new Thread(() -> {
-            try {
-                LinkRunner lr = LinkRunner.getInstance();
-                BuildersKt.runBlocking(
-                    Dispatchers.getIO(),
-                    (scope, continuation) -> lr.setPushToken(pushToken, continuation)
-                );
-            } catch (Exception e) {
-                Log.e(TAG, "SetPushToken failed: " + e.getMessage());
-            }
-        }).start();
+        LinkrunnerJava lr = LinkrunnerJava.getInstance();
+        lr.setPushToken(pushToken, null);
     }
 
     public static void setAdditionalData(String clevertapId) {
-        new Thread(() -> {
-            try {
-                IntegrationData data = new IntegrationData(
-                    clevertapId.isEmpty() ? null : clevertapId
-                );
-                LinkRunner lr = LinkRunner.getInstance();
-                BuildersKt.runBlocking(
-                    Dispatchers.getIO(),
-                    (scope, continuation) -> lr.setAdditionalData(data, continuation)
-                );
-            } catch (Exception e) {
-                Log.e(TAG, "SetAdditionalData failed: " + e.getMessage());
-            }
-        }).start();
+        IntegrationData data = new IntegrationData(
+            clevertapId.isEmpty() ? null : clevertapId
+        );
+        LinkrunnerJava lr = LinkrunnerJava.getInstance();
+        lr.setAdditionalData(data, null);
     }
 
     public static void enablePIIHashing(boolean enabled) {
-        LinkRunner.getInstance().enablePIIHashing(enabled);
+        LinkrunnerJava.getInstance().enablePIIHashing(enabled);
     }
 
     public static void setDisableAaidCollection(boolean disabled) {
-        LinkRunner.getInstance().setDisableAaidCollection(disabled);
+        LinkrunnerJava.getInstance().setDisableAaidCollection(disabled);
     }
 }
 ```
 
-<Warning>
-The bridge code above uses `kotlinx.coroutines.BuildersKt.runBlocking` to call the SDK's suspend functions from Java. This is executed on a background thread to avoid blocking Unity's main thread. The Kotlin coroutines library is bundled with the Linkrunner Android SDK, so no additional dependencies are needed.
-</Warning>
+<Tip>
+The bridge uses `LinkrunnerJava`, a callback-based wrapper included in the Android SDK. It handles all Kotlin coroutine execution internally — no Kotlin imports, no `BuildersKt.runBlocking`, and no background thread management needed in your bridge code. Callbacks are invoked on a background IO thread, which is safe for `UnitySendMessage`.
+</Tip>
 
 ---
 
@@ -1217,7 +1199,6 @@ For detailed testing steps, see the [Integration Testing Guide](/testing/integra
 
 ### Android
 
-- **Build errors with Kotlin coroutines**: Ensure your Unity project's Gradle version supports the Kotlin version bundled with the SDK. You may need to add `implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'` explicitly.
 - **ProGuard/R8 issues**: Add to your ProGuard rules:
   ```
   -keep class io.linkrunner.sdk.** { *; }
