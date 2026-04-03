@@ -65,7 +65,16 @@
                                 ]
                             },
                             "features/webhooks",
-                            "features/social-media-intermediary-page"
+                            "features/social-media-intermediary-page",
+                            {
+                                "group": "Remarketing Campaigns",
+                                "pages": [
+                                    "features/remarketing-campaigns/introduction",
+                                    "features/remarketing-campaigns/google",
+                                    "features/remarketing-campaigns/meta",
+                                    "features/remarketing-campaigns/how-it-works"
+                                ]
+                            }
                         ]
                     },
                     {
