@@ -71,7 +71,14 @@
                                 "pages": [
                                     "features/remarketing-guide",
                                     "features/remarketing",
-                                    "features/remarketing-audience-segments",
+                                    {
+                                        "group": "Creating Audience Segments",
+                                        "pages": [
+                                            "features/remarketing-audience-segments",
+                                            "features/remarketing-audience-events",
+                                            "features/remarketing-audience-upload"
+                                        ]
+                                    },
                                     "features/remarketing-campaigns"
                                 ]
                             }
