@@ -1,0 +1,114 @@
+---
+title: "lr events suggest"
+description: "Get AI-suggested events optimized for ad campaign performance"
+icon: "wand-magic-sparkles"
+---
+
+## Usage
+
+```bash
+lr events suggest [options]
+```
+
+## Description
+
+Analyzes your codebase with AI to recommend the most impactful events for ad campaign optimization. The suggestions are tailored to your app's functionality and connected ad networks, distinguishing between custom events and revenue events.
+
+Requires authentication. Run `lr login` first.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--platform <type>` | Override the auto-detected platform (`flutter`, `react-native`, `expo`, `ios`, `android`, `capacitor`, `web`) |
+| `--json` | Output suggestions as JSON |
+| `--no-insert` | Skip code insertion prompts |
+| `--project-id <id>` | Project ID for ad network context (defaults to `.linkrunner.json` value) |
+
+## How It Works
+
+1. **Scans your codebase** to understand your app's functionality
+2. **Checks connected ad networks** (if project ID is available) for postback mapping context
+3. **Generates 5 event suggestions** using AI, including a mix of custom and revenue events
+4. **Lets you select** which events to add via an interactive checklist
+5. **Generates platform-specific code** for each selected event
+6. **Offers to copy** all generated code to your clipboard
+
+## Output
+
+Each suggested event includes:
+
+- **Name** -- the event name to use in your code
+- **Type** -- `custom` or `revenue`
+- **Description** -- what the event tracks
+- **Why it helps** -- how it improves campaign optimization
+- **Ad network mapping** -- which ad network events it maps to
+
+```
+── Suggested Events for Ad Campaign Optimization ──
+
+  Your app handles payments. 2 revenue events and 3 custom events suggested.
+
+  1. * add_to_cart [ custom ]
+     User adds an item to their shopping cart
+     Why: High-intent signal for campaign lookalike optimization
+     Maps to: Meta AddToCart, Google add_to_cart
+
+  2. $ purchase [ revenue ]
+     User completes a purchase
+     Why: Primary conversion event for ROAS optimization
+     Maps to: Meta Purchase, Google in_app_purchase
+
+? Select events to add: (all selected by default)
+```
+
+## JSON Output
+
+```bash
+lr events suggest --json
+```
+
+```json
+{
+  "hasRevenue": true,
+  "events": [
+    {
+      "name": "add_to_cart",
+      "type": "custom",
+      "description": "User adds an item to their shopping cart",
+      "whyItHelps": "High-intent signal for campaign lookalike optimization",
+      "adNetworkMapping": "Meta AddToCart, Google add_to_cart",
+      "sampleProperties": {
+        "item_id": "SKU-123",
+        "item_name": "Example Product"
+      }
+    }
+  ]
+}
+```
+
+## Examples
+
+### Interactive mode
+
+```bash
+lr events suggest
+```
+
+### With specific project context
+
+```bash
+lr events suggest --project-id 123
+```
+
+### Non-interactive (JSON output, no insertion)
+
+```bash
+lr events suggest --json --no-insert
+```
+
+## Related
+
+- [lr events add](/cli/commands/events) -- manually create event tracking code
+- [lr suggest](/cli/commands/suggest) -- general SDK feature suggestions
+- [Event Capture API](/api-reference/event-capture) -- server-side event tracking

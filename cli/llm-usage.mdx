@@ -1,0 +1,183 @@
+---
+title: "LLM / AI Agent Usage"
+description: "Use the Linkrunner CLI non-interactively with Claude Code, Cursor, and other AI coding assistants"
+icon: "robot"
+---
+
+The `lr` CLI supports fully non-interactive operation, making it usable by LLMs and AI coding agents like Claude Code and Cursor. Every interactive prompt can be bypassed with flags, and most commands support `--json` output.
+
+## Authentication
+
+AI agents need a CLI token or API key. Set it as an environment variable and authenticate non-interactively:
+
+```bash
+export LINKRUNNER_TOKEN="your-token-here"
+lr login --token $LINKRUNNER_TOKEN
+```
+
+Tokens persist in `~/.config/linkrunner-cli/config.json` after login.
+
+## Non-Interactive Init
+
+The `lr init` command is fully scriptable with flags:
+
+```bash
+lr init --project-id 123 --yes --json
+```
+
+### All Init Flags
+
+| Flag | Purpose |
+|------|---------|
+| `--project-id <id>` | Use this project directly (skip selection prompt) |
+| `--platform <type>` | Override auto-detected platform type |
+| `--skip-install` | Skip SDK package installation |
+| `--skip-config` | Skip platform config modifications (AndroidManifest, Info.plist) |
+| `--skip-snippets` | Skip code snippet display and auto-insertion |
+| `--skip-doctor` | Skip post-setup doctor check |
+| `--yes` | Accept all defaults without prompting |
+| `--json` | Output structured JSON result |
+
+Valid platform types: `flutter`, `react-native`, `expo`, `ios`, `android`, `capacitor`, `web`
+
+### JSON Output Schema
+
+When using `--json`, init returns:
+
+```json
+{
+  "success": true,
+  "project": {
+    "id": 123,
+    "name": "My App",
+    "company": "My Company"
+  },
+  "platform": "flutter",
+  "configPath": "/path/to/.linkrunner.json",
+  "projectToken": "tok_...",
+  "sdkInstall": {
+    "installed": true,
+    "command": "flutter pub add linkrunner"
+  },
+  "configModifications": {
+    "applied": ["Add INTERNET and ACCESS_NETWORK_STATE permissions"],
+    "skipped": []
+  },
+  "snippets": {
+    "init": "// initialization code...",
+    "signup": "// signup code...",
+    "setUserData": "// setUserData code..."
+  }
+}
+```
+
+## Complete Non-Interactive Command Reference
+
+### Diagnostics
+
+```bash
+lr doctor --json                     # Validate SDK integration, JSON output
+lr doctor --fix --json               # Auto-fix issues
+lr test --json                       # Test API connectivity and token validity
+lr test --deep --json                # Also verify deep link domains
+lr analyze --json                    # AI-powered deep analysis
+```
+
+### Deep Linking
+
+```bash
+lr deeplink setup --domain example.com --yes    # Configure without prompts
+lr deeplink setup --skip-ios --yes              # Android only
+```
+
+### Event Tracking
+
+```bash
+# Custom event (fully non-interactive)
+lr events add --platform flutter --type custom --name "purchase_complete" --json --no-insert
+
+# Payment event (outputs code, no auto-insert)
+lr events add --platform react-native --type payment --json --no-insert
+
+# Signup event
+lr events add --platform expo --type signup --json --no-insert
+```
+
+### Project Info
+
+```bash
+lr status --json                     # Project dashboard data
+lr suggest --json                    # Feature recommendations
+```
+
+## LLM Workflows
+
+### Initial Project Setup
+
+```bash
+# 1. Authenticate
+lr login --token $LINKRUNNER_TOKEN
+
+# 2. Initialize SDK (non-interactive)
+lr init --project-id 123 --yes --json
+
+# 3. Verify setup
+lr doctor --json
+```
+
+### Diagnose and Fix Issues
+
+```bash
+# 1. Check for problems
+lr doctor --json
+
+# 2. Auto-fix what's possible
+lr doctor --fix --json
+
+# 3. Verify API connectivity
+lr test --json
+```
+
+### Add Event Tracking
+
+```bash
+# 1. Generate event code
+lr events add --platform flutter --type custom --name "button_click" --json --no-insert
+
+# 2. Parse the JSON output and insert the code at the appropriate location
+```
+
+### Minimal Setup (Skip Everything Optional)
+
+```bash
+lr init --project-id 123 --platform flutter --skip-install --skip-config --skip-snippets --skip-doctor --json
+```
+
+This creates only the `.linkrunner.json` config file without touching any other project files.
+
+## Context File Templates
+
+The CLI includes template files that AI agents can use for context:
+
+- **`LINKRUNNER_CLAUDE.md`** -- append to your project's `CLAUDE.md` for Claude Code
+- **`linkrunner.cursorrules`** -- add to your project root for Cursor
+
+These templates contain the complete non-interactive command reference, common workflows, and key config file locations.
+
+## Key Config Files
+
+| File | Purpose |
+|------|---------|
+| `.linkrunner.json` | Project configuration (token, platform settings, credentials) |
+| `android/app/src/main/AndroidManifest.xml` | Android permissions and deep link intent filters |
+| `ios/<AppName>/Info.plist` | iOS tracking permissions |
+| `app.json` | Expo plugin configuration |
+
+## Global Flags
+
+These flags work with any command:
+
+| Flag | Purpose |
+|------|---------|
+| `--debug` | Enable verbose debug logging |
+| `--env <environment>` | Override environment (production, staging, local) |

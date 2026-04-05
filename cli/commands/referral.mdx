@@ -1,0 +1,110 @@
+---
+title: "lr referral setup"
+description: "Configure referral code tracking for your project"
+icon: "share-nodes"
+---
+
+## Usage
+
+```bash
+lr referral setup [options]
+```
+
+## Description
+
+Configures referral code tracking by scanning your codebase for existing referral patterns, helping you choose a referral parameter name, and generating platform-specific code to extract referral codes from deep links.
+
+Requires authentication and a `.linkrunner.json` file. Run `lr init` first if you don't have one.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--param <name>` | Referral query parameter name (skip detection and selection) |
+| `--yes` | Accept defaults without prompting |
+| `--json` | Output results as JSON |
+
+## What It Does
+
+### 1. Scans for Existing Referral Patterns
+
+The CLI scans your codebase for existing referral flows, including:
+
+- Referral SDKs (e.g., Branch, Firebase Dynamic Links)
+- URL parameter extraction patterns
+- Referral-related variable names and functions
+
+If patterns are found, the CLI shows the evidence and suggests using the same parameter name for consistency.
+
+### 2. Chooses a Parameter Name
+
+If no existing pattern is detected (or you want a different name), you choose from:
+
+- `ref` (recommended)
+- `referrer`
+- `invite_code`
+- Custom name
+
+### 3. Generates Your Referral Link Format
+
+```
+https://get.yourapp.com?ref=REFERRAL_CODE
+https://get.yourapp.com/path?ref=REFERRAL_CODE
+```
+
+### 4. Generates Code Snippet
+
+Platform-specific code to extract the referral code from the deep link URL in your app. For example, in Flutter:
+
+```dart
+final initData = await LinkRunner().init(
+  token: 'YOUR_TOKEN',
+);
+
+final referralCode = initData.deepLinkData?['ref'];
+if (referralCode != null) {
+  // Handle referral code
+}
+```
+
+## Examples
+
+### Interactive setup
+
+```bash
+lr referral setup
+```
+
+### With a specific parameter name
+
+```bash
+lr referral setup --param invite_code
+```
+
+### Non-interactive
+
+```bash
+lr referral setup --param ref --yes
+```
+
+### JSON output
+
+```bash
+lr referral setup --json
+```
+
+```json
+{
+  "param_name": "ref",
+  "domain": "get.yourapp.com",
+  "link_format": "https://get.yourapp.com?ref=REFERRAL_CODE",
+  "platform": "flutter",
+  "code_snippet": "// referral extraction code..."
+}
+```
+
+## Related
+
+- [Referral Codes](/features/referral-codes) -- dashboard configuration guide
+- [lr deeplink setup](/cli/commands/deeplink) -- configure deep linking (required for referral links)
+- [lr init](/cli/commands/init) -- set up your project first

@@ -1,0 +1,98 @@
+---
+title: "Authentication"
+description: "How the Linkrunner CLI authenticates with your account"
+icon: "key"
+---
+
+The CLI uses **API keys** to authenticate with the Linkrunner API. There are two ways to obtain a key: the device login flow (recommended) or manual key creation from the dashboard.
+
+## Device Login Flow
+
+When you run `lr login`, the CLI uses an OAuth2 Device Authorization flow:
+
+1. The CLI requests a **user code** from the Linkrunner API
+2. You are shown a code (e.g. `BVKD-3NH7`) and a URL to open in your browser
+3. You open the URL, log into the Linkrunner dashboard, and authorize the code
+4. The CLI polls for approval and receives an API key automatically
+
+```
+$ lr login
+
+  Your device code: BVKD-3NH7
+
+  Open this URL to authorize:
+  https://dashboard.linkrunner.io/cli/auth?code=BVKD-3NH7
+
+  Waiting for authorization...
+
+  ✔ Logged in successfully!
+```
+
+<Note>
+The device code expires after **10 minutes**. If it expires, run `lr login` again to get a new code.
+</Note>
+
+## API Keys
+
+Each login creates an API key that is stored locally. Keys have the prefix `lr_cli_` and can be managed from the Linkrunner dashboard.
+
+### Key Properties
+
+| Property | Description |
+|---|---|
+| **Prefix** | Starts with `lr_cli_` (first 12 chars visible in dashboard) |
+| **Label** | Optional name for identification (auto-set to "CLI Login" for device flow) |
+| **Last Used** | Timestamp of the most recent API call |
+| **Created** | When the key was generated |
+
+### Managing Keys from the Dashboard
+
+Go to **Settings > CLI Keys** in the Linkrunner dashboard to:
+
+- **View** all active CLI API keys and when they were last used
+- **Create** a new key manually (useful for CI/CD or shared environments)
+- **Revoke** a key to immediately invalidate it
+
+<Warning>
+Revoking a key is permanent. Any CLI session using that key will need to re-authenticate with `lr login`.
+</Warning>
+
+### Creating Keys for CI/CD
+
+For automated environments where interactive login isn't possible, create a key manually:
+
+1. Go to **Settings > CLI Keys** in the dashboard
+2. Click **Create New Key**
+3. Copy the key (it's only shown once)
+4. Set it as an environment variable:
+
+```bash
+export LINKRUNNER_API_KEY=lr_cli_...
+```
+
+The CLI automatically picks up the `LINKRUNNER_API_KEY` environment variable when no stored session exists.
+
+## Credential Storage
+
+Your API key is stored in a local config file managed by [conf](https://github.com/sindresorhus/conf):
+
+- **macOS:** `~/Library/Preferences/linkrunner-nodejs/config.json`
+- **Linux:** `~/.config/linkrunner-nodejs/config.json`
+- **Windows:** `%APPDATA%/linkrunner-nodejs/config.json`
+
+## Logout
+
+To clear your stored credentials:
+
+```bash
+lr logout
+```
+
+This removes the locally stored API key but does **not** revoke it on the server. To fully revoke access, also delete the key from **Settings > CLI Keys** in the dashboard.
+
+## Security
+
+- API keys are hashed (SHA-256) before storage on the server — the raw key is never stored
+- Keys are scoped to your user account, not individual projects
+- The device flow codes use an ambiguity-excluded character set to avoid typos
+- Device codes are single-use and expire after 10 minutes

@@ -1,0 +1,97 @@
+---
+title: "lr deeplink push"
+description: "Push deep link verification files to Linkrunner-hosted domains"
+icon: "cloud-arrow-up"
+---
+
+## Usage
+
+```bash
+lr deeplink push [options]
+```
+
+## Description
+
+Generates and pushes deep link verification files (`assetlinks.json` for Android and `apple-app-site-association` for iOS) to your Linkrunner-hosted domains. This eliminates the need to manually host these files on your own server.
+
+Requires authentication and a `.linkrunner.json` file. Your project must have at least one domain configured in the Linkrunner dashboard.
+
+## Options
+
+| Flag | Description |
+|---|---|
+| `--skip-android` | Skip Android verification file |
+| `--skip-ios` | Skip iOS verification file |
+| `--yes` | Auto-confirm all prompts |
+| `--json` | Output results as JSON |
+
+## What It Does
+
+### Android — Digital Asset Links
+
+1. **Resolves SHA-256 fingerprints** using this priority:
+   - Fingerprints already in `.linkrunner.json`
+   - Auto-extracted from your debug keystore (if `keytool` is available)
+   - Auto-extracted from your Gradle signing config
+   - Manual input (with format validation)
+2. **Generates `assetlinks.json`** with your package name and fingerprints
+3. **Pushes to all project domains** so they're served at `https://{domain}/.well-known/assetlinks.json`
+
+### iOS — Apple App Site Association
+
+1. **Resolves Team ID** from `.linkrunner.json` (`team_id` or `app_prefix`), or prompts for manual input
+2. **Generates AASA file** with your team ID and bundle ID
+3. **Pushes to all project domains** so it's served at `https://{domain}/.well-known/apple-app-site-association`
+
+After pushing, any extracted fingerprints or team IDs that were entered manually are saved back to `.linkrunner.json` for future use.
+
+## Examples
+
+### Push both platforms
+
+```bash
+lr deeplink push
+```
+
+```
+── Push Deep Link Verification Files ──
+  Project: My App
+✔ Found 1 domain(s): get.myapp.com
+
+── Android — Digital Asset Links ──
+  Using SHA-256 fingerprints from .linkrunner.json (1 fingerprint(s))
+
+── iOS — Apple App Site Association ──
+
+? Push verification files to 1 domain(s)? Yes
+✔ Verification objects pushed successfully
+
+  ✔ https://get.myapp.com/.well-known/apple-app-site-association
+  ✔ https://get.myapp.com/.well-known/assetlinks.json
+```
+
+### iOS only
+
+```bash
+lr deeplink push --skip-android
+```
+
+### Non-interactive
+
+```bash
+lr deeplink push --yes
+```
+
+## Verifying Your Setup
+
+After pushing, use `lr test --deep` to confirm the verification files are accessible and valid:
+
+```bash
+lr test --deep
+```
+
+## Related
+
+- [lr deeplink setup](/cli/commands/deeplink) -- configure intent filters and associated domains locally
+- [Deep Linking Verification](/features/deep-linking-verification) -- verification file details
+- [lr test](/cli/commands/test) -- verify deep link domain and files
