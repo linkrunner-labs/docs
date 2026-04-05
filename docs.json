@@ -67,8 +67,19 @@
                             "features/webhooks",
                             "features/social-media-intermediary-page",
                             {
-                                "group": "Remarketing Campaigns",
+                                "group": "Remarketing",
                                 "pages": [
+                                    "features/remarketing-guide",
+                                    "features/remarketing",
+                                    {
+                                        "group": "Creating Audience Segments",
+                                        "pages": [
+                                            "features/remarketing-audience-segments",
+                                            "features/remarketing-audience-events",
+                                            "features/remarketing-audience-upload"
+                                        ]
+                                    },
+                                    "features/remarketing-campaigns",
                                     "features/remarketing-campaigns/introduction",
                                     "features/remarketing-campaigns/google",
                                     "features/remarketing-campaigns/meta",
