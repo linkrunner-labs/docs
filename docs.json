@@ -65,7 +65,8 @@
                                 ]
                             },
                             "features/webhooks",
-                            "features/social-media-intermediary-page"
+                            "features/social-media-intermediary-page",
+                            "features/remarketing"
                         ]
                     },
                     {
