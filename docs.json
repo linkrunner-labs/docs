@@ -79,7 +79,11 @@
                                             "features/remarketing-audience-upload"
                                         ]
                                     },
-                                    "features/remarketing-campaigns"
+                                    "features/remarketing-campaigns",
+                                    "features/remarketing-campaigns/introduction",
+                                    "features/remarketing-campaigns/google",
+                                    "features/remarketing-campaigns/meta",
+                                    "features/remarketing-campaigns/how-it-works"
                                 ]
                             }
                         ]
