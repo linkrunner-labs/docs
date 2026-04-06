@@ -612,9 +612,6 @@ import linkrunner from 'rn-linkrunner';
 
 function App() {
   useEffect(() => {
-    // Init SDK first
-    linkrunner.init('your_project_token');
-
     // Cold start — app was launched by a deeplink
     Linking.getInitialURL().then((url) => {
       if (url) {
