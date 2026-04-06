@@ -144,13 +144,14 @@ Implementation references:
 
 ## Testing Remarketing
 
-After verifying basic attribution (click → install → signup), you can test remarketing to confirm reengagement and reinstall reattribution are working.
+After verifying basic attribution (click → install → signup), you can test remarketing to confirm reengagement and install reattribution are working.
 
 ### Prerequisites
 
 - Complete the [basic test flow](#test-flow-click--install--signup) above first (click → install → signup).
 - [Deep linking](/features/deep-linking-setup) is configured in your app.
 - The `handleDeepLink` function from the Linkrunner SDK is implemented. See your SDK usage guide for details.
+- [Android backup configuration](/sdk/react-native#step-4%3A-android-backup-configuration) is set up (required for reinstall detection on Android).
 
 ### Test 1: Reengagement (Deep Link Open)
 
@@ -166,7 +167,7 @@ This test verifies that a returning user opening the app via a deep link is attr
 **Expected result:**
 - In the **Retargeting view** on the dashboard, the reengagement campaign should show **Reengagement: 1**.
 
-### Test 2: Reinstall Reattribution
+### Test 2: Install Reattribution
 
 This test verifies that a user who uninstalls and reinstalls the app is attributed as a reattribution.
 
