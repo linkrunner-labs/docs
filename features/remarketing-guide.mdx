@@ -11,17 +11,6 @@ Follow these steps to set up and run remarketing campaigns with Linkrunner.
 
     [Remarketing & Reattribution](/features/remarketing)
   </Step>
-  <Step title="Set up deep link capture in your SDK">
-    Call the `handleDeeplink` function in your SDK to capture deep link opens. This is required for Linkrunner to detect returning users via deep links and trigger reattribution.
-
-    This also applies to push notification campaigns sent via engagement platforms like MoEngage, WebEngage, and others. Create a remarketing campaign on Linkrunner, use the campaign link in a push notification, and pass the deep link to `handleDeeplink` when the app is opened from that notification. Linkrunner will attribute the reactivation to the correct campaign.
-
-    - [Android](/sdk/android#handle-deeplink)
-    - [iOS](/sdk/ios#handle-deeplink)
-    - [React Native](/sdk/react-native#handle-deeplink)
-    - [Flutter](/sdk/flutter#handle-deeplink)
-    - [Capacitor](/sdk/capacitor#handle-deeplink)
-  </Step>
   <Step title="Create audience segments">
     Build custom audience segments on Meta and Google using tracked events already being sent to the ad platform.
 
@@ -32,8 +21,8 @@ Follow these steps to set up and run remarketing campaigns with Linkrunner.
 
     [Running Remarketing Campaigns](/features/remarketing-campaigns)
   </Step>
-  <Step title="Configure reattribution windows">
-    Set the inactivity window and lookback window from the Linkrunner dashboard to control how returning users are attributed.
+  <Step title="Configure reattribution settings">
+    Set the inactivity window from the Linkrunner dashboard to control how returning users are attributed.
 
     [Dashboard > Settings > Remarketing](https://dashboard.linkrunner.io/settings)
   </Step>

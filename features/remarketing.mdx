@@ -3,7 +3,7 @@ title: "Remarketing & Reattribution"
 icon: "arrows-rotate"
 ---
 
-Remarketing lets you measure when existing users return to your app through your campaigns. Linkrunner tracks these returning users through **reattribution** — attributing a returning user to the campaign that brought them back.
+Remarketing lets you measure when existing users return to your app through your campaigns. Linkrunner tracks these returning users through **reattribution** — attributing a returning user back to the campaign that brought them back.
 
 ## How Reattribution Works
 
@@ -11,10 +11,10 @@ When a user who has already installed your app returns after a period of inactiv
 
 For a user to be reattributed, two conditions must be met:
 
-1. **The user must have been inactive** for at least the configured **inactivity window** (default: 7 days).
-2. **A matching ad interaction** (click) must exist within the configured **lookback window** (default: 7 days).
+1. **The user must have been inactive** for at least the configured **inactivity window** (default: 0 days).
+2. **The reinstall must occur within the reattribution eligibility window** — the maximum time between an uninstall and reinstall for the return to count as a reattribution (default: 90 days).
 
-If both conditions are satisfied, the user's return is attributed to the campaign associated with that ad interaction, and a **reengagement** record is created.
+If both conditions are satisfied, the user's return is attributed to the campaign associated with the ad interaction, and a **reengagement** record is created.
 
 ## Reattribution Triggers
 
@@ -24,31 +24,31 @@ Linkrunner supports three reactivation events:
 
 - **App Install (Reinstall)** — The user reinstalls the app after previously uninstalling it. Linkrunner detects reinstalls using device identifiers (GAID on Android, IDFA on iOS).
 
-- **Deep Link Open** — The user clicks a Linkrunner deep link and is redirected into the app. Only Linkrunner-generated links are eligible for reattribution.
+- **Deep Link Open** — The user clicks a Linkrunner deep link and is redirected into the app. Only Linkrunner-generated links are eligible for reattribution. See the [deep linking setup guide](/features/deep-linking-setup) for handling deep links in your app.
 
 - **Direct Open (App Open)** — The user launches an already-installed app without clicking a tracking link. The very first launch after install counts as an App Install, not a Direct Open.
+
+<Note>
+On iOS, ATT (App Tracking Transparency) permission must be granted by the user for reattribution to work. Without ATT consent, Linkrunner cannot access the IDFA needed to identify returning users.
+</Note>
+
+## Push Notification Campaigns
+
+Remarketing campaigns also include push notification campaigns run through engagement platforms like **MoEngage** and **WebEngage**. These campaigns are tracked as remarketing campaigns within Linkrunner.
+
+The flow is similar to a user opening the app via a Linkrunner link — the marketer creates a campaign on Linkrunner and uses the generated link in a push notification campaign on engagement platforms. When a user opens the app through the push notification link, Linkrunner attributes the return to that campaign.
 
 ## Understanding the Windows
 
 ### Inactivity Window
 
-The minimum number of days a user must be inactive (no app opens) before they can qualify for reattribution.
+The minimum number of days a user must be inactive before they can qualify for reattribution. Linkrunner determines inactivity based on the **last app open** — the time since the user last opened the app is compared against the configured inactivity window.
 
 | | |
 |---|---|
-| **Default** | 7 days |
+| **Default** | 0 days |
 
-**Example:** With a 7-day inactivity window, a user who last opened the app 3 days ago would **not** qualify for reattribution. A user who last opened the app 10 days ago **would** qualify.
-
-### Lookback Window
-
-The time window after an ad interaction (click) during which a returning user can be attributed to that campaign.
-
-| | |
-|---|---|
-| **Default** | 7 days |
-
-**Example:** With a 7-day lookback window, if a user clicked an ad 5 days ago and returns to the app today after being inactive, the return is attributed to that campaign. If the click was 10 days ago, no attribution is made.
+**Example:** With a 7-day inactivity window, a user whose last app open was 3 days ago would **not** qualify for reattribution. A user whose last app open was 10 days ago **would** qualify.
 
 ### Reattribution Window
 
@@ -69,8 +69,7 @@ You can configure remarketing settings from the Linkrunner dashboard:
 From this page you can:
 
 - **Enable or disable** remarketing for your project.
-- **Set the inactivity window** — the minimum inactive days before a user qualifies for reattribution.
-- **Set the lookback window** — the time after an ad click during which a returning user can be attributed to that campaign.
+- **Set the inactivity window** — the minimum inactive days (based on last app open) before a user qualifies for reattribution.
 
 <Note>
 Changes to these settings apply to all future reattribution checks. Existing reattribution records are not affected.
