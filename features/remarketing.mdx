@@ -20,13 +20,11 @@ If both conditions are satisfied, the user's return is attributed to the campaig
 
 A reactivation event is the event a user completes to come back to the app. Reactivation events trigger reattribution and signal a user's return.
 
-Linkrunner supports three reactivation events:
+Linkrunner supports two reactivation events:
 
 - **App Install (Reinstall)** — The user reinstalls the app after previously uninstalling it. Linkrunner detects reinstalls using device identifiers (GAID on Android, IDFA on iOS).
 
-- **Deep Link Open** — The user clicks a Linkrunner deep link and is redirected into the app. Only Linkrunner-generated links are eligible for reattribution. See the [deep linking setup guide](/features/deep-linking-setup) for handling deep links in your app.
-
-- **Direct Open (App Open)** — The user launches an already-installed app without clicking a tracking link. The very first launch after install counts as an App Install, not a Direct Open.
+- **Deep Link Open** — The user clicks a deep link and is redirected into the app. For reattribution to work, deep linking must be configured in your app and the `handleDeepLink` function from the Linkrunner SDK must be called when the app opens via a deep link. See the [deep linking setup guide](/features/deep-linking-setup) for configuration details.
 
 <Note>
 On iOS, ATT (App Tracking Transparency) permission must be granted by the user for reattribution to work. Without ATT consent, Linkrunner cannot access the IDFA needed to identify returning users.
