@@ -770,6 +770,38 @@ Connect Firebase Cloud Messaging (FCM) with Linkrunner
 
 </AccordionGroup>
 
+## Handle Deeplink
+
+To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
+
+```kotlin
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // Cold start deeplink
+        handleDeeplinkFromIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+
+        // Warm start deeplink
+        handleDeeplinkFromIntent(intent)
+    }
+
+    private fun handleDeeplinkFromIntent(intent: Intent) {
+        intent.data?.let { uri ->
+            lifecycleScope.launch {
+                LinkRunner.getInstance().handleDeeplink(uri.toString())
+            }
+        }
+    }
+}
+```
+
 ## Function Placement Guide
 
 | Function                                            | Where to Place                         | When to Call                                   |
@@ -783,6 +815,7 @@ Connect Firebase Cloud Messaging (FCM) with Linkrunner
 | `LinkRunner.getInstance().capturePayment`           | Payment processing                     | When user makes a payment                      |
 | `LinkRunner.getInstance().removePayment`            | Refund flow                            | When payment needs to be removed               |
 | `LinkRunner.getInstance().setPushToken`             | Push notification setup                | When FCM token is available                    |
+| `LinkRunner.getInstance().handleDeeplink`           | Deep link entry points                 | When app is opened via a deep link             |
 | `LinkRunner.getInstance().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection       |
 | `LinkRunner.getInstance().isAaidCollectionDisabled` | Privacy settings or compliance checks  | When you need to check AAID collection status  |
 

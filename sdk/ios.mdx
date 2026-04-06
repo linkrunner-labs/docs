@@ -638,6 +638,57 @@ Connect APNs with Linkrunner
     </Accordion>
 </AccordionGroup>
 
+## Handle Deeplink
+
+To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
+
+Add the following to your `SceneDelegate.swift`:
+
+```swift
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    var window: UIWindow?
+
+    // Cold start via Universal Link
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
+               options connectionOptions: UIScene.ConnectionOptions) {
+        // Check if app was launched via a Universal Link
+        if let userActivity = connectionOptions.userActivities.first,
+           userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+           let url = userActivity.webpageURL {
+            Task {
+                await LinkrunnerSDK.shared.handleDeeplink(url: url.absoluteString)
+            }
+        }
+
+        // Check if app was launched via a custom URL scheme
+        if let urlContext = connectionOptions.urlContexts.first {
+            Task {
+                await LinkrunnerSDK.shared.handleDeeplink(url: urlContext.url.absoluteString)
+            }
+        }
+    }
+
+    // Warm start — Universal Links (app already running in background)
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+              let url = userActivity.webpageURL else { return }
+
+        Task {
+            await LinkrunnerSDK.shared.handleDeeplink(url: url.absoluteString)
+        }
+    }
+
+    // Warm start — Custom URL schemes (app already running in background)
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+
+        Task {
+            await LinkrunnerSDK.shared.handleDeeplink(url: url.absoluteString)
+        }
+    }
+}
+```
+
 ## Function Placement Guide
 
 | Function                                     | Where to Place                 | When to Call                                   |
@@ -651,6 +702,7 @@ Connect APNs with Linkrunner
 | `LinkrunnerSDK.shared.capturePayment`        | Payment processing             | When user makes a payment                      |
 | `LinkrunnerSDK.shared.removePayment`         | Refund flow                    | When payment needs to be removed               |
 | `LinkrunnerSDK.shared.setPushToken`          | Push notification setup        | When APNs token is available                   |
+| `LinkrunnerSDK.shared.handleDeeplink`        | SceneDelegate deep link entry points | When app is opened via a deep link       |
 
 ## Complete Example
 
