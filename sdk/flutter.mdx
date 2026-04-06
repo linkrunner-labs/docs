@@ -794,6 +794,54 @@ Connect APNs with Linkrunner
     </Accordion>
 </AccordionGroup>
 
+## Handle Deeplink
+
+To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:app_links/app_links.dart';
+import 'package:linkrunner/linkrunner.dart';
+
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _appLinks = AppLinks();
+
+  @override
+  void initState() {
+    super.initState();
+    _initLinkRunner();
+  }
+
+  Future<void> _initLinkRunner() async {
+    // Init SDK first
+    await LinkRunner().init('your_project_token');
+
+    // Cold start — app was launched by a deeplink
+    final initialLink = await _appLinks.getInitialLink();
+    if (initialLink != null) {
+      LinkRunner().handleDeeplink(initialLink.toString());
+    }
+
+    // Warm start — app was in background, deeplink brought it to foreground
+    _appLinks.uriLinkStream.listen((Uri uri) {
+      LinkRunner().handleDeeplink(uri.toString());
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      // your app content
+    );
+  }
+}
+```
+
 ## Function Placement Guide
 
 | Function                                | Where to Place                         | When to Call                                   |
@@ -806,6 +854,7 @@ Connect APNs with Linkrunner
 | `LinkRunner().trackEvent`               | Throughout app                         | When specific user actions occur               |
 | `LinkRunner().capturePayment`           | Payment processing                     | When user makes a payment                      |
 | `LinkRunner().removePayment`            | Refund flow                            | When payment needs to be removed               |
+| `LinkRunner().handleDeeplink`           | Deep link entry points                 | When app is opened via a deep link             |
 | `LinkRunner().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection       |
 | `LinkRunner().isAaidCollectionDisabled` | Privacy settings or compliance checks  | When you need to check AAID collection status  |
 

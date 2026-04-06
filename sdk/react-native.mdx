@@ -601,6 +601,41 @@ Connect APNs with Linkrunner
     </Accordion>
 </AccordionGroup>
 
+## Handle Deeplink
+
+To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
+
+```javascript
+import { useEffect } from 'react';
+import { Linking } from 'react-native';
+import linkrunner from 'rn-linkrunner';
+
+function App() {
+  useEffect(() => {
+    // Init SDK first
+    linkrunner.init('your_project_token');
+
+    // Cold start — app was launched by a deeplink
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        linkrunner.handleDeeplink(url);
+      }
+    });
+
+    // Warm start — app was in background, deeplink brought it to foreground
+    const subscription = Linking.addEventListener('url', ({ url }) => {
+      linkrunner.handleDeeplink(url);
+    });
+
+    return () => subscription.remove();
+  }, []);
+
+  return (
+    // your app content
+  );
+}
+```
+
 ## Function Placement Guide
 
 | Function                        | Where to Place                 | When to Call                                   |
@@ -614,6 +649,7 @@ Connect APNs with Linkrunner
 | `linkrunner.capturePayment`     | Payment processing             | When user makes a payment                      |
 | `linkrunner.removePayment`      | Refund flow                    | When payment needs to be removed               |
 | `linkrunner.setPushToken`       | Push notification setup        | When FCM/APNs token is available               |
+| `linkrunner.handleDeeplink`     | Deep link entry points         | When app is opened via a deep link             |
 
 ## Next Steps
 
