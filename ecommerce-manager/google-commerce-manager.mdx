@@ -89,7 +89,7 @@ _In the Linkrunner Dashboard, go to your Google Ads integration settings and map
 
 ## Understanding `event_data` for Google
 
-When sending events via the [Capture Event API](/api-reference/event-capture) or [Capture Payment API](/api-reference/revenue-tracking), you need to include specific fields in `event_data` so Google can correctly attribute conversions and match products in your Merchant Center catalog.
+When sending events via the [Capture Event API](/api-reference/event-capture), [Capture Payment API](/api-reference/revenue-tracking), or the Linkrunner SDK (`trackEvent` and `capturePayment` methods), you need to include specific fields in `event_data` so Google can correctly attribute conversions and match products in your Merchant Center catalog.
 
 ### Required Fields
 
@@ -233,4 +233,4 @@ It can take up to **24 hours** for conversion data to appear after your first ev
 
 ---
 
-> **Note:** For full API details and request schemas, refer to the [Capture Event API](/api-reference/event-capture) and [Capture Payment API](/api-reference/revenue-tracking) documentation.
+> **Note:** The `event_data` fields above can be sent via the Linkrunner SDK (`trackEvent` and `capturePayment` methods) or directly via the APIs. For full request schemas, refer to the [Capture Event API](/api-reference/event-capture) and [Capture Payment API](/api-reference/revenue-tracking) documentation.
