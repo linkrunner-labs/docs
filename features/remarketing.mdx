@@ -26,6 +26,11 @@ Linkrunner supports two reactivation events:
 
 - **Deep Link Open** — The user clicks a deep link and is redirected into the app. For reattribution to work, deep linking must be configured in your app and the `handleDeepLink` function from the Linkrunner SDK must be called when the app opens via a deep link. See the [deep linking setup guide](/features/deep-linking-setup) for configuration details.
 
+**Prerequisites for reattribution tracking:**
+- [Deep linking](/features/deep-linking-setup) must be set up in your app.
+- The `handleDeepLink` function from the Linkrunner SDK must be implemented. Refer to your SDK guide ([React Native](/sdk/react-native#handle-deeplink), [Flutter](/sdk/flutter#handle-deeplink), [Android](/sdk/android#handle-deeplink), [iOS](/sdk/ios#handle-deeplink)) for details.
+- Android backup configuration must be set up for reinstall detection on Android. Refer to your SDK guide ([React Native](/sdk/react-native#step-4%3A-android-backup-configuration), [Flutter](/sdk/flutter#backup-configuration), [Android](/sdk/android#step-3%3A-backup-configuration)) for details.
+
 <Note>
 On iOS, ATT (App Tracking Transparency) permission must be granted by the user for reattribution to work. Without ATT consent, Linkrunner cannot access the IDFA needed to identify returning users.
 </Note>

@@ -142,6 +142,49 @@ Implementation references:
 -   [iOS Usage (signup)](https://docs.linkrunner.io/sdk/ios/usage)
 -   [Android Usage (signup)](https://docs.linkrunner.io/sdk/android/usage)
 
+## Testing Remarketing
+
+After verifying basic attribution (click → install → signup), you can test remarketing to confirm reengagement and install reattribution are working.
+
+### Prerequisites
+
+- Complete the [basic test flow](#test-flow-click--install--signup) above first (click → install → signup).
+- [Deep linking](/features/deep-linking-setup) is configured in your app.
+- The `handleDeepLink` function from the Linkrunner SDK is implemented. Refer to your SDK guide ([React Native](/sdk/react-native#handle-deeplink), [Flutter](/sdk/flutter#handle-deeplink), [Android](/sdk/android#handle-deeplink), [iOS](/sdk/ios#handle-deeplink)) for details.
+- Android backup configuration is set up for reinstall detection on Android. Refer to your SDK guide ([React Native](/sdk/react-native#step-4%3A-android-backup-configuration), [Flutter](/sdk/flutter#backup-configuration), [Android](/sdk/android#step-3%3A-backup-configuration)) for details.
+
+### Test 1: Reengagement (Deep Link Open)
+
+This test verifies that a returning user opening the app via a deep link is attributed to a reengagement campaign.
+
+1. **Create a campaign and install the app** — Follow the [basic test flow](#test-flow-click--install--signup) above to create a campaign, click the link, and install the app.
+
+2. **Create a reengagement campaign** — Create a new campaign in the dashboard. This will be your reengagement campaign.
+   - [Create Campaign](https://dashboard.linkrunner.io/dashboard?m=create-campaign)
+
+3. **Click the reengagement campaign link** — Open the reengagement campaign link on the same device. The app should open via the deep link.
+
+**Expected result:**
+- In the **Retargeting view** on the dashboard, the reengagement campaign should show **Reengagement: 1**.
+
+### Test 2: Install Reattribution
+
+This test verifies that a user who uninstalls and reinstalls the app is attributed as a reattribution.
+
+1. **Create a campaign and install the app** — Follow the [basic test flow](#test-flow-click--install--signup) above to create a campaign, click the link, and install the app.
+
+2. **Create a reengagement campaign** — Create a new campaign in the dashboard.
+   - [Create Campaign](https://dashboard.linkrunner.io/dashboard?m=create-campaign)
+
+3. **Uninstall the app** — Remove the app from the test device.
+
+4. **Click the reengagement campaign link** — Open the reengagement campaign link on the same device.
+
+5. **Reinstall the app** — Install and open the app again on the device.
+
+**Expected result:**
+- In the **Retargeting view** on the dashboard, the reengagement campaign should show the **Reattribution** count incremented by 1.
+
 ## Troubleshooting
 
 ### Click count not increasing
