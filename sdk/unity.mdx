@@ -390,12 +390,11 @@ public class LinkrunnerBridge {
                 public void onSuccess(io.linkrunner.sdk.models.response.DeeplinkData result) {
                     try {
                         JSONObject json = new JSONObject();
-                        if (result != null) {
-                            json.put("deeplink", result.getDeeplink());
-                            json.put("is_linkrunner", result.isLinkrunner());
-                            if (result.getProcessing() != null) {
-                                json.put("processing", result.getProcessing());
-                            }
+                        // Always include keys with defaults for stable payload shape
+                        json.put("deeplink", result != null ? result.getDeeplink() : JSONObject.NULL);
+                        json.put("is_linkrunner", result != null && result.isLinkrunner());
+                        if (result != null && result.getProcessing() != null) {
+                            json.put("processing", result.getProcessing());
                         }
                         sendToUnity("OnHandleDeeplinkComplete", json.toString());
                     } catch (JSONException e) {
@@ -1034,6 +1033,16 @@ public class LinkrunnerSDK : MonoBehaviour
     void OnHandleDeeplinkComplete(string message)
     {
         OnDeeplinkHandled?.Invoke(message);
+    }
+
+    /// <summary>
+    /// Called by native code (DeeplinkActivity on Android, AppDelegate on iOS) when the app
+    /// is opened via a deeplink. This method forwards the URL to HandleDeeplink for processing.
+    /// </summary>
+    void OnDeeplinkReceived(string url)
+    {
+        Debug.Log($"[Linkrunner] Deeplink received from native: {url}");
+        HandleDeeplink(url);
     }
 }
 
