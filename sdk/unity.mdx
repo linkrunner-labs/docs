@@ -706,6 +706,9 @@ func linkrunnerHandleDeeplink(_ deeplinkUrl: UnsafePointer<CChar>?) {
         var result: [String: Any] = [:]
         result["deeplink"] = response.deeplink as Any
         result["is_linkrunner"] = response.isLinkrunner
+        if let processing = response.processing {
+            result["processing"] = processing
+        }
         
         if let jsonData = try? JSONSerialization.data(withJSONObject: result),
            let jsonStr = String(data: jsonData, encoding: .utf8) {
