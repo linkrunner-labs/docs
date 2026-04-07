@@ -17,6 +17,7 @@ Follow these steps to set up and run remarketing campaigns with Linkrunner.
     - Set up [deep linking](/features/deep-linking-setup) in your app.
     - Implement the `handleDeepLink` function from the Linkrunner SDK. Refer to your [SDK guide](/sdk/react-native) for details.
     - Android backup configuration must be set up for reinstall detection on Android. Refer to your respective [SDK guide](/sdk/react-native) for details.
+    - On iOS, ATT (App Tracking Transparency) permission must be granted by the user. Without ATT consent, Linkrunner cannot access the IDFA needed to identify returning users.
   </Step>
   <Step title="Create audience segments">
     Build custom audience segments on Meta and Google using tracked events already being sent to the ad platform.
