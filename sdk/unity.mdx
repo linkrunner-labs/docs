@@ -375,6 +375,39 @@ public class LinkrunnerBridge {
     public static void setDisableAaidCollection(boolean disabled) {
         LinkrunnerJava.getInstance().setDisableAaidCollection(disabled);
     }
+
+    public static void handleDeeplink(String deeplinkUrl) {
+        if (deeplinkUrl == null || deeplinkUrl.isEmpty()) {
+            Log.d(TAG, "handleDeeplink called with null or empty URL, ignoring");
+            sendToUnity("OnHandleDeeplinkComplete", "{\"deeplink\":null,\"is_linkrunner\":false}");
+            return;
+        }
+
+        LinkrunnerJava lr = LinkrunnerJava.getInstance();
+        lr.handleDeeplink(
+            deeplinkUrl,
+            new LinkRunnerCallback<io.linkrunner.sdk.models.response.DeeplinkData>() {
+                public void onSuccess(io.linkrunner.sdk.models.response.DeeplinkData result) {
+                    try {
+                        JSONObject json = new JSONObject();
+                        // Always include keys with defaults for stable payload shape
+                        json.put("deeplink", result != null ? result.getDeeplink() : JSONObject.NULL);
+                        json.put("is_linkrunner", result != null && result.isLinkrunner());
+                        if (result != null && result.getProcessing() != null) {
+                            json.put("processing", result.getProcessing());
+                        }
+                        sendToUnity("OnHandleDeeplinkComplete", json.toString());
+                    } catch (JSONException e) {
+                        sendToUnity("OnHandleDeeplinkComplete", "error:" + e.getMessage());
+                    }
+                }
+                public void onError(String error) {
+                    Log.e(TAG, "HandleDeeplink failed: " + error);
+                    sendToUnity("OnHandleDeeplinkComplete", "error:" + error);
+                }
+            }
+        );
+    }
 }
 ```
 
@@ -662,6 +695,29 @@ func linkrunnerSetAdditionalData(_ clevertapId: UnsafePointer<CChar>?) {
 func linkrunnerEnablePIIHashing(_ enabled: Bool) {
     LinkrunnerSDK.shared.enablePIIHashing(enabled)
 }
+
+@_cdecl("_LinkrunnerHandleDeeplink")
+func linkrunnerHandleDeeplink(_ deeplinkUrl: UnsafePointer<CChar>?) {
+    let url = toOptionalString(deeplinkUrl)
+    
+    Task {
+        let response = await LinkrunnerSDK.shared.handleDeeplink(url: url)
+        
+        var result: [String: Any] = [:]
+        result["deeplink"] = response.deeplink as Any
+        result["is_linkrunner"] = response.isLinkrunner
+        if let processing = response.processing {
+            result["processing"] = processing
+        }
+        
+        if let jsonData = try? JSONSerialization.data(withJSONObject: result),
+           let jsonStr = String(data: jsonData, encoding: .utf8) {
+            sendToUnity("OnHandleDeeplinkComplete", jsonStr)
+        } else {
+            sendToUnity("OnHandleDeeplinkComplete", "error:serialization_failed")
+        }
+    }
+}
 ```
 
 <Warning>
@@ -701,6 +757,7 @@ public class LinkrunnerSDK : MonoBehaviour
     public static event Action<bool, string> OnEventTracked;
     public static event Action<bool, string> OnPaymentCaptured;
     public static event Action<bool, string> OnPaymentRemoved;
+    public static event Action<string> OnDeeplinkHandled;
 
 #if UNITY_IOS && !UNITY_EDITOR
     [DllImport("__Internal")]
@@ -726,6 +783,8 @@ public class LinkrunnerSDK : MonoBehaviour
     private static extern void _LinkrunnerSetAdditionalData(string clevertapId);
     [DllImport("__Internal")]
     private static extern void _LinkrunnerEnablePIIHashing(bool enabled);
+    [DllImport("__Internal")]
+    private static extern void _LinkrunnerHandleDeeplink(string deeplinkUrl);
 #endif
 
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -902,6 +961,23 @@ public class LinkrunnerSDK : MonoBehaviour
     }
 
     /// <summary>
+    /// Handle a deeplink for re-engagement attribution.
+    /// Call this when the app is opened via a deeplink (cold start or warm start).
+    /// Result is delivered via the OnDeeplinkHandled event.
+    /// </summary>
+    public static void HandleDeeplink(string deeplinkUrl)
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        Bridge.CallStatic("handleDeeplink", deeplinkUrl ?? "");
+#elif UNITY_IOS && !UNITY_EDITOR
+        _LinkrunnerHandleDeeplink(deeplinkUrl);
+#else
+        Debug.Log("[Linkrunner] HandleDeeplink: " + deeplinkUrl);
+        OnDeeplinkHandled?.Invoke("{\"deeplink\":\"" + deeplinkUrl + "\",\"is_linkrunner\":false}");
+#endif
+    }
+
+    /// <summary>
     /// Disable Google Advertising ID collection (Android only, for COPPA compliance).
     /// Must be called before Initialize().
     /// </summary>
@@ -955,6 +1031,21 @@ public class LinkrunnerSDK : MonoBehaviour
     {
         bool success = message == "success";
         OnPaymentRemoved?.Invoke(success, message);
+    }
+
+    void OnHandleDeeplinkComplete(string message)
+    {
+        OnDeeplinkHandled?.Invoke(message);
+    }
+
+    /// <summary>
+    /// Called by native code (DeeplinkActivity on Android, AppDelegate on iOS) when the app
+    /// is opened via a deeplink. This method forwards the URL to HandleDeeplink for processing.
+    /// </summary>
+    void OnDeeplinkReceived(string url)
+    {
+        Debug.Log($"[Linkrunner] Deeplink received from native: {url}");
+        HandleDeeplink(url);
     }
 }
 
@@ -1053,6 +1144,79 @@ LinkrunnerSDK.OnAttributionData += (jsonString) =>
 LinkrunnerSDK.GetAttributionData();
 ```
 
+### Handle Deeplinks
+
+Call `HandleDeeplink` when your app is opened via a deeplink — both cold start (app was closed) and warm start (app was in background):
+
+```csharp
+void Start()
+{
+    // Subscribe to deeplink results
+    LinkrunnerSDK.OnDeeplinkHandled += (jsonString) =>
+    {
+        Debug.Log($"Deeplink handled: {jsonString}");
+        // Parse jsonString to access deeplink URL and is_linkrunner flag
+        // Example response: {"deeplink":"https://yourapp.link/promo","is_linkrunner":true}
+    };
+}
+
+// Call when app receives a deeplink
+public void OnDeeplinkReceived(string url)
+{
+    LinkrunnerSDK.HandleDeeplink(url);
+}
+```
+
+<Note>
+The `is_linkrunner` field indicates whether the deeplink was created through Linkrunner. Use this to determine if you should apply Linkrunner-specific attribution logic.
+</Note>
+
+For Unity deeplink handling, you'll need to implement platform-specific code to capture the deeplink URL:
+
+<Tabs>
+<Tab title="Android">
+Create a custom `UnityPlayerActivity` to capture deeplinks:
+
+```java
+// Assets/Plugins/Android/DeeplinkActivity.java
+package com.yourcompany.yourapp;
+
+import android.content.Intent;
+import android.os.Bundle;
+import com.unity3d.player.UnityPlayerActivity;
+import com.unity3d.player.UnityPlayer;
+
+public class DeeplinkActivity extends UnityPlayerActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        handleDeeplink(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleDeeplink(intent);
+    }
+
+    private void handleDeeplink(Intent intent) {
+        if (intent != null && intent.getData() != null) {
+            String url = intent.getData().toString();
+            // Send to Unity - LinkrunnerCallbackHandler must exist in scene
+            UnityPlayer.UnitySendMessage("LinkrunnerCallbackHandler", "OnDeeplinkReceived", url);
+        }
+    }
+}
+```
+
+Update your `AndroidManifest.xml` to use this activity and add intent filters for your deeplink scheme.
+</Tab>
+<Tab title="iOS">
+Deeplinks on iOS are handled through the `AppDelegate`. After Unity generates the Xcode project, modify `UnityAppController.mm` or use a native plugin to forward deeplink URLs to Unity via `UnitySendMessage`.
+</Tab>
+</Tabs>
+
 ### Track Events
 
 ```csharp
@@ -1134,6 +1298,7 @@ LinkrunnerSDK.SetDisableAaidCollection(true);
 | `CapturePayment` | Payment flow | When payment succeeds |
 | `RemovePayment` | Refund flow | When payment is reversed |
 | `SetPushToken` | After token refresh | When push token changes |
+| `HandleDeeplink` | Deeplink entry points | When app is opened via a deeplink |
 
 ---
 
