@@ -16,7 +16,7 @@ Google Merchant Center lets you upload your product catalog so it can appear acr
 
 ## Step 1: Create a Google Merchant Center Account and Link to Google Ads
 
-First, create your Google Merchant Center account at [merchant.google.com](https://business.google.com/in/merchant-center/replace). During setup, you'll provide your business name, website URL, and country.
+First, create your Google Merchant Center account at [merchant.google.com](https://business.google.com/in/merchant-center). During setup, you'll provide your business name, website URL, and country.
 
 Once your account is created, you need to link it to your Google Ads account so your product data can be used in campaigns.
 
@@ -121,6 +121,7 @@ await linkrunner.trackEvent(
 {
   "token": "your_project_token",
   "event_name": "view_item",
+  "user_id": "user_123",
   "install_instance_id": "abc-123",
   "event_data": {
     "content_ids": ["sku_blue_tshirt"]   // Must match ID or SKU in Google Merchant Center
@@ -153,6 +154,7 @@ await linkrunner.trackEvent(
 {
   "token": "your_project_token",
   "event_name": "add_to_cart",
+  "user_id": "user_123",
   "install_instance_id": "abc-123",
   "event_data": {
     "content_ids": ["sku_blue_tshirt"],  // Must match ID or SKU in Google Merchant Center
@@ -210,7 +212,7 @@ await linkrunner.capturePayment({
 
 </CodeGroup>
 
-_The SDK examples above use React Native syntax. The same `eventData` fields apply across all SDKs — for platform-specific examples (Flutter, iOS, Android, etc.), refer to the [Ecommerce Events section](/sdk/react-native#ecommerce-events) in each SDK guide._
+_The SDK examples above use React Native syntax. The same `eventData` fields apply across all SDKs — for platform-specific examples, refer to the Ecommerce Events section in each SDK guide: [React Native](/sdk/react-native#ecommerce-events), [Flutter](/sdk/flutter#ecommerce-events), [iOS](/sdk/ios#ecommerce-events), [Android](/sdk/android#ecommerce-events)._
 
 <Warning>
 The `content_ids` you send must exactly match the **ID or SKU** of the product in Google Merchant Center (the same ID from Step 3). If they don't match, Google won't be able to link the conversion back to the correct product in your catalog.
