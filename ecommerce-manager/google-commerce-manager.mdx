@@ -72,7 +72,7 @@ This is a critical step. The product IDs in Google Merchant Center must exactly 
 In Google Merchant Center, each product has an **ID** (also called `offer_id`). This is the value you'll use when sending ecommerce events through Linkrunner. If these IDs don't match, Google won't be able to attribute events back to the correct products.
 
 <Warning>
-Make sure the product `id` you send in your Linkrunner events exactly matches the **ID / Offer ID** of the product in Google Merchant Center. A mismatch will break product attribution and lower your campaign performance.
+Make sure the product `id` you send in your Linkrunner events exactly matches the **ID (`offer_id`)** of the product in Google Merchant Center. A mismatch will break product attribution and lower your campaign performance.
 </Warning>
 
 ## Step 4: Event Mapping
@@ -95,7 +95,7 @@ When sending events via the [Capture Event API](/api-reference/event-capture), [
 
 | Parameter     | Type   | Required for                              | Description                                                                 |
 | ------------- | ------ | ----------------------------------------- | --------------------------------------------------------------------------- |
-| `content_ids` | array  | `view_item`, `add_to_cart`, `ecommerce_purchase` | Product IDs — must exactly match the **ID or SKU** in Google Merchant Center |
+| `content_ids` | array  | `view_item`, `add_to_cart`, `ecommerce_purchase` | Product IDs — must exactly match the **ID (`offer_id`)** in Google Merchant Center |
 | `value`       | number | `add_to_cart`, `ecommerce_purchase`       | Total revenue value. No currency symbols.                                   |
 | `currency`    | string | `add_to_cart`, `ecommerce_purchase`       | 3-letter ISO currency code (e.g., `"INR"`, `"USD"`)                         |
 | `num_items`   | number | `add_to_cart`, `ecommerce_purchase`       | Total quantity of items                                                      |
@@ -111,7 +111,7 @@ Fired when a user views a product page.
 await linkrunner.trackEvent(
   "view_item", // Map this custom event to "view_item" in the Linkrunner Dashboard
   {
-    content_ids: ["sku_blue_tshirt"], // Must match ID or SKU in Google Merchant Center
+    content_ids: ["sku_blue_tshirt"], // Must match Merchant Center ID (offer_id)
   },
 );
 ```
@@ -124,7 +124,7 @@ await linkrunner.trackEvent(
   "user_id": "user_123",
   "install_instance_id": "abc-123",
   "event_data": {
-    "content_ids": ["sku_blue_tshirt"]   // Must match ID or SKU in Google Merchant Center
+    "content_ids": ["sku_blue_tshirt"]   // Must match Merchant Center ID (offer_id)
   }
 }
 ```
@@ -141,7 +141,7 @@ Fired when a user adds a product to their cart.
 await linkrunner.trackEvent(
   "add_to_cart", // Map this custom event to "add_to_cart" in the Linkrunner Dashboard
   {
-    content_ids: ["sku_blue_tshirt"], // Must match ID or SKU in Google Merchant Center
+    content_ids: ["sku_blue_tshirt"], // Must match Merchant Center ID (offer_id)
     value: 1598,                      // Required — total value (Google uses this as revenue)
     currency: "INR",                  // Required
     num_items: 2,                     // Required
@@ -157,7 +157,7 @@ await linkrunner.trackEvent(
   "user_id": "user_123",
   "install_instance_id": "abc-123",
   "event_data": {
-    "content_ids": ["sku_blue_tshirt"],  // Must match ID or SKU in Google Merchant Center
+    "content_ids": ["sku_blue_tshirt"],  // Must match Merchant Center ID (offer_id)
     "value": 1598,                       // Required — total value (Google uses this as revenue)
     "currency": "INR",                   // Required
     "num_items": 2                       // Required
@@ -181,7 +181,7 @@ await linkrunner.capturePayment({
   type: "FIRST_PAYMENT",       // Map this payment type to "ecommerce_purchase" in the Linkrunner Dashboard
   status: "PAYMENT_COMPLETED",
   eventData: {
-    content_ids: ["sku_blue_tshirt", "sku_red_shoes"], // Must match ID or SKU in Google Merchant Center
+    content_ids: ["sku_blue_tshirt", "sku_red_shoes"], // Must match Merchant Center ID (offer_id)
     value: 2298,               // Required
     currency: "INR",           // Required
     num_items: 2,              // Required
@@ -201,7 +201,7 @@ await linkrunner.capturePayment({
   "status": "PAYMENT_COMPLETED",
   "install_instance_id": "abc-123",
   "event_data": {
-    "content_ids": ["sku_blue_tshirt", "sku_red_shoes"], // Must match ID or SKU in Google Merchant Center
+    "content_ids": ["sku_blue_tshirt", "sku_red_shoes"], // Must match Merchant Center ID (offer_id)
     "value": 2298,
     "currency": "INR",
     "num_items": 2,
@@ -215,7 +215,7 @@ await linkrunner.capturePayment({
 _The SDK examples above use React Native syntax. The same `eventData` fields apply across all SDKs — for platform-specific examples, refer to the Ecommerce Events section in each SDK guide: [React Native](/sdk/react-native#ecommerce-events), [Flutter](/sdk/flutter#ecommerce-events), [iOS](/sdk/ios#ecommerce-events), [Android](/sdk/android#ecommerce-events)._
 
 <Warning>
-The `content_ids` you send must exactly match the **ID or SKU** of the product in Google Merchant Center (the same ID from Step 3). If they don't match, Google won't be able to link the conversion back to the correct product in your catalog.
+The `content_ids` you send must exactly match the **ID (`offer_id`)** of the product in Google Merchant Center (the same ID from Step 3). If they don't match, Google won't be able to link the conversion back to the correct product in your catalog.
 </Warning>
 
 <Tip>
