@@ -129,7 +129,10 @@
                     },
                     {
                         "group": "FAQ",
-                        "pages": ["testing/testing-attribution-troubleshooting"]
+                        "pages": [
+                            "testing/testing-attribution-troubleshooting",
+                            "ad-networks/google-ads-discrepancies"
+                        ]
                     }
                 ]
             }
