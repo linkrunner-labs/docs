@@ -25,6 +25,7 @@
                             "sdk/react-native",
                             "sdk/flutter",
                             "sdk/capacitor",
+                            "sdk/cordova",
                             "sdk/ios",
                             "sdk/android",
                             "sdk/expo",
