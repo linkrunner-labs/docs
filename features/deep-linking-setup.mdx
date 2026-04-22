@@ -1,90 +1,151 @@
 ---
-title: "Setup Deep Linking"
-description: "Learn how to set up deep linking with subdomains and custom URI schemes in your React Native and Flutter apps"
+title: "Deep Linking Setup"
+description: "Complete guide to setting up and verifying deep links with Linkrunner for React Native and Flutter apps"
 icon: "link"
 ---
 
-Deep links allow users to navigate directly to specific content within your app by clicking on a URL. There are two primary approaches to deep linking:
+Deep links allow users to navigate directly to specific content within your app by clicking on a URL. This guide walks you through the complete setup — from creating your verification config files and saving them in Linkrunner, to making the necessary code changes in your app.
 
-1. **[HTTP/HTTPS Deep Links](#httphttps-deep-linking-with-subdomains)** (including subdomains): URLs with `http://` or `https://` protocols that can open your app when clicked.
-2. **[Custom URI Schemes](#custom-uri-schemes-for-deep-linking)**: URLs with a custom protocol like `myapp://` that are registered to your app.
+There are two primary approaches to deep linking:
 
-This guide covers how to implement both methods for React Native and Flutter applications.
+1. **[HTTP/HTTPS Deep Links](#httphttps-deep-linking)**: URLs with `http://` or `https://` protocols that can open your app when clicked. Requires domain verification.
+2. **[Custom URI Schemes](#custom-uri-schemes)**: URLs with a custom protocol like `myapp://` that are registered to your app. No verification needed.
 
-## HTTP/HTTPS Deep Linking with Subdomains
+---
 
-When using subdomains for deep linking, you can create a structured approach to handle different sections or features of your app.
+## HTTP/HTTPS Deep Linking
+
+HTTP/HTTPS deep links (including App Links on Android and Universal Links on iOS) require you to prove domain ownership before they work reliably. The setup has four parts:
+
+1. Create your verification config files
+2. Save them in Linkrunner
+3. Update native configuration (Android & iOS)
+4. Configure your app's navigation
+
+### Step 1: Create Verification Config Files
+
+<Tabs>
+  <Tab title="Android">
+    #### Create the Digital Asset Links file
+
+    Create a file named `assetlinks.json` with the following content:
+
+    ```json
+    [
+        {
+            "relation": ["delegate_permission/common.handle_all_urls"],
+            "target": {
+                "namespace": "android_app",
+                "package_name": "your.package.name",
+                "sha256_cert_fingerprints": ["SHA-256:XX:XX:XX:..."]
+            }
+        }
+    ]
+    ```
+
+    Replace:
+    - `your.package.name` with your actual Android package name
+    - `SHA-256:XX:XX:XX:...` with your app's SHA-256 fingerprint
+
+    #### Get your app's SHA-256 fingerprint
+
+    For debug builds:
+
+    ```bash
+    keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+    ```
+
+    For release builds:
+
+    ```bash
+    keytool -list -v -keystore your_release_keystore.keystore -alias your_key_alias
+    ```
+
+    Look for the "SHA-256 Certificate fingerprint" line in the output.
+  </Tab>
+  <Tab title="iOS">
+    #### Create the Apple App Site Association file
+
+    Create a file named `apple-app-site-association` (no file extension) with the following content:
+
+    ```json
+    {
+        "applinks": {
+            "apps": [],
+            "details": [
+                {
+                    "appID": "TEAM_ID.BUNDLE_ID",
+                    "paths": ["/*"]
+                }
+            ]
+        }
+    }
+    ```
+
+    Replace:
+    - `TEAM_ID` with your Apple Developer Team ID (found in the [Apple Developer Portal](https://developer.apple.com/account) under Membership Details)
+    - `BUNDLE_ID` with your app's bundle identifier (found in your Xcode project settings)
+
+    The `paths` array can be customized to include only specific paths your app should handle. Use `/*` to handle all paths.
+  </Tab>
+</Tabs>
+
+### Step 2: Save Verification Config in Linkrunner
+
+Linkrunner hosts your verification files automatically so you don't have to manage server configuration yourself.
+
+1. Log in to your [Linkrunner dashboard](https://dashboard.linkrunner.io/settings?sort_by=activity-1&s=store-verification)
+2. Go to **Project Settings** from the navigation menu
+3. In the **Domain Verification** section:
+    - Paste your `apple-app-site-association` JSON in the **iOS (Only JSON allowed)** text area
+    - Paste your `assetlinks.json` content in the **Android (Only JSON allowed)** text area
+4. Click **Save**
+
+Linkrunner will automatically host these files at:
+- iOS: `https://your-domain.io/.well-known/apple-app-site-association`
+- Android: `https://your-domain.io/.well-known/assetlinks.json`
+
+### Step 3: Update Native Configuration
+
+These changes are the same whether you're using React Native or Flutter.
+
+<Tabs>
+  <Tab title="Android">
+    Open `android/app/src/main/AndroidManifest.xml` and add the following inside the `<activity>` section:
+
+    ```xml
+    <intent-filter android:autoVerify="true">
+      <action android:name="android.intent.action.VIEW" />
+      <category android:name="android.intent.category.DEFAULT" />
+      <category android:name="android.intent.category.BROWSABLE" />
+      <!-- Your domain and subdomains -->
+      <data android:scheme="https" android:host="example.com" />
+      <data android:scheme="https" android:host="app.example.com" />
+      <data android:scheme="https" android:host="store.example.com" />
+    </intent-filter>
+    ```
+  </Tab>
+  <Tab title="iOS">
+    1. Open your iOS project in Xcode
+    2. Go to **Signing & Capabilities**
+    3. Add the **Associated Domains** capability
+    4. Add your domains:
+
+    ```
+    applinks:example.com
+    applinks:app.example.com
+    applinks:store.example.com
+    ```
+
+    For more details, see the [official Apple documentation](https://developer.apple.com/documentation/xcode/supporting-associated-domains).
+  </Tab>
+</Tabs>
+
+### Step 4: Configure Navigation
 
 <Tabs>
   <Tab title="React Native">
-    React Native uses [React Navigation](https://reactnavigation.org/) for handling navigation and deep linking.
-
-    ### Step 1: Configure your app to handle HTTP/HTTPS links
-
-    First, you need to modify your Android and iOS configurations to handle subdomain links.
-
-    <Tabs>
-      <Tab title="Android">
-        Open your `android/app/src/main/AndroidManifest.xml` file and add the following inside the `<activity>` section:
-
-        ```xml
-        <intent-filter android:autoVerify="true">
-          <action android:name="android.intent.action.VIEW" />
-          <category android:name="android.intent.category.DEFAULT" />
-          <category android:name="android.intent.category.BROWSABLE" />
-          <!-- For your main domain -->
-          <data android:scheme="https" android:host="example.com" />
-          <!-- For your subdomain -->
-          <data android:scheme="https" android:host="app.example.com" />
-          <!-- Add other subdomains as needed -->
-          <data android:scheme="https" android:host="store.example.com" />
-        </intent-filter>
-        ```
-      </Tab>
-      <Tab title="iOS">
-        1. Open your iOS project in Xcode
-        2. Go to the "Info" tab
-        3. Add a new entry to the URL Types section
-        4. Configure your URL schemes based on your domains and subdomains
-        5. In your `Info.plist` file, add:
-
-        ```xml
-        <key>CFBundleURLTypes</key>
-        <array>
-          <dict>
-            <key>CFBundleURLSchemes</key>
-            <array>
-              <string>https</string>
-            </array>
-            <key>CFBundleURLName</key>
-            <string>com.example.app</string>
-          </dict>
-        </array>
-        <key>CFBundleTypeRole</key>
-        <string>Editor</string>
-        <key>CFBundleURLSchemes</key>
-        <array>
-          <string>https</string>
-        </array>
-
-        <key>LSApplicationQueriesSchemes</key>
-        <array>
-          <string>https</string>
-        </array>
-
-        <key>com.apple.developer.associated-domains</key>
-        <array>
-          <string>applinks:example.com</string>
-          <string>applinks:app.example.com</string>
-          <string>applinks:store.example.com</string>
-        </array>
-        ```
-      </Tab>
-    </Tabs>
-
-    ### Step 2: Configure React Navigation
-
-    In your navigation configuration:
+    React Native uses [React Navigation](https://reactnavigation.org/) for handling deep links.
 
     ```javascript
     // App.js or your navigation configuration file
@@ -96,7 +157,11 @@ When using subdomains for deep linking, you can create a structured approach to 
 
     function App() {
         const linking = {
-            prefixes: ["https://example.com", "https://app.example.com", "https://store.example.com"],
+            prefixes: [
+                "https://example.com",
+                "https://app.example.com",
+                "https://store.example.com",
+            ],
             config: {
                 screens: {
                     Home: "",
@@ -107,7 +172,6 @@ When using subdomains for deep linking, you can create a structured approach to 
                             category: (category) => category || "all",
                         },
                     },
-                    // For subdomain-specific routing
                     "app.example.com": {
                         screens: {
                             AppSpecificScreen: ":id",
@@ -131,70 +195,9 @@ When using subdomains for deep linking, you can create a structured approach to 
 
     export default App;
     ```
-
   </Tab>
   <Tab title="Flutter">
     Flutter uses [go_router](https://pub.dev/packages/go_router) or its own navigation system to handle deep links.
-
-    ### Step 1: Configure your app to handle HTTP/HTTPS links
-
-    <Tabs>
-      <Tab title="Android">
-        Modify your `android/app/src/main/AndroidManifest.xml` file:
-
-        ```xml
-        <manifest ...>
-          <application ...>
-            <activity ...>
-              <!-- Other activity configuration -->
-
-              <!-- Deep linking -->
-              <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <!-- Your domain and subdomains -->
-                <data android:scheme="https" android:host="example.com" />
-                <data android:scheme="https" android:host="app.example.com" />
-                <data android:scheme="https" android:host="store.example.com" />
-              </intent-filter>
-            </activity>
-          </application>
-        </manifest>
-        ```
-      </Tab>
-      <Tab title="iOS">
-        Update your `ios/Runner/Info.plist` file:
-
-        ```xml
-        <key>CFBundleURLTypes</key>
-        <array>
-          <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLName</key>
-            <string>com.example.app</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-              <string>https</string>
-            </array>
-          </dict>
-        </array>
-
-        <key>com.apple.developer.associated-domains</key>
-        <array>
-          <string>applinks:example.com</string>
-          <string>applinks:app.example.com</string>
-          <string>applinks:store.example.com</string>
-        </array>
-        ```
-      </Tab>
-    </Tabs>
-
-    ### Step 2: Configure your router to handle deep links
-
-    If you're using `go_router`:
 
     ```dart
     import 'package:flutter/material.dart';
@@ -222,7 +225,6 @@ When using subdomains for deep linking, you can create a structured approach to 
               return ProfileScreen(id: id);
             },
           ),
-          // Subdomain-specific routes
           GoRoute(
             path: '/app/:id',
             builder: (context, state) {
@@ -238,18 +240,14 @@ When using subdomains for deep linking, you can create a structured approach to 
             },
           ),
         ],
-        // Handle link parsing
         redirect: (context, state) {
           final uri = Uri.parse(state.location);
-
-          // Handle different subdomains
           if (uri.host == 'app.example.com') {
             return '/app/${uri.pathSegments.isNotEmpty ? uri.pathSegments.first : ''}';
           } else if (uri.host == 'store.example.com') {
             return '/store/${uri.pathSegments.isNotEmpty ? uri.pathSegments.first : 'all'}';
           }
-
-          return null; // No redirect needed
+          return null;
         },
       );
 
@@ -258,118 +256,68 @@ When using subdomains for deep linking, you can create a structured approach to 
         return MaterialApp.router(
           routerConfig: _router,
           title: 'My App',
-          // Other app configuration
         );
       }
     }
     ```
-
   </Tab>
 </Tabs>
 
-## Custom URI Schemes for Deep Linking
+---
 
-Custom URI schemes provide an alternative method for deep linking, allowing your app to handle URLs with a custom protocol like `myapp://`. While HTTP/HTTPS deep links are generally recommended for production apps, custom URI schemes can be useful in specific scenarios or for backward compatibility.
+## Custom URI Schemes
+
+Custom URI schemes use a custom protocol like `myapp://` and don't require domain verification. They're useful for backward compatibility or simpler setups.
+
+### Native Configuration
 
 <Tabs>
-  <Tab title="React Native">
-    ### Step 1: Configure your app to handle custom URI schemes
+  <Tab title="Android">
+    Open `android/app/src/main/AndroidManifest.xml` and add inside the `<activity>` section:
 
-    <Tabs>
-      <Tab title="Android">
-        Open your `android/app/src/main/AndroidManifest.xml` file and add the following inside the `<activity>` section:
-
-        ```xml
-        <intent-filter>
-          <action android:name="android.intent.action.VIEW" />
-          <category android:name="android.intent.category.DEFAULT" />
-          <category android:name="android.intent.category.BROWSABLE" />
-          <!-- Your custom URI scheme -->
-          <data android:scheme="myapp" />
-        </intent-filter>
-        ```
-      </Tab>
-      <Tab title="iOS">
-        1. Open your iOS project in Xcode
-        2. Go to the "Info" tab
-        3. Add a new entry to the URL Types section with:
-            - Identifier: Your app bundle identifier (e.g., `com.example.myapp`)
-            - URL Schemes: Your custom scheme (e.g., `myapp`)
-        4. In your `Info.plist` file, it should look like:
-
-        ```xml
-        <key>CFBundleURLTypes</key>
-        <array>
-          <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLName</key>
-            <string>com.example.myapp</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-              <string>myapp</string>
-            </array>
-          </dict>
-        </array>
-        ```
-      </Tab>
-    </Tabs>
-
+    ```xml
+    <intent-filter>
+      <action android:name="android.intent.action.VIEW" />
+      <category android:name="android.intent.category.DEFAULT" />
+      <category android:name="android.intent.category.BROWSABLE" />
+      <data android:scheme="myapp" />
+    </intent-filter>
+    ```
   </Tab>
-  <Tab title="Flutter">
-    ### Step 1: Configure your app to handle custom URI schemes
+  <Tab title="iOS">
+    1. Open your iOS project in Xcode
+    2. Go to the **Info** tab
+    3. Add a new entry to **URL Types** with:
+        - Identifier: Your app bundle identifier (e.g., `com.example.myapp`)
+        - URL Schemes: Your custom scheme (e.g., `myapp`)
 
-    <Tabs>
-      <Tab title="Android">
-        Modify your `android/app/src/main/AndroidManifest.xml` file:
+    In `Info.plist`:
 
-        ```xml
-        <manifest ...>
-          <application ...>
-            <activity ...>
-              <!-- Other activity configuration -->
-
-              <!-- Custom URI scheme -->
-              <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="myapp" />
-              </intent-filter>
-            </activity>
-          </application>
-        </manifest>
-        ```
-      </Tab>
-      <Tab title="iOS">
-        Update your `ios/Runner/Info.plist` file:
-
-        ```xml
-        <key>CFBundleURLTypes</key>
+    ```xml
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLName</key>
+        <string>com.example.myapp</string>
+        <key>CFBundleURLSchemes</key>
         <array>
-          <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLName</key>
-            <string>com.example.myapp</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-              <string>myapp</string>
-            </array>
-          </dict>
+          <string>myapp</string>
         </array>
-        ```
-      </Tab>
-    </Tabs>
-
+      </dict>
+    </array>
+    ```
   </Tab>
 </Tabs>
+
+---
 
 ## Testing Your Deep Links
 
 <Tabs>
   <Tab title="Android">
-    Use `adb` for Android testing:
+    Use `adb` to test:
 
     ```bash
     # Test HTTP/HTTPS deep links
@@ -379,9 +327,13 @@ Custom URI schemes provide an alternative method for deep linking, allowing your
     adb shell am start -a android.intent.action.VIEW -d "myapp://profile/123" your.package.name
     ```
 
+    ### Troubleshooting
+
+    - **App doesn't open automatically**: Ensure your `assetlinks.json` is correctly formatted, the SHA-256 fingerprint matches your signing key, and the file is accessible via HTTPS.
+    - **Verification warnings**: Look for "IntentFilterIntentSvc" messages in logcat for details on verification failures.
   </Tab>
   <Tab title="iOS">
-    Use simulator URL schemes for iOS testing:
+    Use the iOS Simulator:
 
     ```bash
     # Test HTTP/HTTPS deep links
@@ -391,6 +343,10 @@ Custom URI schemes provide an alternative method for deep linking, allowing your
     xcrun simctl openurl booted "myapp://profile/123"
     ```
 
+    ### Troubleshooting
+
+    - **App doesn't open with Universal Links**: Ensure your `apple-app-site-association` file is correctly formatted, Team ID and Bundle ID are correct, the file is accessible via HTTPS, and Associated Domains capability is enabled.
+    - **Debug Universal Links**: Connect your device to a Mac, open Console.app and filter for "swcd" to see Universal Links logs.
   </Tab>
   <Tab title="Web">
     Create actual links on your website and test on real devices:
