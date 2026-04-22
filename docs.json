@@ -36,10 +36,7 @@
                         "group": "Core Features",
                         "pages": [
                             "features/subdomain-setup",
-                            {
-                                "group": "Deep Linking",
-                                "pages": ["features/deep-linking-setup", "features/deep-linking-verification"]
-                            },
+                            "features/deep-linking-setup",
                             "features/deferred-deep-linking",
                             "features/link-redirection",
                             "features/referral-codes",
@@ -215,7 +212,11 @@
         },
         {
             "source": "/sdk/deep-linking/verification",
-            "destination": "/features/deep-linking-verification"
+            "destination": "/features/deep-linking-setup"
+        },
+        {
+            "source": "/features/deep-linking-verification",
+            "destination": "/features/deep-linking-setup"
         },
         {
             "source": "/sdk/skadnetwork/integration",
