@@ -104,7 +104,8 @@
                             "analytics-integrations/mixpanel",
                             "analytics-integrations/moengage",
                             "analytics-integrations/netcore",
-                            "analytics-integrations/posthog"
+                            "analytics-integrations/posthog",
+                            "analytics-integrations/revenuecat"
                         ]
                     },
                     {
