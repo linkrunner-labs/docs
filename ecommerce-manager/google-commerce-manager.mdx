@@ -1,0 +1,238 @@
+---
+title: "Google Commerce Manager"
+description: "Setting up Google Commerce Manager with Google Ads for ecommerce tracking and attribution via Linkrunner."
+icon: "google"
+---
+
+## Overview
+
+Google Merchant Center lets you upload your product catalog so it can appear across Google surfaces — Search, Shopping, Display, and more. To run Shopping or Performance Max campaigns, you need to link your Merchant Center account to Google Ads and have your products approved. Once that's done, you can start sending ecommerce event data through Linkrunner for proper attribution.
+
+<Note>
+**Before you begin, make sure you have:**
+- A Google Ads account set up and linked to Linkrunner (see [Google Ads setup](/ad-networks/google-ads))
+- Products ready to upload to Google Merchant Center
+</Note>
+
+## Step 1: Create a Google Merchant Center Account and Link to Google Ads
+
+First, create your Google Merchant Center account at [merchant.google.com](https://business.google.com/in/merchant-center). During setup, you'll provide your business name, website URL, and country.
+
+Once your account is created, you need to link it to your Google Ads account so your product data can be used in campaigns.
+
+<img
+  src="/images/ecommerce-event-google/ecommerce-1.png"
+  alt="Google Merchant Center account setup and linking to Google Ads"
+/>
+
+To link your accounts:
+
+1. In Google Merchant Center, go to **Settings** → **Linked accounts**.
+2. Under **Google Ads**, click **Link account**.
+3. Enter your Google Ads customer ID and send the link request.
+4. In Google Ads, go to **Tools** → **Linked accounts** → **Google Merchant Center** and approve the request.
+
+<img
+  src="/images/ecommerce-event-google/ecommerce-2.png"
+  alt="Linking Google Merchant Center with Google Ads account"
+/>
+
+Once linked, your product catalog will be available to use in Google Ads campaigns like Shopping and Performance Max.
+
+## Step 2: Add Products to Google Merchant Center
+
+With your account set up and linked, the next step is adding your products. You can do this manually, via a spreadsheet feed, or through a scheduled data feed URL.
+
+<img
+  src="/images/ecommerce-event-google/ecommerce-5.png"
+  alt="Adding products to Google Merchant Center"
+/>
+
+When adding products, make sure to fill in all required attributes:
+
+- **Title** — clear, descriptive product name
+- **Description** — accurate product details
+- **Link** — the product page URL on your website
+- **Image link** — high-quality product image URL
+- **Price** — must match the price on your website
+- **Availability** — `in stock`, `out of stock`, or `preorder`
+- **Brand**, **GTIN** or **MPN** — for product identification
+
+After uploading, Google will review your products. This typically takes **1–3 business days**. You can monitor the status in **Products** → **All products** in Merchant Center.
+
+## Step 3: Match Product IDs with Your Backend
+
+This is a critical step. The product IDs in Google Merchant Center must exactly match the product IDs you use in your backend and send through Linkrunner events.
+
+<img
+  src="/images/ecommerce-event-google/ecommerce-6.png"
+  alt="Product ID mapping between Google Merchant Center and your backend"
+/>
+
+In Google Merchant Center, each product has an **ID** (also called `offer_id`). This is the value you'll use when sending ecommerce events through Linkrunner. If these IDs don't match, Google won't be able to attribute events back to the correct products.
+
+<Warning>
+Make sure the product `id` you send in your Linkrunner events exactly matches the **ID (`offer_id`)** of the product in Google Merchant Center. A mismatch will break product attribution and lower your campaign performance.
+</Warning>
+
+## Step 4: Event Mapping
+
+Once your products are approved and your campaign is live, you need to map your custom app events to the standard Google ecommerce events in the Linkrunner Dashboard. This tells Linkrunner which of your events correspond to which Google conversion actions.
+
+There are **3 essential events** to map:
+
+- Your view item event (e.g., `view_item`, `item_viewed`) → maps to **`view_item`**
+- Your add to cart event (e.g., `add_to_cart`) → maps to **`add_to_cart`**
+- Your purchase event (e.g., `FIRST_PAYMENT`, `DEFAULT`) → maps to **`ecommerce_purchase`**
+
+_In the Linkrunner Dashboard, go to your Google Ads integration settings and map each of your custom event names to the corresponding standard Google event._
+
+## Understanding `event_data` for Google
+
+When sending events via the [Capture Event API](/api-reference/event-capture), [Capture Payment API](/api-reference/revenue-tracking), or the Linkrunner SDK (`trackEvent` and `capturePayment` methods), you need to include specific fields in `event_data` so Google can correctly attribute conversions and match products in your Merchant Center catalog.
+
+### Required Fields
+
+| Parameter     | Type   | Required for                              | Description                                                                 |
+| ------------- | ------ | ----------------------------------------- | --------------------------------------------------------------------------- |
+| `content_ids` | array  | `view_item`, `add_to_cart`, `ecommerce_purchase` | Product IDs — must exactly match the **ID (`offer_id`)** in Google Merchant Center |
+| `value`       | number | `add_to_cart`, `ecommerce_purchase`       | Total revenue value. No currency symbols.                                   |
+| `currency`    | string | `add_to_cart`, `ecommerce_purchase`       | 3-letter ISO currency code (e.g., `"INR"`, `"USD"`)                         |
+| `num_items`   | number | `add_to_cart`, `ecommerce_purchase`       | Total quantity of items                                                      |
+| `order_id`    | string | `ecommerce_purchase`                      | Unique order ID from your backend                                            |
+
+### view_item
+
+Fired when a user views a product page.
+
+<CodeGroup>
+
+```javascript SDK
+await linkrunner.trackEvent(
+  "view_item", // Map this custom event to "view_item" in the Linkrunner Dashboard
+  {
+    content_ids: ["sku_blue_tshirt"], // Must match Merchant Center ID (offer_id)
+  },
+);
+```
+
+```json API
+// POST /capture-event
+{
+  "token": "your_project_token",
+  "event_name": "view_item",
+  "user_id": "user_123",
+  "install_instance_id": "abc-123",
+  "event_data": {
+    "content_ids": ["sku_blue_tshirt"]   // Must match Merchant Center ID (offer_id)
+  }
+}
+```
+
+</CodeGroup>
+
+### add_to_cart
+
+Fired when a user adds a product to their cart.
+
+<CodeGroup>
+
+```javascript SDK
+await linkrunner.trackEvent(
+  "add_to_cart", // Map this custom event to "add_to_cart" in the Linkrunner Dashboard
+  {
+    content_ids: ["sku_blue_tshirt"], // Must match Merchant Center ID (offer_id)
+    value: 1598,                      // Required — total value (Google uses this as revenue)
+    currency: "INR",                  // Required
+    num_items: 2,                     // Required
+  },
+);
+```
+
+```json API
+// POST /capture-event
+{
+  "token": "your_project_token",
+  "event_name": "add_to_cart",
+  "user_id": "user_123",
+  "install_instance_id": "abc-123",
+  "event_data": {
+    "content_ids": ["sku_blue_tshirt"],  // Must match Merchant Center ID (offer_id)
+    "value": 1598,                       // Required — total value (Google uses this as revenue)
+    "currency": "INR",                   // Required
+    "num_items": 2                       // Required
+  }
+}
+```
+
+</CodeGroup>
+
+### ecommerce_purchase
+
+Fired when a user completes a purchase.
+
+<CodeGroup>
+
+```javascript SDK
+await linkrunner.capturePayment({
+  amount: 2298.00,
+  userId: "user_456",
+  paymentId: "order_98765",
+  type: "FIRST_PAYMENT",       // Map this payment type to "ecommerce_purchase" in the Linkrunner Dashboard
+  status: "PAYMENT_COMPLETED",
+  eventData: {
+    content_ids: ["sku_blue_tshirt", "sku_red_shoes"], // Must match Merchant Center ID (offer_id)
+    value: 2298,               // Required
+    currency: "INR",           // Required
+    num_items: 2,              // Required
+    order_id: "order_98765",   // Required for purchase events
+  },
+});
+```
+
+```json API
+// POST /capture-payment
+{
+  "token": "your_project_token",
+  "payment_id": "order_98765",
+  "user_id": "user_456",
+  "amount": 2298.00,
+  "type": "FIRST_PAYMENT",
+  "status": "PAYMENT_COMPLETED",
+  "install_instance_id": "abc-123",
+  "event_data": {
+    "content_ids": ["sku_blue_tshirt", "sku_red_shoes"], // Must match Merchant Center ID (offer_id)
+    "value": 2298,
+    "currency": "INR",
+    "num_items": 2,
+    "order_id": "order_98765"
+  }
+}
+```
+
+</CodeGroup>
+
+_The SDK examples above use React Native syntax. The same `eventData` fields apply across all SDKs — for platform-specific examples, refer to the Ecommerce Events section in each SDK guide: [React Native](/sdk/react-native#ecommerce-events), [Flutter](/sdk/flutter#ecommerce-events), [iOS](/sdk/ios#ecommerce-events), [Android](/sdk/android#ecommerce-events)._
+
+<Warning>
+The `content_ids` you send must exactly match the **ID (`offer_id`)** of the product in Google Merchant Center (the same ID from Step 3). If they don't match, Google won't be able to link the conversion back to the correct product in your catalog.
+</Warning>
+
+<Tip>
+The `amount` field in `capturePayment` and the `value` field in `event_data` should be consistent — both represent the total order value. Google reads `value` from `event_data` for conversion reporting.
+</Tip>
+
+## Verifying Events in Google Ads
+
+Once you start sending events through Linkrunner, you can verify they're being received in Google Ads under **Goals → Summary**. You'll see your mapped conversion actions (`view_item`, `add_to_cart`, `ecommerce_purchase`) listed there with their recorded conversion counts.
+
+<img
+  src="/images/ecommerce-event-google/ecommerce-4.png"
+  alt="Google Ads Goals Summary showing ecommerce conversion events"
+/>
+
+It can take up to **24 hours** for conversion data to appear after your first events are sent. If you don't see data after that window, double-check your event mapping in the Linkrunner Dashboard and verify the `content_ids` match your Merchant Center catalog.
+
+---
+
+> **Note:** The `event_data` fields above can be sent via the Linkrunner SDK (`trackEvent` and `capturePayment` methods) or directly via the APIs. For full request schemas, refer to the [Capture Event API](/api-reference/event-capture) and [Capture Payment API](/api-reference/revenue-tracking) documentation.
