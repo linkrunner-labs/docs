@@ -1,0 +1,155 @@
+---
+title: "Claude (MCP)"
+description: "Ask Claude questions about your campaigns, attribution, and revenue from chat."
+icon: "sparkles"
+---
+
+## Overview
+
+Linkrunner ships a Model Context Protocol (MCP) server that lets Claude answer
+questions about your project's data directly from chat. Generate a token in the
+dashboard, add it as a Custom Connector in Claude.ai, and ask things like:
+
+- "How did my campaigns perform last week?"
+- "Compare my Meta vs Google performance for the last 7 days."
+- "Which campaigns should I cut based on ROAS?"
+- "Why did installs drop yesterday?"
+
+The connector is read-only. Claude can query the same metrics surfaced in your
+dashboard (campaigns, installs, revenue, attribution, events) but cannot make
+changes to campaigns, projects, or settings.
+
+## Prerequisites
+
+- A project on Linkrunner that you have access to.
+- The **Admin**, **Owner**, or **Manager** role on that project. Members and
+  Influencers cannot mint MCP tokens.
+- A Claude.ai account on a plan that supports Custom Connectors (Pro, Team, or
+  Enterprise).
+
+## Setup
+
+### 1. Generate a token
+
+1. Open the [Linkrunner dashboard](https://dashboard.linkrunner.io) and switch
+   to the project you want to connect.
+2. Click **Claude (MCP)** in the sidebar.
+3. Click **Generate Token**.
+4. The dashboard shows a one-time **Server URL** with the token already
+   embedded as a query parameter. Copy it now. The full URL will not be shown
+   again.
+
+<Warning>
+The URL contains the token as a query parameter. Treat it like a password:
+don't paste it into shared documents, screenshots, or chat threads. Revoke it
+from the dashboard if it leaks, and generate a new one.
+</Warning>
+
+### 2. Add the connector in Claude
+
+1. Click **Add to Claude** in the dashboard. This copies the URL and opens
+   Claude's "Add custom connector" dialog in a new tab.
+2. Paste the URL into the **URL** field.
+3. Give the connector a name (e.g. "Linkrunner — MyApp").
+4. Leave authentication as **No authentication**. The token is already part of
+   the URL.
+5. Click **Connect**.
+
+<Note>
+You only need one connector per project. If you manage several Linkrunner
+projects, generate a token for each project and add a separate Claude
+connector for each one with a clear name. Tokens are scoped to a single
+project.
+</Note>
+
+### 3. Try it
+
+Open a new chat in Claude, make sure your Linkrunner connector is enabled in
+the chat's tools, and ask one of the starter prompts above. Claude will fetch
+data through the connector and answer in plain language.
+
+## What Claude can answer
+
+The connector exposes the following tools. Claude picks them automatically
+based on your question.
+
+| Tool | Use it for |
+|------|------------|
+| `get_project_info` | Project name, timezone, display currency. |
+| `get_project_stats` | Headline KPIs (clicks, installs, onboards, revenue) and trend graph. |
+| `list_campaigns` | Campaign-level metrics with filters (date range, network, platform, search). |
+| `list_events` | Custom and revenue event names you've defined. |
+| `lookup_attribution` | Attribution result for a single user or device: campaign, ad network, ad set, creative, keyword (Apple Search Ads), organic vs inorganic flag, device IDs (gaid/idfa), and click/install timestamps. |
+| `get_billing_usage` | Free-install allowance and current-month usage. Only fetched when you explicitly ask about billing. |
+
+Claude reads these tools' descriptions and decides which to call. You don't
+need to invoke them manually.
+
+## Built-in prompts
+
+The connector also surfaces three starter prompts in Claude's prompt picker:
+
+- **Daily briefing** — yesterday's performance summary in 1-2 paragraphs.
+- **Weekly review** — this week vs last week, with anomalies and a
+  keep/cut/scale recommendation list.
+- **Cut list** — the worst-performing active campaigns, with reasoning.
+
+These are shortcuts. You can always ask the same questions in your own words.
+
+## Managing tokens
+
+Click **Claude (MCP)** in the sidebar to see all active tokens for the
+project. For each token you can see:
+
+- A masked preview of the token.
+- The date it was created.
+- The user who created it.
+- The last time it was used (helps spot stale tokens).
+
+Click the trash icon next to a token to revoke it. Anyone using that token in
+Claude will be disconnected immediately. Revocation is not reversible. Mint a
+new token if you need to reconnect.
+
+A project can have up to 10 active tokens at any time. If you hit the cap,
+revoke an unused token before creating a new one.
+
+## Security
+
+- Tokens are scoped to a single project's data. They cannot read other
+  projects you might be a member of.
+- Tokens are read-only. Claude cannot create, edit, or delete campaigns,
+  projects, members, or any other resource through the connector.
+- Tokens are revocable from the dashboard at any time.
+- The connector does not expose webhooks, SDK private keys, billing settings,
+  or admin actions.
+- Per-project token cap of 10 limits the blast radius if one leaks.
+
+## Troubleshooting
+
+**Claude says "Couldn't reach the MCP server."**
+The token may have been revoked, or the URL may be malformed. Generate a new
+token, copy the full URL exactly, and re-add the connector.
+
+**Claude says it doesn't have access to the data.**
+Make sure your Linkrunner connector is enabled in the current chat. Open the
+chat's tool/connector menu and toggle it on. New chats don't always inherit
+connector state from previous chats.
+
+**Numbers don't match the dashboard.**
+The connector reads the same data the dashboard does. If you see a mismatch,
+check that you and Claude are using the same date range and timezone, and
+that any filters (network, platform) match. Linkrunner's ingestion is
+real-time, so there's no lag to account for.
+
+**Generating a token returns "Maximum of 10 active tokens reached."**
+You're at the per-project cap. Revoke an unused token from the same settings
+page before creating a new one.
+
+## What this is not
+
+- Not a write API. Use the [Linkrunner data
+  API](/api-reference/introduction) for programmatic writes.
+- Not a generic SQL/Postgres bridge. It calls the same endpoints the
+  dashboard uses, with the same access controls.
+- Not a substitute for webhooks. Use [webhooks](/features/webhooks) for
+  real-time install and signup notifications.
