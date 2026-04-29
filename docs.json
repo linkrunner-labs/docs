@@ -63,7 +63,7 @@
                                 ]
                             },
                             "features/webhooks",
-                            "features/claude-mcp",
+                            "features/mcp",
                             "features/social-media-intermediary-page",
                             {
                                 "group": "Remarketing",
