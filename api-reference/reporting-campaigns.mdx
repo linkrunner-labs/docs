@@ -1,0 +1,289 @@
+---
+title: "Reporting API"
+description: "Programmatic access to campaign analytics: clicks, installs, signups, spend, revenue, ROAS, ad sets, ad creatives, and keywords."
+icon: "chart-mixed"
+---
+
+The Reporting API returns the same campaign analytics shown on the Linkrunner dashboard.
+
+## Base URL
+
+```
+https://api.linkrunner.io/api/v1
+```
+
+## Authentication
+
+Pass your project's server key in the `linkrunner-key` header. This is the same key used by other `/api/v1` endpoints. Find it under [Settings → Data APIs](https://dashboard.linkrunner.io/settings?s=data-apis):
+
+```
+linkrunner-key: YOUR_API_KEY
+```
+
+## Postman collection
+
+[Download the Postman collection](https://gist.githubusercontent.com/RathodDarshil/20d04e80c2d97f8280e1b3beffb58465/raw/reporting-campaigns.postman_collection.json). Import it into Postman, set the `linkrunner_key` collection variable to your key, and run any request.
+
+## Rate limit and freshness
+
+- **1 request per minute per API key** (`429` with `Retry-After: 60` when exceeded).
+- 30 req/sec per source IP (shared across all `/api/v1` endpoints).
+- Underlying analytics refresh on roughly the same cadence, so cache responses for at least 60 seconds.
+
+## Endpoint
+
+```
+GET /reporting/campaigns
+```
+
+### Query parameters
+
+| Parameter         | Type    | Default            | Notes                                                                                      |
+| ----------------- | ------- | ------------------ | ------------------------------------------------------------------------------------------ |
+| `from`, `to`      | string  | (none)             | `YYYY-MM-DD`, project timezone. `start_date` / `end_date` are accepted aliases.            |
+| `active`          | string  | (all)              | `true` or `false`.                                                                         |
+| `network`         | string  | (all)              | `meta`, `google`, `apple_search_ads`, `tiktok`, `snapchat`, `sandbox_ads`, etc.            |
+| `meta_account_id` | number  | (none)             | Restrict to a single Meta network account.                                                 |
+| `platform`        | string  | (both)             | `ios` or `android`.                                                                        |
+| `search`          | string  | (none)             | Matches name, display ID, domain, deeplink, or full tracking URL.                          |
+| `view`            | string  | `user_acquisition` | `user_acquisition` (new users: `installs`, `cost_per_install`) or `retargeting` (re-engaged users: `reinstalls`, `reengagements`, `cost_per_reinstall`). |
+| `sort_field`      | string  | `installs`         | `clicks`, `installs`, `signups`, `revenue`, `spend`, `created_at`, `uninstalls`, `conversion`, `suspicious_installs`, `roas`. |
+| `sort_order`      | string  | `descending`       | `ascending` or `descending`.                                                               |
+| `page`            | number  | `1`                | 1-indexed.                                                                                  |
+| `limit`           | number  | `10`               | **Max 100.** Larger values return `422`.                                                   |
+
+See [Configurable columns](#configurable-columns) below for `events`, `payment_events`, `unique_user_events`, `cost_per_event`, and `active_users`.
+
+### Configurable columns
+
+By default the response includes:
+
+- **All custom events** your project tracks (under `custom_events`), each as a total occurrence count.
+- **All payment events** (under `payment_events`), each as a total count and total amount.
+- **`active_users`** with a 7-day window.
+
+These query params let you narrow or change that:
+
+| Parameter             | Effect                                                                                                                             | Example                              |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `events`              | Whitelist `custom_events` to only these names. Smaller payload, faster query.                                                      | `events=Purchase,AddToCart`          |
+| `payment_events`      | Whitelist `payment_events` to only these types.                                                                                    | `payment_events=PURCHASE`            |
+| `unique_user_events`  | Count distinct users (`unique_count`) for these events instead of total occurrences. Works for both custom and payment events.    | `unique_user_events=Purchase`        |
+| `cost_per_event`      | Include `cost_per_custom_events` / `cost_per_payment_events` for these event names. Off by default.                              | `cost_per_event=Purchase,PURCHASE`   |
+| `active_users`        | Override the active-users window (in days).                                                                                        | `active_users=14`                    |
+
+All five accept a comma-separated list. Unknown event names are silently dropped (they map to no rows in our analytics store).
+
+Find your project's event names under [Dashboard → Settings → Events](https://dashboard.linkrunner.io/dashboard/settings/events).
+
+#### Example: revenue events with cost-per and 14-day active users
+
+```bash
+curl 'https://api.linkrunner.io/api/v1/reporting/campaigns?\
+events=Purchase,AddToCart&\
+unique_user_events=Purchase&\
+cost_per_event=Purchase&\
+active_users=14&\
+from=2026-04-01&to=2026-04-30&limit=20' \
+  -H 'linkrunner-key: YOUR_API_KEY'
+```
+
+Returns each campaign with:
+
+- `custom_events.Purchase` containing a `unique_count` (distinct paying users) instead of `count`.
+- `custom_events.AddToCart` with the standard total `count`.
+- `cost_per_custom_events.Purchase` (spend ÷ Purchase count).
+- `active_users` computed over a 14-day window.
+
+### Example
+
+```bash
+curl 'https://api.linkrunner.io/api/v1/reporting/campaigns?from=2026-04-01&to=2026-04-30&network=meta&limit=20' \
+  -H 'linkrunner-key: YOUR_API_KEY'
+```
+
+```json
+{
+    "msg": "Campaigns fetched successfully",
+    "status": 200,
+    "data": {
+        "campaigns": [ /* see TypeScript types below */ ],
+        "pagination": { "total": 142, "pages": 8, "page": 1, "limit": 20 },
+        "display_currency": "USD",
+        "view": "user_acquisition"
+    }
+}
+```
+
+Numeric fields are returned as **formatted strings** (`"3,201"`, `"$12,540.50"`). Strip commas before parsing for math: `Number(value.replace(/[^0-9.-]/g, ""))`.
+
+### Errors
+
+| Status | When                                                                         |
+| ------ | ---------------------------------------------------------------------------- |
+| `401`  | Missing or invalid `linkrunner-key`.                                         |
+| `402`  | Billing account suspended. Body includes `payment_link`.                     |
+| `422`  | `limit` is non-numeric, less than 1, or greater than 100.                    |
+| `429`  | Rate limit exceeded.                                                         |
+| `500`  | Unexpected server error. Retry after a short backoff.                        |
+
+## TypeScript types
+
+```ts
+export interface ReportingCampaignsResponse {
+    msg: string;
+    status: number;
+    data: {
+        campaigns: Campaign[];
+        pagination: { total: number; pages: number; page: number; limit: number };
+        display_currency?: string;
+        view?: "user_acquisition" | "retargeting";
+    };
+}
+
+export interface Campaign {
+    id: number;
+    active: boolean;
+    created_at: string;
+    display_id: string;
+    link: string;
+    name: string;
+
+    // Counts (formatted strings)
+    clicks: string;
+    installs: string;
+    reinstalls?: string;
+    reengagements?: string;
+    "sign-ups": string;
+    uninstalls?: string;
+    suspicious_installs?: string;
+    click_through_attribution?: string;
+    view_through_attribution?: string;
+    conversion: string;
+
+    // Money (formatted strings, in display_currency)
+    revenue: string;
+    revenue_event_count?: string;
+    spend: string;
+    roas?: string;
+    cost_per_install?: string;
+    cost_per_reinstall?: string;
+    cost_per_signup?: string;
+
+    // Network flags
+    meta: boolean;
+    meta_web_to_app: boolean;
+    google: boolean;
+    google_web_to_app: boolean;
+    tiktok?: boolean;
+    snapchat?: boolean;
+    linkedin?: boolean;
+    ad_network_code?: string;
+
+    // Platforms
+    ios: boolean;
+    android: boolean;
+
+    // Misc
+    activity_in_last_x_days: number;
+    has_date_filter: boolean;
+    domain?: { id: number; name: string } | null;
+    custom_store_listing: string | null;
+    active_users?: number | string;
+
+    // Custom & payment events: map of event name → count/amount
+    custom_events?: { [name: string]: { count: string; amount?: string; unique_count?: string } | string };
+    payment_events?: { [type: string]: { count: string; total: string } };
+    cost_per_custom_events?: { [name: string]: string };
+    cost_per_payment_events?: { [type: string]: string };
+
+    // Retention buckets
+    retention: { d1: number | string; d7: number | string };
+    classic_retention?: { d1?: number | string; d7?: number | string; d14?: number | string; d30?: number | string };
+    daywise_revenue?: { d0?: number | string; d3?: number | string; d7?: number | string; d30?: number | string };
+
+    // Connected ad-account (Meta / Google / Apple Search Ads)
+    network_account?: {
+        id: number;
+        name: string;
+        email: string;
+        status: string;
+        capi_configured: boolean;
+        account_name?: string;
+        external_customer_id?: string;
+    } | null;
+
+    // Hierarchy: campaign → adSets → adCreatives + keywords
+    adSets?: AdSet[];
+}
+
+export interface AdSet {
+    id: string;
+    name: string;
+    clicks: string;
+    installs: string;
+    "sign-ups": string;
+    spend: string;
+    revenue: string;
+    revenue_event_count?: string;
+    conversion: string;
+    roas?: string;
+    cost_per_install?: string;
+    cost_per_signup?: string;
+    suspicious_installs?: string;
+    custom_events?: Campaign["custom_events"];
+    payment_events?: Campaign["payment_events"];
+    cost_per_custom_events?: { [name: string]: string };
+    cost_per_payment_events?: { [type: string]: string };
+    daywise_revenue?: Campaign["daywise_revenue"];
+    ios: boolean;
+    android: boolean;
+    retention: { d1: number | string; d7: number | string };
+    adCreatives?: AdCreative[];
+    keywords?: Keyword[];
+}
+
+export interface AdCreative {
+    id: string;
+    name: string;
+    type: string;
+    deeplink: number;
+    clicks: string;
+    installs: string;
+    "sign-ups": string;
+    spend: string;
+    revenue: string;
+    revenue_event_count?: string;
+    conversion: string;
+    roas?: string;
+    cost_per_install?: string;
+    cost_per_signup?: string;
+    custom_events?: Campaign["custom_events"];
+    payment_events?: Campaign["payment_events"];
+    cost_per_custom_events?: { [name: string]: string };
+    cost_per_payment_events?: { [type: string]: string };
+    retention: { d1: number | string; d7: number | string };
+}
+
+// Apple Search Ads keyword-level rows. Same shape as AdCreative metrics.
+export interface Keyword {
+    id: string;
+    name: string;
+    clicks: string;
+    installs: string;
+    "sign-ups": string;
+    spend: string;
+    revenue: string;
+    revenue_event_count?: string;
+    conversion: string;
+    roas?: string;
+    cost_per_install?: string;
+    cost_per_signup?: string;
+    suspicious_installs?: string;
+    custom_events?: Campaign["custom_events"];
+    payment_events?: Campaign["payment_events"];
+    cost_per_custom_events?: { [name: string]: string };
+    cost_per_payment_events?: { [type: string]: string };
+    retention?: { d1: number | string; d7: number | string };
+}
+```
