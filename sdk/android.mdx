@@ -531,9 +531,9 @@ private fun trackPurchaseEvent() {
 
 > **Minimum SDK Version:** Ecommerce Event Manager requires `linkrunner-android` **v3.6.0** or above. Please ensure your SDK is updated before using this feature.
 
-If you are tracking Ecommerce events to sync with Meta Catalog Sales, you must format your `eventData` to include Meta's required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
+If you are tracking Ecommerce events to sync with Meta or Google, you must format your `eventData` to include the required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
 
-For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event_data).
+For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event_data) or [Google Commerce Manager documentation](/ecommerce-manager/google-commerce-manager#understanding-event_data-for-google).
 
 ### Add To Cart Example
 
@@ -543,7 +543,7 @@ Use the `trackEvent` method to send an `AddToCart` event:
 private fun trackAddToCart() {
     CoroutineScope(Dispatchers.IO).launch {
         LinkRunner.getInstance().trackEvent(
-            eventName = "add_to_cart", // Map this custom event to "AddToCart" in the Linkrunner Dashboard
+            eventName = "add_to_cart", // Your custom event name — map to "AddToCart" (Meta) or "add_to_cart" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
             eventData = mapOf(
                 "content_ids" to listOf("product_123"),
                 "contents" to listOf(
@@ -571,7 +571,7 @@ Use the `trackEvent` method to send a `ViewContent` event:
 private fun trackViewContent() {
     CoroutineScope(Dispatchers.IO).launch {
         LinkRunner.getInstance().trackEvent(
-            eventName = "view_item", // Map this custom event to "ViewContent" in the Linkrunner Dashboard
+            eventName = "view_item", // Your custom event name — map to "ViewContent" (Meta) or "view_item" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
             eventData = mapOf(
                 "content_ids" to listOf("product_123"),
                 "contents" to listOf(
@@ -603,7 +603,7 @@ private fun capturePurchase() {
                 paymentId = "payment_456",
                 userId = "user123",
                 amount = 49.99,
-                type = PaymentType.FIRST_PAYMENT, // Map this payment type to "Purchase" in the Linkrunner Dashboard
+                type = PaymentType.FIRST_PAYMENT, // Your payment type — map to "Purchase" (Meta) or "ecommerce_purchase" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
                 status = PaymentStatus.PAYMENT_COMPLETED,
                 eventData = mapOf(
                     "content_ids" to listOf("product_123"),
@@ -629,7 +629,7 @@ private fun capturePurchase() {
 }
 ```
 
-> **Note:** For more information on testing and verifying your ecommerce events, please see our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
+> **Note:** For more information on testing and verifying your ecommerce events, please see our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) or [Google Commerce Manager](/ecommerce-manager/google-commerce-manager#verifying-events-in-google-ads) guide.
 
 ## Enhanced Privacy Controls
 

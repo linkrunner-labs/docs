@@ -112,7 +112,8 @@
                     {
                         "group": "Ecommerce Manager",
                         "pages": [
-                            "ecommerce-manager/meta-commerce-manager"
+                            "ecommerce-manager/meta-commerce-manager",
+                            "ecommerce-manager/google-commerce-manager"
                         ]
                     },
                     {
@@ -253,6 +254,10 @@
         {
             "source": "/web-to-app/google",
             "destination": "/ad-networks/google-web-to-app"
+        },
+        {
+            "source": "/ecommerce-manager/google-merchant-center",
+            "destination": "/ecommerce-manager/google-commerce-manager"
         }
     ]
 }

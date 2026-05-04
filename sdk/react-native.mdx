@@ -298,7 +298,7 @@ const capturePayment = async () => {
   - `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
   - `PAYMENT_FAILED` - Payment attempt failed
   - `PAYMENT_CANCELLED` - Payment was cancelled
-- `eventData`: object (optional) - Key-value pairs for additional event data, including Meta ecommerce properties.
+- `eventData`: object (optional) - Key-value pairs for additional event data, including ecommerce properties for Meta and Google.
 
 ### Removing Payments
 
@@ -324,9 +324,9 @@ Note: Either `paymentId` or `userId` must be provided when calling `removePaymen
 
 > **Minimum SDK Version:** Ecommerce Event Manager requires `react-native-linkrunner` **v2.7.0** or above. Please ensure your SDK is updated before using this feature.
 
-If you are tracking Ecommerce events to sync with Meta Catalog Sales, you must format your `eventData` to include Meta's required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
+If you are tracking Ecommerce events to sync with Meta or Google, you must format your `eventData` to include the required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
 
-For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event_data).
+For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event_data) or [Google Commerce Manager documentation](/ecommerce-manager/google-commerce-manager#understanding-event_data-for-google).
 
 ### Add To Cart Example
 
@@ -336,7 +336,7 @@ Use the `trackEvent` method to send an `AddToCart` event:
 const trackAddToCart = async () => {
   try {
     await linkrunner.trackEvent(
-      "add_to_cart", // Map this custom event to "AddToCart" in the Linkrunner Dashboard
+      "add_to_cart", // Your custom event name — map to "AddToCart" (Meta) or "add_to_cart" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
       {
         content_ids: ["product_123"],
         contents: [
@@ -367,7 +367,7 @@ Use the `trackEvent` method to send a `ViewContent` event:
 const trackViewContent = async () => {
   try {
     await linkrunner.trackEvent(
-      "view_item", // Map this custom event to "ViewContent" in the Linkrunner Dashboard
+      "view_item", // Your custom event name — map to "ViewContent" (Meta) or "view_item" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
       {
         content_ids: ["product_123"],
         contents: [
@@ -401,7 +401,7 @@ const capturePurchase = async () => {
       amount: 49.99,
       userId: "user123",
       paymentId: "payment_456",
-      type: "FIRST_PAYMENT", // Map this payment type to "Purchase" in the Linkrunner Dashboard
+      type: "FIRST_PAYMENT", // Your payment type — map to "Purchase" (Meta) or "ecommerce_purchase" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
       status: "PAYMENT_COMPLETED",
       eventData: {
         content_ids: ["product_123"],
@@ -426,7 +426,7 @@ const capturePurchase = async () => {
 };
 ```
 
-> **Note:** For more information on testing and verifying your ecommerce events, please see our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
+> **Note:** For more information on testing and verifying your ecommerce events, please see our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) or [Google Commerce Manager](/ecommerce-manager/google-commerce-manager#verifying-events-in-google-ads) guide.
 
 ## Tracking Custom Events
 
