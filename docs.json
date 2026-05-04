@@ -121,7 +121,8 @@
                             "api-reference/data-apis",
                             "api-reference/revenue-tracking",
                             "api-reference/event-capture",
-                            "api-reference/campaign-apis"
+                            "api-reference/campaign-apis",
+                            "api-reference/reporting-campaigns"
                         ]
                     },
                     {

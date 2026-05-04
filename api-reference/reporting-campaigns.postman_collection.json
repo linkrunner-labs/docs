@@ -1,0 +1,149 @@
+{
+  "info": {
+    "name": "Linkrunner Reporting API",
+    "description": "Test the Linkrunner Reporting API. Set the `linkrunner_key` collection variable once, then run any request.\n\nDocs: https://docs.linkrunner.io/api-reference/reporting-campaigns\n\nRate limit: 1 request per minute per API key.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.linkrunner.io/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "linkrunner_key",
+      "value": "REPLACE_WITH_YOUR_LINKRUNNER_KEY",
+      "type": "string",
+      "description": "Your project's server key. Find it under Dashboard → Settings → Data APIs."
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "linkrunner-key", "type": "string" },
+      { "key": "value", "value": "{{linkrunner_key}}", "type": "string" },
+      { "key": "in", "value": "header", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "List campaigns (default)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/campaigns?page=1&limit=20",
+          "host": ["{{base_url}}"],
+          "path": ["reporting", "campaigns"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "20", "description": "Max 100." }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List campaigns (date range)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/campaigns?from=2026-04-01&to=2026-04-30&limit=20",
+          "host": ["{{base_url}}"],
+          "path": ["reporting", "campaigns"],
+          "query": [
+            { "key": "from", "value": "2026-04-01", "description": "YYYY-MM-DD, project timezone." },
+            { "key": "to", "value": "2026-04-30" },
+            { "key": "limit", "value": "20" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filter by network (Meta)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/campaigns?network=meta&active=true&limit=20",
+          "host": ["{{base_url}}"],
+          "path": ["reporting", "campaigns"],
+          "query": [
+            { "key": "network", "value": "meta", "description": "meta | google | apple_search_ads | tiktok | snapchat | sandbox_ads" },
+            { "key": "active", "value": "true" },
+            { "key": "limit", "value": "20" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filter by platform (iOS) + sort by ROAS",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/campaigns?platform=ios&sort_field=roas&sort_order=descending&limit=20",
+          "host": ["{{base_url}}"],
+          "path": ["reporting", "campaigns"],
+          "query": [
+            { "key": "platform", "value": "ios" },
+            { "key": "sort_field", "value": "roas" },
+            { "key": "sort_order", "value": "descending" },
+            { "key": "limit", "value": "20" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Retargeting view",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/campaigns?view=retargeting&limit=20",
+          "host": ["{{base_url}}"],
+          "path": ["reporting", "campaigns"],
+          "query": [
+            { "key": "view", "value": "retargeting", "description": "Returns reinstalls + reengagements instead of installs." },
+            { "key": "limit", "value": "20" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Search by name / display ID / link",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/campaigns?search=summer&limit=20",
+          "host": ["{{base_url}}"],
+          "path": ["reporting", "campaigns"],
+          "query": [
+            { "key": "search", "value": "summer", "description": "Free-text. Also accepts a full tracking URL." },
+            { "key": "limit", "value": "20" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Configurable columns: events + cost-per + active users",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/campaigns?events=Purchase,AddToCart&unique_user_events=Purchase&cost_per_event=Purchase&active_users=14&limit=20",
+          "host": ["{{base_url}}"],
+          "path": ["reporting", "campaigns"],
+          "query": [
+            { "key": "events", "value": "Purchase,AddToCart", "description": "Whitelist custom_events to these names." },
+            { "key": "unique_user_events", "value": "Purchase", "description": "Count distinct users (unique_count) instead of total occurrences." },
+            { "key": "cost_per_event", "value": "Purchase", "description": "Include cost_per_custom_events / cost_per_payment_events for these names." },
+            { "key": "active_users", "value": "14", "description": "Active users window in days. Default 7." },
+            { "key": "limit", "value": "20" }
+          ]
+        }
+      }
+    }
+  ]
+}
