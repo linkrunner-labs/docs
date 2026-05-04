@@ -831,7 +831,7 @@ public class LinkrunnerSDK : MonoBehaviour
     }
 
     /// <summary>
-    /// Register a user signup. Call once after user completes onboarding.
+    /// Identify the user. Call once as soon as the user is identified (signup or login).
     /// </summary>
     public static void Signup(LinkrunnerUserData userData, string additionalDataJson = "")
     {
@@ -1080,7 +1080,7 @@ public class LinkrunnerUserData
 2. Name it **`LinkrunnerCallbackHandler`** (must match exactly)
 3. Attach the `LinkrunnerSDK.cs` script to it
 
-### Initialization
+### Initialization (Required)
 
 Call `Initialize` as early as possible — typically in your startup scene:
 
@@ -1101,9 +1101,9 @@ void Start()
 
 Find your project token at: [Dashboard → Documentation](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation)
 
-### User Signup
+### User Identification (Required)
 
-Call once after the user completes onboarding:
+Call `Signup` as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 
 ```csharp
 var userData = new LinkrunnerUserData
@@ -1115,33 +1115,6 @@ var userData = new LinkrunnerUserData
 };
 
 LinkrunnerSDK.Signup(userData);
-```
-
-### Set User Data on App Open
-
-Call every time the app opens and the user is logged in:
-
-```csharp
-var userData = new LinkrunnerUserData
-{
-    id = "user_123",
-    name = "Jane Doe",
-    email = "jane@example.com"
-};
-
-LinkrunnerSDK.SetUserData(userData);
-```
-
-### Get Attribution Data
-
-```csharp
-LinkrunnerSDK.OnAttributionData += (jsonString) =>
-{
-    Debug.Log($"Attribution data: {jsonString}");
-    // Parse jsonString to access deeplink, campaignData, etc.
-};
-
-LinkrunnerSDK.GetAttributionData();
 ```
 
 ### Handle Deeplinks
@@ -1216,6 +1189,37 @@ Update your `AndroidManifest.xml` to use this activity and add intent filters fo
 Deeplinks on iOS are handled through the `AppDelegate`. After Unity generates the Xcode project, modify `UnityAppController.mm` or use a native plugin to forward deeplink URLs to Unity via `UnitySendMessage`.
 </Tab>
 </Tabs>
+
+### Set User Data on App Open
+
+Call every time the app opens and the user is logged in:
+
+<Note>
+**`SetUserData` is optional and is not a replacement for `Signup`.** Always call `Signup` first as soon as the user is identified (signup or login). Use `SetUserData` afterwards only when additional user details become available later — for example, when the user adds a phone number, email, or completes their profile after identification.
+</Note>
+
+```csharp
+var userData = new LinkrunnerUserData
+{
+    id = "user_123",
+    name = "Jane Doe",
+    email = "jane@example.com"
+};
+
+LinkrunnerSDK.SetUserData(userData);
+```
+
+### Get Attribution Data
+
+```csharp
+LinkrunnerSDK.OnAttributionData += (jsonString) =>
+{
+    Debug.Log($"Attribution data: {jsonString}");
+    // Parse jsonString to access deeplink, campaignData, etc.
+};
+
+LinkrunnerSDK.GetAttributionData();
+```
 
 ### Track Events
 

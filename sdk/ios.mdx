@@ -82,8 +82,7 @@ For complete SKAdNetwork integration details, see the [SKAdNetwork Integration G
 
 The SDK requires network access to communicate with Linkrunner services. Make sure your app has the appropriate permissions for network access.
 
-## Initialization
-
+## Initialization (Required)
 Initialize the Linkrunner SDK in your app's startup code, typically in your `AppDelegate` or `SceneDelegate`:
 
 You can find your project token [here](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
@@ -120,7 +119,7 @@ struct MyApp: App {
 }
 ```
 
-### SDK Signing Parameters (Optional)
+## SDK Signing Parameters (Optional)
 
 For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
 
@@ -131,9 +130,8 @@ For enhanced security, the LinkRunner SDK requires the following signing paramet
 
 You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
 
-## User Registration
-
-Call the `signup` method once after the user has completed your app's onboarding process:
+## User Identification (Required)
+Call the `signup` method as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 
 It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
 
@@ -170,6 +168,57 @@ func onSignup() async {
         print("Signup successful")
     } catch {
         print("Error during signup:", error)
+    }
+}
+```
+
+## Handle Deeplink
+
+To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
+
+Add the following to your `SceneDelegate.swift`:
+
+```swift
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    var window: UIWindow?
+
+    // Cold start via Universal Link
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
+               options connectionOptions: UIScene.ConnectionOptions) {
+        // Check if app was launched via a Universal Link
+        if let userActivity = connectionOptions.userActivities.first,
+           userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+           let url = userActivity.webpageURL {
+            Task {
+                await LinkrunnerSDK.shared.handleDeeplink(url: url.absoluteString)
+            }
+        }
+
+        // Check if app was launched via a custom URL scheme
+        if let urlContext = connectionOptions.urlContexts.first {
+            Task {
+                await LinkrunnerSDK.shared.handleDeeplink(url: urlContext.url.absoluteString)
+            }
+        }
+    }
+
+    // Warm start — Universal Links (app already running in background)
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+              let url = userActivity.webpageURL else { return }
+
+        Task {
+            await LinkrunnerSDK.shared.handleDeeplink(url: url.absoluteString)
+        }
+    }
+
+    // Warm start — Custom URL schemes (app already running in background)
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+
+        Task {
+            await LinkrunnerSDK.shared.handleDeeplink(url: url.absoluteString)
+        }
     }
 }
 ```
@@ -220,6 +269,10 @@ struct CampaignData: Codable, Sendable {
 ## Setting User Data
 
 Call `setUserData` each time the app opens and the user is logged in:
+
+<Note>
+**`setUserData` is optional and is not a replacement for `signup`.** Always call `signup` first as soon as the user is identified (signup or login). Use `setUserData` afterwards only when additional user details become available later — for example, when the user adds a phone number, email, or completes their profile after identification.
+</Note>
 
 ```swift
 func setUserData() async {
@@ -638,57 +691,6 @@ Connect APNs with Linkrunner
     </Accordion>
 </AccordionGroup>
 
-## Handle Deeplink
-
-To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
-
-Add the following to your `SceneDelegate.swift`:
-
-```swift
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-    var window: UIWindow?
-
-    // Cold start via Universal Link
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
-               options connectionOptions: UIScene.ConnectionOptions) {
-        // Check if app was launched via a Universal Link
-        if let userActivity = connectionOptions.userActivities.first,
-           userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-           let url = userActivity.webpageURL {
-            Task {
-                await LinkrunnerSDK.shared.handleDeeplink(url: url.absoluteString)
-            }
-        }
-
-        // Check if app was launched via a custom URL scheme
-        if let urlContext = connectionOptions.urlContexts.first {
-            Task {
-                await LinkrunnerSDK.shared.handleDeeplink(url: urlContext.url.absoluteString)
-            }
-        }
-    }
-
-    // Warm start — Universal Links (app already running in background)
-    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-              let url = userActivity.webpageURL else { return }
-
-        Task {
-            await LinkrunnerSDK.shared.handleDeeplink(url: url.absoluteString)
-        }
-    }
-
-    // Warm start — Custom URL schemes (app already running in background)
-    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        guard let url = URLContexts.first?.url else { return }
-
-        Task {
-            await LinkrunnerSDK.shared.handleDeeplink(url: url.absoluteString)
-        }
-    }
-}
-```
-
 ## Function Placement Guide
 
 | Function                                     | Where to Place                 | When to Call                                   |
@@ -696,7 +698,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 | `LinkrunnerSDK.shared.initialize`            | App initialization             | Once when app starts                           |
 | `LinkrunnerSDK.shared.getAttributionData`    | Attribution data handling flow | Whenever the attribution data is needed        |
 | `LinkrunnerSDK.shared.setAdditionalData`     | Integration code               | When third-party integration IDs are available |
-| `LinkrunnerSDK.shared.signup`                | Onboarding flow                | Once after user completes onboarding           |
+| `LinkrunnerSDK.shared.signup`                | Identification flow (signup or login) | Once when the user is identified        |
 | `LinkrunnerSDK.shared.setUserData`           | Authentication logic           | Every time app opens with logged-in user       |
 | `LinkrunnerSDK.shared.trackEvent`            | Throughout app                 | When specific user actions occur               |
 | `LinkrunnerSDK.shared.capturePayment`        | Payment processing             | When user makes a payment                      |
