@@ -1,78 +1,156 @@
 ---
 title: Welcome to Linkrunner
-description: "App attribution and marketing analytics made simple"
+description: "The modern mobile attribution and marketing analytics platform"
 icon: "house"
 ---
 
-Linkrunner is a Mobile Measurement Partner (MMP) that helps you track user journeys from first click to revenue generation.
+Linkrunner is a Mobile Measurement Partner (MMP) that helps founders, growth marketers, and mobile developers track every user journey from first click to revenue, across web and mobile.
 
-## Get Started in Minutes
+## Key Features
+
+-   **Multi-platform attribution** for web, iOS, Android, and cross-platform frameworks
+-   **Deferred deep linking** that routes users to specific in-app content after install
+-   **Revenue and ROAS tracking** tied to acquisition source down to ad and creative
+-   **Branded short links** on your own custom domain
+-   **SKAdNetwork & privacy-safe iOS measurement** with conversion value management
+-   **Remarketing audiences** built from on-device events
+-   **Webhooks, data APIs, and an MCP server** to plug attribution data into any tool
+-   **Multi-cloud, low-latency ingestion** from US, EU, and Asia
+
+## Get Started
 
 <CardGroup cols={2}>
-    <Card title="Quickstart Guide" icon="rocket" href="/quickstart">
-        Get up and running in just a few minutes
+    <Card title="Quickstart" icon="rocket" href="/quickstart">
+        Set up your first project, install the SDK, and see your first attributed install in minutes.
     </Card>
-    <Card title="SDK Integration" icon="code" href="/sdk/web">
-        Install the SDK for your platform
+    <Card title="Install an SDK" icon="code" href="/sdk/web">
+        Add Linkrunner to your web, iOS, Android, or cross-platform app.
+    </Card>
+    <Card title="Connect an Ad Network" icon="bullhorn" href="/ad-networks/meta-ads">
+        Wire up Meta, Google, TikTok, Snapchat, or LinkedIn for full-funnel attribution.
     </Card>
     <Card title="Test Your Setup" icon="flask" href="/testing/integration-testing">
-        Validate your integration end-to-end
-    </Card>
-    <Card title="API Reference" icon="database" href="/api-reference/data-apis">
-        Access attribution data programmatically
+        Validate clicks, installs, events, and postbacks end-to-end before launch.
     </Card>
 </CardGroup>
 
-## Key Capabilities
+## SDKs
 
-<CardGroup cols={2}>
-    <Card title="User Attribution" icon="user">
-        Track user journeys with 30+ attributes across web and mobile
-    </Card>
-    <Card title="Unified Analytics" icon="chart-line">
-        Monitor clicks, installs, and revenue from all campaigns in one dashboard
-    </Card>
-    <Card title="Link AI Insights" icon="robot">
-        Get instant campaign and user insights powered by AI
-    </Card>
-    <Card title="ROAS Tracking" icon="dollar-sign">
-        Measure return on ad spend across all marketing channels
-    </Card>
-</CardGroup>
+Pick your platform — every SDK ships with attribution, deferred deep linking, event tracking, and revenue capture out of the box.
 
-## Platform Support
-
+<Tabs>
+<Tab title="Mobile">
 <CardGroup cols={3}>
-    <Card title="Web" icon="globe" href="/sdk/web">
-        JavaScript/TypeScript SDK
+    <Card title="iOS" icon="apple" href="/sdk/ios">
+        Native Swift / Objective-C
+    </Card>
+    <Card title="Android" icon="android" href="/sdk/android">
+        Native Kotlin / Java
     </Card>
     <Card title="React Native" icon="react" href="/sdk/react-native">
-        Cross-platform mobile apps
+        Cross-platform mobile
     </Card>
     <Card title="Flutter" icon="flutter" href="/sdk/flutter">
         Dart-based mobile apps
     </Card>
-    <Card title="iOS" icon="apple" href="/sdk/ios">
-        Native Swift/Objective-C
-    </Card>
-    <Card title="Android" icon="android" href="/sdk/android">
-        Native Kotlin/Java
-    </Card>
     <Card title="Expo" icon="rocket" href="/sdk/expo">
-        Expo React Native apps
+        Managed React Native workflow
+    </Card>
+    <Card title="Unity" icon="gamepad" href="/sdk/unity">
+        iOS and Android games
+    </Card>
+</CardGroup>
+</Tab>
+<Tab title="Hybrid">
+<CardGroup cols={2}>
+    <Card title="Capacitor" icon="bolt" href="/sdk/capacitor">
+        Ionic / Capacitor apps
+    </Card>
+    <Card title="Cordova" icon="mobile-screen" href="/sdk/cordova">
+        Apache Cordova plugin
+    </Card>
+</CardGroup>
+</Tab>
+<Tab title="Web">
+<CardGroup cols={1}>
+    <Card title="Web SDK" icon="globe" href="/sdk/web">
+        JavaScript / TypeScript with React and Next.js integrations
+    </Card>
+</CardGroup>
+</Tab>
+</Tabs>
+
+## Ad Network Integrations
+
+Connect the channels you spend on and Linkrunner handles attribution, postbacks, and ROAS.
+
+<CardGroup cols={3}>
+    <Card title="Google Ads" icon="google" href="/ad-networks/google-ads">
+        Including Web-to-App
+    </Card>
+    <Card title="Meta Ads" icon="meta" href="/ad-networks/meta-ads">
+        Including Web-to-App
+    </Card>
+    <Card title="TikTok" icon="tiktok" href="/ad-networks/tiktok">
+        Events API & postbacks
+    </Card>
+    <Card title="Snapchat" icon="snapchat" href="/ad-networks/snapchat">
+        Conversion API
+    </Card>
+    <Card title="LinkedIn Ads" icon="linkedin" href="/ad-networks/linkedin-ads">
+        B2B install attribution
+    </Card>
+    <Card title="SKAdNetwork" icon="apple" href="/features/skadnetwork-integration">
+        Privacy-safe iOS measurement
     </Card>
 </CardGroup>
 
-## Core Features
+## Analytics & MarTech
 
--   **Custom Domain Links** - Branded links using your own domain
--   **Multi-Platform Attribution** - Track users from click to revenue across web and mobile
--   **Deferred Deep Linking** - Direct users to specific in-app content after install
--   **Revenue Attribution** - Connect revenue to acquisition source
--   **Multi-Cloud Deployment** - Low-latency tracking from US, EU, and Asia
+Forward attribution data to the tools your team already uses.
 
-## Need Help?
+<CardGroup cols={3}>
+    <Card title="Mixpanel" icon="chart-line" href="/analytics-integrations/mixpanel" />
+    <Card title="Amplitude" icon="wave-square" href="/analytics-integrations/amplitude" />
+    <Card title="PostHog" icon="chart-mixed" href="/analytics-integrations/posthog" />
+    <Card title="GA4" icon="google" href="/analytics-integrations/ga4" />
+    <Card title="Braze" icon="fire" href="/analytics-integrations/braze" />
+    <Card title="CleverTap" icon="hand-pointer" href="/analytics-integrations/clevertap" />
+    <Card title="MoEngage" icon="bolt" href="/analytics-integrations/moengage" />
+    <Card title="Netcore" icon="bullseye" href="/analytics-integrations/netcore" />
+    <Card title="RevenueCat" icon="dollar-sign" href="/analytics-integrations/revenuecat" />
+</CardGroup>
 
-<Card title="Contact Support" icon="envelope" href="mailto:support@linkrunner.io">
-    Reach out for personalized assistance
-</Card>
+## Build with the API
+
+<CardGroup cols={2}>
+    <Card title="Data APIs" icon="database" href="/api-reference/data-apis">
+        Pull attribution, install, and campaign data programmatically.
+    </Card>
+    <Card title="Revenue Tracking" icon="circle-dollar" href="/api-reference/revenue-tracking">
+        Send revenue events from your backend or payments stack.
+    </Card>
+    <Card title="Event Capture" icon="bolt" href="/api-reference/event-capture">
+        Server-to-server events without an SDK.
+    </Card>
+    <Card title="Campaign APIs" icon="flag" href="/api-reference/campaign-apis">
+        Create and manage campaigns and links from code.
+    </Card>
+    <Card title="Webhooks" icon="webhook" href="/features/webhooks">
+        Receive real-time events for installs, opens, and conversions.
+    </Card>
+    <Card title="MCP Server" icon="plug" href="/features/mcp">
+        Query your attribution data from Claude and other AI clients.
+    </Card>
+</CardGroup>
+
+## Stay in Touch
+
+<CardGroup cols={2}>
+    <Card title="Open the Dashboard" icon="chart-pie" href="https://dashboard.linkrunner.io">
+        Manage projects, campaigns, billing, and team members.
+    </Card>
+    <Card title="Contact Support" icon="envelope" href="mailto:support@linkrunner.io">
+        Reach out for personalized integration help.
+    </Card>
+</CardGroup>

@@ -203,5 +203,5 @@ This test verifies that a user who uninstalls and reinstalls the app is attribut
 
 ### Signup count not increasing
 
--   Confirm your app calls `signup` only **after** the user completes onboarding/login.
+-   Confirm your app calls `signup` as soon as the user is identified (signup or login) — and not before.
 -   Confirm you are passing the required user identifier fields per your SDK usage guide.

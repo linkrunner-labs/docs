@@ -80,20 +80,10 @@ buildscript {
 }
 ```
 
-## Initialization
-
+## Initialization (Required)
 To initialize the Linkrunner SDK, add this code to your app's initialization:
 
 You can find your project token [here](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
-
-### SDK Signing Parameters (Optional)
-
-For enhanced security, the Linkrunner SDK accepts the following signing parameters during initialization:
-
--   **`secretKey`**: A unique secret key used for request signing and authentication
--   **`keyId`**: A unique identifier for the key pair used in the signing process
-
-You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
 
 Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
 
@@ -116,10 +106,17 @@ const init = async () => {
 init();
 ```
 
+## SDK Signing Parameters (Optional)
 
-## User Registration
+For enhanced security, the Linkrunner SDK accepts the following signing parameters during initialization:
 
-Call the `signup` method once after the user has completed your app's onboarding process:
+-   **`secretKey`**: A unique secret key used for request signing and authentication
+-   **`keyId`**: A unique identifier for the key pair used in the signing process
+
+You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
+
+## User Identification (Required)
+Call the `signup` method as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 
 It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
 
@@ -158,6 +155,29 @@ const onSignup = async () => {
         console.error("Error during signup:", error);
     }
 };
+```
+
+## Handle Deeplink
+
+To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
+
+```typescript
+import { App } from '@capacitor/app';
+import linkrunner from 'capacitor-linkrunner';
+
+// Init SDK first
+await linkrunner.init('your_project_token');
+
+// Cold start — app was launched by a deeplink
+const launchUrl = await App.getLaunchUrl();
+if (launchUrl?.url) {
+  linkrunner.handleDeeplink(launchUrl.url);
+}
+
+// Warm start — app was in background, deeplink brought it to foreground
+App.addListener('appUrlOpen', ({ url }) => {
+  linkrunner.handleDeeplink(url);
+});
 ```
 
 ## Getting Attribution Data
@@ -199,6 +219,10 @@ The `getAttributionData` function returns:
 ## Setting User Data
 
 Call `setUserData` each time the app opens and the user is logged in:
+
+<Note>
+**`setUserData` is optional and is not a replacement for `signup`.** Always call `signup` first as soon as the user is identified (signup or login). Use `setUserData` afterwards only when additional user details become available later — for example, when the user adds a phone number, email, or completes their profile after identification.
+</Note>
 
 ```typescript
 import linkrunner from "capacitor-linkrunner";
@@ -511,29 +535,6 @@ Connect APNs with Linkrunner
     </Accordion>
 </AccordionGroup>
 
-## Handle Deeplink
-
-To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
-
-```typescript
-import { App } from '@capacitor/app';
-import linkrunner from 'capacitor-linkrunner';
-
-// Init SDK first
-await linkrunner.init('your_project_token');
-
-// Cold start — app was launched by a deeplink
-const launchUrl = await App.getLaunchUrl();
-if (launchUrl?.url) {
-  linkrunner.handleDeeplink(launchUrl.url);
-}
-
-// Warm start — app was in background, deeplink brought it to foreground
-App.addListener('appUrlOpen', ({ url }) => {
-  linkrunner.handleDeeplink(url);
-});
-```
-
 ## Function Placement Guide
 
 | Function                        | Where to Place                 | When to Call                                   |
@@ -541,7 +542,7 @@ App.addListener('appUrlOpen', ({ url }) => {
 | `linkrunner.init`               | App initialization             | Once when app starts                           |
 | `linkrunner.getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed        |
 | `linkrunner.setAdditionalData`  | Integration code               | When third-party integration IDs are available |
-| `linkrunner.signup`             | Onboarding flow                | Once after user completes onboarding           |
+| `linkrunner.signup`             | Identification flow (signup or login) | Once when the user is identified        |
 | `linkrunner.setUserData`        | Authentication logic           | Every time app opens with logged-in user       |
 | `linkrunner.trackEvent`         | Throughout app                 | When specific user actions occur               |
 | `linkrunner.capturePayment`     | Payment processing             | When user makes a payment                      |

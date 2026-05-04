@@ -120,18 +120,8 @@ platform :ios, '15.0'
 <string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
 ```
 
-## Initialization
-
+## Initialization (Required)
 You'll need your [project token](https://dashboard.linkrunner.io/dashboard?m=documentation) to get started!
-
-### SDK Signing Parameters (Optional)
-
-For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
-
--   **`secretKey`**: A unique secret key used for request signing and authentication
--   **`keyId`**: A unique identifier for the key pair used in the signing process
-
-You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
 
 Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
 
@@ -163,6 +153,15 @@ void initState() {
 }
 ```
 
+## SDK Signing Parameters (Optional)
+
+For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+
+-   **`secretKey`**: A unique secret key used for request signing and authentication
+-   **`keyId`**: A unique identifier for the key pair used in the signing process
+
+You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
+
 ### Platform-Specific SDK Signing
 
 For applications requiring different signing keys per platform:
@@ -187,9 +186,8 @@ Future<void> initLinkrunnerWithSigning() async {
 }
 ```
 
-## User Registration
-
-Call the `signup` method once after the user has completed your app's onboarding process:
+## User Identification (Required)
+Call the `signup` method as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 
 It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
 
@@ -224,6 +222,54 @@ Future<void> onSignup() async {
     print('Signup successful');
   } catch (e) {
     print('Error during signup: $e');
+  }
+}
+```
+
+## Handle Deeplink
+
+To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:app_links/app_links.dart';
+import 'package:linkrunner/linkrunner.dart';
+
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _appLinks = AppLinks();
+
+  @override
+  void initState() {
+    super.initState();
+    _initLinkRunner();
+  }
+
+  Future<void> _initLinkRunner() async {
+    // Init SDK first
+    await LinkRunner().init('your_project_token');
+
+    // Cold start — app was launched by a deeplink
+    final initialLink = await _appLinks.getInitialLink();
+    if (initialLink != null) {
+      LinkRunner().handleDeeplink(initialLink.toString());
+    }
+
+    // Warm start — app was in background, deeplink brought it to foreground
+    _appLinks.uriLinkStream.listen((Uri uri) {
+      LinkRunner().handleDeeplink(uri.toString());
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      // your app content
+    );
   }
 }
 ```
@@ -286,6 +332,10 @@ Example response:
 ## Setting User Data
 
 Call `setUserData` each time the app opens and the user is logged in:
+
+<Note>
+**`setUserData` is optional and is not a replacement for `signup`.** Always call `signup` first as soon as the user is identified (signup or login). Use `setUserData` afterwards only when additional user details become available later — for example, when the user adds a phone number, email, or completes their profile after identification.
+</Note>
 
 ```dart
 Future<void> setUserData() async {
@@ -794,54 +844,6 @@ Connect APNs with Linkrunner
     </Accordion>
 </AccordionGroup>
 
-## Handle Deeplink
-
-To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
-
-```dart
-import 'package:flutter/material.dart';
-import 'package:app_links/app_links.dart';
-import 'package:linkrunner/linkrunner.dart';
-
-class MyApp extends StatefulWidget {
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  final _appLinks = AppLinks();
-
-  @override
-  void initState() {
-    super.initState();
-    _initLinkRunner();
-  }
-
-  Future<void> _initLinkRunner() async {
-    // Init SDK first
-    await LinkRunner().init('your_project_token');
-
-    // Cold start — app was launched by a deeplink
-    final initialLink = await _appLinks.getInitialLink();
-    if (initialLink != null) {
-      LinkRunner().handleDeeplink(initialLink.toString());
-    }
-
-    // Warm start — app was in background, deeplink brought it to foreground
-    _appLinks.uriLinkStream.listen((Uri uri) {
-      LinkRunner().handleDeeplink(uri.toString());
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      // your app content
-    );
-  }
-}
-```
-
 ## Function Placement Guide
 
 | Function                                | Where to Place                         | When to Call                                   |
@@ -849,7 +851,7 @@ class _MyAppState extends State<MyApp> {
 | `LinkRunner().init`                     | App initialization                     | Once when app starts                           |
 | `LinkRunner().getAttributionData`       | Attribution data handling flow         | Whenever the attribution data is needed        |
 | `LinkRunner().setAdditionalData`        | Integration code                       | When third-party integration IDs are available |
-| `LinkRunner().signup`                   | Onboarding flow                        | Once after user completes onboarding           |
+| `LinkRunner().signup`                   | Identification flow (signup or login)  | Once when the user is identified               |
 | `LinkRunner().setUserData`              | Authentication logic                   | Every time app opens with logged-in user       |
 | `LinkRunner().trackEvent`               | Throughout app                         | When specific user actions occur               |
 | `LinkRunner().capturePayment`           | Payment processing                     | When user makes a payment                      |

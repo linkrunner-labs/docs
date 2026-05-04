@@ -1,91 +1,234 @@
 ---
-title: "Quickstart Guide"
-description: "Get started with Linkrunner in minutes"
+title: "Quickstart"
+description: "Get Linkrunner attributing your installs in under 10 minutes"
 icon: "rocket"
 ---
 
-## Choose Your Platform
+This guide walks you through the four steps every Linkrunner integration follows. Each step links out to platform-specific instructions when you need them.
 
-Get up and running with Linkrunner in just a few minutes. Select your platform below:
+## 1. Create a Project & Get Your Token
 
-<CardGroup cols={2}>
-    <Card title="Web SDK" icon="globe" href="/sdk/web">
-        JavaScript/TypeScript for web applications
-    </Card>
-    <Card title="React Native" icon="react" href="/sdk/react-native">
-        For React Native mobile apps
-    </Card>
-    <Card title="Flutter" icon="flutter" href="/sdk/flutter">
-        For Flutter mobile apps
-    </Card>
-    <Card title="iOS" icon="apple" href="/sdk/ios">
-        Native iOS Swift/Objective-C
-    </Card>
-    <Card title="Android" icon="android" href="/sdk/android">
-        Native Android Kotlin/Java
-    </Card>
-    <Card title="Expo" icon="rocket" href="/sdk/expo">
-        For Expo React Native apps
-    </Card>
-</CardGroup>
+1. Sign in to the [Linkrunner Dashboard](https://dashboard.linkrunner.io).
+2. Create a new project (or open an existing one).
+3. Copy your **Project Token** from [Dashboard → Documentation](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
+4. (Optional, recommended for production) Grab your **Secret Key** and **Key ID** from [Dashboard → Settings → SDK Signing](https://dashboard.linkrunner.io/settings?s=sdk-signing) to enable request signing.
 
-## Quick Setup Overview
+## 2. Install the SDK
 
-All Linkrunner SDKs follow the same simple pattern:
+Pick your platform and follow the install steps in the corresponding SDK guide.
 
-### 1. Install the SDK
-
+<Tabs>
+<Tab title="React Native">
 ```bash
-# Example for React Native
 npm install rn-linkrunner
+# or
+yarn add rn-linkrunner
 ```
+[Full React Native guide →](/sdk/react-native)
+</Tab>
+<Tab title="Flutter">
+```bash
+flutter pub add linkrunner
+```
+[Full Flutter guide →](/sdk/flutter)
+</Tab>
+<Tab title="iOS">
+```ruby
+# Podfile
+pod 'Linkrunner'
+```
+[Full iOS guide →](/sdk/ios)
+</Tab>
+<Tab title="Android">
+```kotlin
+// build.gradle.kts
+implementation("io.linkrunner:sdk:<latest>")
+```
+[Full Android guide →](/sdk/android)
+</Tab>
+<Tab title="Expo">
+```bash
+npx expo install expo-linkrunner rn-linkrunner
+```
+[Full Expo guide →](/sdk/expo)
+</Tab>
+<Tab title="Web">
+```html
+<script src="https://cdn.linkrunner.io/sdk/v1/linkrunner.min.js" data-token="YOUR_WEB_SDK_TOKEN"></script>
+```
+[Full Web guide →](/sdk/web)
+</Tab>
+<Tab title="Capacitor">
+```bash
+npm install capacitor-linkrunner
+npx cap sync
+```
+[Full Capacitor guide →](/sdk/capacitor)
+</Tab>
+<Tab title="Cordova">
+```bash
+cordova plugin add cordova-plugin-linkrunner
+```
+[Full Cordova guide →](/sdk/cordova)
+</Tab>
+<Tab title="Unity">
+Add the Android and iOS bridges, then drop in `LinkrunnerSDK.cs`. [Full Unity guide →](/sdk/unity)
+</Tab>
+</Tabs>
 
-### 2. Initialize in Your App
+## 3. Initialize the SDK (Required)
 
+Call `init` as early as possible in your app's startup — typically in your root component, `Application` class, or `AppDelegate`. Pass the optional `secretKey` and `keyId` if you set them up in step 1.
+
+<Tabs>
+<Tab title="React Native">
 ```javascript
-// Find your project token at: https://dashboard.linkrunner.io/dashboard?s=members&m=documentation
-await linkrunner.init("YOUR_PROJECT_TOKEN");
+import linkrunner from "rn-linkrunner";
+
+await linkrunner.init(
+    "YOUR_PROJECT_TOKEN",
+    "YOUR_SECRET_KEY", // Optional
+    "YOUR_KEY_ID",     // Optional
+);
 ```
+</Tab>
+<Tab title="Flutter">
+```dart
+import 'package:linkrunner/linkrunner.dart';
 
-### 3. Track User Signup
+await LinkRunner().init(
+  'YOUR_PROJECT_TOKEN',
+  'YOUR_SECRET_KEY', // Optional
+  'YOUR_KEY_ID',     // Optional
+);
+```
+</Tab>
+<Tab title="iOS">
+```swift
+import Linkrunner
 
+try await LinkrunnerSDK.shared.initialize(
+    token: "YOUR_PROJECT_TOKEN",
+    secretKey: "YOUR_SECRET_KEY", // Optional
+    keyId: "YOUR_KEY_ID"          // Optional
+)
+```
+</Tab>
+<Tab title="Android">
+```kotlin
+LinkRunner.getInstance().init(
+    context = applicationContext,
+    token = "YOUR_PROJECT_TOKEN",
+    secretKey = "YOUR_SECRET_KEY", // Optional
+    keyId = "YOUR_KEY_ID"          // Optional
+)
+```
+</Tab>
+<Tab title="Web">
+```javascript
+linkrunner.init({ token: "YOUR_WEB_SDK_TOKEN" });
+```
+</Tab>
+</Tabs>
+
+## 4. Identify the User (Required)
+
+Call `signup` **once**, as soon as the user is identified — whether through signup or login. This is what ties the install (and any future events) to a user identifier and powers revenue and lifecycle attribution.
+
+<Tabs>
+<Tab title="React Native">
 ```javascript
 await linkrunner.signup({
     user_data: {
-        id: "user_123",
-        email: "user@example.com"
-    }
+        id: "user_123",        // Required
+        name: "Jane Doe",      // Optional
+        email: "jane@example.com",
+        phone: "9876543210",
+        is_first_time_user: true,
+    },
 });
 ```
-
-### 4. Get Attribution Data
-
-```javascript
-const attribution = await linkrunner.getAttributionData();
-console.log(attribution);
+</Tab>
+<Tab title="Flutter">
+```dart
+await LinkRunner().signup(
+  userData: LRUserData(
+    id: 'user_123',
+    name: 'Jane Doe',
+    email: 'jane@example.com',
+  ),
+);
 ```
+</Tab>
+<Tab title="iOS">
+```swift
+try await LinkrunnerSDK.shared.signup(
+    userData: LinkrunnerUserData(
+        id: "user_123",
+        name: "Jane Doe",
+        email: "jane@example.com"
+    )
+)
+```
+</Tab>
+<Tab title="Android">
+```kotlin
+LinkRunner.getInstance().signup(
+    userData = UserDataRequest(
+        id = "user_123",
+        name = "Jane Doe",
+        email = "jane@example.com"
+    )
+)
+```
+</Tab>
+</Tabs>
 
-## What's Next?
+<Note>
+**`signup` is required.** `setUserData` is optional and is **not** a replacement for `signup` — call it later only when additional user details become available (e.g., the user adds a phone or completes their profile after the initial signup).
+</Note>
+
+## 5. Handle Deep Links
+
+To unlock [remarketing](/features/remarketing) and deferred deep linking, forward incoming deep link URLs to Linkrunner. Each SDK exposes a `handleDeeplink` (or equivalent) method — see the SDK guide for the cold-start and warm-start hooks specific to your platform.
 
 <CardGroup cols={2}>
-    <Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
-        Validate your setup end-to-end
+    <Card title="Deep Linking Setup" icon="link" href="/features/deep-linking-setup">
+        Configure universal links and app links for your domain.
     </Card>
-    <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
-        Direct users to specific in-app content
-    </Card>
-    <Card title="Connect Ad Networks" icon="rectangle-ad" href="/ad-networks/google-ads">
-        Track conversions from your ad campaigns
-    </Card>
-    <Card title="Use the API" icon="database" href="/api-reference/data-apis">
-        Access attribution data programmatically
+    <Card title="Deferred Deep Linking" icon="link-slash" href="/features/deferred-deep-linking">
+        Route brand-new installs to the right in-app screen.
     </Card>
 </CardGroup>
 
-## Get Your Project Token
+## 6. Verify Your Setup
 
-Find your project token in the [Linkrunner Dashboard](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
+<CardGroup cols={2}>
+    <Card title="Run the integration test suite" icon="flask" href="/testing/integration-testing">
+        End-to-end checks for clicks, installs, events, and postbacks.
+    </Card>
+    <Card title="Troubleshoot attribution" icon="bug" href="/testing/testing-attribution-troubleshooting">
+        Common issues and how to debug them.
+    </Card>
+</CardGroup>
+
+## What to Build Next
+
+<CardGroup cols={2}>
+    <Card title="Connect Ad Networks" icon="bullhorn" href="/ad-networks/meta-ads">
+        Hook up Meta, Google, TikTok, Snapchat, or LinkedIn.
+    </Card>
+    <Card title="Track Revenue" icon="circle-dollar" href="/api-reference/revenue-tracking">
+        Send purchases and tie them back to acquisition source.
+    </Card>
+    <Card title="Forward to Analytics" icon="chart-line" href="/analytics-integrations/mixpanel">
+        Pipe attribution into Mixpanel, Amplitude, PostHog, GA4, and more.
+    </Card>
+    <Card title="Build Remarketing Audiences" icon="users" href="/features/remarketing-guide">
+        Re-engage users with on-device event-based segments.
+    </Card>
+</CardGroup>
 
 ## Need Help?
 
-Contact our team at [support@linkrunner.io](mailto:support@linkrunner.io)
+Email [support@linkrunner.io](mailto:support@linkrunner.io) — we typically respond within a few hours during business hours.
