@@ -32,7 +32,7 @@ Connect your Meta advertising account with Linkrunner to enable seamless data sh
 2. Click on **"Add account"**
 3. Log in with your Facebook account credentials
 
-![Meta Integration - Add Account](/images/meta/meta-integration.webp)
+![Meta Integration - Add Account](/images/meta/meta-integration.png)
 
 ### Step 2: Configure CAPI for Meta Account
 
@@ -70,12 +70,17 @@ Set up your campaign link in Linkrunner with the Meta integration enabled.
 
 ### Step 1: Create New Campaign
 
-1. Go to your Linkrunner Dashboard
-2. Create a new campaign link
-3. Select **"Web to App"** as the campaign type
-4. Choose the Meta account you integrated in the previous steps
+1. Go to your Linkrunner Dashboard and click **Create Campaign**
+2. Enter a **Campaign Name** and an optional **Display ID**
+3. Expand **Advanced Options**
+4. Under **Ad Channel**, select **Meta Web to App Ads** (1)
+5. Under **Meta Ad Account**, pick the Meta ad account you integrated in the previous steps (2)
 
-![Campaign Link Creation - Select Meta Account](/images/meta/campaign-link.webp)
+![Campaign Link Creation - Ad Channel and Meta Ad Account](/images/meta/campaign-link.png)
+
+<Warning>
+    If you skip the **Ad Channel** and **Meta Ad Account** selection, the campaign is saved without a Meta link, and **Meta spend will not sync into Linkrunner reports** for it.
+</Warning>
 
 ### Step 2: Configure Campaign Settings
 
@@ -112,6 +117,24 @@ With your Linkrunner campaign link ready, create your ad campaign in Meta Ads Ma
 
 <Note>
     Even though the conversion location is set to Website, the Linkrunner link will automatically redirect users to your app when opened from a mobile device. This is how web-to-app campaigns work — Meta treats it as a website click, but Linkrunner handles the redirection to your app seamlessly.
+</Note>
+
+### Step 4: Add URL Parameters for Granular Attribution
+
+To attribute installs and events down to the **ad set, ad, and placement** level (not just the campaign), add the following to the **URL parameters** field in the ad's Tracking section:
+
+```
+utm_source=facebook&utm_medium=paid_social&campaign_id={{campaign.id}}&adset_id={{adset.id}}&ad_id={{ad.id}}&placement={{placement}}&site_source={{site_source_name}}
+```
+
+Meta automatically replaces the `{{...}}` placeholders with the real campaign/ad set/ad IDs and placement at delivery time, so Linkrunner can split your reports by ad set, creative, and placement.
+
+You'll find the **URL parameters** field inside the **Tracking** section while editing your ad in Meta Ads Manager:
+
+![Tracking section in Meta Ads Manager ad](/images/meta/tracking-section.png)
+
+<Note>
+    Without these parameters, Linkrunner can still attribute installs to the campaign (via the link itself), but ad set, ad, and placement breakdowns will be missing from your reports.
 </Note>
 
 ## Why Run Meta Web to App Ads?

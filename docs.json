@@ -44,13 +44,18 @@
                             "features/uninstall-tracking",
                             "features/meta-install-referrer",
                             "features/ios-campaign-data-limitations",
+                            "features/webhooks",
+                            "features/mcp",
+                            "features/social-media-intermediary-page",
                             {
                                 "group": "SKAdNetwork",
+                                "icon": "apple",
                                 "pages": [
                                     "features/skadnetwork-integration",
                                     "features/skadnetwork-conversion-values",
                                     {
                                         "group": "SKAN Dashboard",
+                                        "icon": "gauge",
                                         "pages": [
                                             "features/skan-dashboard/overview",
                                             "features/skan-dashboard/stats-cards",
@@ -62,11 +67,9 @@
                                     }
                                 ]
                             },
-                            "features/webhooks",
-                            "features/mcp",
-                            "features/social-media-intermediary-page",
                             {
                                 "group": "Remarketing",
+                                "icon": "bullseye",
                                 "pages": [
                                     "features/remarketing-guide",
                                     "features/remarketing",
