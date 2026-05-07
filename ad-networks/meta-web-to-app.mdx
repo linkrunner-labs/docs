@@ -69,7 +69,17 @@ Complete the access token generation steps as shown in your Meta Business settin
 Set up your campaign link in Linkrunner with the Meta integration enabled.
 
 <Note>
-    Create **one Linkrunner campaign per Meta ad**, not per Meta campaign or ad set. Each Linkrunner campaign produces a unique link that you'll paste into a single Meta ad in Step 4. This keeps spend, installs, and event reporting tied 1:1 to a specific creative and gives you the cleanest per-ad breakdowns in the Linkrunner dashboard.
+    **How Meta's hierarchy maps to Linkrunner**
+
+    Meta organises ads in three nested levels:
+
+    1. **Campaign** — defines the overall objective (e.g. App Promotion, Sales) and the budget at the top level.
+    2. **Ad Set** — sits inside a campaign and controls targeting, schedule, and placement settings.
+    3. **Ad** — the actual creative (image, video, copy) that's served to users. An ad set can contain many ads.
+
+    For each Meta **Ad**, create a separate Linkrunner campaign. Every Linkrunner campaign generates a unique link, and that link is what you paste into a single Meta ad's destination URL in Step 4 below. So if you're running 1 Meta campaign with 2 ad sets and 4 ads (2 per ad set), you'll create **4 Linkrunner campaigns**, one per Meta ad.
+
+    Mapping at the ad level keeps spend, installs, and revenue reporting tied 1:1 to a specific creative, and gives you the cleanest per-ad breakdowns in the Linkrunner dashboard.
 </Note>
 
 ### Step 1: Create New Campaign
