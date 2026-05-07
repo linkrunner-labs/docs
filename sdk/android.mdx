@@ -99,7 +99,17 @@ If you already have your own backup rules specified (e.g., `android:fullBackupCo
 </data-extraction-rules>
 ```
 
-### Step 4: Revoking the AD_ID Permission (Optional)
+### Step 4: Encrypted SharedPreferences
+
+<Note>
+  **SDK Version Requirement:** Starting from `linkrunner-android` **v3.8.1**, the SDK automatically encrypts the credentials it stores in SharedPreferences. No additional configuration is required — upgrade to v3.8.1 or above to get this behavior by default.
+</Note>
+
+Values written by the SDK are encrypted at rest, with a hardware-protected key generated on the device and stored in the [Android Keystore](https://developer.android.com/training/articles/keystore). The key never leaves the device and is not bundled with the SDK.
+
+If you are upgrading from an earlier version, the SDK will transparently migrate any existing plaintext entries to the encrypted store on the next read after the upgrade — no code changes are needed on your side.
+
+### Step 5: Revoking the AD_ID Permission (Optional)
 
 According to [Google's Policy](https://support.google.com/googleplay/android-developer/answer/11043825?hl=en), apps that target children must not transmit the Advertising ID.
 

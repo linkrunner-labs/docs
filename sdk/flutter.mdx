@@ -105,6 +105,16 @@ For Android apps, the SDK provides backup rules to exclude Shared Preferences da
 
 For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android/installation#backup-configuration).
 
+#### Encrypted SharedPreferences
+
+<Note>
+  **SDK Version Requirement:** Starting from `linkrunner` **v3.9.1**, the SDK automatically encrypts the credentials it stores in Android SharedPreferences (such as the install ID and other persisted SDK state). No additional configuration is required — upgrade to v3.9.1 or above to get this behavior by default.
+</Note>
+
+On Android, values written by the SDK are encrypted at rest, with a hardware-protected key generated on the device and stored in the [Android Keystore](https://developer.android.com/training/articles/keystore). The key never leaves the device and is not bundled with the SDK.
+
+If you are upgrading from an earlier version, the SDK will transparently migrate any existing plaintext entries to the encrypted store on the next read after the upgrade — no code changes are needed on your side.
+
 #### iOS Configuration
 
 1. Update your iOS deployment target to iOS 15.0 or higher in your `ios/Podfile`:

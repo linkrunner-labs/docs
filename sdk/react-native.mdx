@@ -52,6 +52,16 @@ For Android apps, the SDK provides backup rules to exclude Shared Preferences da
 
 For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android#backup-configuration).
 
+### Step 5: Encrypted SharedPreferences (Android)
+
+<Note>
+  **SDK Version Requirement:** Starting from `rn-linkrunner` **v2.10.1**, the SDK automatically encrypts the credentials it stores in Android SharedPreferences (such as the install ID and other persisted SDK state). No additional configuration is required — upgrade to v2.10.1 or above to get this behavior by default.
+</Note>
+
+On Android, values written by the SDK are encrypted at rest, with a hardware-protected key generated on the device and stored in the [Android Keystore](https://developer.android.com/training/articles/keystore). The key never leaves the device and is not bundled with the SDK.
+
+If you are upgrading from an earlier version, the SDK will transparently migrate any existing plaintext entries to the encrypted store on the next read after the upgrade — no code changes are needed on your side.
+
 ### Expo Support
 
 If you are using Expo, follow the above steps to install the required packages. After this, you will need to use development builds since the Linkrunner SDK relies on native libraries. Follow the [Expo Development Builds Documentation](https://docs.expo.dev/develop/development-builds/introduction/) to get started.
