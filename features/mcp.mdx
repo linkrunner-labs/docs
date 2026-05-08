@@ -8,17 +8,20 @@ icon: "sparkles"
 ## Overview
 
 Linkrunner ships a Model Context Protocol (MCP) server that lets Claude answer
-questions about your project's data directly from chat. Generate a token in the
-dashboard, add it as a Custom Connector in Claude.ai, and ask things like:
+questions about your project's data and create new campaigns directly from
+chat. Generate a token in the dashboard, add it as a Custom Connector in
+Claude.ai, and ask things like:
 
 - "How did my campaigns perform last week?"
 - "Compare my Meta vs Google performance for the last 7 days."
 - "Which campaigns should I cut based on ROAS?"
 - "Why did installs drop yesterday?"
+- "Create a new Meta web-to-app campaign for the Diwali promo, deep link to /promo/diwali."
 
-The connector is read-only. Claude can query the same metrics surfaced in your
-dashboard (campaigns, installs, revenue, attribution, events) but cannot make
-changes to campaigns, projects, or settings.
+Claude can query the same metrics surfaced in your dashboard (campaigns,
+installs, revenue, attribution, events) and can create campaigns through the
+same backend the dashboard uses. The connector cannot edit existing campaigns,
+change project settings, manage members, or access billing actions.
 
 ## Prerequisites
 
@@ -82,9 +85,39 @@ based on your question.
 | `list_events` | Custom and revenue event names you've defined. |
 | `lookup_attribution` | Attribution result for a single user or device: campaign, ad network, ad set, creative, keyword (Apple Search Ads), organic vs inorganic flag, device IDs (gaid/idfa), and click/install timestamps. |
 | `get_billing_usage` | Free-install allowance and current-month usage. Only fetched when you explicitly ask about billing. |
+| `create_campaign` | Create a new campaign (attribution link). Equivalent to the dashboard's Create Campaign modal. Supports Meta app/web-to-app, Google app, TikTok, Snapchat, LinkedIn, and organic. |
+| `list_domains` | Lookup. Lists the project's domains so Claude can fill `domain_id` or assemble a deep link URL. |
+| `list_store_listings` | Lookup. Lists custom App Store / Play Store listings so Claude can fill `store_listing_ids`. |
+| `list_ad_accounts` | Lookup. Lists connected ad-network accounts (Meta, Google, TikTok, Snapchat, LinkedIn, Apple Search Ads) so Claude can fill `network_account_id`. |
 
 Claude reads these tools' descriptions and decides which to call. You don't
 need to invoke them manually.
+
+## Creating a campaign from chat
+
+When you ask Claude to create a campaign, it gathers what it needs and calls
+the lookup tools as needed before submitting. Example flow:
+
+> "Create a Meta web-to-app campaign called 'Diwali 2026 - Reels' that deep
+> links to /promo/diwali. Use my main Meta ad account."
+
+1. Claude calls `list_ad_accounts` with `network: "meta"` to find your Meta
+   account ID.
+2. Claude calls `list_domains` if it needs to confirm a non-default domain.
+3. Claude calls `create_campaign` with the gathered fields.
+4. The connector returns the new campaign object plus a dashboard URL Claude
+   shows you so you can click straight into the campaign details.
+
+If a parameter is missing or invalid, the connector returns a structured error
+with a hint about which lookup to call next or which value to ask you for.
+Claude surfaces that hint in chat. For example, asking for a Meta web-to-app
+campaign without a `meta_campaign_id` will prompt Claude to ask you for the
+campaign ID from Meta Ads Manager.
+
+The same backend validation that runs in the dashboard runs here. Anything
+that works (or fails) in the dashboard works (or fails) the same way through
+MCP. See the [Create Campaign API reference](/api-reference/campaign-apis) for
+the full list of fields and their constraints.
 
 ## Built-in prompts
 
@@ -118,12 +151,20 @@ revoke an unused token before creating a new one.
 
 - Tokens are scoped to a single project's data. They cannot read other
   projects you might be a member of.
-- Tokens are read-only. Claude cannot create, edit, or delete campaigns,
-  projects, members, or any other resource through the connector.
+- Tokens can read project data and create new campaigns. They cannot edit or
+  delete existing campaigns, change project settings, manage members,
+  or access billing actions.
 - Tokens are revocable from the dashboard at any time.
 - The connector does not expose webhooks, SDK private keys, billing settings,
   or admin actions.
 - Per-project token cap of 10 limits the blast radius if one leaks.
+- All MCP requests are rate limited per token: 300 reads per minute and 30
+  writes per minute (currently `create_campaign` is the only write).
+  Exceeding either returns a 429 to Claude.
+- Campaigns created from chat are attributed to the project admin / owner /
+  manager who minted the token (or, if that user is no longer eligible, to
+  another qualifying member). The activity is recorded the same way as
+  dashboard creations.
 
 ## Troubleshooting
 
@@ -146,10 +187,18 @@ real-time, so there's no lag to account for.
 You're at the per-project cap. Revoke an unused token from the same settings
 page before creating a new one.
 
+**Claude says it hit a rate limit (HTTP 429).**
+Each token is capped at 300 reads per minute and 30 writes per minute. The
+limit is per-token, so generating an additional token on a busy project gives
+you separate quotas. Wait a minute and retry, or split workloads across
+tokens.
+
 ## What this is not
 
-- Not a write API. Use the [Linkrunner data
-  API](/api-reference/introduction) for programmatic writes.
+- Not a full write API. Campaign creation is supported, but editing or
+  deleting campaigns, changing project settings, and managing members are not
+  exposed. Use the [Linkrunner data API](/api-reference/introduction) or the
+  dashboard for those.
 - Not a generic SQL/Postgres bridge. It calls the same endpoints the
   dashboard uses, with the same access controls.
 - Not a substitute for webhooks. Use [webhooks](/features/webhooks) for
