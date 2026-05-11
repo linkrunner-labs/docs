@@ -62,6 +62,23 @@ HTTP/HTTPS deep links (including App Links on Android and Universal Links on iOS
     ```
 
     Look for the "SHA-256 Certificate fingerprint" line in the output.
+
+    <Warning>
+      Debug and release builds are signed with different keystores, so they produce different SHA-256 fingerprints. App Links verification will only succeed for the build whose fingerprint is currently saved in Linkrunner.
+
+      Before testing or shipping a release build, either:
+      - Update the `sha256_cert_fingerprints` value in Linkrunner to your release keystore's fingerprint, or
+      - List both fingerprints in the array so debug and release builds both verify:
+
+      ```json
+      "sha256_cert_fingerprints": [
+          "SHA-256:DEBUG:FINGERPRINT:...",
+          "SHA-256:RELEASE:FINGERPRINT:..."
+      ]
+      ```
+
+      If you use Google Play App Signing, get the release fingerprint from **Play Console → Setup → App integrity**, not your local upload keystore.
+    </Warning>
   </Tab>
   <Tab title="iOS">
     #### Create the Apple App Site Association file
