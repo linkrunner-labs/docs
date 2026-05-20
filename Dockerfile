@@ -8,8 +8,8 @@
 
 FROM node:20-alpine
 
-# Non-root user (uid/gid 1000 matches the chart's securityContext).
-RUN addgroup -g 1000 -S app && adduser -u 1000 -S app -G app
+# Base image ships a `node` user at uid/gid 1000 — reuse it so the chart's
+# runAsUser: 1000 lines up.
 
 WORKDIR /app
 
@@ -19,13 +19,13 @@ RUN npm install -g mintlify@latest
 
 # Copy the docs sources. The CLI walks the working directory at boot, so we
 # bring the whole repo in (mdx pages, docs.json, images, snippets, etc.).
-COPY --chown=app:app . .
+COPY --chown=node:node . .
 
-USER app
+USER node
 
 # Mintlify writes cache state under $HOME/.mintlify; the chart mounts an
-# emptyDir there so the read-only-rootfs path stays safe.
-ENV HOME=/home/app
+# emptyDir at /home/node/.mintlify so the read-only-rootfs path stays safe.
+ENV HOME=/home/node
 
 EXPOSE 3001
 
