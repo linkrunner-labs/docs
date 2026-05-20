@@ -6,7 +6,7 @@ icon: "/images/logos/meta.webp"
 
 ## Overview
 
-Meta Ads integration with Linkrunner enables you to track conversions and optimize your app campaigns directly within the Meta advertising platform. This integration allows you to send in-app events from your app to Meta as conversion events, providing better insights into your campaign performance and user behavior.
+Connect Meta Ads to send installs, registrations, purchases, and custom app events from Linkrunner to Meta. Use this guide to connect your Meta app and ad account, configure Conversions API, and map the events Meta should receive.
 
 <iframe
     width="100%"
@@ -31,7 +31,7 @@ Setting up Meta Ads integration involves configuring your Meta app credentials, 
 
 ## 1. Configure Meta App Integration
 
-This process connects your app with Meta's attribution and conversion tracking systems.
+This process connects your app and Meta ad account with Linkrunner.
 
 ### Step 1: Get Your Meta App ID
 
@@ -57,79 +57,72 @@ This process connects your app with Meta's attribution and conversion tracking s
 
 ### Step 3: Configure in Linkrunner Dashboard
 
-1. Go to [Linkrunner Settings - Meta Integration](https://dashboard.linkrunner.io/settings?s=meta-integration)
+1. Go to [Meta App Integration](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=integration)
 2. Enter your **App ID** in the designated field
 3. Enter your **Referrer Decryption Key**
 4. Click **Save**
 
+<img src="/images/meta/app-integration.png" alt="Meta App Integration tab in Linkrunner" />
+
+### Step 4: Connect Meta Ad Account
+
+1. Go to [Ad Account Integration](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=ad_account)
+2. Click **Add Meta Account**
+3. Log in with Meta and connect your ad account
+
+<img src="/images/meta/ad-account-integration.png" alt="Meta Ad Account Integration tab in Linkrunner" />
+
+### Step 5: Configure CAPI
+
+1. Click **Configure CAPI** for the connected ad account
+2. Enter the **Dataset ID** from Meta Events Manager
+3. Enter the **CAPI Access Token** from Meta Events Manager → **Settings** → **Conversions API**
+4. Click **Save**
+
+<img src="/images/meta/configure-capi.png" alt="Configure CAPI modal in Linkrunner" />
+
 ## 2. Set Up Event Mapping
 
-Map your in-app events to Meta events to enable postback conversion tracking and campaign optimization.
+Map your app events to Meta events so Linkrunner can send postback conversions.
 
 <Note>
-    **First app open** and **Sign up** events are captured and shared with Meta by default — no configuration needed for
-    these events.
+    **MobileAppInstall** and **CompleteRegistration** are sent to Meta by default. You do not need mappings for these
+    events.
 </Note>
 
-### Step 1: Navigate to Event Mapping
+1. Go to [Meta Ads Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=event_mapping)
+2. Click **Add Mapping**
+3. Select your event under **Your Events**
+4. Select the matching **Meta Ads Event**
+5. Turn on **Send Revenue** only for revenue events, then choose the **Currency**
+6. Click **Save**
+7. Click the paper plane **Send to ad network** icon to fire a test event
 
-1. In your Linkrunner Dashboard, go to the **Event Mapping** section for Meta
-2. Click **Add Mapping** to create a new event mapping
+<img src="/images/meta/event-mapping.png" alt="Meta Ads event mapping table in Linkrunner" />
 
-### Step 2: Configure Event Mapping
-
-1. **Select your app event** from the dropdown menu
-2. **Select the corresponding Meta ad network event** (e.g., Purchase, AddToCart, ViewContent)
-3. **Enable Send Revenue** if you want to share revenue data with Meta
-    - Select the appropriate currency for revenue tracking
-4. Click **Save** to create the mapping
-
-### Step 3: Test Your Event Mappings
-
-1. After creating your event mappings, you can test them by clicking the **Send** button
-2. This will send a test event to Meta to verify the integration is working correctly
-3. Check your Meta Events Manager to confirm the test event was received
+<Note>
+    After Linkrunner fires an event, it can take up to 1 hour to appear in Meta Events Manager.
+</Note>
 
 <Tip>
-    Start with basic events like Purchase before adding more complex custom events. This helps verify your integration
-    is working correctly.
+    If you cannot see **MobileAppInstall** or **CompleteRegistration** in Meta Events Manager, click the paper plane
+    **Send to ad network** icon for that event.
 </Tip>
 
 ## 3. Configure Events in Meta Events Manager
 
-After setting up event mapping in Linkrunner, you need to configure your Meta Events Manager to receive and process these events.
-
-### Step 1: Access Events Manager
+Use Meta Events Manager to verify that Meta receives events from Linkrunner.
 
 1. Go to [Meta Ads Dashboard](https://business.facebook.com/)
-2. Navigate to **Events Manager** → **Datasets**
-
-### Step 2: Select or Create Dataset
-
-1. Select your existing dataset, or
-2. Click **"+ Create Dataset"** if you haven't created one yet
-
-### Step 3: Configure Conversions API
-
-1. Navigate to **Settings** → **Conversions API**
-2. Ensure your dataset is configured to receive events from Conversions API
-3. Verify the connection status shows as active
-
-### Step 4: View Incoming Events
-
-1. Go to the **Events** tab in your dataset
-2. You should see incoming events from Linkrunner
-3. Events may take a few minutes to appear after initial setup
-
-### Step 5: Create Custom Conversion Events
-
-1. Go to **Conversions** → **Create Conversion Event**
-2. To get started, select the **Purchase** event
-3. Configure additional conversion events based on your campaign goals
+2. Open **Events Manager** → **Datasets**
+3. Select your app dataset, or click **Create Dataset**
+4. Go to **Settings** → **Conversions API** and confirm the dataset can receive Conversions API events
+5. Open the **Events** tab to view events from Linkrunner
+6. Create custom conversion events for the events you want to optimize campaigns on
 
 <Note>
-    It may take a few minutes for events to start appearing in Meta Events Manager after initial configuration. If
-    events don't appear after 15 minutes, verify your App ID and Referrer Decryption Key are correct.
+    If events do not appear in Meta Events Manager after 1 hour, verify your App ID and Referrer Decryption Key are
+    correct.
 </Note>
 
 ## 4. Campaign Tracking
@@ -151,88 +144,60 @@ Once your integration is configured, Meta ad campaigns will automatically appear
 
 ## 5. Deferred Deep Linking
 
-Deferred deep linking allows you to direct users to specific in-app content after they install your app from a Meta ad campaign. When a user clicks on your ad and installs your app, the deferred deep link ensures they land on the exact content or screen you want them to see, creating a seamless user experience from ad to app.
-
-Once configured in the Linkrunner dashboard, the deep link will be returned in the `getAttributionData` method of the Linkrunner SDK when the app is installed and opened for the first time. Your app can then use this deep link to navigate the user to the appropriate in-app destination.
+Use deferred deep links when a Meta install should open a specific screen after first app open. Linkrunner returns the selected URL in the SDK `getAttributionData()` response.
 
 <Note>
-    Campaigns must generate at least one install before they appear in the Linkrunner dashboard. Once a campaign
-    appears, you can configure deferred deep links at the campaign, ad set, or ad creative level.
+    Campaign, ad set, and ad creative rows appear in Linkrunner after they receive at least one install.
 </Note>
 
-### When to Use Each Configuration Level
+### Priority Order
 
-Choose the appropriate level based on how granular you want your deep linking strategy to be:
+Linkrunner uses the most specific deep link available:
 
-| Configuration Level   | Best For                                                                                                                                                              | Granularity |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| **Campaign Level**    | Consistent experience across all ads in a campaign. All users from any ad in the campaign will be directed to the same in-app destination.                            | Low         |
-| **Ad Set Level**      | Targeting different audiences with different content. Each ad set can direct users to different in-app destinations based on audience segments or targeting criteria. | Medium      |
-| **Ad Creative Level** | Highly personalized experiences based on specific ad content. Each individual ad can direct users to unique in-app destinations that match the ad's creative message. | High        |
-
-<Tip>
-    Start with campaign-level deep links for simplicity, then move to ad set or ad creative levels as your campaigns
-    become more sophisticated and you need more granular control over user experiences.
-</Tip>
+1. **Ad Creative Level**: Used first
+2. **Ad Set Level**: Used when the ad creative has no deep link
+3. **Campaign Level**: Used as the fallback
 
 ### Campaign-Level Deep Links
 
-Configure deferred deep links at the campaign level to provide a consistent user experience across all ads within a campaign.
-
-<Note>
-    Your Meta campaign must appear in the Linkrunner dashboard before you can add a deferred deep link. Campaigns appear
-    automatically after they generate their first install.
-</Note>
+Use this when every ad in the campaign should open the same destination.
 
 1. Navigate to the **Campaigns** section in your [Linkrunner Dashboard](https://dashboard.linkrunner.io)
 2. Find your Meta campaign in the list
 3. Click the **Edit** button on the campaign row
 4. In the campaign settings, locate the **Deferred Deep Link** field
-5. Enter your deep link URL (e.g., `myapp://product/12345` or `https://myapp.com/product/12345`)
+5. Enter your deep link URL, such as `https://myapp.com/product/12345`
 6. Click **Save** to apply the changes
-
-All users who install your app from any ad within this campaign will be directed to the specified in-app destination upon first app open.
 
 ### Ad Set-Level Deep Links
 
-Configure deferred deep links at the ad set level to provide different user experiences for different audience segments or targeting criteria. Ad set-level deep links can be configured independently from campaign-level deep links, giving you more granular control over where users land in your app.
+Use this when an ad set should open a different destination from the campaign default.
 
 1. Navigate to the **Campaigns** section in your [Linkrunner Dashboard](https://dashboard.linkrunner.io)
 2. Find your Meta campaign in the list
 3. Click on the **ad set name** to open the ad set details
 4. In the ad set configuration, locate the **Deferred Deep Link** field
-5. Enter your deep link URL (e.g., `myapp://category/electronics` or `https://myapp.com/category/electronics`)
-6. Click **Save** to apply the changes
+5. Enter your deep link URL, such as `https://myapp.com/category/electronics`
+6. Click **Update** to apply the changes
 
-Users who install your app from ads within this specific ad set will be directed to the ad set's deep link destination. If no ad set-level deep link is configured, the campaign-level deep link (if set) will be used instead.
+<img src="/images/meta/ad-set-deeplink-modal.png" alt="Edit ad set deep link modal" />
+
+If no ad set deep link is set, Linkrunner uses the campaign deep link.
 
 ### Ad Creative-Level Deep Links
 
-Configure deferred deep links at the ad creative level to provide highly personalized user experiences based on the specific ad content. This is the most granular level of deep link configuration, allowing each individual ad to direct users to unique in-app destinations that match the ad's creative message.
-
-**Deep Link Configuration Hierarchy:**
-
-When a user installs your app from a Meta ad, Linkrunner determines which deep link to use based on the following priority order:
-
-1. **Ad Creative-Level** (highest priority) — If configured, this deep link is used
-2. **Ad Set-Level** — If no ad creative-level deep link exists, the ad set-level deep link is used
-3. **Campaign-Level** (lowest priority) — If neither ad creative nor ad set deep links exist, the campaign-level deep link is used
-
-This hierarchy allows you to set a default deep link at the campaign level while overriding it for specific ad sets or individual ad creatives as needed.
+Use this when one ad should open a specific product, offer, or screen.
 
 1. Navigate to the **Campaigns** section in your [Linkrunner Dashboard](https://dashboard.linkrunner.io)
 2. Find your Meta campaign in the list
 3. Click on the **ad creative name** (or ad name) to open the ad creative details
 4. In the ad creative configuration, locate the **Deferred Deep Link** field
-5. Enter your deep link URL (e.g., `myapp://product/12345?promo=summer` or `https://myapp.com/product/12345?promo=summer`)
-6. Click **Save** to apply the changes
+5. Enter your deep link URL, such as `https://myapp.com/product/12345?promo=summer`
+6. Click **Update** to apply the changes
 
-Users who install your app from this specific ad creative will be directed to the ad creative's deep link destination. This allows you to create highly targeted user journeys that align with the specific message, offer, or product featured in each ad.
+<img src="/images/meta/ad-creative-deeplink-modal.png" alt="Edit ad creative deep link modal" />
 
-<Tip>
-    Use ad creative-level deep links when running A/B tests or promoting multiple products within the same campaign. For
-    example, if one ad features a specific product, you can deep link directly to that product page in your app.
-</Tip>
+If no ad creative deep link is set, Linkrunner checks the ad set, then the campaign.
 
 ## 6. Enable Meta View-Through Attribution (Android)
 
@@ -289,8 +254,8 @@ For more details, see the [Meta Install Referrer](/features/meta-install-referre
 
 - Verify your Referrer Decryption Key is correct
 - Check that your dataset is configured to receive Conversions API events
-- Wait 45 mins - 1 hour for initial events to propagate
-- Test your event mappings using the Send button in Linkrunner
+- Wait up to 1 hour for events to appear in Meta Events Manager
+- Test your event mappings using the paper plane **Send to ad network** icon in Linkrunner
 
 ### Campaigns Not Appearing in Dashboard
 
