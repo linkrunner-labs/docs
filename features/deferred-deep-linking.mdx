@@ -6,6 +6,10 @@ icon: "link-simple"
 
 Direct users to specific screens after they install your app from a campaign link. Works on Android & iOS.
 
+<Note>
+    For Meta App Promotion campaigns, you can add the app link in Meta Ads Manager. Linkrunner syncs the Meta ad creative app link and returns it from `getAttributionData()`. Manual ad set and ad creative deep links saved in Linkrunner override synced Meta links.
+</Note>
+
 ## Quick Example
 
 **Campaign Setup:** Enable deferred deep linking, set URL to `get.yourdomain.com/product/123`
@@ -78,7 +82,7 @@ Call `getAttributionData()` when you need attribution data, check for the `deepl
 
 **Onboarding:** `get.yourdomain.com/onboarding?trial=30days` → Custom onboarding flow
 
-**Referral Tracking:** `get.yourdomain.com/product/123?referrer=jane` → Deep link + attribution ([learn more](/feature/referral-codes))
+**Referral Tracking:** `get.yourdomain.com/product/123?referrer=jane` → Deep link + attribution ([learn more](/features/referral-codes))
 
 ## Testing
 

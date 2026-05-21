@@ -150,13 +150,33 @@ Use deferred deep links when a Meta install should open a specific screen after 
     Campaign, ad set, and ad creative rows appear in Linkrunner after they receive at least one install.
 </Note>
 
+### Meta App Promotion Deep Links
+
+For Meta App Promotion campaigns, you can add the app link directly in Meta Ads Manager. Linkrunner reads the ad creative `app_link` from Meta and returns it from `getAttributionData()`.
+
+1. Open the campaign in [Meta Ads Manager](https://business.facebook.com/adsmanager)
+2. Edit the ad creative
+3. Add your app link in Meta's deep link or app link field
+4. Publish the ad
+
+The fresh Meta sync runs every 30 minutes for the last 2 days of active clicks and spend. When an active ad has an `app_link`, Linkrunner stores it on the matching ad creative. If you update or remove the app link in Meta, Linkrunner updates the auto-synced value on the next fresh sync that sees that ad.
+
+<Note>
+    Meta app links can use a Linkrunner domain, another app-link domain, an MMP link, or a custom scheme. If Linkrunner imports the link from Meta, the domain does not need to be added in Linkrunner.
+</Note>
+
+<Warning>
+    Do not use a Play Store or App Store URL as the app link. Meta exposes store destinations separately, and Linkrunner only returns the app link.
+</Warning>
+
 ### Priority Order
 
-Linkrunner uses the most specific deep link available:
+Linkrunner uses manual ad entity values before auto-synced Meta values:
 
-1. **Ad Creative Level**: Used first
-2. **Ad Set Level**: Used when the ad creative has no deep link
-3. **Campaign Level**: Used as the fallback
+1. **Manual Ad Creative Level**: Used first
+2. **Manual Ad Set Level**: Used when the ad creative has no manual deep link
+3. **Meta App Promotion App Link**: Used when Meta returns an ad creative `app_link`
+4. **Campaign Level**: Used as the fallback
 
 ### Campaign-Level Deep Links
 
@@ -171,7 +191,7 @@ Use this when every ad in the campaign should open the same destination.
 
 ### Ad Set-Level Deep Links
 
-Use this when an ad set should open a different destination from the campaign default.
+Use this when an ad set should open a different destination from the campaign default. Manual ad set links use your Linkrunner project domain and override auto-synced Meta app links.
 
 1. Navigate to the **Campaigns** section in your [Linkrunner Dashboard](https://dashboard.linkrunner.io)
 2. Find your Meta campaign in the list
@@ -186,7 +206,7 @@ If no ad set deep link is set, Linkrunner uses the campaign deep link.
 
 ### Ad Creative-Level Deep Links
 
-Use this when one ad should open a specific product, offer, or screen.
+Use this when one ad should open a specific product, offer, or screen. Manual ad creative links use your Linkrunner project domain and override auto-synced Meta app links.
 
 1. Navigate to the **Campaigns** section in your [Linkrunner Dashboard](https://dashboard.linkrunner.io)
 2. Find your Meta campaign in the list
