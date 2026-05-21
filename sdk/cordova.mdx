@@ -71,7 +71,7 @@ The `cordova plugin add` command automatically configures the following native s
 
 For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
 
-For detailed Android backup configuration instructions, refer to the [Android SDK Backup Configuration](/sdk/android#backup-configuration).
+For detailed Android backup configuration instructions, refer to the [Android SDK Backup Configuration](/sdk/android#step-3%3A-backup-configuration).
 
 ## Initialization (Required)
 To initialize the Linkrunner SDK, add this code inside the `deviceready` event. No import or require is needed — `linkrunner` is globally available after plugin installation.
@@ -256,7 +256,7 @@ This method allows you to connect user identities across different analytics and
 ## Revenue Tracking
 
 <Note>
-    Revenue data is only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before capturing payments. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
+    Revenue data is only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-identification-required) function before capturing payments. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
 </Note>
 
 ### Capture Payment
@@ -336,7 +336,7 @@ Note: At least one of `paymentId` or `userId` must be provided when calling `rem
 
 If you are tracking Ecommerce events to sync with Meta Catalog Sales, you must format your `eventData` to include Meta's required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
 
-For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event_data).
+For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event-data).
 
 ### Add To Cart Example
 
@@ -432,7 +432,7 @@ linkrunner.capturePayment({
 ## Tracking Custom Events
 
 <Note>
-    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-identification-required) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
 </Note>
 
 Track custom events in your app:

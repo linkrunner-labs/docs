@@ -212,7 +212,7 @@ Unlike Meta campaigns, TikTok campaigns **do not appear automatically** on the L
 
 **Checklist to fix this:**
 
-1. **Verify your campaign links are set up correctly** — Each TikTok ad must have a unique Linkrunner campaign link as the destination URL ([see Step 5](#step-5-add-destination-urls))
+1. **Verify your campaign links are set up correctly** — Each TikTok ad must have a unique Linkrunner campaign link as the destination URL ([see Step 5](#step-5%3A-add-destination-urls))
 2. **Ensure your ads are active and receiving traffic** — Campaigns only appear after at least one click comes through the tracking link
 3. **Check that the Linkrunner SDK is integrated in your app** — Your app must be live with the Linkrunner SDK for installs to be attributed
 4. **Confirm your TikTok pixel is configured** — Without a properly configured pixel ([see Part 1](#1-configuring-pixel-in-tiktok-events-manager)), event postbacks to TikTok won't work
@@ -223,7 +223,7 @@ Unlike Meta campaigns, TikTok campaigns **do not appear automatically** on the L
 
 If installs or other events are not appearing in TikTok Events Manager, check the following:
 
-1. **Pixel credentials are correct** — Verify that the **Pixel ID** and **Access Token** you pasted into Linkrunner match the ones in TikTok Events Manager ([see Step 12](#step-12-copy-credentials))
+1. **Pixel credentials are correct** — Verify that the **Pixel ID** and **Access Token** you pasted into Linkrunner match the ones in TikTok Events Manager ([see Step 12](#step-12%3A-copy-credentials))
 2. **Access token hasn't expired** — TikTok access tokens can expire or be revoked. Regenerate the token in TikTok Events Manager and update it in Linkrunner if needed
 3. **Wait for propagation** — It can take up to 45 minutes to 1 hour for initial events to appear in TikTok Events Manager
 4. **Users are clicking the campaign link** — Events are only sent to TikTok for installs that came through a Linkrunner campaign link with a valid TikTok click ID (`ttclid`)
@@ -263,7 +263,7 @@ This is because TikTok uses a web-to-app flow where the campaign link acts as th
 - See which specific ad is driving the most installs and conversions
 - Make better optimization decisions based on granular data
 
-You can quickly duplicate campaigns in Linkrunner to create multiple links ([see Step 4](#step-4-create-linkrunner-campaign-links)).
+You can quickly duplicate campaigns in Linkrunner to create multiple links ([see Step 4](#step-4%3A-create-linkrunner-campaign-links)).
 
 </Accordion>
 
@@ -273,7 +273,7 @@ You can quickly duplicate campaigns in Linkrunner to create multiple links ([see
 
 To set this up:
 1. Ensure your app sends revenue events with amount and currency through the Linkrunner SDK
-2. Select **Purchase** as the optimization event when creating your TikTok campaign ([see Step 3](#step-3-configure-optimization-and-bidding))
+2. Select **Purchase** as the optimization event when creating your TikTok campaign ([see Step 3](#step-3%3A-configure-optimization-and-bidding))
 
 Revenue data is sent in the currency your app provides (ISO 4217 format, e.g., USD, INR).
 
