@@ -152,18 +152,26 @@ Use deferred deep links when a Meta install should open a specific screen after 
 
 ### Meta App Promotion Deep Links
 
-For Meta App Promotion campaigns, you can add the app link directly in Meta Ads Manager. Linkrunner reads the ad creative `app_link` from Meta and returns it from `getAttributionData()`.
+For Meta App Promotion campaigns, add the destination in Meta Ads Manager at the ad level. Linkrunner reads the ad creative `app_link` from Meta and returns it from `getAttributionData()`.
 
 1. Open the campaign in [Meta Ads Manager](https://business.facebook.com/adsmanager)
-2. Edit the ad creative
-3. Add your app link in Meta's deep link or app link field
-4. Publish the ad
+2. Edit the **Ad** inside your App Promotion ad set
+3. In **Destination**, choose **App**
+4. Add your Linkrunner or app-link URL in **Deferred deep link**
+5. Leave **Custom store listing** empty unless you want Meta to send users to a specific store listing
+6. Publish the ad
+
+<img src="/images/meta/meta-app-promotion-destination.png" alt="Meta App Promotion Destination section with Deferred deep link and Custom store listing fields" />
 
 The fresh Meta sync runs every 30 minutes for the last 2 days of active clicks and spend. When an active ad has an `app_link`, Linkrunner stores it on the matching ad creative. If you update or remove the app link in Meta, Linkrunner updates the auto-synced value on the next fresh sync that sees that ad.
 
 <Note>
     Meta app links can use a Linkrunner domain, another app-link domain, an MMP link, or a custom scheme. If Linkrunner imports the link from Meta, the domain does not need to be added in Linkrunner.
 </Note>
+
+<Info>
+    Linkrunner syncs **Deferred deep link**. It does not currently sync Meta's **Custom store listing** value. That field controls the store page Meta opens when the app is not installed and is separate from the deep link returned by `getAttributionData()`.
+</Info>
 
 <Warning>
     Do not use a Play Store or App Store URL as the app link. Meta exposes store destinations separately, and Linkrunner only returns the app link.
