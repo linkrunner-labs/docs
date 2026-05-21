@@ -4,7 +4,9 @@ description: "Get Linkrunner attributing your installs in under 10 minutes"
 icon: "rocket"
 ---
 
-This guide walks you through the four steps every Linkrunner integration follows. Each step links out to platform-specific instructions when you need them.
+This guide walks you through the six steps every Linkrunner integration follows. Each step links out to platform-specific instructions when you need them.
+
+For mobile SDK testing, [Open SDK Console](https://dashboard.linkrunner.io/dashboard/sdk-console/register-test-device) in the dashboard. It is in beta and helps you register a test device and verify SDK events.
 
 ## 1. Create a Project & Get Your Token
 
@@ -202,6 +204,12 @@ To unlock [remarketing](/features/remarketing) and deferred deep linking, forwar
 </CardGroup>
 
 ## 6. Verify Your Setup
+
+For mobile SDKs, use SDK Console to register a test device, verify SDK initialization, check attribution data, and test signup, custom events, and revenue events.
+
+<Note>
+For normal testing, registering the device in SDK Console is enough. Set `debug = true` in SDK init only if GAID collection is disabled on Android, or the ATT prompt is disabled on iOS so IDFA is unavailable. Remove `debug = true` before production.
+</Note>
 
 <CardGroup cols={2}>
     <Card title="Run the integration test suite" icon="flask" href="/testing/integration-testing">
