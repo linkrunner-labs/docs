@@ -1128,8 +1128,8 @@ void Start()
     LinkrunnerSDK.OnDeeplinkHandled += (jsonString) =>
     {
         Debug.Log($"Deeplink handled: {jsonString}");
-        // Parse jsonString to access deeplink URL and is_linkrunner flag
-        // Example response: {"deeplink":"https://yourapp.link/promo","is_linkrunner":true}
+        // Parse jsonString to access deeplink URL
+        // Example response: {"deeplink":"https://yourapp.link/promo"}
     };
 }
 
@@ -1137,6 +1137,14 @@ void Start()
 public void OnDeeplinkReceived(string url)
 {
     LinkrunnerSDK.HandleDeeplink(url);
+}
+```
+
+Linkrunner sends the updated deeplink back after processing. For Linkrunner campaign links, use `deeplink` from `OnDeeplinkHandled` as the resolved destination instead of the original tracking URL.
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123"
 }
 ```
 
