@@ -21,7 +21,6 @@
                         "group": "SDK Guides",
                         "pages": [
                             "testing/integration-testing",
-                            "sdk/web",
                             "sdk/react-native",
                             "sdk/flutter",
                             "sdk/capacitor",
