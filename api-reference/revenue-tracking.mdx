@@ -5,7 +5,7 @@ icon: "money-bill"
 ---
 
 <Note>
-    Revenue data is only stored and displayed for attributed users. The user must have been registered via the `.signup` function in one of the [SDKs](/sdk/flutter#user-registration) for their payment data to appear on Linkrunner. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
+    Revenue data is only stored and displayed for attributed users. The user must have been registered via the `.signup` function in one of the [SDKs](/sdk/flutter#user-identification-required) for their payment data to appear on Linkrunner. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
 </Note>
 
 ## Base URL
@@ -106,7 +106,7 @@ _Note: Any Payment event you send should be mapped with **Purchase** for Commerc
 
 While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events to correctly attribute catalog sales. Your `event_data` object should include the following fields:
 
-For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event_data) documentation.
+For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event-data) documentation.
 
 ```json
 {

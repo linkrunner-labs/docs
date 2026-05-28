@@ -7,7 +7,7 @@ icon: "shuffle"
 This documentation is for tracking custom events from your backend only! For tracking events from your app please go through the [Flutter](https://docs.linkrunner.io/sdk/flutter/usage#tracking-custom-events) or [React Native](https://docs.linkrunner.io/sdk/react-native/usage#tracking-custom-events) documentation.
 
 <Note>
-    Events are only stored and displayed for attributed users. The user must have been registered via the `.signup` function in one of the [SDKs](/sdk/flutter#user-registration) for their events to appear on Linkrunner. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [capture-payment](/api-reference/revenue-tracking) API instead of capture-event.
+    Events are only stored and displayed for attributed users. The user must have been registered via the `.signup` function in one of the [SDKs](/sdk/flutter#user-identification-required) for their events to appear on Linkrunner. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [capture-payment](/api-reference/revenue-tracking) API instead of capture-event.
 </Note>
 
 ## Base URL
@@ -171,7 +171,7 @@ While you can include any custom attributes in the `event_data` object, Meta req
 
 Here is an example of the exact `event_data` structure you need to send for Meta Commerce Manager:
 
-For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event_data) documentation.
+For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event-data) documentation.
 
 ```json
 {

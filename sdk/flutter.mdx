@@ -103,7 +103,7 @@ For more information, see [Google Play Services documentation](https://developer
 
 For Android apps, the SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
 
-For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android/installation#backup-configuration).
+For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android#step-3%3A-backup-configuration).
 
 #### Encrypted SharedPreferences
 
@@ -404,7 +404,7 @@ This method allows you to connect user identities across different analytics and
 ## Revenue Tracking
 
 <Note>
-    Revenue data is only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before capturing payments. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
+    Revenue data is only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-identification-required) function before capturing payments. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
 </Note>
 
 ### Capturing Payments
@@ -501,7 +501,7 @@ Note: Either `paymentId` or `userId` must be provided when calling `removePaymen
 
 If you are tracking Ecommerce events to sync with Meta Catalog Sales, you must format your `eventData` to include Meta's required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
 
-For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event_data).
+For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event-data).
 
 ### Add To Cart Example
 
@@ -608,7 +608,7 @@ Future<void> capturePurchase() async {
 ## Tracking Custom Events
 
 <Note>
-    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-identification-required) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
 </Note>
 
 Track custom events in your app:
@@ -963,7 +963,7 @@ class _HomeScreenState extends State<HomeScreen> {
   >
     Validate your setup end-to-end
   </Card>
-  <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+  <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking-setup">
     Configure deep links for your app
   </Card>
 </CardGroup>
