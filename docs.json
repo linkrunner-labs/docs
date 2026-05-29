@@ -3,9 +3,9 @@
     "theme": "mint",
     "name": "Linkrunner",
     "colors": {
-        "primary": "#7A77FF",
-        "light": "#7A77FF",
-        "dark": "#7A77FF"
+        "primary": "#4D4BF7",
+        "light": "#8F8DFF",
+        "dark": "#3D3BD6"
     },
     "favicon": "/favicon.svg",
     "navigation": {
