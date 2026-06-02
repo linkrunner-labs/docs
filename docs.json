@@ -37,6 +37,7 @@
                             "features/subdomain-setup",
                             "features/deep-linking-setup",
                             "features/deferred-deep-linking",
+                            "features/web-to-app-journeys",
                             "features/link-redirection",
                             "features/referral-codes",
                             "features/custom-store-listing",
