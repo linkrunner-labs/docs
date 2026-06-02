@@ -2,6 +2,12 @@
 
 Public docs for [Linkrunner](https://www.linkrunner.io), built with [Mintlify](https://mintlify.com) and deployed to [docs.linkrunner.io](https://docs.linkrunner.io) via AWS Amplify on every push to `main`.
 
+## The most important rule
+
+**Keep it easy to read.** Everything below serves this.
+
+Docs should be concise and easy to read. Guide the user as they read; don't overwhelm them. Introduce one idea at a time, lead with what matters, and cut anything that isn't pulling its weight. The [writing rules](#writing-rules) below are how you do that in practice.
+
 ## Local dev
 
 ```bash
