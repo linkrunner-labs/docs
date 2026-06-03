@@ -677,6 +677,10 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 
 The SDK provides options to disable AAID (Google Advertising ID) collection. This is useful for apps targeting children or families to comply with Google Play's Family Policy.
 
+<Warning>
+  Disabling AAID collection is not recommended unless absolutely necessary. The GAID is a primary signal for Google Ads attribution and install matching, so disabling it reduces attribution accuracy. Only disable it if your app is built for children or families and must comply with Google Play's Family Policy.
+</Warning>
+
 ### Disable AAID Collection
 
 To disable AAID collection, call `setDisableAaidCollection` before SDK initialization:
