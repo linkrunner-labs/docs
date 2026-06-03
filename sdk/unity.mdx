@@ -80,6 +80,10 @@ Add the following to your `Assets/Plugins/Android/AndroidManifest.xml`:
 
 If your app targets children and you need to disable advertising ID collection, remove the `AD_ID` permission:
 
+<Warning>
+  Disabling AAID collection is not recommended unless absolutely necessary. The GAID is a primary signal for Google Ads attribution and install matching, so disabling it reduces attribution accuracy. Only disable it if your app is built for children or families and must comply with Google Play's Family Policy.
+</Warning>
+
 ```xml
 <uses-permission android:name="com.google.android.gms.permission.AD_ID"
     tools:node="remove" />
