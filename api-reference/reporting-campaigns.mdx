@@ -33,8 +33,12 @@ linkrunner-key: YOUR_API_KEY
 ## Endpoint
 
 ```
-GET /reporting/campaigns
+GET https://api.linkrunner.io/api/v1/reporting/campaigns
 ```
+
+<Warning>
+  Do not call the docs page URL (`/api-reference/reporting-campaigns`) as the API endpoint. The API path is `/api/v1/reporting/campaigns`.
+</Warning>
 
 ### Query parameters
 
@@ -100,6 +104,22 @@ Returns each campaign with:
 ```bash
 curl 'https://api.linkrunner.io/api/v1/reporting/campaigns?from=2026-04-01&to=2026-04-30&network=meta&limit=20' \
   -H 'linkrunner-key: YOUR_API_KEY'
+```
+
+#### Google Apps Script
+
+```js
+const response = UrlFetchApp.fetch(
+    "https://api.linkrunner.io/api/v1/reporting/campaigns?from=2026-04-01&to=2026-04-30&limit=20",
+    {
+        method: "get",
+        headers: {
+            "linkrunner-key": "YOUR_API_KEY",
+        },
+    }
+);
+
+const data = JSON.parse(response.getContentText());
 ```
 
 ```json
