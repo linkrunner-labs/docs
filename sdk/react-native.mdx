@@ -201,21 +201,24 @@ The `getAttributionData` function returns:
 
 ```typescript
 {
-    deeplink: string | null;
-    campaign_data: {
+    deeplink?: string;
+    campaignData?: {
         id: string;
         name: string;
         type: string; // "ORGANIC" | "INORGANIC"
-        ad_network: string | null; // "META" | "GOOGLE" | null
-        installed_at: string;
-        store_click_at: string | null;
-        group_name: string;
-        asset_name: string;
-        asset_group_name: string;
+        adNetwork?: string | null; // "META" | "GOOGLE" | "APPLE_SEARCH_ADS" | "TIKTOK" | "SNAPCHAT" | null
+        installedAt: string;
+        storeClickAt?: string | null;
+        groupName?: string;
+        assetName?: string;
+        assetGroupName?: string;
     }
-    attribution_source: string;
 }
 ```
+
+<Note>
+On iOS, the same fields are also returned under their old snake_case keys (`campaign_data`, `ad_network`, etc.) as deprecated aliases. Use the camelCase keys above, which work on both Android and iOS.
+</Note>
 
 ## Setting User Data
 
