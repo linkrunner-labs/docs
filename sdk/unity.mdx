@@ -1233,6 +1233,32 @@ LinkrunnerSDK.OnAttributionData += (jsonString) =>
 LinkrunnerSDK.GetAttributionData();
 ```
 
+The result arrives as a JSON string on the `OnAttributionData` event. With the reference bridge code in this guide, the shape differs by platform.
+
+**iOS**
+
+```json
+{
+    "deeplink": "https://...",      // optional
+    "attributionSource": "string",  // "ORGANIC", "META", "GOOGLE", etc.
+    "campaignData": {
+        "id": "string",
+        "name": "string",
+        "groupName": "string",
+        "assetName": "string",
+        "assetGroupName": "string"
+    }
+}
+```
+
+**Android**
+
+```json
+{
+    "raw": "AttributionData(deeplink=..., campaignData=CampaignData(...))"
+}
+```
+
 ### Track Events
 
 ```csharp

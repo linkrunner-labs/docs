@@ -205,17 +205,19 @@ The `getAttributionData` function returns:
 
 ```javascript
 {
-    deeplink: "https://..." | null,
-    campaignData: {
-        id: "string",
-        name: "string",
-        type: "string", // "ORGANIC" | "INORGANIC"
-        adNetwork: "string" | null, // "META" | "GOOGLE" | null
-        installedAt: "string",
-        storeClickAt: "string" | null,
-        groupName: "string",
-        assetName: "string",
-        assetGroupName: "string"
+    data: {
+        deeplink: "https://..." | null,
+        campaignData: {
+            id: "string",
+            name: "string",
+            type: "string", // "ORGANIC" | "INORGANIC"
+            adNetwork: "string" | null, // "META" | "GOOGLE" | "APPLE_SEARCH_ADS" | "TIKTOK" | "SNAPCHAT" | null
+            installedAt: "string",
+            storeClickAt: "string" | null,
+            groupName: "string",
+            assetName: "string",
+            assetGroupName: "string"
+        }
     }
 }
 ```
