@@ -83,13 +83,15 @@ Find your project's event names under [Dashboard → Settings → Events](https:
 #### Example: revenue events with cost-per and 14-day active users
 
 ```bash
-curl 'https://api.linkrunner.io/api/v1/reporting/campaigns?\
-events=Purchase,AddToCart&\
-unique_user_events=Purchase&\
-cost_per_event=Purchase&\
-active_users=14&\
-from=2026-04-01&to=2026-04-30&limit=20' \
-  -H 'linkrunner-key: YOUR_API_KEY'
+curl -G 'https://api.linkrunner.io/api/v1/reporting/campaigns' \
+  -H 'linkrunner-key: YOUR_API_KEY' \
+  --data-urlencode 'events=Purchase,AddToCart' \
+  --data-urlencode 'unique_user_events=Purchase' \
+  --data-urlencode 'cost_per_event=Purchase' \
+  --data-urlencode 'active_users=14' \
+  --data-urlencode 'from=2026-04-01' \
+  --data-urlencode 'to=2026-04-30' \
+  --data-urlencode 'limit=20'
 ```
 
 Returns each campaign with:
