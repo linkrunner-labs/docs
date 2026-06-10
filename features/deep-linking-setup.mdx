@@ -79,6 +79,27 @@ HTTP/HTTPS deep links (including App Links on Android and Universal Links on iOS
 
       If you use Google Play App Signing, get the release fingerprint from **Play Console → Setup → App integrity**, not your local upload keystore.
     </Warning>
+
+    #### After changing the fingerprint
+
+    The hosted `assetlinks.json` updates in seconds, but two caches sit downstream and can keep verification failing for hours.
+
+    **Google's Digital Asset Links cache** serves the statement list to devices and has no public invalidation endpoint. Check what Google currently sees:
+
+    ```
+    https://digitalassetlinks.googleapis.com/v1/statements:list?source.web.site=https://your-domain.io&relation=delegate_permission/common.handle_all_urls
+    ```
+
+    Once the new fingerprint appears there, future device verifications will succeed.
+
+    **The Android Domain Verification Agent** runs on each device as part of Google Play Services. Reinstalling or updating the app is the most reliable way to retrigger it. To force re-verification on a connected device without reinstalling:
+
+    ```bash
+    adb -s <device-id> shell pm verify-app-links --re-verify your.package.name
+    adb -s <device-id> shell pm get-app-links your.package.name
+    ```
+
+    `get-app-links` prints the verification state per host. If it still shows the old state, reinstall the app: the agent rate-limits re-verification and may skip requests.
   </Tab>
   <Tab title="iOS">
     #### Create the Apple App Site Association file
