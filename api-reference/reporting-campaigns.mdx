@@ -40,11 +40,58 @@ GET https://api.linkrunner.io/api/v1/reporting/campaigns
   Do not call the docs page URL (`/api-reference/reporting-campaigns`) as the API endpoint. The API path is `/api/v1/reporting/campaigns`.
 </Warning>
 
+### Example request
+
+<Tabs>
+<Tab title="cURL">
+```bash
+curl 'https://api.linkrunner.io/api/v1/reporting/campaigns?from=2026-04-01&to=2026-04-30&network=meta&limit=20' \
+  -H 'linkrunner-key: YOUR_API_KEY'
+```
+</Tab>
+<Tab title="Google Apps Script">
+```js
+const response = UrlFetchApp.fetch(
+    "https://api.linkrunner.io/api/v1/reporting/campaigns?from=2026-04-01&to=2026-04-30&limit=20",
+    {
+        method: "get",
+        headers: {
+            "linkrunner-key": "YOUR_API_KEY",
+        },
+    }
+);
+
+const data = JSON.parse(response.getContentText());
+```
+</Tab>
+</Tabs>
+
+### Response
+
+```json
+{
+    "msg": "Campaigns fetched successfully",
+    "status": 200,
+    "data": {
+        "campaigns": [ /* see TypeScript types below */ ],
+        "pagination": { "total": 142, "pages": 8, "page": 1, "limit": 20 },
+        "display_currency": "USD",
+        "view": "user_acquisition"
+    }
+}
+```
+
+`pagination.total` is the number of campaigns matching your filters, and `pages` is `total / limit` rounded up.
+
+<Warning>
+Numeric fields are returned as **formatted strings** (`"3,201"`, `"$12,540.50"`). Strip the formatting before doing math: `Number(value.replace(/[^0-9.-]/g, ""))`.
+</Warning>
+
 ### Query parameters
 
 | Parameter         | Type    | Default            | Notes                                                                                      |
 | ----------------- | ------- | ------------------ | ------------------------------------------------------------------------------------------ |
-| `from`, `to`      | string  | (none)             | `YYYY-MM-DD`, project timezone. `start_date` / `end_date` are accepted aliases.            |
+| `from`, `to`      | string  | (none)             | `YYYY-MM-DD`, inclusive, in your project's timezone. `start_date` / `end_date` are accepted aliases. Sets the metrics window; never filters the campaign list (see note below). |
 | `active`          | string  | (all)              | `true` or `false`.                                                                         |
 | `network`         | string  | (all)              | `meta`, `google`, `apple_search_ads`, `tiktok`, `snapchat`, `sandbox_ads`, etc.            |
 | `meta_account_id` | number  | (none)             | Restrict to a single Meta network account.                                                 |
@@ -55,6 +102,10 @@ GET https://api.linkrunner.io/api/v1/reporting/campaigns
 | `sort_order`      | string  | `descending`       | `ascending` or `descending`.                                                               |
 | `page`            | number  | `1`                | 1-indexed.                                                                                  |
 | `limit`           | number  | `10`               | **Max 100.** Larger values return `422`.                                                   |
+
+<Note>
+`from` and `to` choose the window over which metrics (clicks, installs, revenue, spend) are computed. They do not filter which campaigns are returned: a campaign created after `to` still appears, with zeros for the window. This matches the dashboard campaign table, where the date picker changes the numbers, not the list. To fetch only campaigns created in a range, see [Troubleshooting](#troubleshooting).
+</Note>
 
 See [Configurable columns](#configurable-columns) below for `events`, `payment_events`, `unique_user_events`, `cost_per_event`, and `active_users`.
 
@@ -101,44 +152,6 @@ Returns each campaign with:
 - `cost_per_custom_events.Purchase` (spend ÷ Purchase count).
 - `active_users` computed over a 14-day window.
 
-### Example
-
-```bash
-curl 'https://api.linkrunner.io/api/v1/reporting/campaigns?from=2026-04-01&to=2026-04-30&network=meta&limit=20' \
-  -H 'linkrunner-key: YOUR_API_KEY'
-```
-
-#### Google Apps Script
-
-```js
-const response = UrlFetchApp.fetch(
-    "https://api.linkrunner.io/api/v1/reporting/campaigns?from=2026-04-01&to=2026-04-30&limit=20",
-    {
-        method: "get",
-        headers: {
-            "linkrunner-key": "YOUR_API_KEY",
-        },
-    }
-);
-
-const data = JSON.parse(response.getContentText());
-```
-
-```json
-{
-    "msg": "Campaigns fetched successfully",
-    "status": 200,
-    "data": {
-        "campaigns": [ /* see TypeScript types below */ ],
-        "pagination": { "total": 142, "pages": 8, "page": 1, "limit": 20 },
-        "display_currency": "USD",
-        "view": "user_acquisition"
-    }
-}
-```
-
-Numeric fields are returned as **formatted strings** (`"3,201"`, `"$12,540.50"`). Strip commas before parsing for math: `Number(value.replace(/[^0-9.-]/g, ""))`.
-
 ### Errors
 
 | Status | When                                                                         |
@@ -148,6 +161,20 @@ Numeric fields are returned as **formatted strings** (`"3,201"`, `"$12,540.50"`)
 | `422`  | `limit` is non-numeric, less than 1, or greater than 100.                    |
 | `429`  | Rate limit exceeded.                                                         |
 | `500`  | Unexpected server error. Retry after a short backoff.                        |
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="Campaigns created outside my from/to range are in the response">
+This is expected. `from` and `to` set the metrics window; they never remove campaigns from the list. To keep only campaigns created in a range, request `sort_field=created_at&sort_order=descending`, then drop rows client-side once `created_at` falls before `from`.
+</Accordion>
+<Accordion title="429 Too Many Requests on the second call">
+The limit is 1 request per minute per API key. Honor the `Retry-After: 60` header and cache responses for at least 60 seconds. The underlying analytics refresh on roughly the same cadence, so polling faster returns the same data.
+</Accordion>
+<Accordion title="Numbers don't match the dashboard">
+Compare the same date range and the same `view` (`user_acquisition` vs `retargeting`). The API interprets `from` and `to` in your project's timezone, exactly like the dashboard date picker. If you are doing math on the values, remember they are formatted strings (see the warning under [Response](#response)).
+</Accordion>
+</AccordionGroup>
 
 ## TypeScript types
 
@@ -309,3 +336,5 @@ export interface Keyword {
     retention?: { d1: number | string; d7: number | string };
 }
 ```
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
