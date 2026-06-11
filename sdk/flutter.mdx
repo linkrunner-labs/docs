@@ -321,6 +321,11 @@ class CampaignData {
   final String? adNetwork;           // Optional: "META" | "GOOGLE" | null
   final String? groupName;           // Optional: Campaign group name
   final String? assetGroupName;      // Optional: Asset group name
+  final String? adNetworkCampaignId; // Optional: Ad network campaign ID
+  final String? adSetId;             // Optional: Ad set ID
+  final String? adSetName;           // Optional: Ad set name
+  final String? adCreativeId;        // Optional: Ad creative ID
+  final String? adCreativeName;      // Optional: Ad creative name
   final String? assetName;           // Optional: Asset name
   final String type;                 // Required: Campaign type ("ORGANIC" | "INORGANIC")
   final String installedAt;          // Required: Installation timestamp
@@ -331,18 +336,24 @@ class CampaignData {
 Example response:
 
 ```dart
+// getAttributionData() returns a typed AttributionData object — access fields in camelCase.
 {
   "deeplink": "https://app.yourdomain.com/product/123",
-  "campaign_data": {
+  "campaignData": {
     "id": "camp_123",
     "name": "Summer Sale 2024",
-    "ad_network": "META",
-    "group_name": "iOS Campaign",
-    "asset_group_name": "Product Catalog",
-    "asset_name": "Banner Ad 1",
+    "adNetwork": "META",
+    "groupName": "iOS Campaign",
+    "assetGroupName": "Product Catalog",
+    "assetName": "Banner Ad 1",
+    "adNetworkCampaignId": "120214682829390250",
+    "adSetId": "120214682829640250",
+    "adSetName": "Productivity",
+    "adCreativeId": "120214682926100250",
+    "adCreativeName": "Static_2",
     "type": "INORGANIC",
-    "installed_at": "2024-03-20T10:30:00Z",
-    "store_click_at": "2024-03-20T10:29:45Z"
+    "installedAt": "2024-03-20T10:30:00Z",
+    "storeClickAt": "2024-03-20T10:29:45Z"
   }
 }
 ```

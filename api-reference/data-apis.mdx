@@ -535,6 +535,7 @@ GET /get-attribution-result?device_identifier=550e8400-e29b-41d4-a716-4466554400
     "data": {
         "campaign_name": "Summer Sale 2024",
         "display_id": "XYZ123",
+        "ad_network_campaign_id": "120214682829390250",
         "deeplink": "https://app.domain.com/promo/summer",
         "domain_name": "app.domain.com",
         "ad_set_id": "138726384957162840",
@@ -559,6 +560,7 @@ If no attribution data is found for the provided identifier, the API returns a `
 | ------------------ | --------------------- | ------------------------------------------------------------------------------------------------------- |
 | `campaign_name`    | string\|null          | The name of the campaign that the user was attributed to                                                |
 | `display_id`       | string\|null          | The campaign's display identifier                                                                       |
+| `ad_network_campaign_id` | string\|null    | The ad-network campaign ID (resolves to the Google campaign ID, else Meta campaign ID, else generic ad-network campaign ID) |
 | `deeplink`         | string\|null          | The deeplink URL associated with the campaign                                                           |
 | `domain_name`      | string\|null          | The domain name used for the campaign                                                                   |
 | `ad_set_id`        | string\|null          | The ad set ID from the advertising platform (e.g., Meta Ad Set ID)                                      |
@@ -588,6 +590,7 @@ type AttributionType = "ORGANIC" | "INORGANIC";
 interface AttributionResult {
     campaign_name: string | null;
     display_id: string | null;
+    ad_network_campaign_id: string | null;
     deeplink: string | null;
     domain_name: string | null;
     ad_set_id: string | null;

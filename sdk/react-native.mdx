@@ -212,6 +212,35 @@ The `getAttributionData` function returns:
         groupName?: string;
         assetName?: string;
         assetGroupName?: string;
+        adNetworkCampaignId?: string | null; // Ad network campaign ID
+        adSetId?: string | null; // Ad set ID
+        adSetName?: string | null; // Ad set name
+        adCreativeId?: string | null; // Ad creative ID
+        adCreativeName?: string | null; // Ad creative name
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123",
+    "campaignData": {
+        "id": "camp_123",
+        "name": "Summer Sale 2024",
+        "type": "INORGANIC",
+        "adNetwork": "META",
+        "installedAt": "2024-03-20T10:30:00Z",
+        "storeClickAt": "2024-03-20T10:29:45Z",
+        "groupName": "iOS Campaign",
+        "assetName": "Banner Ad 1",
+        "assetGroupName": "Product Catalog",
+        "adNetworkCampaignId": "120214682829390250",
+        "adSetId": "120214682829640250",
+        "adSetName": "Productivity",
+        "adCreativeId": "120214682926100250",
+        "adCreativeName": "Static_2"
     }
 }
 ```
