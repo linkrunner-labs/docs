@@ -58,10 +58,10 @@ The Final URL suffix is appended to every landing page URL in your campaign. Set
 Use this template. Replace `<your-linkrunner-domain>` only in the JavaScript snippet below (Step 4); in the suffix itself, keep the ValueTrack macros exactly as shown:
 
 ```
-utm_source=google&utm_medium=cpc&gad_campaignid={campaignid}&lr_adgroupid={adgroupid}&lr_ad_id={creative}&lr_network={network}&lr_device={device}&lr_keyword={keyword}
+utm_source=google&utm_medium=cpc&gad_campaignid={campaignid}&adset_id={adgroupid}&ad_id={creative}&utm_term={keyword}&network={network}&device={device}
 ```
 
-Google substitutes the `{...}` macros with real values at delivery time. `gad_campaignid` is what Linkrunner uses to look up and auto-create the campaign. The other parameters (`lr_adgroupid`, `lr_ad_id`, `lr_network`, `lr_device`, `lr_keyword`) feed the campaign breakdown reports in your Linkrunner dashboard.
+Google substitutes the `{...}` macros with real values at delivery time. `gad_campaignid` is what Linkrunner uses to look up and auto-create the campaign. `adset_id` and `ad_id` are the same parameter names Linkrunner reads for Meta Web to App, and they feed the ad group and ad level breakdowns in your dashboard. `utm_term`, `network`, and `device` are standard reporting parameters carried along for future use.
 
 **To set the suffix at the account level:**
 
