@@ -6,17 +6,17 @@ icon: "/images/logos/google.webp"
 
 ## Overview
 
-Google Web to App lets you run Search, Display, or Performance Max campaigns that point to your website. When a user clicks your ad, they land on your site. From there, they tap your Download button and your app opens or installs. Linkrunner handles the attribution by reading the click parameters that Google injects into the landing page URL.
+Google Web to App lets you run Search, Display, or Performance Max campaigns that drive app installs through the web. Your ad's Final URL is your Linkrunner domain: Google appends the click parameters to it automatically, Linkrunner records the click, sends mobile users into your app or its store listing, and forwards desktop users to your website. No code on your website is required.
 
 **Works for both Android and iOS apps.**
 
 ## How It Works
 
-1. A user clicks your Google ad.
-2. Google appends click parameters (`gclid`, `wbraid`, `gbraid`) and your ValueTrack parameters to the landing page URL.
-3. Your landing page saves the full query string to `sessionStorage`.
-4. The user taps **Download App**. Your page reads the query string from `sessionStorage` and appends it to your Linkrunner domain URL.
-5. Linkrunner receives the click, reads the parameters, and attributes the install when the app is opened.
+1. A user clicks your Google ad. The ad's Final URL is your Linkrunner domain.
+2. Google automatically appends the click IDs (`gclid`, `wbraid`, `gbraid`) and your Final URL suffix parameters to that URL.
+3. Linkrunner records the click with all parameters. No code runs on your website.
+4. Mobile users see a lightweight redirect page that opens your app if installed, or takes them to the App Store / Play Store. Desktop users are forwarded to your website with the parameters preserved.
+5. When the app is opened after install, Linkrunner attributes it to the campaign.
 
 ## Setup
 
@@ -55,7 +55,7 @@ Once your subdomain is active (CNAME verified and SSL active), you are ready for
 
 The Final URL suffix is appended to every landing page URL in your campaign. Set it at the account or campaign level in Google Ads.
 
-Use this template. Replace `<your-linkrunner-domain>` only in the JavaScript snippet below (Step 4); in the suffix itself, keep the ValueTrack macros exactly as shown:
+Use this template, keeping the ValueTrack macros exactly as shown:
 
 ```
 utm_source=google&utm_medium=cpc&gad_campaignid={campaignid}&adset_id={adgroupid}&ad_id={creative}&utm_term={keyword}&network={network}&device={device}
@@ -93,48 +93,27 @@ Google substitutes the `{...}` macros with real values at delivery time. `gad_ca
 
 </Step>
 
-<Step title="Add the parameter capture snippet to your landing page">
+<Step title="Use your Linkrunner domain as the ad's Final URL">
 
-When a user lands on your page, Google appends the click parameters to the URL. Your page must save the entire query string to `sessionStorage` so that the parameters survive any navigation the user does before tapping **Download App**.
+Set the **Final URL** of your ads to your Linkrunner domain:
 
-**On every page of your site (or in a shared layout/header script):**
-
-```html
-<script>
-  // Save the full query string on first arrival so it survives navigation.
-  (function () {
-    var qs = window.location.search;
-    if (qs) {
-      sessionStorage.setItem("lr_qs", qs);
-    }
-  })();
-</script>
+```
+https://<your-linkrunner-domain>/
 ```
 
-**On the Download App button:**
+That is the entire website-side setup: there is none. Google appends the click IDs and your suffix parameters to this URL automatically, and Linkrunner handles the rest.
 
-```html
-<script>
-  document.getElementById("download-btn").addEventListener("click", function (e) {
-    e.preventDefault();
+- **Mobile users** see a lightweight redirect page that opens your app if it is installed, or takes them to the App Store / Play Store.
+- **Desktop users** are forwarded to your website with all parameters preserved.
 
-    var base = "https://<your-linkrunner-domain>";
-    var saved = sessionStorage.getItem("lr_qs") || window.location.search;
-
-    // Forward the entire query string, including gclid / wbraid / gbraid
-    // and the ValueTrack parameters added by the Final URL suffix.
-    window.location.href = base + saved;
-  });
-</script>
-```
-
-Replace `<your-linkrunner-domain>` with your active Linkrunner subdomain (for example `go.example.com`).
+Because your Linkrunner domain is a subdomain of your website's domain, it satisfies Google's display URL requirements.
 
 <Note>
-  Forward the **entire** query string rather than extracting individual
-  parameters. This ensures all click IDs (`gclid`, `wbraid`, `gbraid`) and
-  ValueTrack parameters reach Linkrunner, even if Google adds new ones in the
-  future.
+  Prefer to land users on your website first? Point the ad at your site as
+  usual, then make your Download button link to the same Linkrunner URL with
+  the full query string forwarded, for example
+  `"https://<your-linkrunner-domain>/" + window.location.search`. Without that
+  forwarding the click IDs never reach Linkrunner.
 </Note>
 
 </Step>
@@ -143,7 +122,7 @@ Replace `<your-linkrunner-domain>` with your active Linkrunner subdomain (for ex
 
 ## Click IDs: gclid, wbraid, and gbraid
 
-Google appends different click IDs depending on the platform and tracking context. Capture and forward all three defensively.
+Google appends different click IDs depending on the platform and tracking context. They land on your Linkrunner domain automatically; you never handle them yourself.
 
 | Parameter | When it appears |
 |---|---|
@@ -151,15 +130,14 @@ Google appends different click IDs depending on the platform and tracking contex
 | `wbraid` | iOS clicks from a website landing page (Safari / browser-based flow). |
 | `gbraid` | iOS clicks where Google can route directly into an app destination. Less common in web-to-app flows. |
 
-The `sessionStorage` snippet above captures all three automatically because it saves the full query string.
+All three arrive automatically because the ad's Final URL is your Linkrunner domain.
 
 ## Implementation Checklist
 
 - [ ] Auto-tagging is enabled in Google Ads account settings
 - [ ] Linkrunner subdomain is active (CNAME verified, SSL active)
 - [ ] Final URL suffix is set at the account or campaign level
-- [ ] Query string capture script is on every page of the site
-- [ ] Download button script forwards the full query string to the Linkrunner domain
+- [ ] Ad Final URL points at your Linkrunner domain (or your site's Download button forwards the full query string to it)
 - [ ] End-to-end test: click a test ad, install the app, confirm attribution appears in the Linkrunner dashboard
 
 ## Troubleshooting
@@ -171,15 +149,14 @@ Linkrunner auto-creates a campaign on the first click that carries a valid `gad_
 - Confirm the Final URL suffix includes `gad_campaignid={campaignid}` with the exact macro syntax.
 - Verify the suffix is saved at the account or campaign level (not just at the ad level).
 - Check that your Linkrunner subdomain is active (CNAME verified and SSL active).
-- Open your browser DevTools and inspect the landing page URL after clicking the ad. The `gad_campaignid` parameter should be present in the address bar.
+- Click a test ad and inspect the URL you land on: `gad_campaignid` should be present on the Linkrunner domain URL.
 
 ### No installs attributed
 
-- Verify that the `sessionStorage` save script is present on the landing page.
-- Confirm the Download button handler is reading from `sessionStorage` and appending the query string to the Linkrunner domain URL.
+- Confirm the ad's Final URL is your Linkrunner domain. If you link from your own website instead, confirm the Download button forwards the full query string to it.
 - Check that the Linkrunner SDK is initialised in your app and calling the attribution endpoint on first open.
 
-### Click IDs missing (gclid / wbraid / gbraid not in landing page URL)
+### Click IDs missing (gclid / wbraid / gbraid not on the click URL)
 
 - This almost always means auto-tagging is off. Go to **Google Ads → Admin → Account settings → Auto-tagging** and confirm it is enabled.
 - ValueTrack macros cannot substitute click IDs. Auto-tagging is the only source of `gclid`, `wbraid`, and `gbraid`.
