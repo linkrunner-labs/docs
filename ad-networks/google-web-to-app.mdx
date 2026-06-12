@@ -20,9 +20,9 @@ Google Web to App lets you run Search, Display, or Performance Max campaigns tha
 
 ## Setup
 
-<Steps>
+<Steps titleSize="h3">
 
-<Step title="Enable auto-tagging in Google Ads">
+<Step title="Enable auto-tagging in Google Ads" id="enable-auto-tagging">
 
 Auto-tagging is a Google Ads account setting that appends a `gclid` (and `wbraid` / `gbraid` on iOS) to every ad click URL. Linkrunner depends on these click IDs for attribution. Without auto-tagging, no click IDs are appended and attribution cannot work.
 
@@ -41,7 +41,7 @@ To verify or enable auto-tagging:
 
 </Step>
 
-<Step title="Add your Linkrunner domain">
+<Step title="Add your Linkrunner domain" id="add-your-linkrunner-domain">
 
 Linkrunner uses your custom subdomain as the final destination URL. If you have not set one up yet, go to [Settings → Domains](https://dashboard.linkrunner.io/settings?s=domains) and add a subdomain.
 
@@ -51,7 +51,7 @@ Once your subdomain is active (CNAME verified and SSL active), you are ready for
 
 </Step>
 
-<Step title="Set the Final URL suffix in Google Ads">
+<Step title="Set the Final URL suffix in Google Ads" id="set-the-final-url-suffix">
 
 The Final URL suffix is appended to every landing page URL in your campaign. Set it at the account or campaign level in Google Ads.
 
@@ -93,7 +93,7 @@ Google substitutes the `{...}` macros with real values at delivery time. `gad_ca
 
 </Step>
 
-<Step title="Use your Linkrunner domain as the ad's Final URL">
+<Step title="Use your Linkrunner domain as the ad's Final URL" id="set-the-ads-final-url">
 
 Set the **Final URL** of your ads to your Linkrunner domain:
 
