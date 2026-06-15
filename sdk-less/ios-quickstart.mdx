@@ -1,0 +1,419 @@
+---
+title: "iOS Quickstart"
+description: "The recommended SDK-less path on iOS: one Swift client that collects every signal and calls every endpoint."
+icon: "apple"
+---
+
+This is the recommended way to integrate without the SDK on iOS. You add one Swift file, configure your token, and call typed methods that mirror the SDK. The client collects device signals, manages the install instance ID, applies SKAdNetwork conversion values, and retries failed requests.
+
+<Note>
+  No third-party dependencies are needed. The client uses `URLSession` and Apple frameworks (`AdSupport`, `AppTrackingTransparency`, `AdServices`, `StoreKit`). It targets iOS 15 and above.
+</Note>
+
+## 1. Configure Info.plist
+
+To collect the IDFA, add a tracking usage description. Without it, iOS will not show the App Tracking Transparency prompt and the IDFA stays empty.
+
+```xml
+<key>NSUserTrackingUsageDescription</key>
+<string>We use your data to attribute installs and measure ad performance.</string>
+```
+
+## 2. Add the client
+
+Create `LinkrunnerClient.swift`. It authenticates with your project token in the request body.
+
+```swift
+import Foundation
+import UIKit
+import AdSupport
+import AppTrackingTransparency
+import AdServices
+import StoreKit
+
+@available(iOS 15.0, *)
+final class LinkrunnerClient {
+    static let shared = LinkrunnerClient()
+    private init() {}
+
+    private let baseURL = "https://api.linkrunner.io"
+    private let platform = "IOS"
+    private var token = "YOUR_PROJECT_TOKEN"
+    private var debug = false
+
+    private let installIdKey = "linkrunner_install_instance_id"
+    private let installTimeKey = "linkrunner_install_time"
+
+    func configure(token: String, debug: Bool = false) {
+        self.token = token
+        self.debug = debug
+        _ = installInstanceId()
+        if UserDefaults.standard.object(forKey: installTimeKey) == nil {
+            UserDefaults.standard.set(Date(), forKey: installTimeKey)
+        }
+    }
+
+    /// Stable per-install identity. Generated once, then reused forever.
+    func installInstanceId() -> String {
+        if let id = UserDefaults.standard.string(forKey: installIdKey) { return id }
+        let id = UUID().uuidString
+        UserDefaults.standard.set(id, forKey: installIdKey)
+        return id
+    }
+
+    /// Ask for IDFA permission. Requires NSUserTrackingUsageDescription. Call when the app is active.
+    func requestTrackingAuthorization() async {
+        await withCheckedContinuation { cont in
+            ATTrackingManager.requestTrackingAuthorization { _ in cont.resume() }
+        }
+    }
+
+    // MARK: - Endpoints
+
+    @discardableResult
+    func initialize(link: String? = nil) async throws -> [String: Any] {
+        var body = base()
+        body["package_version"] = "ios-rest-1.0"
+        body["app_version"] = appVersion()
+        body["device_data"] = await deviceData()
+        body["debug"] = debug
+        if let link { body["link"] = link }
+        return try await post("/api/client/init", body)
+    }
+
+    func attributionData() async throws -> [String: Any] {
+        var body = base()
+        body["device_data"] = await deviceData()
+        body["debug"] = debug
+        return try await post("/api/client/attribution-data", body)
+    }
+
+    @discardableResult
+    func signup(userData: [String: Any], additionalData: [String: Any] = [:]) async throws -> [String: Any] {
+        var data = additionalData
+        data["device_data"] = await deviceData()
+        var body = base()
+        body["user_data"] = userData
+        body["data"] = data
+        body["time_since_app_install"] = timeSinceInstall()
+        let res = try await post("/api/client/trigger", body)
+        applySKAN(res)
+        return res
+    }
+
+    @discardableResult
+    func setUserData(_ userData: [String: Any]) async throws -> [String: Any] {
+        var body = base()
+        body["user_data"] = userData
+        body["device_data"] = await deviceData()
+        return try await post("/api/client/set-user-data", body)
+    }
+
+    @discardableResult
+    func trackEvent(_ name: String, data eventData: [String: Any]? = nil) async throws -> [String: Any] {
+        var body = base()
+        body["event_name"] = name
+        if let eventData { body["event_data"] = eventData }
+        body["device_data"] = await deviceData()
+        body["time_since_app_install"] = timeSinceInstall()
+        let res = try await post("/api/client/capture-event", body)
+        applySKAN(res)
+        return res
+    }
+
+    @discardableResult
+    func capturePayment(
+        amount: Double,
+        userId: String,
+        paymentId: String? = nil,
+        type: String = "DEFAULT",
+        status: String = "PAYMENT_COMPLETED",
+        eventData: [String: Any]? = nil
+    ) async throws -> [String: Any] {
+        var body = base()
+        body["amount"] = amount
+        body["user_id"] = userId
+        body["type"] = type
+        body["status"] = status
+        if let paymentId { body["payment_id"] = paymentId }
+        if let eventData { body["event_data"] = eventData }
+        body["time_since_app_install"] = timeSinceInstall()
+        body["data"] = ["device_data": await deviceData()]
+        let res = try await post("/api/client/capture-payment", body)
+        applySKAN(res)
+        return res
+    }
+
+    @discardableResult
+    func removePayment(userId: String, paymentId: String? = nil) async throws -> [String: Any] {
+        var body = base()
+        body["user_id"] = userId
+        if let paymentId { body["payment_id"] = paymentId }
+        body["data"] = ["device_data": await deviceData()]
+        return try await post("/api/client/remove-captured-payment", body)
+    }
+
+    @discardableResult
+    func setPushToken(_ pushToken: String) async throws -> [String: Any] {
+        var body = base()
+        body["push_token"] = pushToken
+        return try await post("/api/client/update-push-token", body)
+    }
+
+    @discardableResult
+    func setIntegrationData(clevertapId: String) async throws -> [String: Any] {
+        var body = base()
+        body["integration_info"] = ["clevertap_id": clevertapId]
+        return try await post("/api/client/integrations", body)
+    }
+
+    @discardableResult
+    func handleDeeplink(_ url: String) async throws -> [String: Any] {
+        var body = base()
+        body["deeplink_url"] = url
+        body["device_data"] = await deviceData()
+        let res = try await post("/api/client/handle-deeplink", body)
+        applySKAN(res)
+        return res
+    }
+
+    // MARK: - Networking
+
+    private enum LRError: Error { case http(Int, String) }
+    private let retriableStatus: Set<Int> = [408, 429, 500, 502, 503, 504]
+    private let maxRetries = 3
+
+    private func base() -> [String: Any] {
+        ["token": token, "platform": platform, "install_instance_id": installInstanceId()]
+    }
+
+    private func post(_ path: String, _ body: [String: Any]) async throws -> [String: Any] {
+        let url = URL(string: baseURL + path)!
+        var attempt = 0
+        while true {
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+            do {
+                let (data, response) = try await URLSession.shared.data(for: request)
+                let code = (response as? HTTPURLResponse)?.statusCode ?? 0
+                if (200..<300).contains(code) {
+                    return (try? JSONSerialization.jsonObject(with: data) as? [String: Any]) ?? [:]
+                }
+                if !(retriableStatus.contains(code) && attempt < maxRetries) {
+                    throw LRError.http(code, String(data: data, encoding: .utf8) ?? "")
+                }
+            } catch let error as LRError {
+                throw error
+            } catch {
+                if attempt >= maxRetries { throw error }
+            }
+            try await Task.sleep(nanoseconds: UInt64(pow(2.0, Double(attempt)) * 1_000_000_000)) // 1s, 2s, 4s
+            attempt += 1
+        }
+    }
+
+    // MARK: - SKAdNetwork
+
+    /// Applies the conversion value returned by the server, if present.
+    private func applySKAN(_ response: [String: Any]) {
+        guard let data = response["data"] as? [String: Any],
+              let fine = data["fine_conversion_value"] as? Int else { return }
+        let coarse = data["coarse_conversion_value"] as? String
+        let lock = data["lock_postback"] as? Bool ?? false
+        if #available(iOS 16.1, *) {
+            let coarseValue: SKAdNetwork.CoarseConversionValue
+            switch coarse?.lowercased() {
+            case "high": coarseValue = .high
+            case "medium": coarseValue = .medium
+            default: coarseValue = .low
+            }
+            SKAdNetwork.updatePostbackConversionValue(fine, coarseValue: coarseValue, lockWindow: lock) { _ in }
+        } else if #available(iOS 15.4, *) {
+            SKAdNetwork.updatePostbackConversionValue(fine) { _ in }
+        } else {
+            SKAdNetwork.updateConversionValue(fine)
+        }
+    }
+
+    // MARK: - Device data
+
+    private func deviceData() async -> [String: Any] {
+        var d = await uiDeviceData()
+        d["brand"] = "Apple"
+        d["manufacturer"] = "Apple"
+        d["install_instance_id"] = installInstanceId()
+        if let bundleId = Bundle.main.bundleIdentifier { d["bundle_id"] = bundleId }
+        d["version"] = appVersion()
+        if let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String { d["build_number"] = build }
+        if let idfa = idfa() { d["idfa"] = idfa }
+        let locale = Locale.current
+        d["locale"] = locale.identifier
+        if let lang = locale.languageCode { d["language"] = lang }
+        if let region = locale.regionCode { d["country"] = region }
+        d["timezone"] = TimeZone.current.identifier
+        d["timezone_offset"] = TimeZone.current.secondsFromGMT() / 60
+        if let token = adServicesToken() { d["adservices_attribution_token"] = token }
+        return d
+    }
+
+    @MainActor
+    private func uiDeviceData() -> [String: Any] {
+        let device = UIDevice.current
+        let screen = UIScreen.main
+        var d: [String: Any] = [
+            "device": device.model,
+            "device_name": device.name,
+            "system_version": device.systemVersion,
+            "device_display": [
+                "width": screen.bounds.width,
+                "height": screen.bounds.height,
+                "scale": screen.scale
+            ]
+        ]
+        if let idfv = device.identifierForVendor?.uuidString { d["idfv"] = idfv }
+        return d
+    }
+
+    private func idfa() -> String? {
+        guard ATTrackingManager.trackingAuthorizationStatus == .authorized else { return nil }
+        return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+    }
+
+    private func adServicesToken() -> String? {
+        try? AAAttribution.attributionToken()
+    }
+
+    private func appVersion() -> String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+    }
+
+    private func timeSinceInstall() -> TimeInterval {
+        let installed = UserDefaults.standard.object(forKey: installTimeKey) as? Date ?? Date()
+        return Date().timeIntervalSince(installed)
+    }
+}
+```
+
+## 3. Initialize and read attribution
+
+Call `configure` once, then `initialize`, then poll `attributionData`.
+
+```swift
+import SwiftUI
+
+@main
+struct MyApp: App {
+    init() {
+        LinkrunnerClient.shared.configure(token: "YOUR_PROJECT_TOKEN")
+        Task {
+            try? await LinkrunnerClient.shared.initialize()
+
+            for _ in 0..<5 {
+                let data = (try? await LinkrunnerClient.shared.attributionData())?["data"] as? [String: Any]
+                if let campaign = data?["campaign_data"] as? [String: Any] {
+                    print("Campaign: \(campaign)")
+                    break
+                }
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+            }
+        }
+    }
+
+    var body: some Scene {
+        WindowGroup { ContentView() }
+    }
+}
+```
+
+<Tip>
+  To collect the IDFA, call `await LinkrunnerClient.shared.requestTrackingAuthorization()` when the app is active (for example after your first screen appears), not during launch. The IDFA improves matching but is optional.
+</Tip>
+
+## 4. Identify the user
+
+Call `signup` when the user signs up or logs in. Events and payments are only stored for attributed users.
+
+```swift
+Task {
+    try? await LinkrunnerClient.shared.signup(
+        userData: ["id": "user_123", "email": "user@example.com", "name": "John Doe"]
+    )
+}
+```
+
+## 5. Track events and payments
+
+```swift
+// Custom event
+Task {
+    try? await LinkrunnerClient.shared.trackEvent(
+        "purchase_initiated",
+        data: ["product_id": "12345", "amount": 99.99]
+    )
+}
+
+// Payment
+Task {
+    try? await LinkrunnerClient.shared.capturePayment(
+        amount: 99.99,
+        userId: "user_123",
+        paymentId: "payment_123",
+        type: "FIRST_PAYMENT"
+    )
+}
+```
+
+<Note>
+  Add `amount` as a number in event or payment data to enable revenue sharing with Google and Meta.
+</Note>
+
+## Other endpoints
+
+```swift
+try? await LinkrunnerClient.shared.setUserData(["id": "user_123", "phone": "9876543210"])
+try? await LinkrunnerClient.shared.setPushToken(apnsOrFcmToken)
+try? await LinkrunnerClient.shared.setIntegrationData(clevertapId: "YOUR_CLEVERTAP_ID")
+try? await LinkrunnerClient.shared.handleDeeplink("https://app.example.com/product/123")
+try? await LinkrunnerClient.shared.removePayment(userId: "user_123", paymentId: "payment_123")
+```
+
+## SKAdNetwork
+
+`init`, `signup`, `capture-event`, and `capture-payment` responses can include a conversion value (`fine_conversion_value`, `coarse_conversion_value`, `lock_postback`). The client applies it automatically through `applySKAN`, which calls `SKAdNetwork.updatePostbackConversionValue`. You do not need to manage conversion values yourself. See [Collecting device data](/sdk-less/ios-device-data#skadnetwork) for how this fits with Apple's attribution.
+
+## Retries and idempotency
+
+The client retries failed requests up to 3 times with exponential backoff (1s, 2s, 4s). It retries on network errors and on HTTP `408`, `429`, and `5xx`. Other responses, such as `400` or `401`, are not retried.
+
+A retry can send the same request twice if the first attempt reached the server but the response was lost. How that is handled depends on the endpoint:
+
+| Endpoint | Safe to retry? | Why |
+| --- | --- | --- |
+| `init` | Yes | The server deduplicates on `install_instance_id`. |
+| `capture-payment` | Yes, with `payment_id` | The server deduplicates on `payment_id`. Always send one. |
+| `capture-event` | Not deduplicated | A retried event can be counted twice. |
+
+<Tip>
+  Always pass a `paymentId` to `capturePayment` so retries cannot double count revenue. Events have no server-side deduplication, so if exact event counts matter, disable retries for those calls.
+</Tip>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Attribution data is always organic">
+    Make sure `initialize` ran on the device, not your backend. For Apple Search Ads, confirm `adservices_attribution_token` is present in `device_data`. The IDFA helps but only after the user grants App Tracking Transparency. See [Collecting device data](/sdk-less/ios-device-data).
+  </Accordion>
+  <Accordion title="IDFA is always empty">
+    The IDFA is only available after the user authorizes tracking. Add `NSUserTrackingUsageDescription` and call `requestTrackingAuthorization()` while the app is active.
+  </Accordion>
+  <Accordion title="Events or payments do not appear">
+    Events and payments are only stored for attributed users. Call `signup` first, and use the same `install_instance_id` everywhere.
+  </Accordion>
+  <Accordion title="Every install looks like the same device or location">
+    You are likely calling from your backend. The server matches on the calling IP, so calls must come from the user's device.
+  </Accordion>
+</AccordionGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
