@@ -120,17 +120,53 @@ Because your Linkrunner domain is a subdomain of your website's domain, it satis
 
 </Steps>
 
+## Create Your First Campaign in Google Ads
+
+Use this flow when you are creating a new Google Web to App campaign from scratch. Complete the account-level setup above first so auto-tagging, your Final URL suffix, and your Linkrunner domain are ready before traffic starts.
+
+<Steps titleSize="h3">
+
+<Step title="Choose a campaign objective" id="choose-campaign-objective">
+
+In Google Ads, click **New campaign**. On **What's your campaign objective?**, select **Create a campaign without guidance**.
+
+![Google Ads campaign objective screen with Create a campaign without guidance selected](/images/google_ads/web-to-app/campaign-objective-without-guidance.png)
+
+</Step>
+
+<Step title="Select Performance Max" id="select-performance-max">
+
+On **Select a campaign type**, choose **Performance Max**.
+
+![Google Ads campaign type screen with Performance Max selected](/images/google_ads/web-to-app/campaign-type-performance-max.png)
+
+</Step>
+
+<Step title="Use the Linkrunner URL" id="use-the-linkrunner-url">
+
+When Google asks for the campaign or ad **Final URL**, paste your Linkrunner domain:
+
+```
+https://<your-linkrunner-domain>/
+```
+
+Do not paste the Final URL suffix into this field. Keep the suffix in **Tracking → Final URL suffix** at the account or campaign level.
+
+</Step>
+
+</Steps>
+
 ## Click IDs: gclid, wbraid, and gbraid
 
 Google appends different click IDs depending on the platform and tracking context. They land on your Linkrunner domain automatically; you never handle them yourself.
 
 | Parameter | When it appears |
 |---|---|
-| `gclid` | Most clicks. Present on both Android and iOS when auto-tagging is on. |
-| `wbraid` | iOS clicks from a website landing page (Safari / browser-based flow). |
-| `gbraid` | iOS clicks where Google can route directly into an app destination. Less common in web-to-app flows. |
+| `gclid` | Most clicks. Present on Android and on iOS website-page clicks (often alongside `wbraid`). |
+| `wbraid` | iOS clicks from a website landing page (Safari / browser-based flow). Arrives together with `gclid` when both are present. |
+| `gbraid` | iOS clicks where Google routes directly into an app destination (app-destination ID). Less common in web-to-app flows. |
 
-All three arrive automatically because the ad's Final URL is your Linkrunner domain.
+All three arrive automatically because the ad's Final URL is your Linkrunner domain. Linkrunner captures whichever IDs Google appends.
 
 ## Implementation Checklist
 
