@@ -1,0 +1,198 @@
+---
+title: "Minimal Integration"
+description: "The smallest Android integration that still attributes: install, signup, event, payment."
+icon: "feather"
+---
+
+This is the leanest SDK-less path. It registers an install, reads attribution, identifies the user, and sends one event and one payment. It collects only the two highest-value signals: the advertising ID and the install referrer.
+
+<Tip>
+  For production, prefer the [full client](/sdk-less/android-quickstart). It collects more signals and handles retries, which improves match rates. Use this minimal version only when you want the smallest possible footprint.
+</Tip>
+
+## Dependencies
+
+```gradle
+dependencies {
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
+    implementation 'com.android.installreferrer:installreferrer:2.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+}
+```
+
+## Permissions
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+```
+
+## LinkrunnerMinimal.kt
+
+Set your project token at the top.
+
+```kotlin
+import android.content.Context
+import com.android.installreferrer.api.InstallReferrerClient
+import com.android.installreferrer.api.InstallReferrerStateListener
+import com.google.android.gms.ads.identifier.AdvertisingIdClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
+import java.util.UUID
+import kotlin.coroutines.resume
+
+object LinkrunnerMinimal {
+    private const val BASE_URL = "https://api.linkrunner.io"
+    private const val TOKEN = "YOUR_PROJECT_TOKEN"
+
+    private val http = OkHttpClient()
+    private val jsonType = "application/json; charset=utf-8".toMediaType()
+
+    /** Generated once, then reused for the life of the install. */
+    private fun installId(context: Context): String {
+        val prefs = context.getSharedPreferences("linkrunner_min", Context.MODE_PRIVATE)
+        prefs.getString("iid", null)?.let { return it }
+        return UUID.randomUUID().toString().also { prefs.edit().putString("iid", it).apply() }
+    }
+
+    private fun base(context: Context) = JSONObject()
+        .put("token", TOKEN)
+        .put("platform", "ANDROID")
+        .put("install_instance_id", installId(context))
+
+    private suspend fun post(path: String, body: JSONObject): JSONObject = withContext(Dispatchers.IO) {
+        val req = Request.Builder()
+            .url(BASE_URL + path)
+            .post(body.toString().toRequestBody(jsonType))
+            .build()
+        http.newCall(req).execute().use { res ->
+            val text = res.body?.string().orEmpty()
+            if (!res.isSuccessful) throw RuntimeException("Linkrunner ${res.code}: $text")
+            if (text.isEmpty()) JSONObject() else JSONObject(text)
+        }
+    }
+
+    // ---- Device signals ----
+
+    private suspend fun deviceData(context: Context): JSONObject = withContext(Dispatchers.IO) {
+        val d = JSONObject().put("idfa", "").put("idfv", "")
+        try {
+            val info = AdvertisingIdClient.getAdvertisingIdInfo(context)
+            d.put("gaid", if (info.isLimitAdTrackingEnabled) "" else info.id)
+        } catch (e: Exception) {
+            d.put("gaid", "")
+        }
+        installReferrer(context)?.let { d.put("install_ref", it) }
+        d
+    }
+
+    private suspend fun installReferrer(context: Context): String? = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { cont ->
+            val client = InstallReferrerClient.newBuilder(context).build()
+            client.startConnection(object : InstallReferrerStateListener {
+                override fun onInstallReferrerSetupFinished(code: Int) {
+                    try {
+                        if (code == InstallReferrerClient.InstallReferrerResponse.OK) {
+                            cont.resume(client.installReferrer.installReferrer)
+                        } else cont.resume(null)
+                    } catch (e: Exception) {
+                        cont.resume(null)
+                    } finally {
+                        runCatching { client.endConnection() }
+                    }
+                }
+                override fun onInstallReferrerServiceDisconnected() {
+                    if (cont.isActive) cont.resume(null)
+                }
+            })
+            cont.invokeOnCancellation { runCatching { client.endConnection() } }
+        }
+    }
+
+    // ---- Endpoints ----
+
+    suspend fun init(context: Context) =
+        post("/api/client/init", base(context).put("device_data", deviceData(context)))
+
+    suspend fun attribution(context: Context): JSONObject =
+        post("/api/client/attribution-data", base(context).put("device_data", deviceData(context)))
+
+    suspend fun signup(context: Context, userId: String) =
+        post(
+            "/api/client/trigger",
+            base(context)
+                .put("user_data", JSONObject().put("id", userId))
+                .put("data", JSONObject().put("device_data", deviceData(context)))
+        )
+
+    suspend fun trackEvent(context: Context, name: String, data: JSONObject? = null) =
+        post(
+            "/api/client/capture-event",
+            base(context).put("event_name", name).apply { if (data != null) put("event_data", data) }
+        )
+
+    suspend fun capturePayment(context: Context, userId: String, amount: Double) =
+        post(
+            "/api/client/capture-payment",
+            base(context).put("user_id", userId).put("amount", amount).put("status", "PAYMENT_COMPLETED")
+        )
+}
+```
+
+## Using it
+
+Register the install and read attribution on app start.
+
+```kotlin
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        CoroutineScope(Dispatchers.IO).launch {
+            // 1. Register the install
+            LinkrunnerMinimal.init(applicationContext)
+
+            // 2. Read attribution (poll until campaign_data appears)
+            repeat(5) {
+                val data = LinkrunnerMinimal.attribution(applicationContext).optJSONObject("data")
+                if (data?.isNull("campaign_data") == false) {
+                    println("Attributed: ${data.getJSONObject("campaign_data")}")
+                    return@launch
+                }
+                delay(2000)
+            }
+        }
+    }
+}
+```
+
+Then identify the user and track activity.
+
+```kotlin
+// 3. When the user signs up or logs in
+CoroutineScope(Dispatchers.IO).launch {
+    LinkrunnerMinimal.signup(context, userId = "user_123")
+}
+
+// 4. Track an event
+CoroutineScope(Dispatchers.IO).launch {
+    LinkrunnerMinimal.trackEvent(context, "purchase_initiated", JSONObject().put("amount", 99.99))
+}
+
+// 5. Capture a payment
+CoroutineScope(Dispatchers.IO).launch {
+    LinkrunnerMinimal.capturePayment(context, userId = "user_123", amount = 99.99)
+}
+```
+
+<Warning>
+  Run every call off the main thread, and call from the device so Linkrunner sees the device IP.
+</Warning>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

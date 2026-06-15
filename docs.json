@@ -32,6 +32,31 @@
                         ]
                     },
                     {
+                        "group": "SDK-less Integration",
+                        "pages": [
+                            "sdk-less/introduction",
+                            {
+                                "group": "Android",
+                                "icon": "android",
+                                "pages": [
+                                    "sdk-less/android-quickstart",
+                                    "sdk-less/android-device-data",
+                                    "sdk-less/android-minimal"
+                                ]
+                            },
+                            {
+                                "group": "iOS",
+                                "icon": "apple",
+                                "pages": [
+                                    "sdk-less/ios-quickstart",
+                                    "sdk-less/ios-device-data",
+                                    "sdk-less/ios-minimal"
+                                ]
+                            },
+                            "sdk-less/api-reference"
+                        ]
+                    },
+                    {
                         "group": "Core Features",
                         "pages": [
                             "features/subdomain-setup",
