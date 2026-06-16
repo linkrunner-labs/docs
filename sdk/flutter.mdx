@@ -196,6 +196,29 @@ Future<void> initLinkrunnerWithSigning() async {
 }
 ```
 
+## Setting the Customer User ID
+
+Use `setCustomerUserId` to attach your own user identifier to the device **right after `init`**. Once set, the identifier is stored securely on-device and automatically included in every event you track — so you never have to pass it on each `trackEvent` call.
+
+Call it as early as the user's ID is available. This guarantees every event carries a `user_id` from the very first event, and is especially useful for existing users who were already onboarded before this feature shipped.
+
+<Note>
+    Available from **Flutter SDK v3.10.0**.
+</Note>
+
+```dart
+try {
+  await LinkRunner().setCustomerUserId("123"); // Your user ID
+  print('Customer user id set');
+} catch (e) {
+  print('Error setting customer user id: $e');
+}
+```
+
+<Note>
+    The identifier is stored securely on-device and persists across app restarts. Calling `setCustomerUserId` again will **not** overwrite an existing identifier — only `signup()` / `setUserData()` update it.
+</Note>
+
 ## User Identification (Required)
 Call the `signup` method as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 

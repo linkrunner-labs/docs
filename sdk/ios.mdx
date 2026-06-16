@@ -130,6 +130,26 @@ For enhanced security, the LinkRunner SDK requires the following signing paramet
 
 You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
 
+## Setting the Customer User ID
+
+Use `setCustomerUserId` to attach your own user identifier to the device **right after `init`**. Once set, the identifier is stored securely on-device and automatically included in every event you track — so you never have to pass it on each `trackEvent` call.
+
+Call it as early as the user's ID is available. This guarantees every event carries a `user_id` from the very first event, and is especially useful for existing users who were already onboarded before this feature shipped.
+
+<Note>
+    Available from **iOS SDK v3.11.0**.
+</Note>
+
+```swift
+func setCustomerUserId() async {
+    await LinkrunnerSDK.shared.setCustomerUserId("123") // Your user ID
+}
+```
+
+<Note>
+    The identifier is stored in the Keychain and persists across app restarts. Calling `setCustomerUserId` again will **not** overwrite an existing identifier — only `signup()` / `setUserData()` update it.
+</Note>
+
 ## User Identification (Required)
 Call the `signup` method as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 
