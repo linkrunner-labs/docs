@@ -18,6 +18,23 @@ Google Web to App lets you run Search, Display, or Performance Max campaigns tha
 4. Mobile users see a lightweight redirect page that opens your app if installed, or takes them to the App Store / Play Store. Desktop users are forwarded to your website with the parameters preserved.
 5. When the app is opened after install, Linkrunner attributes it to the campaign.
 
+## Connect your Google Ads account
+
+Connecting your Google Ads account lets Linkrunner sync your campaigns and spend, and send in-app conversions back to Google so it can optimize your web-to-app campaigns.
+
+Go to [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads), click **Add Google Account**, and choose how to connect:
+
+- **Google App Ads**: campaign sync and spend reporting.
+- **Google Web to App Ads**: everything above, plus permission to upload in-app conversions to your Google Ads conversion actions. Choose this for web-to-app so Google can optimize Search and Performance Max campaigns on real in-app events.
+
+Sign in with a Google account that has access to your Google Ads account and approve the requested permissions.
+
+<Note>
+  Web to App Ads asks for one extra Google permission (Data Manager) so
+  Linkrunner can send conversions to your account. If you connected with App Ads
+  earlier, reconnect with Web to App Ads to enable conversion uploads.
+</Note>
+
 ## Setup
 
 <Steps titleSize="h3">
@@ -156,6 +173,43 @@ Do not paste the Final URL suffix into this field. Keep the suffix in **Tracking
 
 </Steps>
 
+## Send in-app conversions to Google
+
+After installs are attributed, Linkrunner can upload in-app conversions (such as purchases or sign-ups) back to Google Ads. Google uses them to optimize your Search and Performance Max campaigns on real outcomes, not just installs.
+
+This requires connecting with **Google Web to App Ads** so Linkrunner has permission to send conversions.
+
+<Steps titleSize="h3">
+
+<Step title="Map an event to a conversion action">
+
+Go to [Integrations → Google Ads → Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping). For each event you want to send (for example `purchase` or `sign_up`), pick a Google conversion action in the **Conversion action** column.
+
+If you do not have one yet, choose **Create new** and Linkrunner creates a conversion action in your Google Ads account and maps it in one step.
+
+</Step>
+
+<Step title="Set the conversion action as a goal in Google Ads">
+
+In Google Ads, open **Goals → Conversions** and set the conversion action as a primary action for the campaigns you want to optimize. Linkrunner can create the action, but only you decide which goals your campaigns bid toward.
+
+</Step>
+
+<Step title="Confirm conversions arrive">
+
+Run real traffic and confirm conversions appear against the conversion action in Google Ads. Uploads happen after attribution and can take a few hours to show.
+
+</Step>
+
+</Steps>
+
+<Note>
+  If your project has more than one connected Google account, use the account
+  selector at the top of the Event Mapping tab to choose which account's
+  conversion actions you are mapping. Conversion actions are specific to each
+  Google Ads account.
+</Note>
+
 ## Click IDs: gclid, wbraid, and gbraid
 
 Google appends different click IDs depending on the platform and tracking context. They land on your Linkrunner domain automatically; you never handle them yourself.
@@ -175,6 +229,8 @@ All three arrive automatically because the ad's Final URL is your Linkrunner dom
 - [ ] Final URL suffix is set at the account or campaign level
 - [ ] Ad Final URL points at your Linkrunner domain (or your site's Download button forwards the full query string to it)
 - [ ] End-to-end test: click a test ad, install the app, confirm attribution appears in the Linkrunner dashboard
+- [ ] Google Ads account connected under Integrations → Google Ads (use **Google Web to App Ads** to enable conversion uploads)
+- [ ] (Optional) Key events mapped to Google conversion actions under Event Mapping, and those actions set as goals in Google Ads
 
 ## Troubleshooting
 
@@ -202,6 +258,13 @@ Linkrunner auto-creates a campaign on the first click that carries a valid `gad_
 - Confirm your Google Ads account is connected under [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads).
 - Allow up to a few hours for the first spend data to appear after campaign launch.
 - Make sure the campaign running in Google Ads matches the connected account.
+
+### In-app conversions not reaching Google Ads
+
+- Confirm you connected with **Google Web to App Ads**, not App Ads. The App Ads connection cannot upload conversions. Reconnect with Web to App Ads if needed.
+- Confirm the event is mapped to a conversion action under [Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping).
+- Make sure the conversion action is enabled in Google Ads and set as a goal for the campaign.
+- Uploads happen after attribution and can take a few hours to appear in Google Ads.
 
 ---
 
