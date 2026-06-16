@@ -141,6 +141,29 @@ These changes are the same whether you're using React Native or Flutter.
       <data android:scheme="https" android:host="store.example.com" />
     </intent-filter>
     ```
+
+    #### Enable install detection (Continue to app popup)
+
+    To let the Linkrunner redirect page detect that your app is installed and show a [Continue to app popup](/features/link-redirection#open-in-app-popup) instead of sending the user to the store, declare an `asset_statements` link back to your subdomain.
+
+    Add the statement to `android/app/src/main/res/values/strings.xml`:
+
+    ```xml
+    <string name="asset_statements" translatable="false">
+      [{\"relation\": [\"delegate_permission/common.handle_all_urls\"],
+        \"target\": {\"namespace\": \"web\", \"site\": \"https://your.subdomain.com\"}}]
+    </string>
+    ```
+
+    Then reference it from `AndroidManifest.xml`, inside the `<application>` section:
+
+    ```xml
+    <meta-data
+      android:name="asset_statements"
+      android:resource="@string/asset_statements" />
+    ```
+
+    Replace `https://your.subdomain.com` with your Linkrunner subdomain. This is the app→site half of the Digital Asset Link. Linkrunner already hosts the site→app half at `/.well-known/assetlinks.json` on your subdomain.
   </Tab>
   <Tab title="iOS">
     1. Open your iOS project in Xcode
