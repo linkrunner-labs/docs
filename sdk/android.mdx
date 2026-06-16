@@ -480,6 +480,10 @@ private fun removePayment() {
 ## Tracking Custom Events
 
 <Note>
+    From **Android SDK v3.9.0**, custom events automatically include the `user_id` you set during `signup()` / `setUserData()`. The SDK stores this identifier securely on-device and attaches it to every `trackEvent` call, so you no longer need to pass it manually. Events tracked before signup are sent without a `user_id`.
+</Note>
+
+<Note>
     Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
 </Note>
 
