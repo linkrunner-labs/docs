@@ -216,7 +216,7 @@ import kotlinx.coroutines.launch
 
 private fun setCustomerUserId() {
     CoroutineScope(Dispatchers.IO).launch {
-        val result = LinkRunner.getInstance().setCustomerUserId("123") // Your user ID
+        val result = LinkRunner.getInstance().setCustomerUserId("f47ac10b-58cc-4372-a567-0e02b2c3d479") // Your unique customer user ID (e.g. a UUID)
         result
             .onSuccess { println("Customer user id set") }
             .onFailure { println("Failed to set customer user id: ${it.message}") }

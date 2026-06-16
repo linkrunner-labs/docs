@@ -115,7 +115,7 @@ Call it as early as the user's ID is available. This guarantees every event carr
 ```javascript
 const setCustomerUserId = async () => {
     try {
-        await linkrunner.setCustomerUserId("123"); // Your user ID
+        await linkrunner.setCustomerUserId("f47ac10b-58cc-4372-a567-0e02b2c3d479"); // Your unique customer user ID (e.g. a UUID)
         console.log("Customer user id set");
     } catch (error) {
         console.error("Error setting customer user id:", error);
