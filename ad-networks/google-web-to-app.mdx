@@ -87,6 +87,8 @@ Google substitutes the `{...}` macros with real values at delivery time. `gad_ca
 3. Paste the template above into **Final URL suffix**
 4. Click **Save**
 
+![Google Ads account settings showing the Tracking section with the Final URL suffix field](/images/google_ads/web-to-app/final-url-suffix-account-settings.png)
+
 **To set it at the campaign level:**
 
 1. Open the campaign → **Settings**
@@ -117,6 +119,10 @@ Set the **Final URL** of your ads to your Linkrunner domain:
 ```
 https://<your-linkrunner-domain>/
 ```
+
+Grab your exact Final URL from [Integrations → Google Ads → Web to App](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=web_to_app) in the dashboard. Pick your destination domain there and use the **Copy** button to copy the ready-to-paste Final URL (the Final URL suffix from the previous step is on the same screen).
+
+![Linkrunner dashboard Web to App tab with the destination domain picker, the Final URL suffix, and the Final URL, each with a Copy button](/images/google_ads/web-to-app/web-to-app-setup.png)
 
 That is the entire website-side setup: there is none. Google appends the click IDs and your suffix parameters to this URL automatically, and Linkrunner handles the rest.
 
@@ -159,15 +165,25 @@ On **Select a campaign type**, choose **Performance Max**.
 
 </Step>
 
-<Step title="Use the Linkrunner URL" id="use-the-linkrunner-url">
+<Step title="Select your conversion goals" id="select-conversion-goals">
 
-When Google asks for the campaign or ad **Final URL**, paste your Linkrunner domain:
+Pick the conversion goals this campaign should optimize for (for example **Sign-ups** or **Purchases**). These are the Google goals your mapped conversion actions belong to, so the campaign bids toward real in-app outcomes, not just installs.
+
+![Google Ads screen for selecting conversion goals for campaign performance optimisation](/images/google_ads/web-to-app/campaign-conversion-goals.png)
+
+</Step>
+
+<Step title="Add your destination link" id="add-destination-link">
+
+When Google asks **Where should people go after clicking your ads?**, enter your Linkrunner domain as the destination URL:
 
 ```
 https://<your-linkrunner-domain>/
 ```
 
-Do not paste the Final URL suffix into this field. Keep the suffix in **Tracking → Final URL suffix** at the account or campaign level.
+Grab the exact URL from [Integrations → Google Ads → Web to App](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=web_to_app) using the **Copy** button. Do not paste the Final URL suffix in this field. Keep the suffix in **Tracking → Final URL suffix** at the account or campaign level.
+
+![Google Ads screen asking where people should go after clicking your ads, with the destination URL field](/images/google_ads/web-to-app/campaign-destination-link.png)
 
 </Step>
 
@@ -183,15 +199,25 @@ This requires connecting with **Google Web to App Ads** so Linkrunner has permis
 
 <Step title="Map an event to a conversion action">
 
-Go to [Integrations → Google Ads → Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping). For each event you want to send (for example `purchase` or `sign_up`), pick a Google conversion action in the **Conversion action** column.
+Go to [Integrations → Google Ads → Web to App](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=web_to_app) and scroll to the **conversion actions** section. It lists your Google event mappings; for each event you want to send (for example `purchase` or `sign_up`), pick a Google conversion action in the **Conversion action** column. If an event is not listed, add it under the **Event Mapping** tab first.
 
-If you do not have one yet, choose **Create new** and Linkrunner creates a conversion action in your Google Ads account and maps it in one step.
+![Web to App conversion actions table mapping each of your events to a Google conversion action, with a Goal column](/images/google_ads/web-to-app/web-to-app-conversion-actions.png)
+
+If you do not have one yet, choose **Create new**, give it a name and a **Goal** (Sign-up, Purchase, and so on), and Linkrunner creates the conversion action in your Google Ads account under that goal and maps it in one step.
+
+![Create Google conversion action dialog with a name field and a Goal selector](/images/google_ads/web-to-app/web-to-app-create-conversion-action.png)
 
 </Step>
 
-<Step title="Set the conversion action as a goal in Google Ads">
+<Step title="Set its goal">
 
-In Google Ads, open **Goals → Conversions** and set the conversion action as a primary action for the campaigns you want to optimize. Linkrunner can create the action, but only you decide which goals your campaigns bid toward.
+Each conversion action belongs to a Google **goal** (Sign-up, Purchase, and so on), which decides how Google groups and optimizes it. Set or change it in the **Goal** column of the same table, and Linkrunner updates it in your Google Ads account, so you do not need to edit it there. A new action you create uses the goal you picked.
+
+</Step>
+
+<Step title="Mark it primary in Google Ads">
+
+Setting the goal files the action under the right goal, but Google decides whether a goal drives bidding. In Google Ads, open **Goals → Conversions**, open the goal, and make sure the action is a **Primary** action (not Secondary) for the campaigns you want to optimize. Linkrunner sets the goal; you choose which goals your campaigns bid toward.
 
 </Step>
 
@@ -205,7 +231,7 @@ Run real traffic and confirm conversions appear against the conversion action in
 
 <Note>
   If your project has more than one connected Google account, use the account
-  selector at the top of the Event Mapping tab to choose which account's
+  selector at the top of the conversion actions section to choose which account's
   conversion actions you are mapping. Conversion actions are specific to each
   Google Ads account.
 </Note>
@@ -230,7 +256,7 @@ All three arrive automatically because the ad's Final URL is your Linkrunner dom
 - [ ] Ad Final URL points at your Linkrunner domain (or your site's Download button forwards the full query string to it)
 - [ ] End-to-end test: click a test ad, install the app, confirm attribution appears in the Linkrunner dashboard
 - [ ] Google Ads account connected under Integrations → Google Ads (use **Google Web to App Ads** to enable conversion uploads)
-- [ ] (Optional) Key events mapped to Google conversion actions under Event Mapping, and those actions set as goals in Google Ads
+- [ ] (Optional) Key events mapped to Google conversion actions under Web to App (with a goal set), and marked as Primary in Google Ads
 
 ## Troubleshooting
 
@@ -262,7 +288,7 @@ Linkrunner auto-creates a campaign on the first click that carries a valid `gad_
 ### In-app conversions not reaching Google Ads
 
 - Confirm you connected with **Google Web to App Ads**, not App Ads. The App Ads connection cannot upload conversions. Reconnect with Web to App Ads if needed.
-- Confirm the event is mapped to a conversion action under [Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping).
+- Confirm the event is mapped to a conversion action under [Web to App](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=web_to_app).
 - Make sure the conversion action is enabled in Google Ads and set as a goal for the campaign.
 - Uploads happen after attribution and can take a few hours to appear in Google Ads.
 
