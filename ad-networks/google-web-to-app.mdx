@@ -27,12 +27,24 @@ Go to [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/in
 - **Google App Ads**: campaign sync and spend reporting.
 - **Google Web to App Ads**: everything above, plus permission to upload in-app conversions to your Google Ads conversion actions. Choose this for web-to-app so Google can optimize Search and Performance Max campaigns on real in-app events.
 
-Sign in with a Google account that has access to your Google Ads account and approve the requested permissions.
+Click **Google Web to App Ads** for this setup, then sign in with a Google account that has access to your Google Ads account and approve the requested permissions.
+
+![Google Ads Add Google Account dropdown with the Google Web to App Ads option](/images/google_ads/web-to-app/google-web-to-app-connect-option.png)
+
+<Note>
+  Google may show **Google hasn't verified this app** while Linkrunner's Data
+  Manager permission is under Google verification. It is safe to continue when
+  you started the login from Linkrunner. Click **Advanced** if needed, then
+  click **Go to Linkrunner (unsafe)**.
+</Note>
+
+![Google unverified app warning with the Go to Linkrunner unsafe link highlighted](/images/google_ads/web-to-app/google-unverified-app-warning.png)
 
 <Note>
   Web to App Ads asks for one extra Google permission (Data Manager) so
   Linkrunner can send conversions to your account. If you connected with App Ads
-  earlier, reconnect with Web to App Ads to enable conversion uploads.
+  earlier, the **Web to App** column on the Account Integration tab shows a
+  reconnect option. Click it and sign in with **Google Web to App Ads**.
 </Note>
 
 ## Setup
@@ -49,6 +61,8 @@ To verify or enable auto-tagging:
 2. Find the **Auto-tagging** section
 3. Make sure **Tag the URL that people click through from my ad** is checked
 4. Click **Save**
+
+![Google Ads account settings with auto-tagging enabled](/images/google_ads/web-to-app/google-auto-tagging-account-settings.png)
 
 <Warning>
   Auto-tagging must be on before you run any web-to-app traffic. ValueTrack
@@ -105,9 +119,9 @@ Google substitutes the `{...}` macros with real values at delivery time. `gad_ca
 </Note>
 
 <Warning>
-  Set the Final URL suffix at the **account** or **campaign** level. If you
-  only set it at the ad level you risk missing coverage when new ads are added
-  to the campaign.
+  Set the Final URL suffix at the **account** or **campaign** level. If you only
+  set it at the ad level you risk missing coverage when new ads are added to the
+  campaign.
 </Warning>
 
 </Step>
@@ -231,20 +245,20 @@ Run real traffic and confirm conversions appear against the conversion action in
 
 <Note>
   If your project has more than one connected Google account, use the account
-  selector at the top of the conversion actions section to choose which account's
-  conversion actions you are mapping. Conversion actions are specific to each
-  Google Ads account.
+  selector at the top of the conversion actions section to choose which
+  account's conversion actions you are mapping. Conversion actions are specific
+  to each Google Ads account.
 </Note>
 
 ## Click IDs: gclid, wbraid, and gbraid
 
 Google appends different click IDs depending on the platform and tracking context. They land on your Linkrunner domain automatically; you never handle them yourself.
 
-| Parameter | When it appears |
-|---|---|
-| `gclid` | Most clicks. Present on Android and on iOS website-page clicks (often alongside `wbraid`). |
-| `wbraid` | iOS clicks from a website landing page (Safari / browser-based flow). Arrives together with `gclid` when both are present. |
-| `gbraid` | iOS clicks where Google routes directly into an app destination (app-destination ID). Less common in web-to-app flows. |
+| Parameter | When it appears                                                                                                            |
+| --------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `gclid`   | Most clicks. Present on Android and on iOS website-page clicks (often alongside `wbraid`).                                 |
+| `wbraid`  | iOS clicks from a website landing page (Safari / browser-based flow). Arrives together with `gclid` when both are present. |
+| `gbraid`  | iOS clicks where Google routes directly into an app destination (app-destination ID). Less common in web-to-app flows.     |
 
 All three arrive automatically because the ad's Final URL is your Linkrunner domain. Linkrunner captures whichever IDs Google appends.
 
@@ -255,7 +269,7 @@ All three arrive automatically because the ad's Final URL is your Linkrunner dom
 - [ ] Final URL suffix is set at the account or campaign level
 - [ ] Ad Final URL points at your Linkrunner domain (or your site's Download button forwards the full query string to it)
 - [ ] End-to-end test: click a test ad, install the app, confirm attribution appears in the Linkrunner dashboard
-- [ ] Google Ads account connected under Integrations → Google Ads (use **Google Web to App Ads** to enable conversion uploads)
+- [ ] Google Ads account connected under Integrations → Google Ads using **Google Web to App Ads** to enable conversion uploads
 - [ ] (Optional) Key events mapped to Google conversion actions under Web to App (with a goal set), and marked as Primary in Google Ads
 
 ## Troubleshooting
@@ -287,7 +301,7 @@ Linkrunner auto-creates a campaign on the first click that carries a valid `gad_
 
 ### In-app conversions not reaching Google Ads
 
-- Confirm you connected with **Google Web to App Ads**, not App Ads. The App Ads connection cannot upload conversions. Reconnect with Web to App Ads if needed.
+- Confirm the **Web to App** column under [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads) shows enabled. If it shows reconnect, click it and sign in with **Google Web to App Ads**. The regular App Ads connection cannot upload conversions.
 - Confirm the event is mapped to a conversion action under [Web to App](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=web_to_app).
 - Make sure the conversion action is enabled in Google Ads and set as a goal for the campaign.
 - Uploads happen after attribution and can take a few hours to appear in Google Ads.
