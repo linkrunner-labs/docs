@@ -139,6 +139,33 @@ Drop platforms that do not apply. Do not invent new orderings.
 - Always set `alt` text. Crop screenshots to the relevant area; do not include the whole browser chrome.
 - Prefer `.webp` for new screenshots when the source allows. Keep filenames lowercase with hyphens.
 
+### Capturing dashboard screenshots (retina + padding)
+
+In-product screenshots should match the rest of the page: 2x (retina) resolution with a little padding around the element, not a tight 1x crop. The full-width reference on the Google Web to App page is `final-url-suffix-account-settings.png` (2000px wide).
+
+The Playwright MCP `browser_take_screenshot` is locked to 1x (`scale: 'css'`) and crops exactly to the element (no padding). To get retina plus padding, capture via `browser_run_code_unsafe`:
+
+- Emulate retina with CDP, then capture with CDP. Playwright's own `page.screenshot` ignores the override, but `Page.captureScreenshot` honors it:
+
+  ```js
+  const client = await page.context().newCDPSession(page);
+  await client.send('Emulation.setDeviceMetricsOverride', { width: 1600, height: 1040, deviceScaleFactor: 2, mobile: false });
+  const box = await page.locator(SEL).boundingBox();   // CSS px, viewport-relative
+  const P = 32;                                         // padding, CSS px
+  const clip = { x: box.x + scrollX - P, y: box.y + scrollY - P, width: box.width + 2 * P, height: box.height + 2 * P, scale: 1 };
+  const { data } = await client.send('Page.captureScreenshot', { format: 'png', clip, captureBeyondViewport: true });
+  ```
+
+  `clip` is in CSS px and the output comes out at 2x. Add `window.scrollX` / `window.scrollY` to convert the viewport-relative `boundingBox` into the document coordinates `captureBeyondViewport` expects.
+
+- The `run_code_unsafe` VM has no `fs`, `require`, or dynamic `import`, so write the file through a browser download: build a `data:image/png;base64,...` link from `data`, click it, and `await download.saveAs(absolutePath)`.
+
+Other nuances:
+
+- **Redact customer data.** Blur the subdomain, the connected ad-account name, and any custom event names before capturing. In `page.evaluate`, wrap each occurrence's text node in a `<span>` with `filter: blur(6px)` so the surrounding helper text stays readable.
+- **Keep the edges clean.** A stray active-tab indicator can bleed into the top padding: cover the strip above the card with a fixed, page-background-colored div before capturing. For modals, set the full-viewport dark overlay to a light background so the padding around the dialog reads clean.
+- **Capture locally.** New dashboard features are not on prod, so run the dashboard locally (wired to a local backend) and capture from `localhost`. Log in on that origin first; its session is separate from prod.
+
 ## Adding a new page
 
 1. Create the `.mdx` file in the matching folder.
