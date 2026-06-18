@@ -89,7 +89,7 @@ All webhooks are sent as POST requests with a JSON body.
 | `user_id` | `string` \| `null` | Customer user ID for signup webhooks |
 | `campaign_id` | `string` | Unique identifier for the campaign |
 | `campaign_name` | `string` \| `null` | Human-readable campaign name |
-| `network_name` | `string` \| `null` | Attribution network: `ORGANIC`, `META`, `GOOGLE`, etc. |
+| `network_name` | `string` \| `null` | Attribution network: `LINKRUNNER` (matched by a Linkrunner tracking link), `META`, `GOOGLE`, `APPLE_SEARCH_ADS`, or `ORGANIC` (no attribution found) |
 | `ad_channel` | `string` \| `null` | Ad channel: `META`, `GOOGLE`, `TIKTOK`, `APPLE_SEARCH_ADS`, etc. |
 | `attributed_on` | `ISO 8601 date` | Timestamp when attribution occurred |
 | `installed_at` | `ISO 8601 date` \| `null` | Timestamp of app installation |
