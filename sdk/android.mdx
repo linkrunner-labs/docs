@@ -205,7 +205,7 @@ Use `setCustomerUserId` to attach your own user identifier to the device **right
 Call it as early as the user's ID is available. This guarantees every event carries a `user_id` from the very first event, and is especially useful for existing users who were already onboarded before this feature shipped.
 
 <Note>
-    Available from **Android SDK v3.9.0**.
+    Available from **Android SDK v3.9.1**.
 </Note>
 
 ```kotlin
@@ -225,7 +225,7 @@ private fun setCustomerUserId() {
 ```
 
 <Note>
-    The identifier is stored encrypted on-device and persists across app restarts. Calling `setCustomerUserId` again will **not** overwrite an existing identifier. Only `signup()` / `setUserData()` update it.
+    The identifier is stored encrypted on-device and persists across app restarts. Calling `setCustomerUserId` again with a **different** identifier updates the stored value; passing the same identifier is a no-op. `signup()` / `setUserData()` also update it.
 </Note>
 
 ## User Identification (Required)

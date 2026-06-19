@@ -147,7 +147,7 @@ func setCustomerUserId() async {
 ```
 
 <Note>
-    The identifier is stored in the Keychain and persists across app restarts. Calling `setCustomerUserId` again will **not** overwrite an existing identifier. Only `signup()` / `setUserData()` update it.
+    The identifier is stored in the Keychain and persists across app restarts. Calling `setCustomerUserId` again with a **different** identifier updates the stored value; passing the same identifier is a no-op. `signup()` / `setUserData()` also update it.
 </Note>
 
 ## User Identification (Required)
