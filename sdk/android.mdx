@@ -423,7 +423,7 @@ private fun capturePayment() {
     CoroutineScope(Dispatchers.IO).launch {
         try {
             val paymentData = CapturePaymentRequest(
-                paymentId = "payment_123",  // Optional: Unique payment identifier
+                paymentId = "payment_123",  // Required: Unique payment identifier
                 userId = "user123",         // Required: User identifier
                 amount = 99.99,             // Required: Payment amount
                 type = PaymentType.FIRST_PAYMENT,  // Optional: Defaults to DEFAULT
