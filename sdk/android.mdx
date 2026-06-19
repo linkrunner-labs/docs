@@ -208,6 +208,10 @@ Call it as early as the user's ID is available. This guarantees every event carr
     Available from **Android SDK v3.9.1**.
 </Note>
 
+<Note>
+    **Best practice:** set the Customer User ID as early as possible — the `user_id` is only attached to events tracked **after** it's set, and is not applied retroactively. Use a stable, unique identifier from your own system (for example your internal user ID or a UUID) rather than an email address or other PII.
+</Note>
+
 ```kotlin
 import io.linkrunner.sdk.LinkRunner
 import kotlinx.coroutines.CoroutineScope
