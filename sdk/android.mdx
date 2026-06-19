@@ -198,6 +198,40 @@ For enhanced security, the LinkRunner SDK requires the following signing paramet
 
 You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
 
+## Setting the Customer User ID
+
+Use `setCustomerUserId` to attach your own user identifier to the device **right after `init`**. Once set, the identifier is stored securely on-device and automatically included in every event you track, so you never have to pass it on each `trackEvent` call.
+
+Call it as early as the user's ID is available. This guarantees every event carries a `user_id` from the very first event, and is especially useful for existing users who were already onboarded before this feature shipped.
+
+<Note>
+    Available from **Android SDK v3.9.1**.
+</Note>
+
+<Note>
+    **Best practice:** set the Customer User ID as early as possible. The `user_id` is only attached to events tracked **after** it's set, and is not applied retroactively. Use a stable, unique identifier from your own system (for example your internal user ID or a UUID) rather than an email address or other PII.
+</Note>
+
+```kotlin
+import io.linkrunner.sdk.LinkRunner
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+private fun setCustomerUserId() {
+    CoroutineScope(Dispatchers.IO).launch {
+        val result = LinkRunner.getInstance().setCustomerUserId("f47ac10b-58cc-4372-a567-0e02b2c3d479") // Your unique customer user ID (e.g. a UUID)
+        result
+            .onSuccess { println("Customer user id set") }
+            .onFailure { println("Failed to set customer user id: ${it.message}") }
+    }
+}
+```
+
+<Note>
+    The identifier is stored encrypted on-device and persists across app restarts. Calling `setCustomerUserId` again with a **different** identifier updates the stored value; passing the same identifier is a no-op. `signup()` / `setUserData()` also update it.
+</Note>
+
 ## User Identification (Required)
 Call the `signup` method as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 
@@ -478,6 +512,10 @@ private fun removePayment() {
 ```
 
 ## Tracking Custom Events
+
+<Note>
+    From **Android SDK v3.9.0**, custom events automatically include the `user_id` you set during `signup()` / `setUserData()`. The SDK stores this identifier securely on-device and attaches it to every `trackEvent` call, so you no longer need to pass it manually. Events tracked before signup are sent without a `user_id`.
+</Note>
 
 <Note>
     Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
