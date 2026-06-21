@@ -44,15 +44,17 @@ POST: /capture-event
     "currency": "USD",
     "is_featured": true
   },
-  "user_id": "user_12345"
+  "user_id": "user_12345",
+  "event_id": "evt_12345"
 }
 ```
 
-| Parameter  | Type   | Description                                               |
-| ---------- | ------ | --------------------------------------------------------- |
-| event_name | string | **Required**. Name of the event to track                  |
-| event_data | object | **Optional**. Additional data associated with the event   |
-| user_id    | string | **Required**. User identifier to associate with the event |
+| Parameter  | Type   | Description                                                                            |
+| ---------- | ------ | ------------------------------------------------------------------------------------- |
+| event_name | string | **Required**. Name of the event to track                                              |
+| event_data | object | **Optional**. Additional data associated with the event                               |
+| user_id    | string | **Required**. User identifier to associate with the event                             |
+| event_id   | string | **Optional**. Your own unique identifier for the event, useful for deduplication and correlating with your backend |
 
 ### Responses
 
