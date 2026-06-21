@@ -490,10 +490,17 @@ Track custom events in your app:
 const trackEvent = async () => {
     await linkrunner.trackEvent(
         "purchase_initiated", // Event name
-        { product_id: "12345", category: "electronics", amount: 99.99 } // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
+        { product_id: "12345", category: "electronics", amount: 99.99 }, // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
+        "order_12345" // Optional: Your own unique event identifier (string or number)
     );
 };
 ```
+
+#### Parameters for `linkrunner.trackEvent`
+
+- `eventName`: string (required) - Name of the event to track
+- `eventData`: object (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventId`: string | number (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
 
 ### Revenue Sharing with Ad Networks
 
