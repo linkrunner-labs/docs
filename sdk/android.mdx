@@ -533,7 +533,8 @@ private fun trackEvent() {
                     "product_id" to "12345",
                     "category" to "electronics",
                     "amount" to 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
-                )
+                ),
+                eventId = "order_12345" // Optional: Your own unique event identifier
             )
 
             result.onSuccess {
@@ -547,6 +548,12 @@ private fun trackEvent() {
     }
 }
 ```
+
+#### Parameters for `LinkRunner.getInstance().trackEvent`
+
+- `eventName`: `String` (required) - Name of the event to track
+- `eventData`: `Map<String, Any>` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventId`: `String` (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
 
 ### Revenue Sharing with Ad Networks
 

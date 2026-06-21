@@ -451,7 +451,8 @@ func trackEvent() async {
                 "product_id": "12345",
                 "category": "electronics",
                 "amount": 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
-            ]
+            ],
+            eventId: "order_12345" // Optional: Your own unique event identifier
         )
         print("Event tracked successfully")
     } catch {
@@ -459,6 +460,12 @@ func trackEvent() async {
     }
 }
 ```
+
+#### Parameters for `LinkrunnerSDK.shared.trackEvent`
+
+- `eventName`: `String` (required) - Name of the event to track
+- `eventData`: `[String: Any]` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventId`: `String` (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
 
 ### Revenue Sharing with Ad Networks
 

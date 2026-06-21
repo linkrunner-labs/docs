@@ -654,6 +654,7 @@ Future<void> trackEvent() async {
         'category': 'electronics',
         'amount': 99.99, // Include amount as a number for revenue sharing with ad networks like Google and Meta
       },
+      eventId: 'order_12345', // Optional: Your own unique event identifier (String or num)
     );
     print('Event tracked successfully');
   } catch (e) {
@@ -661,6 +662,12 @@ Future<void> trackEvent() async {
   }
 }
 ```
+
+#### Parameters for `LinkRunner().trackEvent`
+
+- `eventName`: `String` (required) - Name of the event to track
+- `eventData`: `Map<String, dynamic>` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventId`: `Object` (optional) - Your own unique identifier for the event (`String` or `num`), useful for deduplication and correlating with your backend
 
 ### Revenue Sharing with Ad Networks
 
