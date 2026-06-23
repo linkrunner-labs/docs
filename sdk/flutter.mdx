@@ -445,7 +445,7 @@ Future<void> capturePayment() async {
       capturePayment: LRCapturePayment(
         amount: 99.99, // Required: Payment amount
         userId: 'user123', // Required: User identifier
-        paymentId: 'payment456', // Optional: Unique payment identifier
+        paymentId: 'payment456', // Required: Unique payment identifier
         type: PaymentType.FIRST_PAYMENT, // Optional: Payment type
         // type: PaymentType.SECOND_PAYMENT, // Optional: Payment type
         status: PaymentStatus.PAYMENT_COMPLETED, // Optional: Payment status
@@ -477,7 +477,7 @@ Future<void> capturePayment() async {
 
 - `amount`: double (required) - The payment amount
 - `userId`: String (required) - Identifier for the user making the payment
-- `paymentId`: String (optional) - Unique identifier for the payment
+- `paymentId`: String (required) - Unique identifier for the payment, used to deduplicate transactions
 - `type`: PaymentType (optional) - Type of payment. Available options:
   - `PaymentType.FIRST_PAYMENT` - First payment made by the user
   - `PaymentType.SECOND_PAYMENT` - Second payment made by the user

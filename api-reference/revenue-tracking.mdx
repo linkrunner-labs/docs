@@ -35,7 +35,7 @@ POST: /capture-payment
 ```json
 {
   "user_id": "666",
-  "payment_id": "ABC", // optional but recommended
+  "payment_id": "ABC", // required, must be unique for each transaction
   "amount": 25096, // Send amount in one currency only
   "type": "FIRST_PAYMENT", // optional
   // "type": "SECOND_PAYMENT", // optional

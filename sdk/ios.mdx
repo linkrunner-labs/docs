@@ -359,7 +359,7 @@ func capturePayment() async {
         try await LinkrunnerSDK.shared.capturePayment(
             amount: 99.99, // Payment amount
             userId: "user123", // User identifier
-            paymentId: "payment456", // Optional: Unique payment identifier
+            paymentId: "payment456", // Required: Unique payment identifier
             type: .firstPayment, // optional
             status: .completed, // optional
             eventData: [        // Optional: Ecommerce/custom event data
