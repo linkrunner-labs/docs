@@ -896,7 +896,7 @@ public class LinkrunnerSDK : MonoBehaviour
     /// <summary>
     /// Track a payment/revenue event.
     /// </summary>
-    public static void CapturePayment(string userId, double amount, string paymentId = "",
+    public static void CapturePayment(string userId, double amount, string paymentId,
         string type = "DEFAULT", string status = "PAYMENT_COMPLETED", string eventDataJson = "")
     {
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -1299,6 +1299,8 @@ LinkrunnerSDK.CapturePayment(
     eventDataJson: eventData
 );
 ```
+
+**`paymentId`** is required and must be unique for each payment. It is used for idempotent deduplication, so retries cannot double count revenue.
 
 **Payment types:** `FIRST_PAYMENT`, `SECOND_PAYMENT`, `WALLET_TOPUP`, `FUNDS_WITHDRAWAL`, `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `ONE_TIME`, `RECURRING`, `DEFAULT`
 

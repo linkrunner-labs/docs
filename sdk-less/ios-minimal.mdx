@@ -99,10 +99,11 @@ enum LinkrunnerMinimal {
     }
 
     @discardableResult
-    static func capturePayment(userId: String, amount: Double) async throws -> [String: Any] {
+    static func capturePayment(userId: String, amount: Double, paymentId: String) async throws -> [String: Any] {
         var body = base()
         body["user_id"] = userId
         body["amount"] = amount
+        body["payment_id"] = paymentId
         body["status"] = "PAYMENT_COMPLETED"
         return try await post("/api/client/capture-payment", body)
     }
@@ -151,7 +152,7 @@ Task { try? await LinkrunnerMinimal.signup(userId: "user_123") }
 Task { try? await LinkrunnerMinimal.trackEvent("purchase_initiated", data: ["amount": 99.99]) }
 
 // 5. Capture a payment
-Task { try? await LinkrunnerMinimal.capturePayment(userId: "user_123", amount: 99.99) }
+Task { try? await LinkrunnerMinimal.capturePayment(userId: "user_123", amount: 99.99, paymentId: "payment_123") }
 ```
 
 <Warning>

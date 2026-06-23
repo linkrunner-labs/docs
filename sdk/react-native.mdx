@@ -300,7 +300,7 @@ const capturePayment = async () => {
   await linkrunner.capturePayment({
     amount: 100, // Payment amount
     userId: "user123", // User identifier
-    paymentId: "payment456", // Optional: Unique payment identifier
+    paymentId: "payment456", // Required: Unique payment identifier
     type: "FIRST_PAYMENT", // Optional: Payment type
     // type: "SECOND_PAYMENT", // Optional: Payment type
     status: "PAYMENT_COMPLETED", // Optional: Payment status
@@ -328,7 +328,7 @@ const capturePayment = async () => {
 
 - `amount`: number (required) - The payment amount
 - `userId`: string (required) - Identifier for the user making the payment
-- `paymentId`: string (optional) - Unique identifier for the payment
+- `paymentId`: string (required) - Unique identifier for the payment, used to deduplicate transactions
 - `type`: string (optional) - Type of payment. Available options:
   - `FIRST_PAYMENT` - First payment made by the user
   - `SECOND_PAYMENT` - Second payment made by the user
