@@ -1,0 +1,145 @@
+---
+title: "Postbacks and Macros"
+description: "The macros Linkrunner fills into your postback URLs, with examples for each conversion"
+icon: "satellite-dish"
+---
+
+## Overview
+
+When a conversion is attributed to your click, Linkrunner sends a server-to-server postback to your endpoint. You give Linkrunner a postback URL that contains macros. Linkrunner replaces each macro with the real value and sends the request.
+
+You provide one URL template per conversion you want to receive (install, signup, in-app event). Linkrunner sends the request as an HTTP `GET`.
+
+## Macro syntax
+
+Macros are written in lowercase inside curly braces:
+
+```
+{macro_name}
+```
+
+Rules:
+
+- Linkrunner replaces every macro it recognizes with the conversion's value.
+- Values are URL-encoded automatically. Do not encode the macros yourself.
+- A macro with no value for a given conversion is replaced with an empty string. For example, `{idfa}` is empty on an Android install.
+- Text that is not a recognized macro is left untouched, so static query parameters are safe.
+
+## Macro reference
+
+### Identifiers
+
+| Macro | Description |
+|---|---|
+| `{click_id}` | The `click_id` you sent on the tracking link. Use this to match the postback to your click. |
+| `{install_id}` | Linkrunner's unique identifier for the install. |
+| `{event_id}` | A unique identifier for this conversion. Use it to deduplicate retried postbacks. |
+
+### Event
+
+| Macro | Description |
+|---|---|
+| `{event_name}` | The conversion name: `install`, `signup`, or the in-app event name (for example `purchase`). |
+| `{event_time}` | Event time as a Unix timestamp in seconds. |
+| `{event_time_iso}` | Event time as an ISO 8601 string in UTC. |
+
+### Revenue
+
+| Macro | Description |
+|---|---|
+| `{revenue}` | Revenue amount in major currency units, with two decimal places (for example `9.99`). Populated only on events that carry revenue. |
+| `{currency}` | ISO 4217 currency code (for example `USD`, `INR`). |
+
+<Warning>
+`{revenue}` is in major currency units, not minor units. `9.99` means 9.99, not 9.99 cents. Parse it as a decimal amount.
+</Warning>
+
+### Device
+
+| Macro | Description |
+|---|---|
+| `{platform}` | `android` or `ios`. |
+| `{advertising_id}` | The device advertising ID for the platform: GAID on Android, IDFA on iOS. |
+| `{gaid}` | Google Advertising ID (Android). |
+| `{idfa}` | iOS Advertising ID (Apple). |
+| `{oaid}` | Open Advertising ID (Android devices without Google Play). |
+| `{ip}` | Device IP address at the time of the event. |
+| `{country}` | ISO 3166 country code derived from the device. |
+
+### App and campaign
+
+| Macro | Description |
+|---|---|
+| `{app_id}` | App store identifier: the package name on Android or the App Store ID on iOS. |
+| `{app_version}` | App version at the time of the event. |
+| `{campaign_id}` | Linkrunner campaign identifier. |
+| `{campaign_name}` | Campaign name. |
+
+### Passthrough
+
+| Macro | Description |
+|---|---|
+| `{sub1}` to `{sub5}` | The `sub1` to `sub5` values you sent on the tracking link, returned unchanged. |
+
+## Examples
+
+### Install postback
+
+Your template:
+
+```
+https://partner.example.com/postback?click_id={click_id}&event={event_name}&device={advertising_id}&platform={platform}&country={country}&ts={event_time}
+```
+
+What Linkrunner sends:
+
+```
+https://partner.example.com/postback?click_id=a1b2c3d4e5&event=install&device=38400000-8cf0-11bd-b23e-10b96e40000d&platform=android&country=IN&ts=1751021400
+```
+
+### Signup postback
+
+```
+https://partner.example.com/postback?click_id={click_id}&event={event_name}&event_id={event_id}&ts={event_time}
+```
+
+### Purchase postback with revenue
+
+Your template:
+
+```
+https://partner.example.com/postback?click_id={click_id}&event={event_name}&amount={revenue}&currency={currency}&event_id={event_id}&ts={event_time}
+```
+
+What Linkrunner sends:
+
+```
+https://partner.example.com/postback?click_id=a1b2c3d4e5&event=purchase&amount=9.99&currency=USD&event_id=8f14e45f&ts=1751025000
+```
+
+## Deduplication
+
+Linkrunner retries a postback if your endpoint does not respond with a success status. Treat postbacks as at-least-once. Use `{event_id}` as an idempotency key so a retried postback is not counted twice.
+
+## Formatting reference
+
+| Value | Format |
+|---|---|
+| Timestamps (`{event_time}`) | Unix seconds. |
+| Timestamps (`{event_time_iso}`) | ISO 8601, UTC. |
+| Revenue (`{revenue}`) | Decimal, two places, major currency units. |
+| Currency (`{currency}`) | ISO 4217 three-letter code. |
+| All values | URL-encoded. |
+
+## Troubleshooting
+
+**A macro arrives empty.**
+The value was not available for that conversion. For example, `{idfa}` is empty on Android, and `{revenue}` is empty on events without revenue. Device advertising IDs depend on the value being present on the click and on user consent.
+
+**You receive the same conversion twice.**
+Postbacks are at-least-once. Deduplicate on `{event_id}`.
+
+**Revenue looks 100x too large or too small.**
+`{revenue}` is in major units (`9.99`), not minor units. Do not multiply or divide by 100.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
