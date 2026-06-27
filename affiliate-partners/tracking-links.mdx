@@ -1,0 +1,76 @@
+---
+title: "Tracking Links"
+description: "Parameters you append to your Linkrunner click tracking links"
+icon: "link"
+---
+
+## Overview
+
+Linkrunner gives the advertiser a tracking link for each campaign. You point your traffic at that link and append the parameters below. These parameters tell Linkrunner who sent the click so it can attribute the install and return your identifiers on the postback.
+
+A tracking link looks like this. The domain is the advertiser's own tracking domain, so always use the exact link Linkrunner provides. The example below uses `track.example.com` as a placeholder.
+
+```
+https://track.example.com/?c=CAMPAIGN_ID&click_id=YOUR_CLICK_ID&sub1=YOUR_VALUE
+```
+
+`c` is the campaign identifier, set by the advertiser when they create the link. You add the rest.
+
+## Parameters
+
+You fill each parameter with your own value at click time, using your own system's macros.
+
+### Required
+
+| Parameter | Description |
+|---|---|
+| `click_id` | A unique ID you generate for every click. Linkrunner returns this value in the `{click_id}` macro on every postback, so you can match conversions back to clicks. |
+
+### Identifiers
+
+| Parameter | Description |
+|---|---|
+| `aff_id` | Your affiliate ID. |
+| `pub_id` | Publisher or sub-affiliate ID. |
+| `offer_id` | Offer ID. |
+| `creative_id` | Creative or ad ID. |
+
+### Passthrough values
+
+| Parameter | Description |
+|---|---|
+| `sub1` to `sub5` | Free-form values you want echoed back. Linkrunner stores each one and returns it in the matching `{sub1}` to `{sub5}` macro on the postback. |
+
+### Device and request
+
+Pass device advertising IDs when you have them. They improve match rates, especially for device-ID matching.
+
+| Parameter | Description |
+|---|---|
+| `gaid` | Google Advertising ID (Android). |
+| `idfa` | iOS Advertising ID (Apple). |
+| `oaid` | Open Advertising ID (Android devices without Google Play). |
+| `ip` | The user's IP address at click time. |
+| `user_agent` | The user's URL-encoded user agent string. |
+
+<Note>
+URL-encode every value before appending it. Linkrunner stores values as received.
+</Note>
+
+## Example
+
+A complete click tracking link:
+
+```
+https://track.example.com/?c=OgWmhiSXhG&click_id=a1b2c3d4e5&aff_id=4471&pub_id=site_209&offer_id=88&sub1=newsletter&gaid=38400000-8cf0-11bd-b23e-10b96e40000d&ip=203.0.113.10
+```
+
+## Troubleshooting
+
+**Conversions arrive with an empty `click_id`.**
+You did not send `click_id` on the click, or you sent it under a different name. Confirm the click link includes `click_id=` with a unique value.
+
+**Installs are not attributed to your clicks.**
+Check that traffic actually passes through the Linkrunner tracking link and that the campaign identifier (`c`) is correct. If you rely on device-ID matching, make sure `gaid` or `idfa` is present on the click.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

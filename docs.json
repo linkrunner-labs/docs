@@ -124,6 +124,14 @@
                         ]
                     },
                     {
+                        "group": "Affiliate Partners",
+                        "pages": [
+                            "affiliate-partners/overview",
+                            "affiliate-partners/tracking-links",
+                            "affiliate-partners/postbacks"
+                        ]
+                    },
+                    {
                         "group": "Analytics Integrations",
                         "pages": [
                             "analytics-integrations/amplitude",
