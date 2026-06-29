@@ -62,26 +62,12 @@ D only opened on day 3, so classic Day 1 misses them, but rolling Day 1 counts t
 
 B never opened the app on day 7 itself, so classic Day 7 misses them. But B came back on day 10, which means they were still around at the 7-day mark, so rolling Day 7 counts them.
 
-## How the cohort size is counted
-
-The denominator in every retention percentage is the **cohort size**: the number of installs being measured. It is not a separate "total installs" figure pulled from somewhere else. It is the installs in view that have had a fair chance to reach Day N.
-
-That "fair chance" is the key rule. An install is only counted in the Day N cohort once it has existed for at least N full days, so each window has its own denominator:
-
-- The **Day 1** cohort = installs that happened at least 1 day ago.
-- The **Day 7** cohort = installs that happened at least 7 days ago.
-- The **Day 30** cohort = installs that happened at least 30 days ago.
-
-An install from 3 days ago is in the Day 1 cohort (it has had more than a day) but not yet in the Day 7 cohort (it has not reached its 7th day), so it is left out of the Day 7 number entirely, on both sides of the formula.
-
-Because this rule is applied to the numerator and the denominator together, an install can only be counted as retained if it is also in the cohort. That is why a retention percentage never goes above 100%.
-
 ## What a date filter does
 
 A date filter selects cohorts by their **install date**, not by the day users came back. Picking January 1 to January 31 measures the installs that happened in January and how many of them returned, no matter which day they returned on.
 
 - The numerator and the denominator both use the install date, so they always describe the same group of installs.
-- The "fair chance to reach Day N" rule still applies inside the window. If your range ends today, the most recent installs in it have not reached Day 7 or Day 30 yet, so they drop out of those longer windows. To read a complete Day 30 number, pick a range that ended at least 30 days ago.
+- Installs still need a fair chance to reach Day N. If your range ends today, the most recent installs in it have not reached Day 7 or Day 30 yet, so they drop out of those longer windows. To read a complete Day 30 number, pick a range that ended at least 30 days ago.
 
 ## Which should you use?
 
@@ -111,6 +97,20 @@ In the [Campaign Reporting API](/api-reference/reporting-campaigns), rolling ret
 **Days are calendar days in your project's timezone.** Day N is a calendar-day difference, not a rolling 24-hour period. A user who installs at 11:55 PM and opens the app at 12:05 AM the next day is counted on Day 1.
 
 **Retention is counted per install.** Each install is counted once per day, no matter how many times the app is opened. Installs reported by an ad network that never produced a tracked app open are not part of the retention cohort.
+
+## How the cohort size is counted
+
+The denominator in every retention percentage is the **cohort size**: the number of installs being measured. It is not a separate "total installs" figure pulled from somewhere else. It is the installs in view that have had a fair chance to reach Day N.
+
+That "fair chance" is the key rule. An install is only counted in the Day N cohort once it has existed for at least N full days, so each window has its own denominator:
+
+- The **Day 1** cohort = installs that happened at least 1 day ago.
+- The **Day 7** cohort = installs that happened at least 7 days ago.
+- The **Day 30** cohort = installs that happened at least 30 days ago.
+
+An install from 3 days ago is in the Day 1 cohort (it has had more than a day) but not yet in the Day 7 cohort (it has not reached its 7th day), so it is left out of the Day 7 number entirely, on both sides of the formula.
+
+Because this rule is applied to the numerator and the denominator together, an install can only be counted as retained if it is also in the cohort. That is why a retention percentage never goes above 100%.
 
 ## Troubleshooting
 
