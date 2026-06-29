@@ -1,0 +1,123 @@
+---
+title: "Retention"
+description: "How Linkrunner calculates rolling and classic retention, explained with a simple example"
+icon: "chart-line"
+---
+
+Retention tells you how many of your installs keep coming back to your app. Linkrunner reports it two ways: **classic** and **rolling**. They are different methods of measuring the same thing, and this page explains what each one means and how the numbers are calculated.
+
+## The basics
+
+Every retention number is built from three things:
+
+- **Cohort**: a group of installs, grouped by their install day. The install day is **Day 0**.
+- **A return**: any time a user opens the app after installing. Opening the app several times on the same day counts once.
+- **Day N**: how many days after install you are measuring (Day 1, Day 7, and so on).
+
+Retention is always a percentage of the cohort:
+
+```
+Day N retention = (installs from the cohort that count as retained on Day N) / (cohort size) × 100
+```
+
+The only thing that changes between classic and rolling is which installs "count as retained" on Day N.
+
+## Classic vs rolling
+
+| Mode | An install counts on Day N if it opened the app... |
+| --- | --- |
+| **Classic** | on **exactly** Day N |
+| **Rolling** | on Day N **or any day after** |
+
+- **Classic Day 7** answers: "What share of the cohort opened the app on day 7 specifically?"
+- **Rolling Day 7** answers: "What share of the cohort was still active on day 7 or later?"
+
+Because rolling counts Day N and everything after it, rolling retention is always equal to or higher than classic retention for the same day.
+
+## A simple example
+
+Five users install your app on the same day (Day 0). Here are the days each of them opened the app afterwards:
+
+| User | Days the app was opened after install |
+| --- | --- |
+| A | 1, 2, 3, 5, 7, 9 |
+| B | 1, 4, 10 |
+| C | 1, 2 |
+| D | 3 |
+| E | (never opened again) |
+
+The cohort size is **5**.
+
+### Day 1
+
+- **Classic D1** = opened on exactly day 1 → A, B, C = **3 of 5 = 60%**
+- **Rolling D1** = opened on day 1 or later → A, B, C, D = **4 of 5 = 80%**
+
+D only opened on day 3, so classic Day 1 misses them, but rolling Day 1 counts them because they returned after day 1. E never came back, so neither number counts E.
+
+### Day 7
+
+- **Classic D7** = opened on exactly day 7 → A = **1 of 5 = 20%**
+- **Rolling D7** = opened on day 7 or later → A (days 7 and 9) and B (day 10) = **2 of 5 = 40%**
+
+B never opened the app on day 7 itself, so classic Day 7 misses them. But B came back on day 10, which means they were still around at the 7-day mark, so rolling Day 7 counts them.
+
+## What a date filter does
+
+A date filter selects cohorts by their **install date**, not by the day users came back. Picking January 1 to January 31 measures the installs that happened in January and how many of them returned, no matter which day they returned on.
+
+- The numerator and the denominator both use the install date, so they always describe the same group of installs.
+- Installs still need a fair chance to reach Day N. If your range ends today, the most recent installs in it have not reached Day 7 or Day 30 yet, so they drop out of those longer windows. To read a complete Day 30 number, pick a range that ended at least 30 days ago.
+
+## Which should you use?
+
+Both measure retention, just with different rules, so they answer different questions.
+
+- **Classic** is a fixed snapshot. Once Day N has passed for a cohort, its classic Day N value does not change. Use it for reports, saved figures, and comparing against industry Day 1 / Day 7 benchmarks, which are usually defined this way.
+- **Rolling** is more forgiving and shows long-term stickiness, since it counts users who came back even if they skipped the exact day. Use it to gauge whether users eventually stuck around.
+
+<Warning>
+    **Rolling retention keeps changing over time.** Because it counts a return on Day N or any later day, a cohort's rolling Day N value keeps rising as users come back weeks or months later.
+
+    - Older time periods almost always show higher rolling retention than recent ones, because older cohorts have had more time for late returns to add up. A recent period can look worse than an old one purely for this reason, not because retention actually dropped.
+    - A rolling number you record today can go stale. If you export it or write it into a report, it will keep climbing afterwards, so refresh it regularly or it will understate the final value.
+
+    If you need a stable number that does not move once a cohort matures, use **classic** retention.
+</Warning>
+
+## Available windows
+
+- **Classic retention**: Day 1, Day 7, Day 14, Day 30
+- **Rolling retention**: Day 1, Day 7
+
+In the [Campaign Reporting API](/api-reference/reporting-campaigns), rolling retention is returned as `retention` (`d1`, `d7`) and classic retention as `classic_retention` (`d1`, `d7`, `d14`, `d30`).
+
+## Details that affect the numbers
+
+**Days are calendar days in your project's timezone.** Day N is a calendar-day difference, not a rolling 24-hour period. A user who installs at 11:55 PM and opens the app at 12:05 AM the next day is counted on Day 1.
+
+**Retention is counted per install.** Each install is counted once per day, no matter how many times the app is opened. Installs reported by an ad network that never produced a tracked app open are not part of the retention cohort.
+
+## How the cohort size is counted
+
+The denominator in every retention percentage is the **cohort size**: the number of installs being measured. It is not a separate "total installs" figure pulled from somewhere else. It is the installs in view that have had a fair chance to reach Day N.
+
+That "fair chance" is the key rule. An install is only counted in the Day N cohort once it has existed for at least N full days, so each window has its own denominator:
+
+- The **Day 1** cohort = installs that happened at least 1 day ago.
+- The **Day 7** cohort = installs that happened at least 7 days ago.
+- The **Day 30** cohort = installs that happened at least 30 days ago.
+
+An install from 3 days ago is in the Day 1 cohort (it has had more than a day) but not yet in the Day 7 cohort (it has not reached its 7th day), so it is left out of the Day 7 number entirely, on both sides of the formula.
+
+Because this rule is applied to the numerator and the denominator together, an install can only be counted as retained if it is also in the cohort. That is why a retention percentage never goes above 100%.
+
+## Troubleshooting
+
+**Day 14 or Day 30 retention looks empty or low.** Your recent cohorts have not matured yet. Widen the date range to include older installs that have had a full 14 or 30 days to return.
+
+**Rolling retention keeps going up for the same period.** This is expected. Rolling counts Day N and every day after, so late returns keep adding to it. Use classic retention if you need a number that stays fixed.
+
+**Retention is lower than your total install count suggests.** Retention only counts installs that opened the app and were tracked by the Linkrunner SDK. Installs reported by an ad network without a tracked app open are excluded from the cohort.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
