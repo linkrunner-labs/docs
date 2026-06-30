@@ -4,7 +4,7 @@ description: "How Linkrunner calculates cumulative, classic, and rolling retenti
 icon: "chart-line"
 ---
 
-Retention tells you how many of your installs keep coming back to your app. Linkrunner reports it three ways: **cumulative**, **classic**, and **rolling**. The number shown simply as **Retention** in the dashboard (and the `retention` field in the API) is **cumulative retention**. This page explains all three and how the numbers are calculated.
+Retention tells you how many of your installs keep coming back to your app. Linkrunner reports it three ways: **cumulative**, **classic**, and **rolling**. In the dashboard these appear as the **Cumulative Retention**, **Classic Retention**, and **Rolling Retention** columns. This page explains all three and how the numbers are calculated.
 
 ## The basics
 
@@ -26,7 +26,7 @@ The only thing that changes between the three methods is which installs "count a
 
 | Method | An install counts on Day N if it opened the app... |
 | --- | --- |
-| **Cumulative** (shown as **Retention**) | on **any day from Day 1 through Day N** |
+| **Cumulative** | on **any day from Day 1 through Day N** |
 | **Classic** | on **exactly** Day N |
 | **Rolling** | on Day N **or any day after** |
 
@@ -122,7 +122,7 @@ Because this rule is applied to the numerator and the denominator together, an i
 
 ## Troubleshooting
 
-**The Retention, Classic, and Rolling columns show different numbers.** This is expected. Retention (cumulative) counts installs that returned at any point in the first N days, classic counts only installs that returned on day N exactly, and rolling counts installs that returned on day N or later. Each answers a different question, so the numbers rarely match.
+**The Cumulative, Classic, and Rolling Retention columns show different numbers.** This is expected. Cumulative counts installs that returned at any point in the first N days, classic counts only installs that returned on day N exactly, and rolling counts installs that returned on day N or later. Each answers a different question, so the numbers rarely match.
 
 **Day 14 or Day 30 retention looks empty or low.** Your recent cohorts have not matured yet. Widen the date range to include older installs that have had a full 14 or 30 days to return.
 
