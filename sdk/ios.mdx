@@ -23,7 +23,7 @@ The Linkrunner SDK can be installed via Swift Package Manager (SPM), which is in
     ```
 3. Select the version you want to use (we recommend using the latest version)
 4. Click **Add Package**
-5. Choose the library type **LinkrunnerStatic**
+5. Choose the library type **LinkrunnerKitStatic**
 
 Alternatively, you can add the package dependency to your `Package.swift` file:
 
@@ -40,7 +40,7 @@ targets: [
     .target(
         name: "YourApp",
         dependencies: [
-            .product(name: "Linkrunner", package: "linkrunner-ios")
+            .product(name: "LinkrunnerKitStatic", package: "linkrunner-ios")
         ]
     )
 ]
@@ -51,8 +51,12 @@ targets: [
 After installation, you can import the SDK in your Swift files:
 
 ```swift
-import Linkrunner
+import LinkrunnerKit
 ```
+
+<Note>
+Use `import LinkrunnerKit` for v3.0.0 and later. The public API remains `LinkrunnerSDK.shared`.
+</Note>
 
 ### Required Permissions
 
@@ -90,7 +94,7 @@ You can find your project token [here](https://dashboard.linkrunner.io/dashboard
 Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
 
 ```swift
-import Linkrunner
+import LinkrunnerKit
 import SwiftUI
 
 @main
@@ -664,7 +668,7 @@ Connect APNs with Linkrunner
 
             ```swift
             import UIKit
-            import Linkrunner
+            import LinkrunnerKit
 
             class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -698,7 +702,7 @@ Connect APNs with Linkrunner
 
             ```swift
             import SwiftUI
-            import Linkrunner
+            import LinkrunnerKit
 
             @main
             struct MyApp: App {
@@ -757,7 +761,7 @@ You can find your project token [here](https://dashboard.linkrunner.io/dashboard
 
 ```swift
 import SwiftUI
-import Linkrunner
+import LinkrunnerKit
 
 @main
 struct MyApp: App {
