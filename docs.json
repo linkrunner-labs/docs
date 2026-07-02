@@ -170,7 +170,8 @@
                         "group": "FAQ",
                         "pages": [
                             "testing/testing-attribution-troubleshooting",
-                            "ad-networks/google-ads-discrepancies"
+                            "ad-networks/google-ads-discrepancies",
+                            "ad-networks/meta-ads-discrepancies"
                         ]
                     }
                 ]
