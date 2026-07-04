@@ -15,21 +15,21 @@ This is the same model used across the industry, so if you have integrated with 
 
 ```
 Your traffic
-   │  click  (you append click_id + sub params)
+   │  click  (you append tid + s2/s3/s4 params)
    ▼
 Linkrunner tracking link  ──►  install attributed to your click
    │
-   │  postback (we fill your macros: click_id, event, revenue, ...)
+   │  postback (we fill your macros: click_id, event_name, revenue, ...)
    ▼
 Your endpoint
 ```
 
 ## How attribution works
 
-The link between a click and a conversion is your **click ID**. You generate a unique ID for every click and pass it to Linkrunner on the tracking link as `click_id`. When a conversion is attributed back to that click, Linkrunner returns the same value in the `{click_id}` macro on the postback. You match the postback to your original click using that value.
+The link between a click and a conversion is your **click ID**. You generate a unique ID for every click and pass it to Linkrunner on the tracking link as `tid`. When a conversion is attributed back to that click, Linkrunner returns the same value in the `{click_id}` and `{tid}` macros on the postback. You match the postback to your original click using that value.
 
 <Note>
-Pass a unique `click_id` on every click. Without it, Linkrunner cannot echo an identifier back to you on the postback, and you cannot reconcile conversions against your clicks.
+Pass a unique `tid` on every click. Without it, Linkrunner cannot echo an identifier back to you on the postback, and you cannot reconcile conversions against your clicks.
 </Note>
 
 ## What you can receive postbacks for
