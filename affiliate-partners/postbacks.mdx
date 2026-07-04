@@ -11,8 +11,36 @@ When a conversion is attributed to your click, Linkrunner sends a server-to-serv
 You provide one URL template per conversion you want to receive (install, signup, in-app event). Linkrunner sends the request as an HTTP `GET`.
 
 <Note>
-These are postback URL macros. They are different from the macros your platform may use in the click tracking link. Your platform must resolve click macros before sending traffic to Linkrunner.
+  These are postback URL macros. They are different from the macros your
+  platform may use in the click tracking link. Your platform must resolve click
+  macros before sending traffic to Linkrunner.
 </Note>
+
+## Click tracking link
+
+The Linkrunner dashboard shows a click tracking link for your campaign. For affiliate campaigns, the click link uses Linkrunner's click parameters:
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}&s3={publisher_id}&gaid={gaid}
+```
+
+Your platform resolves the placeholders before redirecting the user to Linkrunner. The actual click should look like this:
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid=a1b2c3d4e5&s2=camp_88&s3=pub_4471&gaid=38400000-8cf0-11bd-b23e-10b96e40000d
+```
+
+| Parameter        | Use                                                                                              |
+| ---------------- | ------------------------------------------------------------------------------------------------ |
+| `c`              | Linkrunner campaign identifier. Keep the value from the dashboard.                               |
+| `tid`            | Your click ID. Linkrunner returns this in postbacks as `{click_id}` and `{tid}`.                 |
+| `s2`, `s3`, `s4` | Optional passthrough values. Linkrunner returns them in postbacks as `{s2}`, `{s3}`, and `{s4}`. |
+| `gaid`           | Android Google Advertising ID, when available.                                                   |
+| `idfa`           | iOS advertising ID, when available.                                                              |
+
+Use these parameter names in the URL. For example, use `tid={click_id}` instead of `utm_id={click_id}`, and use `s2={campaign_id}` instead of `cc={campaign_id}`.
+
+Do not add postback-only values such as `postbackKey`, `event`, `event_name`, or `crc` to the click tracking link. If your postback endpoint requires a secret key, configure it privately with Linkrunner.
 
 ## Macro syntax
 
@@ -30,51 +58,54 @@ Rules:
 - Text that is not a recognized macro is left untouched, so static query parameters are safe.
 
 <Warning>
-Only use the macros listed below. Unsupported macros such as `{campaign_id}`, `{cc}`, `{event_id}`, `{event_time}`, `{advertising_id}`, `{platform}`, `{sub1}`, or `{secret.postbackKey}` are not replaced by the current Linkrunner postback renderer.
+  Only use the postback macros listed below in your postback URL template.
+  Linkrunner leaves unsupported campaign, event, platform, sub, and secret
+  placeholders unchanged.
 </Warning>
 
 ## Macro reference
 
 ### Identifiers
 
-| Macro | Description |
-|---|---|
-| `{click_id}` | The `tid` value you sent on the tracking link. Use this to match the postback to your click. |
-| `{tid}` | Same value as `{click_id}`. |
-| `{install_id}` | Linkrunner's unique identifier for the install. |
+| Macro          | Description                                                                                  |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| `{click_id}`   | The `tid` value you sent on the tracking link. Use this to match the postback to your click. |
+| `{tid}`        | Same value as `{click_id}`.                                                                  |
+| `{install_id}` | Linkrunner's unique identifier for the install.                                              |
 
 ### Event
 
-| Macro | Description |
-|---|---|
+| Macro          | Description                                                                                  |
+| -------------- | -------------------------------------------------------------------------------------------- |
 | `{event_name}` | The conversion name: `install`, `signup`, or the in-app event name (for example `purchase`). |
-| `{event}` | Same value as `{event_name}`. |
-| `{timestamp}` | Time when Linkrunner builds the postback, as a Unix timestamp in seconds. |
+| `{event}`      | Same value as `{event_name}`.                                                                |
+| `{timestamp}`  | Time when Linkrunner builds the postback, as a Unix timestamp in seconds.                    |
 
 ### Revenue
 
-| Macro | Description |
-|---|---|
-| `{revenue}` | Revenue amount in major currency units, with two decimal places (for example `9.99`). Populated only on events that carry revenue. |
-| `{sale_amount}` | Same value as `{revenue}`. |
-| `{amount}` | Same value as `{revenue}`. |
-| `{currency}` | ISO 4217 currency code (for example `USD`, `INR`). |
+| Macro           | Description                                                                                                                        |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `{revenue}`     | Revenue amount in major currency units, with two decimal places (for example `9.99`). Populated only on events that carry revenue. |
+| `{sale_amount}` | Same value as `{revenue}`.                                                                                                         |
+| `{amount}`      | Same value as `{revenue}`.                                                                                                         |
+| `{currency}`    | ISO 4217 currency code (for example `USD`, `INR`).                                                                                 |
 
 <Warning>
-`{revenue}` is in major currency units, not minor units. `9.99` means 9.99, not 9.99 cents. Parse it as a decimal amount.
+  `{revenue}` is in major currency units, not minor units. `9.99` means 9.99,
+  not 9.99 cents. Parse it as a decimal amount.
 </Warning>
 
 ### Device
 
-| Macro | Description |
-|---|---|
+| Macro    | Description                      |
+| -------- | -------------------------------- |
 | `{gaid}` | Google Advertising ID (Android). |
-| `{idfa}` | iOS Advertising ID (Apple). |
+| `{idfa}` | iOS Advertising ID (Apple).      |
 
 ### Click passthrough
 
-| Macro | Description |
-|---|---|
+| Macro  | Description                                   |
+| ------ | --------------------------------------------- |
 | `{s2}` | The `s2` value you sent on the tracking link. |
 | `{s3}` | The `s3` value you sent on the tracking link. |
 | `{s4}` | The `s4` value you sent on the tracking link. |
@@ -84,10 +115,10 @@ Only use the macros listed below. Unsupported macros such as `{campaign_id}`, `{
 If your endpoint needs a fixed query parameter, add it as plain text in the URL template:
 
 ```
-https://partner.example.com/postback?tid={click_id}&postbackKey=YOUR_KEY
+https://partner.example.com/postback?tid={click_id}&source=linkrunner
 ```
 
-Do not use `{secret.postbackKey}`. Add fixed keys as plain query parameters in the template.
+Do not use `{secret.postbackKey}`. If your endpoint requires a secret key, configure it privately with Linkrunner so it is not shown in dashboard tracking links or public examples.
 
 ## Examples
 
@@ -131,12 +162,12 @@ Linkrunner retries a postback if your endpoint does not respond with a success s
 
 ## Formatting reference
 
-| Value | Format |
-|---|---|
-| Timestamps (`{timestamp}`) | Unix seconds. |
-| Revenue (`{revenue}`) | Decimal, two places, major currency units. |
-| Currency (`{currency}`) | ISO 4217 three-letter code. |
-| All values | URL-encoded. |
+| Value                      | Format                                     |
+| -------------------------- | ------------------------------------------ |
+| Timestamps (`{timestamp}`) | Unix seconds.                              |
+| Revenue (`{revenue}`)      | Decimal, two places, major currency units. |
+| Currency (`{currency}`)    | ISO 4217 three-letter code.                |
+| All values                 | URL-encoded.                               |
 
 ## Troubleshooting
 
