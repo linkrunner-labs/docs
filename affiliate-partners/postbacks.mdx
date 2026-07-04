@@ -81,13 +81,13 @@ Only use the macros listed below. Unsupported macros such as `{campaign_id}`, `{
 
 ### Static values
 
-If your endpoint needs a fixed query parameter, add it as plain text in the URL template:
+If your endpoint needs a fixed non-secret query parameter, add it as plain text in the URL template:
 
 ```
-https://partner.example.com/postback?tid={click_id}&postbackKey=YOUR_KEY
+https://partner.example.com/postback?tid={click_id}&source=linkrunner
 ```
 
-Do not use `{secret.postbackKey}`. Add fixed keys as plain query parameters in the template.
+Do not use `{secret.postbackKey}`. If your endpoint requires a postback key or another secret, configure it privately with Linkrunner so the value is hidden from copied tracking links and public examples.
 
 ## Examples
 

@@ -58,7 +58,7 @@ Do not add postback-only values to the tracking link.
 
 | Value | Where it belongs |
 |---|---|
-| `postbackKey` or another secret key | Your postback URL template, not the user-facing tracking link. |
+| `postbackKey` or another secret key | Server-side postback configuration. Do not include it in the user-facing tracking link. |
 | `{event_name}` | The postback URL template. There is no event name at click time. |
 | `{revenue}`, `{sale_amount}`, `{currency}` | The postback URL template. These values exist only after a conversion. |
 
