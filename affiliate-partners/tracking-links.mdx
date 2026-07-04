@@ -11,35 +11,32 @@ Linkrunner gives the advertiser a tracking link for each campaign. You point you
 A tracking link looks like this. The domain is the advertiser's own tracking domain, so always use the exact link Linkrunner provides. The example below uses `track.example.com` as a placeholder.
 
 ```
-https://track.example.com/?c=CAMPAIGN_ID&click_id=YOUR_CLICK_ID&sub1=YOUR_VALUE
+https://track.example.com/?c=CAMPAIGN_ID&tid=YOUR_CLICK_ID&s2=YOUR_CAMPAIGN_ID
 ```
 
-`c` is the campaign identifier, set by the advertiser when they create the link. You add the rest.
+`c` is the Linkrunner campaign identifier, set by the advertiser when they create the link. You add the rest.
+
+<Warning>
+Your platform must replace its own click macros before the click reaches Linkrunner. If the final URL still contains a value like `{click_id}` or `{campaign_id}`, Linkrunner stores it as text. Linkrunner only fills macros in the server-to-server postback URL.
+</Warning>
 
 ## Parameters
 
-You fill each parameter with your own value at click time, using your own system's macros.
+You fill each parameter with your own value at click time.
 
 ### Required
 
 | Parameter | Description |
 |---|---|
-| `click_id` | A unique ID you generate for every click. Linkrunner returns this value in the `{click_id}` macro on every postback, so you can match conversions back to clicks. |
-
-### Identifiers
-
-| Parameter | Description |
-|---|---|
-| `aff_id` | Your affiliate ID. |
-| `pub_id` | Publisher or sub-affiliate ID. |
-| `offer_id` | Offer ID. |
-| `creative_id` | Creative or ad ID. |
+| `tid` | A unique ID you generate for every click. Linkrunner returns this value in the `{click_id}` and `{tid}` postback macros, so you can match conversions back to clicks. |
 
 ### Passthrough values
 
 | Parameter | Description |
 |---|---|
-| `sub1` to `sub5` | Free-form values you want echoed back. Linkrunner stores each one and returns it in the matching `{sub1}` to `{sub5}` macro on the postback. |
+| `s2` | Optional campaign, source, or publisher value. Linkrunner returns this in the `{s2}` postback macro. |
+| `s3` | Optional ad set, placement, or sub-publisher value. Linkrunner returns this in the `{s3}` postback macro. |
+| `s4` | Optional deduplication or extra tracking value. Linkrunner returns this in the `{s4}` postback macro. |
 
 ### Device and request
 
@@ -49,26 +46,37 @@ Pass device advertising IDs when you have them. They improve match rates, especi
 |---|---|
 | `gaid` | Google Advertising ID (Android). |
 | `idfa` | iOS Advertising ID (Apple). |
-| `oaid` | Open Advertising ID (Android devices without Google Play). |
-| `ip` | The user's IP address at click time. |
-| `user_agent` | The user's URL-encoded user agent string. |
+| `device_id` | Optional fallback. Linkrunner treats it as GAID or IDFA based on the device platform. |
 
 <Note>
 URL-encode every value before appending it. Linkrunner stores values as received.
 </Note>
+
+## What not to put in the tracking link
+
+Do not add postback-only values to the tracking link.
+
+| Value | Where it belongs |
+|---|---|
+| `postbackKey` or another secret key | Your postback URL template, not the user-facing tracking link. |
+| `{event_name}` | The postback URL template. There is no event name at click time. |
+| `{revenue}`, `{sale_amount}`, `{currency}` | The postback URL template. These values exist only after a conversion. |
 
 ## Example
 
 A complete click tracking link:
 
 ```
-https://track.example.com/?c=OgWmhiSXhG&click_id=a1b2c3d4e5&aff_id=4471&pub_id=site_209&offer_id=88&sub1=newsletter&gaid=38400000-8cf0-11bd-b23e-10b96e40000d&ip=203.0.113.10
+https://track.example.com/?c=OgWmhiSXhG&tid=a1b2c3d4e5&s2=camp_88&s3=pub_4471&gaid=38400000-8cf0-11bd-b23e-10b96e40000d
 ```
 
 ## Troubleshooting
 
-**Conversions arrive with an empty `click_id`.**
-You did not send `click_id` on the click, or you sent it under a different name. Confirm the click link includes `click_id=` with a unique value.
+**Conversions arrive with an empty click ID.**
+You did not send `tid` on the click, or the value was empty. Confirm the final clicked URL includes `tid=` with a unique value.
+
+**The final URL still shows `{click_id}` or another macro.**
+Your platform did not replace that macro before redirecting the user. Replace it in your platform first, then send the resolved value to Linkrunner.
 
 **Installs are not attributed to your clicks.**
 Check that traffic actually passes through the Linkrunner tracking link and that the campaign identifier (`c`) is correct. If you rely on device-ID matching, make sure `gaid` or `idfa` is present on the click.
