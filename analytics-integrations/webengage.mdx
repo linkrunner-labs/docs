@@ -1,0 +1,108 @@
+---
+title: "WebEngage"
+description: "Connect Linkrunner with WebEngage to send install attribution events and understand your user acquisition campaigns"
+icon: "/images/logos/webengage.webp"
+---
+
+Linkrunner integrates with WebEngage to automatically send install attribution events, helping you understand which campaigns are driving user acquisition and engagement.
+
+## How it works
+
+Every time an install is attributed by Linkrunner, we send an event to WebEngage's Events API. Linkrunner sends one of two event names:
+
+| Event | Description |
+|---|---|
+| `organic_install` | Sent when the install is not attributed to a campaign. |
+| `inorganic_install` | Sent when the install is attributed to a campaign. |
+
+The event carries these attribution fields in `eventData`:
+
+| Field | Description |
+|---|---|
+| `utm_source` | The acquisition source. For inorganic installs this is the ad network (for example `meta`, `google`, or `tiktok`). For organic installs this is `organic`. |
+| `utm_campaign` | The campaign name. Sent when campaign data is available. |
+| `campaign_id` | The Linkrunner campaign ID. Sent for inorganic installs. |
+| `campaign_display_id` | The Linkrunner campaign display ID. Sent when available. |
+| `ad_network_id` | The Linkrunner ad network ID. Sent for inorganic installs. |
+| `ad_network_code` | The ad network code, such as `META`, `GOOGLE`, or `TIKTOK`. Sent when available. |
+| `platform` | The app platform. |
+
+Linkrunner uses your app user ID when it is available. If the user ID is not available at install time, Linkrunner uses the install instance ID as the WebEngage `userId` so the install event is still captured.
+
+### Example
+
+- User came from a Meta campaign named `Summer_Sale`
+- In WebEngage, that user's profile receives an `inorganic_install` event with `utm_source` set to `meta` and `utm_campaign` set to `Summer_Sale`
+- An unattributed install instead receives an `organic_install` event with `utm_source` set to `organic`
+
+## Prerequisites
+
+| Requirement | Description |
+|---|---|
+| Linkrunner account | A Linkrunner account is required to take advantage of this integration. |
+| WebEngage account | A WebEngage account with REST API access. |
+| WebEngage License Code | Your WebEngage account license code. Copy it exactly as shown in WebEngage, including a leading `~` if present. |
+| WebEngage API Key | Your WebEngage API key for the Events API. |
+| Data Center Region | The WebEngage data center for your account: India, Global/US, or KSA. |
+| iOS or Android app | This integration supports iOS and Android apps. |
+| Linkrunner SDK | You must have the [Linkrunner SDK](/introduction) installed in your app. |
+
+## Steps to setup
+
+<Steps>
+  <Step title="Get Credentials from WebEngage">
+    First, you need to get your WebEngage credentials.
+
+    1. Log in to your WebEngage dashboard
+    2. Copy your **WebEngage License Code**
+    3. Copy your **WebEngage API Key**
+    4. Confirm your WebEngage **Data Center Region**
+
+    <Info>
+      **Important:** Copy the License Code exactly as WebEngage shows it. If your license code includes a leading `~`, include it in Linkrunner as well.
+    </Info>
+  </Step>
+
+  <Step title="Configure WebEngage in Linkrunner">
+    In Linkrunner, add the credentials to your project.
+
+    1. In Linkrunner, navigate to **Integrations** from the left-hand panel
+    2. Under **Analytics**, click **Configure** for WebEngage
+    3. Enter your **WebEngage License Code**
+    4. Enter your **WebEngage API Key**
+    5. Select your **Data Center Region**
+    6. Save the integration
+  </Step>
+
+  <Step title="Select Your Data Center Region">
+    Select the WebEngage data center that matches your account.
+
+    | Region in Linkrunner | WebEngage API host |
+    |---|---|
+    | India | `api.in.webengage.com` |
+    | Global/US | `api.webengage.com` |
+    | KSA | `api.ksa.webengage.com` |
+  </Step>
+
+  <Step title="Install the Linkrunner SDK">
+    WebEngage install attribution events are triggered from the normal Linkrunner install flow. No separate WebEngage ID needs to be passed to the Linkrunner SDK.
+
+    <Info>
+      **Important:** Make sure your app calls the Linkrunner SDK initialization flow after install. Linkrunner uses that install data to determine whether the install is organic or inorganic before sending the WebEngage event.
+    </Info>
+  </Step>
+</Steps>
+
+## Viewing Attribution Data
+
+After the integration is complete, you can view the attribution data in WebEngage:
+
+1. Navigate to a user profile in the WebEngage dashboard
+2. Look for the user's event timeline
+3. You'll see an `organic_install` or `inorganic_install` event with the attribution fields described above
+
+This data can be used to:
+- Create segments based on acquisition source
+- Trigger journeys based on organic or inorganic installs
+- Personalize messaging based on campaign origin
+- Analyze user behavior by acquisition channel
