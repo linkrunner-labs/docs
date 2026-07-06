@@ -67,6 +67,7 @@
                             "features/referral-codes",
                             "features/custom-store-listing",
                             "features/uninstall-tracking",
+                            "features/retention",
                             "features/meta-install-referrer",
                             "features/ios-campaign-data-limitations",
                             "features/webhooks",
@@ -124,6 +125,14 @@
                         ]
                     },
                     {
+                        "group": "Affiliate Partners",
+                        "pages": [
+                            "affiliate-partners/overview",
+                            "affiliate-partners/tracking-links",
+                            "affiliate-partners/postbacks"
+                        ]
+                    },
+                    {
                         "group": "Analytics Integrations",
                         "pages": [
                             "analytics-integrations/amplitude",
@@ -161,7 +170,8 @@
                         "group": "FAQ",
                         "pages": [
                             "testing/testing-attribution-troubleshooting",
-                            "ad-networks/google-ads-discrepancies"
+                            "ad-networks/google-ads-discrepancies",
+                            "ad-networks/meta-ads-discrepancies"
                         ]
                     }
                 ]

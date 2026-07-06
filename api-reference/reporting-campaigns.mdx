@@ -246,8 +246,9 @@ export interface Campaign {
     cost_per_custom_events?: { [name: string]: string };
     cost_per_payment_events?: { [type: string]: string };
 
-    // Retention buckets
-    retention: { d1: number | string; d7: number | string };
+    // Retention buckets (rates as percentages). `retention` carries cumulative retention.
+    retention: { d1: number | string; d7: number | string; d14: number | string; d30: number | string };
+    rolling_retention?: { d1: number | string; d7: number | string };
     classic_retention?: { d1?: number | string; d7?: number | string; d14?: number | string; d30?: number | string };
     daywise_revenue?: { d0?: number | string; d3?: number | string; d7?: number | string; d30?: number | string };
 
@@ -287,7 +288,8 @@ export interface AdSet {
     daywise_revenue?: Campaign["daywise_revenue"];
     ios: boolean;
     android: boolean;
-    retention: { d1: number | string; d7: number | string };
+    retention: { d1: number | string; d7: number | string; d14: number | string; d30: number | string };
+    rolling_retention?: { d1: number | string; d7: number | string };
     adCreatives?: AdCreative[];
     keywords?: Keyword[];
 }
@@ -311,7 +313,8 @@ export interface AdCreative {
     payment_events?: Campaign["payment_events"];
     cost_per_custom_events?: { [name: string]: string };
     cost_per_payment_events?: { [type: string]: string };
-    retention: { d1: number | string; d7: number | string };
+    retention: { d1: number | string; d7: number | string; d14: number | string; d30: number | string };
+    rolling_retention?: { d1: number | string; d7: number | string };
 }
 
 // Apple Search Ads keyword-level rows. Same shape as AdCreative metrics.
@@ -333,7 +336,8 @@ export interface Keyword {
     payment_events?: Campaign["payment_events"];
     cost_per_custom_events?: { [name: string]: string };
     cost_per_payment_events?: { [type: string]: string };
-    retention?: { d1: number | string; d7: number | string };
+    retention?: { d1: number | string; d7: number | string; d14: number | string; d30: number | string };
+    rolling_retention?: { d1: number | string; d7: number | string };
 }
 ```
 

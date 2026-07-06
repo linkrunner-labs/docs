@@ -23,7 +23,7 @@ The Linkrunner SDK can be installed via Swift Package Manager (SPM), which is in
     ```
 3. Select the version you want to use (we recommend using the latest version)
 4. Click **Add Package**
-5. Choose the library type **LinkrunnerStatic**
+5. Choose the library type **LinkrunnerKitStatic**
 
 Alternatively, you can add the package dependency to your `Package.swift` file:
 
@@ -40,7 +40,7 @@ targets: [
     .target(
         name: "YourApp",
         dependencies: [
-            .product(name: "Linkrunner", package: "linkrunner-ios")
+            .product(name: "LinkrunnerKitStatic", package: "linkrunner-ios")
         ]
     )
 ]
@@ -51,8 +51,12 @@ targets: [
 After installation, you can import the SDK in your Swift files:
 
 ```swift
-import Linkrunner
+import LinkrunnerKit
 ```
+
+<Note>
+Use `import LinkrunnerKit` for v3.0.0 and later. The public API remains `LinkrunnerSDK.shared`.
+</Note>
 
 ### Required Permissions
 
@@ -90,7 +94,7 @@ You can find your project token [here](https://dashboard.linkrunner.io/dashboard
 Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
 
 ```swift
-import Linkrunner
+import LinkrunnerKit
 import SwiftUI
 
 @main
@@ -359,7 +363,7 @@ func capturePayment() async {
         try await LinkrunnerSDK.shared.capturePayment(
             amount: 99.99, // Payment amount
             userId: "user123", // User identifier
-            paymentId: "payment456", // Optional: Unique payment identifier
+            paymentId: "payment456", // Required: Unique payment identifier
             type: .firstPayment, // optional
             status: .completed, // optional
             eventData: [        // Optional: Ecommerce/custom event data
@@ -451,7 +455,8 @@ func trackEvent() async {
                 "product_id": "12345",
                 "category": "electronics",
                 "amount": 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
-            ]
+            ],
+            eventId: "order_12345" // Optional: Your own unique event identifier
         )
         print("Event tracked successfully")
     } catch {
@@ -459,6 +464,12 @@ func trackEvent() async {
     }
 }
 ```
+
+#### Parameters for `LinkrunnerSDK.shared.trackEvent`
+
+- `eventName`: `String` (required) - Name of the event to track
+- `eventData`: `[String: Any]` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventId`: `String` (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
 
 ### Revenue Sharing with Ad Networks
 
@@ -657,7 +668,7 @@ Connect APNs with Linkrunner
 
             ```swift
             import UIKit
-            import Linkrunner
+            import LinkrunnerKit
 
             class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -691,7 +702,7 @@ Connect APNs with Linkrunner
 
             ```swift
             import SwiftUI
-            import Linkrunner
+            import LinkrunnerKit
 
             @main
             struct MyApp: App {
@@ -750,7 +761,7 @@ You can find your project token [here](https://dashboard.linkrunner.io/dashboard
 
 ```swift
 import SwiftUI
-import Linkrunner
+import LinkrunnerKit
 
 @main
 struct MyApp: App {

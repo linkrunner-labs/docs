@@ -199,7 +199,7 @@ Tracks revenue. Like events, the user must be attributed via `signup`.
 | `token` | string | **Required**. |
 | `amount` | number | Payment amount. Must be zero or greater. |
 | `user_id` | string | The paying user. |
-| `payment_id` | string | Optional. Used to deduplicate. Sending the same `payment_id` twice is ignored. |
+| `payment_id` | string | **Required**. Used to deduplicate. Sending the same `payment_id` twice is ignored. |
 | `type` | string | Optional. Defaults to `DEFAULT`. |
 | `status` | string | Optional. Defaults to `PAYMENT_COMPLETED`. |
 | `event_data` | object | Optional. Ecommerce attributes. |
