@@ -10,9 +10,30 @@ Google Ads integration with Linkrunner enables you to track conversions and opti
 
 ## Setup Process
 
-Setting up Google Ads integration involves three main steps: creating a link ID for your mobile app, mapping events in Linkrunner, and importing events for conversion tracking.
+Setting up Google Ads integration involves four main steps: connecting your Google Ads account, creating a link ID for your mobile app, mapping events in Linkrunner, and importing events for conversion tracking.
 
-## 1. Create Link ID for Android/iOS App
+## 1. Connect Your Google Ads Account
+
+Start in the Linkrunner dashboard.
+
+1. Go to [Integrations](https://dashboard.linkrunner.io/dashboard/integrations) and click **Configure** on the **Google Ads** card
+
+![All Integrations page with the Google Ads card](/images/google_ads/all-integrations-google-ads.png)
+
+2. On the **Account Integration** tab, click **Add Google Account** and select **Google App Ads**
+
+![Add Google Account dropdown with Google App Ads and Google Web to App Ads options](/images/google_ads/add-google-account-dropdown.png)
+
+3. Sign in with a Google account that has access to your Google Ads account and approve the requested permissions
+
+Once connected, your account appears in the **Google Ad Accounts** table with **Auth Status** showing **Connected**.
+
+<Note>
+    Select **Google Web to App Ads** instead if you run Search, Display, or Performance Max campaigns that drive
+    installs through your website. See [Google Web to App](/ad-networks/google-web-to-app).
+</Note>
+
+## 2. Create Link ID for Android/iOS App
 
 To connect your mobile app with Google Ads, you'll need to create a link ID that enables data sharing between Linkrunner and Google Ads.
 
@@ -38,13 +59,13 @@ To connect your mobile app with Google Ads, you'll need to create a link ID that
 
 1. Copy the received link ID from Google Ads
 2. Navigate to your Linkrunner Dashboard
-3. Go to [Settings → Google Ads integration](https://linkrunner.io/settings?s=google-ads-integration)
+3. Go to [Settings → Google Ads integration](https://dashboard.linkrunner.io/settings?s=google-ads-integration)
 4. Paste the link ID in the designated field
 5. Save your configuration
 
 ![Google Ads Dashboard - Link ID Created](/images/google_ads/google-ads-dashboard-3.webp)
 
-## 2. Set Up Event Mapping
+## 3. Set Up Event Mapping
 
 Map your app events to Google Ads events so Linkrunner can send postback conversions.
 
@@ -72,7 +93,7 @@ Map your app events to Google Ads events so Linkrunner can send postback convers
     from **Goals** → **Conversions** → **Summary** after Google finishes processing it.
 </Tip>
 
-## 3. Importing Events for Conversion Actions Setup
+## 4. Importing Events for Conversion Actions Setup
 
 After creating the link ID and mapping events in Linkrunner, you can import app events into Google Ads to set up conversion tracking.
 
