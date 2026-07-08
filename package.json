@@ -11,9 +11,9 @@
         "export": "next build && next export"
     },
     "dependencies": {
+        "jsonc-parser": "^3.3.1",
         "mintlify": "latest"
     },
-    "devDependencies": {},
     "keywords": [
         "documentation",
         "mintlify",
