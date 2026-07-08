@@ -18,7 +18,7 @@ Add the Linkrunner SDK to your app's `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation 'io.linkrunner:android-sdk:2.1.5'
+    implementation 'io.linkrunner:android-sdk:3.10.0'
 }
 ```
 
@@ -344,8 +344,37 @@ data class CampaignData(
     val storeClickAt: String?,
     val groupName: String,
     val assetName: String,
-    val assetGroupName: String
+    val assetGroupName: String,
+    val adNetworkCampaignId: String?, // Ad network campaign ID
+    val adSetId: String?,             // Ad set ID
+    val adSetName: String?,           // Ad set name
+    val adCreativeId: String?,        // Ad creative ID
+    val adCreativeName: String?       // Ad creative name
 )
+```
+
+**Example response:**
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123",
+    "campaignData": {
+        "id": "camp_123",
+        "name": "Summer Sale 2024",
+        "adNetwork": "META",
+        "type": "INORGANIC",
+        "installedAt": "2024-03-20T10:30:00Z",
+        "storeClickAt": "2024-03-20T10:29:45Z",
+        "groupName": "Android Campaign",
+        "assetName": "Banner Ad 1",
+        "assetGroupName": "Product Catalog",
+        "adNetworkCampaignId": "120214682829390250",
+        "adSetId": "120214682829640250",
+        "adSetName": "Productivity",
+        "adCreativeId": "120214682926100250",
+        "adCreativeName": "Static_2"
+    }
+}
 ```
 
 ## Setting User Data

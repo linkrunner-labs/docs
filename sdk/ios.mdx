@@ -29,7 +29,7 @@ Alternatively, you can add the package dependency to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "3.0.2")
+    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "3.12.0")
 ]
 ```
 
@@ -283,22 +283,63 @@ func getAttributionInfo() async {
 ```
 
 ```swift
-struct AttributionData: Codable, Sendable {
-    let deeplink: String?
-    let campaignData: CampaignData
-    let attributionSource: String
+// getAttributionData() returns this type
+public struct LRAttributionDataResponse: Codable, Sendable {
+    public let deeplink: String?
+    public let campaignData: CampaignData?
+    public let attributionSource: String
 }
 
-struct CampaignData: Codable, Sendable {
-    let id: String
-    let name: String
-    let adNetwork: String?
-    let type: String
-    let installedAt: String
-    let storeClickAt: String?
-    let groupName: String
-    let assetName: String
-    let assetGroupName: String
+public struct CampaignData: Codable, Sendable {
+    public let id: String
+    public let name: String
+    public let type: CampaignType        // .organic ("ORGANIC") | .inorganic ("INORGANIC")
+    public let adNetwork: AdNetwork?      // .meta ("META") | .google ("GOOGLE")
+    public let groupName: String?
+    public let assetGroupName: String?
+    public let adNetworkCampaignId: String? // Ad network campaign ID
+    public let adSetId: String?             // Ad set ID
+    public let adSetName: String?           // Ad set name
+    public let adCreativeId: String?        // Ad creative ID
+    public let adCreativeName: String?      // Ad creative name
+    public let assetName: String?
+    public let installedAt: Date?
+    public let storeClickAt: Date?
+}
+
+public enum CampaignType: String, Codable, Sendable {
+    case organic = "ORGANIC"
+    case inorganic = "INORGANIC"
+}
+
+public enum AdNetwork: String, Codable, Sendable {
+    case meta = "META"
+    case google = "GOOGLE"
+}
+```
+
+**Example response** (raw values — `type`/`adNetwork` decode to enums, `installedAt`/`storeClickAt` to `Date`):
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123",
+    "campaignData": {
+        "id": "camp_123",
+        "name": "Summer Sale 2024",
+        "adNetwork": "META",
+        "type": "INORGANIC",
+        "installedAt": "2024-03-20T10:30:00Z",
+        "storeClickAt": "2024-03-20T10:29:45Z",
+        "groupName": "iOS Campaign",
+        "assetName": "Banner Ad 1",
+        "assetGroupName": "Product Catalog",
+        "adNetworkCampaignId": "120214682829390250",
+        "adSetId": "120214682829640250",
+        "adSetName": "Productivity",
+        "adCreativeId": "120214682926100250",
+        "adCreativeName": "Static_2"
+    },
+    "attributionSource": "META"
 }
 ```
 
