@@ -49,22 +49,7 @@ In Reddit Ads Manager, keep these values ready:
 - **Pixel ID** - this identifies the Reddit Pixel that should receive conversions.
 - **Conversion Access Token** - this authorizes Linkrunner to send Reddit Conversions API events.
 
-You can create or manage these from Reddit Events Manager. Reddit's official setup references are useful while gathering credentials:
-
-<CardGroup cols={2}>
-  <Card title="Direct Integration" icon="plug" href="https://ads-api.reddit.com/docs/v3/capi-direct-integration">
-    Reddit's Conversions API direct integration guide.
-  </Card>
-  <Card title="Verify Events" icon="badge-check" href="https://ads-api.reddit.com/docs/v3/capi-verify-events">
-    Reddit's event verification workflow for test events.
-  </Card>
-  <Card title="Click ID Persistence" icon="mouse-pointer-click" href="https://ads-api.reddit.com/docs/v3/capi-click-id-persistence">
-    Reddit's guidance for preserving `rdt_cid`.
-  </Card>
-  <Card title="CAPI Best Practices" icon="book-open-check" href="https://ads-api.reddit.com/docs/v3/capi-best-practices">
-    Reddit's best practices for reliable conversion matching.
-  </Card>
-</CardGroup>
+You can create or manage these from Reddit Events Manager.
 
 ## 2. Add Reddit CAPI credentials in Linkrunner
 
@@ -151,6 +136,10 @@ Use **Advanced Options** to set the ad channel and any campaign metadata you nee
   Create a new Linkrunner campaign for every new Reddit destination link that should be valid and measured independently. For example, use different Linkrunner campaign links for different creatives, landing destinations, audiences, or experiments.
 </Note>
 
+<Tip>
+  Create different links for different ad creatives to track creative-level metrics. You can easily duplicate campaigns once created for every ad creative, making it faster to create multiple campaigns with different tracking links.
+</Tip>
+
 <Warning>
   Do not paste the App Store or Play Store URL directly into Reddit Ads if you want Linkrunner attribution, deferred deep linking, or Reddit CAPI postbacks. Reddit should send the user to the Linkrunner campaign link first.
 </Warning>
@@ -234,24 +223,6 @@ Review the campaign, ad group, and ad before publishing.
   If you create multiple Reddit ads in the same ad group, create a separate Linkrunner campaign link for each ad when you want ad-level reporting in Linkrunner.
 </Tip>
 
-## 6. Validate before scaling spend
-
-Run a small test before increasing budget.
-
-1. Click a Reddit ad preview or run a low-budget live test.
-2. Confirm the click opens the Linkrunner campaign link and redirects to the correct store or destination.
-3. Install and open the app on a test device.
-4. Confirm the Linkrunner SDK initializes on first open.
-5. Trigger the mapped app events you want to test.
-6. Check the Linkrunner campaign and attribution views after processing.
-7. Confirm events appear in Reddit Events Manager's verification view.
-
-Reddit's event verification flow is the best final check that your Pixel ID, Conversion Access Token, event mapping, and click ID persistence are working together.
-
-<Note>
-  Reddit Events Manager may show Linkrunner events under **CAPI Direct**. Pixel source events appear only when you also install Reddit's browser Pixel on your website; Linkrunner's server-side postbacks do not require that browser Pixel source.
-</Note>
-
 ## How attribution and CAPI work
 
 When a Reddit user clicks your ad, Reddit appends `rdt_cid` to the destination URL. Linkrunner captures that click ID on the campaign link click and carries it through install attribution.
@@ -267,27 +238,49 @@ For attributed installs and mapped in-app events, Linkrunner sends a Reddit Conv
 
 This lets Reddit match the server-side conversion back to the ad click while Linkrunner continues to show attribution and campaign performance in your dashboard.
 
-## Troubleshooting
+## Frequently Asked Questions
 
 <AccordionGroup>
-  <Accordion title="Reddit events are not appearing in Reddit Events Manager">
+  <Accordion title="Why are my Reddit campaigns not showing up on Linkrunner?">
+    Unlike Meta campaigns, Reddit campaigns do not appear automatically on the Linkrunner dashboard. They show up after users click the Linkrunner campaign links you set as destination URLs in your Reddit ads.
+
+    To fix this, confirm each Reddit ad uses a Linkrunner campaign link, the ad is active and receiving traffic, and your app is live with the Linkrunner SDK installed.
+  </Accordion>
+
+  <Accordion title="Why are my Reddit events not appearing in Reddit Events Manager?">
     Confirm the Pixel ID and Conversion Access Token are from the same Reddit advertiser account. Then verify that the Reddit ad sends users to the Linkrunner campaign link and that the click URL preserves `rdt_cid`.
+
+    Reddit Events Manager may show Linkrunner events under **CAPI Direct**. Pixel source events appear only when you also install Reddit's browser Pixel on your website; Linkrunner's server-side postbacks do not require that browser Pixel source.
   </Accordion>
 
-  <Accordion title="Installs are not appearing in Linkrunner">
-    Confirm the ad destination is the Linkrunner campaign link, not the app store URL. Also verify that the Linkrunner SDK is installed, initializes on first open, and uses the same project as the campaign link.
+  <Accordion title="Do Reddit campaigns appear automatically like Meta campaigns?">
+    No. Reddit uses a web-to-app flow where the Linkrunner campaign link acts as the tracking mechanism. Campaigns appear on the dashboard when users click through these links.
   </Accordion>
 
-  <Accordion title="All Reddit ads show under one Linkrunner campaign">
-    Create separate Linkrunner campaign links for each Reddit ad, creative, destination, or experiment you want to split in reporting. Update each Reddit ad destination URL with the correct Linkrunner campaign link.
+  <Accordion title="What is rdt_cid and why is it important?">
+    `rdt_cid` is Reddit's click ID. Reddit appends it to the destination URL when a user clicks an ad, and Linkrunner captures it from the campaign link click for attribution and Reddit CAPI postbacks.
+
+    Keep the Linkrunner campaign link intact and do not remove URL parameters. Without `rdt_cid`, Linkrunner cannot match the install or event back to the Reddit ad click.
+  </Accordion>
+
+  <Accordion title="Can I use the same campaign link for multiple Reddit ads?">
+    You can, but it is not recommended when you want creative-level reporting. Create separate Linkrunner campaign links for each Reddit ad, creative, destination, or experiment you want to split in reporting. Update each Reddit ad destination URL with the correct Linkrunner campaign link.
+
+    You can quickly duplicate campaigns in Linkrunner to create multiple links for different ad creatives.
   </Accordion>
 
   <Accordion title="The ad click opens the wrong destination">
     Check the Linkrunner campaign's store URLs, platform routing, and deferred deep link configuration. If you changed the campaign after publishing the Reddit ad, click the Reddit ad again to test the current redirect behavior.
   </Accordion>
 
-  <Accordion title="Deferred deep links are missing after install">
-    Verify your Android App Links or iOS Universal Links setup, and confirm the app reads Linkrunner attribution or deferred deep link data after first open.
+  <Accordion title="Can I track revenue and purchase events from Reddit campaigns?">
+    Yes. Linkrunner can send mapped purchase and revenue events to Reddit when your app sends revenue events through the Linkrunner SDK and the event is mapped to Reddit's `PURCHASE` event.
+
+    For purchase or revenue events, enable **Send Revenue** in the Reddit event mapping and choose the currency that should be sent to Reddit.
+  </Accordion>
+
+  <Accordion title="How do I verify Linkrunner is sending events to Reddit?">
+    Use Linkrunner's SDK testing flow to verify installs and events first. Then use [Reddit's event verification workflow for test events](https://ads-api.reddit.com/docs/v3/capi-verify-events) to confirm events are reaching Reddit Events Manager.
   </Accordion>
 </AccordionGroup>
 
