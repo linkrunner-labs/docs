@@ -1,21 +1,21 @@
 ---
 title: "Google Web to App"
-description: "Run Google web-to-app campaigns and attribute installs from Search, Display, and Performance Max ads through your website."
+description: "Run Google web-to-app campaigns and attribute installs from Search, Display, and Performance Max ads through a Linkrunner landing page."
 icon: "/images/logos/google.webp"
 ---
 
 ## Overview
 
-Google Web to App lets you run Search, Display, or Performance Max campaigns that drive app installs through the web. Your ad's Final URL is your Linkrunner domain: Google appends the click parameters to it automatically, Linkrunner records the click, sends mobile users into your app or its store listing, and forwards desktop users to your website. No code on your website is required.
+Google Web to App lets you run Search, Display, or Performance Max campaigns that drive app installs through the web. Your ad's Final URL is your Linkrunner domain. Google appends the click parameters automatically, and Linkrunner returns a landing page that opens your app or its store listing. No code on your website is required.
 
 **Works for both Android and iOS apps.**
 
 ## How It Works
 
 1. A user clicks your Google ad. The ad's Final URL is your Linkrunner domain.
-2. Google automatically appends the click IDs (`gclid`, `wbraid`, `gbraid`) and your Final URL suffix parameters to that URL.
-3. Linkrunner records the click with all parameters. No code runs on your website.
-4. Mobile users see a lightweight redirect page that opens your app if installed, or takes them to the App Store / Play Store. Desktop users are forwarded to your website with the parameters preserved.
+2. Google automatically appends the click IDs (`gclid`, `wbraid`, `gbraid`) and your Final URL suffix parameters, including `lr_w2a=google`.
+3. Linkrunner records the click and returns its landing page with an HTTP 200 response instead of a server-side redirect.
+4. The landing page tries to open your app. If the app does not open, it sends the visitor to the App Store or Play Store.
 5. When the app is opened after install, Linkrunner attributes it to the campaign.
 
 ## Connect your Google Ads account
@@ -89,10 +89,10 @@ The Final URL suffix is appended to every landing page URL in your campaign. Set
 Use this template, keeping the ValueTrack macros exactly as shown:
 
 ```
-utm_source=google&utm_medium=cpc&gad_campaignid={campaignid}&adset_id={adgroupid}&ad_id={creative}&utm_term={keyword}&network={network}&device={device}
+lr_w2a=google&utm_source=google&utm_medium=cpc&gad_campaignid={campaignid}&adset_id={adgroupid}&ad_id={creative}&utm_term={keyword}&network={network}&device={device}
 ```
 
-Google substitutes the `{...}` macros with real values at delivery time. `gad_campaignid` is what Linkrunner uses to look up and auto-create the campaign. `adset_id` and `ad_id` are the same parameter names Linkrunner reads for Meta Web to App, and they feed the ad group and ad level breakdowns in your dashboard. `utm_term`, `network`, and `device` are standard reporting parameters carried along for future use.
+Google substitutes the `{...}` macros with real values at delivery time. `lr_w2a=google` tells Linkrunner to return its landing page instead of a server-side redirect. `gad_campaignid` is what Linkrunner uses to look up and auto-create the campaign. `adset_id` and `ad_id` feed the ad group and ad level breakdowns in your dashboard. `utm_term`, `network`, and `device` are reporting parameters preserved on the click.
 
 **To set the suffix at the account level:**
 
@@ -138,10 +138,7 @@ Grab your exact Final URL from [Integrations → Google Ads → Web to App](http
 
 ![Linkrunner dashboard Web to App tab with the destination domain picker, the Final URL suffix, and the Final URL, each with a Copy button](/images/google_ads/web-to-app/web-to-app-setup.png)
 
-That is the entire website-side setup: there is none. Google appends the click IDs and your suffix parameters to this URL automatically, and Linkrunner handles the rest.
-
-- **Mobile users** see a lightweight redirect page that opens your app if it is installed, or takes them to the App Store / Play Store.
-- **Desktop users** are forwarded to your website with all parameters preserved.
+That is the entire website-side setup: there is none. Google appends the click IDs and your suffix parameters to this URL automatically. Linkrunner records the click, returns its landing page, then tries to open your app and falls back to its store listing.
 
 Because your Linkrunner domain is a subdomain of your website's domain, it satisfies Google's display URL requirements.
 
@@ -266,7 +263,7 @@ All three arrive automatically because the ad's Final URL is your Linkrunner dom
 
 - [ ] Auto-tagging is enabled in Google Ads account settings
 - [ ] Linkrunner subdomain is active (CNAME verified, SSL active)
-- [ ] Final URL suffix is set at the account or campaign level
+- [ ] Final URL suffix includes `lr_w2a=google` and is set at the account or campaign level
 - [ ] Ad Final URL points at your Linkrunner domain (or your site's Download button forwards the full query string to it)
 - [ ] End-to-end test: click a test ad, install the app, confirm attribution appears in the Linkrunner dashboard
 - [ ] Google Ads account connected under Integrations → Google Ads using **Google Web to App Ads** to enable conversion uploads
@@ -282,6 +279,12 @@ Linkrunner auto-creates a campaign on the first click that carries a valid `gad_
 - Verify the suffix is saved at the account or campaign level (not just at the ad level).
 - Check that your Linkrunner subdomain is active (CNAME verified and SSL active).
 - Click a test ad and inspect the URL you land on: `gad_campaignid` should be present on the Linkrunner domain URL.
+
+### Linkrunner returns a redirect instead of the landing page
+
+- Confirm the Final URL suffix includes `lr_w2a=google` exactly as shown in the setup template.
+- Confirm Google appended the suffix to the Linkrunner domain URL when you clicked the ad.
+- Links without `lr_w2a=google` keep the existing redirect behavior.
 
 ### No installs attributed
 
