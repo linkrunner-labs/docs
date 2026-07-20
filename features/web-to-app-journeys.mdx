@@ -65,7 +65,7 @@ These journeys go through the store. Deferred deep linking carries the original 
 | **Website → Install → Purchase** | Install + revenue | **Revenue**, **ROAS**, **Paying Users**, **Daywise Revenue** columns | [`capturePayment`](/sdk/react-native#revenue-tracking); convert to one currency; map the event for Meta/Google ROAS |
 | **Website → Install → Onboarding** | Install + activation event | Custom **event column**; [Events settings](https://dashboard.linkrunner.io/dashboard/settings/events) | Define the activation event and fire it with [`trackEvent`](/sdk/react-native#tracking-custom-events) |
 | **Specific page → Install → Same context** | Deferred deep link carrying the page context through the install | Campaign **Installs**; the link resolves via `getAttributionData().deeplink` | Enable deferred deep linking on the campaign; pass the path into the link; parse `deeplink` in-app |
-| **Referral link → Install** | Install + referral conversion | Campaign per referral; event column | [Referral codes](/features/referral-codes); add `?referrer=` to the link; handle it in-app |
+| **Referral link → Install** | Install + referral conversion | Campaign per referral; event column | [Deep link management](/features/deep-link-management); add `?referrer=` to the link; handle it in-app |
 
 <Note>
 The deferred deep link is read once, after the first open, from [`getAttributionData`](/sdk/react-native#getting-attribution-data). Check the `deeplink` field, parse the URL, and navigate. The SDK does not navigate for you.
