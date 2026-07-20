@@ -64,7 +64,7 @@
                             "features/deferred-deep-linking",
                             "features/web-to-app-journeys",
                             "features/link-redirection",
-                            "features/referral-codes",
+                            "features/deep-link-management",
                             "features/custom-store-listing",
                             "features/uninstall-tracking",
                             "features/retention",
@@ -279,7 +279,11 @@
         },
         {
             "source": "/feature/referral-codes",
-            "destination": "/features/referral-codes"
+            "destination": "/features/deep-link-management"
+        },
+        {
+            "source": "/features/referral-codes",
+            "destination": "/features/deep-link-management"
         },
         {
             "source": "/feature/deferred-deep-linking",
