@@ -56,7 +56,7 @@ For getting/listing existing campaigns, please refer to the [List Campaigns API 
 
 ### 2. Create Campaign
 
-Create a new campaign. You can optionally create a short link by including the `is_shortlink: true` parameter.
+Create a new campaign. You can optionally create a short link by including the `is_shortlink: true` parameter. To group Linkrunner links under a project-level custom channel such as WhatsApp, Offline QR, or CleverTap Push, include `custom_channel_names`.
 
 #### Request
 
@@ -78,6 +78,18 @@ POST /create-campaign
 }
 ```
 
+**Creating Campaign with a Custom Channel:**
+
+```json
+{
+    "name": "WhatsApp Summer Sale 2025",
+    "deeplink": "https://app.domain.com/promo/summer25",
+    "link_for_desktop_users": "https://www.your-website.com",
+    "custom_display_id": "whatsapp-summer-sale-2025",
+    "custom_channel_names": ["WhatsApp"]
+}
+```
+
 #### Request Parameters
 
 | Parameter                | Type     | Required | Description                                                                                                                                        |
@@ -91,6 +103,7 @@ POST /create-campaign
 | `is_shortlink`           | boolean  | No       | Set to `true` to create a shortened campaign link. When enabled, creates a compact URL format suitable for sharing.                                |
 | `domain`                 | string   | No       | The domain name to use for this campaign (e.g., "app.example.com"). Must belong to your project. If not provided, the project's primary domain will be used. |
 | `store_listing_ids`      | string[] | No       | Array of store listing IDs to associate with this campaign. Get store listing IDs from your [dashboard settings](https://dashboard.linkrunner.io/dashboard/settings/store-listings). Allows targeting different store URLs per platform (iOS/Android). |
+| `custom_channel_names`   | string[] | No       | Array containing one custom channel name to group this campaign under. If the active channel already exists for the project, the campaign is attached to it; otherwise, a new custom channel is created. |
 
 ##### Note: If `android_web_redirect` or `ios_web_redirect` is provided, it will override the default store listing link for that platform within the campaign and redirect users to the specified URL instead.
 
@@ -148,6 +161,34 @@ The `store_listing_ids` parameter allows you to associate multiple store listing
 { "store_listing_ids": ["ios-v1", "ios-v2"] }      // Error: "Cannot assign multiple store listings with the same platform to a campaign!"
 ```
 
+##### Custom Channel Grouping (`custom_channel_names`)
+
+The `custom_channel_names` parameter lets you group Linkrunner campaigns under a custom channel for dashboard filtering and channel-level aggregation.
+
+##### Note: Linkrunner currently supports only one custom channel per campaign.
+
+**Parameter Type**: `string[]` (array containing at most one custom channel name)
+
+**Behavior**:
+- If the channel already exists and is active for the project, the campaign is attached to it
+- If the channel does not exist, Linkrunner creates it for the project and attaches the campaign to it
+- The channel code is generated from the name by lowercasing it and replacing non-alphanumeric characters with underscores
+- A campaign can have at most one custom channel
+- Default channel names such as Google, Meta, Reddit, Snapchat, TikTok, LinkedIn, Apple Search Ads, Organic, Linkrunner Links, and None cannot be used as custom channel names
+
+**Examples**:
+```json
+// Valid custom channel names
+{ "custom_channel_names": ["WhatsApp"] }
+{ "custom_channel_names": ["Offline QR"] }
+{ "custom_channel_names": ["CleverTap Push"] }
+
+// Invalid - will return errors
+{ "custom_channel_names": ["WhatsApp", "Offline QR"] }  // Error: "A campaign can have at most one custom channel"
+{ "custom_channel_names": ["Google"] }                  // Error: reserved channel name
+{ "custom_channel_names": ["<script>alert(1)</script>"] } // Error: HTML/scripts are not allowed
+```
+
 #### Response
 
 **Standard Campaign Response:**
@@ -166,6 +207,13 @@ The `store_listing_ids` parameter allows you to associate multiple store listing
         "android_web_redirect": null,
         "ios_web_redirect": null,
         "domain": "app.domain.com",
+        "custom_channels": [
+            {
+                "id": 456,
+                "name": "WhatsApp",
+                "slug": "whatsapp"
+            }
+        ],
         "store_listings": [
             {
                 "store_listing_id": "android-store-v1",
@@ -193,6 +241,7 @@ The `store_listing_ids` parameter allows you to associate multiple store listing
         "android_web_redirect": null,
         "ios_web_redirect": null,
         "domain": "app.domain.com",
+        "custom_channels": [],
         "store_listings": []
     }
 }
@@ -212,6 +261,9 @@ The `store_listing_ids` parameter allows you to associate multiple store listing
 | `store_listings`   | StoreListing[]        | Array of store listings associated with this campaign. Each object contains `store_listing_id` (string), `name` (string), and `platform` ("IOS" \| "ANDROID"). |
 | `android_web_redirect` | string\|null      | The Android web redirect URL if specified, otherwise `null`.                                                            |
 | `ios_web_redirect`     | string\|null      | The iOS web redirect URL if specified, otherwise `null`.                                                                |
+| `custom_channels`      | CustomChannel[]     | Custom channels attached to this campaign. At most one custom channel is currently supported.                           |
+
+##### Note: Some responses may include legacy custom-channel aliases such as `custom_channel`, `custom_channel_code`, `custom_channel_name`, `custom_channel_codes`, or `custom_channel_names`. Use `custom_channels` as the canonical response field.
 
 ### 3. Edit Campaign
 
@@ -220,7 +272,7 @@ Update an existing campaign.
 #### Request
 
 ```
-PATCH /api/v1/campaigns/:display_id
+PATCH /campaigns/:display_id
 ```
 
 #### Request Body
@@ -228,14 +280,24 @@ PATCH /api/v1/campaigns/:display_id
 ```json
 {
     "name": "campaign name",
-    "active": false
+    "active": false,
+    "custom_channel_names": ["WhatsApp"]
 }
 ```
 
-| Parameter | Type    | Description                        |
-| --------- | ------- | ---------------------------------- |
-| name      | string  | **Optional**. Name of the campaign |
-| active    | boolean | **Optional**. Campaign status      |
+To remove the custom channel from a campaign, pass an empty array:
+
+```json
+{
+    "custom_channel_names": []
+}
+```
+
+| Parameter                | Type     | Description |
+| ------------------------ | -------- | ----------- |
+| name                     | string   | **Optional**. Name of the campaign |
+| active                   | boolean  | **Optional**. Campaign status |
+| custom_channel_names     | string[] | **Optional**. Omit to leave unchanged, pass one name to set or replace the campaign custom channel, or pass an empty array to clear it. Linkrunner currently supports only one custom channel per campaign. |
 
 #### Responses
 
@@ -261,7 +323,14 @@ PATCH /api/v1/campaigns/:display_id
         "meta_web_to_app": false,
         "active": false,
         "default_link": true,
-        "attributed_users": 0
+        "attributed_users": 0,
+        "custom_channels": [
+            {
+                "id": 456,
+                "name": "WhatsApp",
+                "slug": "whatsapp"
+            }
+        ]
     }
 }
 ```
@@ -271,9 +340,10 @@ PATCH /api/v1/campaigns/:display_id
 | HTTP Status | Message                                                       | When/Why                                                 |
 | ----------- | ------------------------------------------------------------- | -------------------------------------------------------- |
 | 400         | "Campaign display ID is required!"                            | If the display_id param is missing                       |
-| 400         | "At least one field (name or active) is required for update!" | If both name and active are missing in the request body  |
+| 400         | "At least one field (name, active, website, deeplink, store listing, linkedin, network_account_id, ad_network_id, or custom channel) is required" | If no supported update field is provided |
 | 400         | "Campaign name cannot be empty!"                              | If name is provided but is empty or only whitespace      |
 | 400         | "Active field must be a boolean!"                             | If active is provided but is not a boolean               |
+| 400         | "A campaign can have at most one custom channel"              | If more than one custom channel name is provided         |
 | 404         | "Campaign not found!"                                         | If the campaign with the given display_id does not exist |
 | 500         | "Internal server error"                                       |                                                          |
 
@@ -284,7 +354,7 @@ Delete an existing campaign.
 #### Request
 
 ```
-DELETE /api/v1/campaigns/:display_id
+DELETE /campaigns/:display_id
 ```
 
 #### Responses
@@ -334,6 +404,7 @@ fetch("https://api.linkrunner.io/api/v1/create-campaign", {
         deeplink: "https://app.domain.com/promo/summer25",
         link_for_desktop_users: "https://www.your-website.com",
         custom_display_id: "summer-sale-2025",
+        custom_channel_names: ["WhatsApp"],
     }),
 })
     .then((response) => response.json())
@@ -345,7 +416,7 @@ fetch("https://api.linkrunner.io/api/v1/create-campaign", {
 
 ```javascript
 fetch("https://api.linkrunner.io/api/v1/campaigns/TOhmGM", {
-    method: "PUT",
+    method: "PATCH",
     headers: {
         "Content-Type": "application/json",
         "linkrunner-key": "YOUR-SERVER-KEY",
@@ -394,5 +465,15 @@ Specific error responses for each endpoint are detailed in their respective sect
 | 400         | "store_listing_ids must be an array of non-empty strings!"             | store_listing_ids parameter is not an array or contains empty strings |
 | 400         | "Store listing(s) not found for this project: {ids}"                   | One or more store listing IDs don't exist in your project  |
 | 400         | "Cannot assign multiple store listings with the same platform to a campaign!" | Attempting to add more than one iOS or Android store listing |
+
+### Custom Channel Specific Errors
+
+| Status Code | Error Message                                             | Description                                                       |
+| ----------- | --------------------------------------------------------- | ----------------------------------------------------------------- |
+| 400         | "A campaign can have at most one custom channel"          | More than one value was provided in `custom_channel_names`.        |
+| 400         | "Custom channel name must be less than 80 characters"     | A custom channel name is longer than the allowed limit.            |
+| 400         | "Custom channel name cannot contain HTML tags or scripts" | A custom channel name contains HTML or script content.             |
+| 400         | `"{name}" is a reserved channel name`                     | The custom channel name resolves to a default or reserved channel. |
+| 409         | "Channel name conflicts with a previously deleted channel - pick a different name" | The channel code belongs to an inactive custom channel. |
 
 For any help please reach out to [support@linkrunner.io](mailto:support@linkrunner.io)
