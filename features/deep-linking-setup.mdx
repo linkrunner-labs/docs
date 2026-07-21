@@ -395,6 +395,16 @@ Custom URI schemes use a custom protocol like `myapp://` and don't require domai
 
 If an HTTPS link opens the browser instead of your app, domain verification is the usual cause. Work through these checks to find where it's failing.
 
+<Note>
+  **Prefer to let your AI coding agent diagnose it?** Run:
+
+  ```bash
+  npx @linkrunner/skills add deep-links
+  ```
+
+  The skill runs the full gauntlet below automatically (hosted files, Apple CDN freshness, Android fingerprint + verification state, native wiring) and tells you exactly what is broken. See [Linkrunner Agent Skills](/ai-agent-skills).
+</Note>
+
 <Tabs>
   <Tab title="Android">
     <Steps>
