@@ -4,6 +4,16 @@ description: "Receive real-time notifications when attribution events occur"
 icon: "webhook"
 ---
 
+<Note>
+  **Using an AI coding agent?** Have it write your webhook receiver for you:
+
+  ```bash
+  npx @linkrunner/skills add webhooks
+  ```
+
+  The skill generates a handler for your backend that verifies the `linkrunner-key` header and processes install/signup payloads. See [Linkrunner Agent Skills](/ai-agent-skills).
+</Note>
+
 ## Overview
 
 Webhooks allow you to receive real-time HTTP notifications when attribution events occur in your app. When a user installs your app or signs up, Linkrunner sends a POST request to your configured endpoint with detailed attribution data.
