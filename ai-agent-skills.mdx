@@ -1,0 +1,77 @@
+---
+title: "AI Agent Skills"
+description: "Let your AI coding agent integrate the Linkrunner SDK and deep linking for you"
+icon: "sparkles"
+---
+
+If you use an AI coding agent (Claude Code, Cursor, GitHub Copilot, or Windsurf),
+you can install a **Linkrunner skill** and have your agent do the integration for
+you, including the deep-linking setup that is usually the trickiest part.
+
+## Install
+
+Run this in your app's repo. The installer detects which agent your project is
+set up for and writes the skill in that agent's native format.
+
+```bash
+npx @linkrunner/skills list           # see every supported platform
+npx @linkrunner/skills add flutter     # install the skill for your platform
+```
+
+Then ask your agent, in its chat:
+
+> integrate Linkrunner
+
+or
+
+> set up Linkrunner deep links
+
+The agent picks up the skill, inspects your project, adds the SDK, wires up
+initialization and user identification, configures deep linking, and runs a
+validator to confirm your Universal Links / App Links actually verify.
+
+## Supported platforms
+
+| Platform | Command |
+| --- | --- |
+| Flutter | `npx @linkrunner/skills add flutter` |
+| React Native | `npx @linkrunner/skills add react-native` |
+| Expo | `npx @linkrunner/skills add expo` |
+| iOS (native) | `npx @linkrunner/skills add ios` |
+| Android (native) | `npx @linkrunner/skills add android` |
+| Capacitor | `npx @linkrunner/skills add capacitor` |
+| Cordova | `npx @linkrunner/skills add cordova` |
+| Unity | `npx @linkrunner/skills add unity` |
+
+## Options
+
+```bash
+# Force a specific agent instead of auto-detecting
+npx @linkrunner/skills add ios --agent cursor
+
+# Install into a subdirectory (monorepos)
+npx @linkrunner/skills add react-native --dir ./apps/mobile
+
+# Preview what will be written without changing anything
+npx @linkrunner/skills add flutter --dry-run
+```
+
+Supported `--agent` values: `claude-code`, `cursor`, `windsurf`, `copilot`,
+`agents-md`.
+
+## What gets installed
+
+Each skill bundles the integration steps, the deep-linking setup, the event and
+revenue APIs, and a deep-link verification script. For Claude Code the skill is
+written to `.claude/skills/`; for other agents it is compiled to that agent's
+rules format, with the validator script placed under `.linkrunner/`.
+
+The skills mirror this documentation, so what your agent does matches the manual
+guides for each platform.
+
+<Note>
+  The skills are open source at
+  [github.com/linkrunner-labs/skills](https://github.com/linkrunner-labs/skills).
+</Note>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

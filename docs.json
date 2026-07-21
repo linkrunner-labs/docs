@@ -15,7 +15,7 @@
                 "groups": [
                     {
                         "group": "Getting Started",
-                        "pages": ["introduction", "quickstart"]
+                        "pages": ["introduction", "quickstart", "ai-agent-skills"]
                     },
                     {
                         "group": "SDK Guides",
