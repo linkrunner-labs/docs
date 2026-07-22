@@ -8,7 +8,9 @@ Linkrunner integrates with CleverTap to automatically send attribution data, hel
 
 ## How it works
 
-Every time a user is attributed by Linkrunner, we send an install event to CleverTap's attribution API for the corresponding user profile. The profile is matched using the CleverTap ID you pass to the Linkrunner SDK (see [Map User Identifiers](#steps-to-setup)).
+When a user is attributed by Linkrunner and their CleverTap ID has been linked, we send an install event to CleverTap's attribution API for the corresponding user profile. The profile is matched using the CleverTap ID you pass to the Linkrunner SDK (see [Map User Identifiers](#steps-to-setup)).
+
+Delivery isn't guaranteed to happen the instant a user is attributed — the most reliable way to make sure every install reaches CleverTap is the **Sync with CleverTap** feature described below.
 
 The event carries these attribution fields:
 
@@ -135,9 +137,11 @@ The event carries these attribution fields:
 
 After the integration is complete, you can view the attribution data in CleverTap:
 
-1. Navigate to a user profile in the CleverTap dashboard
-2. Look for the install events section
-3. You'll see an `organic_install` or `inorganic_install` event with the `utm_source`, `utm_campaign`, and `platform` values described above
+1. Navigate to **Analytics > Events** in the CleverTap dashboard
+2. Select the **UTM Visited** event
+3. You'll see your installs broken down by `utm_source`, `utm_campaign`, and `platform` — the `event_type` (`organic_install` or `inorganic_install`) is included as an event property
+
+Individual user profiles won't show this data under "Initially acquired from" — that field only reflects CleverTap's own SDK-side install-referrer capture, not attribution data sent via this integration.
 
 This data can be used to:
 - Create segments based on acquisition source
