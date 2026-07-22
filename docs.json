@@ -173,7 +173,8 @@
                         "pages": [
                             "testing/testing-attribution-troubleshooting",
                             "ad-networks/google-ads-discrepancies",
-                            "ad-networks/meta-ads-discrepancies"
+                            "ad-networks/meta-ads-discrepancies",
+                            "ad-networks/meta-view-through-attribution"
                         ]
                     }
                 ]
