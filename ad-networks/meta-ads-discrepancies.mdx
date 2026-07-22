@@ -48,7 +48,7 @@ Two more common causes:
 This is the most common direction of discrepancy, and most of it is by design:
 
 - **Meta self-attributes.** Meta claims every install with a Meta ad engagement inside its window, even when the user's last touch was another network. Linkrunner uses last-touch attribution across all networks and credits one source per install.
-- **View-through conversions.** Meta counts installs after an ad view (1-day view window) by default. Linkrunner measures view-through only on Android, and only when [Meta Install Referrer](/features/meta-install-referrer) is set up. iOS view-through installs land as organic in Linkrunner.
+- **View-through conversions.** Meta counts installs after an ad view (1-day view window) by default. Linkrunner measures view-through only on Android, and only when [Meta Install Referrer](/features/meta-install-referrer) is set up. Meta also shares view-through data only for App promotion campaigns with broad targeting; see the [Meta View-Through Attribution FAQ](/ad-networks/meta-view-through-attribution). iOS view-through installs land as organic in Linkrunner.
 - **Cross-device attribution.** Meta can credit an ad click on one device for an install on another. Linkrunner matches signals on the same device only.
 - **Modeled results on iOS.** Meta's iOS reporting (Aggregated Event Measurement and SKAdNetwork) includes modeled and aggregated conversions. Linkrunner's SDK attribution on iOS is deterministic, and users who deny App Tracking Transparency often can't be matched, so those installs show as organic.
 </Accordion>
