@@ -54,6 +54,10 @@ The event carries these attribution fields:
   <Step title="Map User Identifiers in SDK">
     To properly link users between Linkrunner and CleverTap, you need to pass the CleverTap ID in the `signup` function.
 
+    <Warning>
+      **This step is required, not optional.** If `clevertapId` is never passed to the `signup` function, no attribution data will reach CleverTap for that user — there's no error or partial data, the integration simply has nothing to send. If you've completed Step 1 but don't see any data in CleverTap, this is the most likely cause: check that your app is actually calling `signup` with `clevertapId` set.
+    </Warning>
+
     <Info>
       **Important:** Make sure to use CleverTap's functions correctly to retrieve the CleverTap ID and send it to the Linkrunner SDK.
     </Info>
