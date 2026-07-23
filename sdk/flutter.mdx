@@ -140,6 +140,17 @@ platform :ios, '15.0'
 <string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
 ```
 
+3. To enable SKAdNetwork postback copies to be sent to Linkrunner, add the following keys to your `Info.plist` file:
+
+```xml
+<key>NSAdvertisingAttributionReportEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+<key>AttributionCopyEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+```
+
+For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
+
 ## Initialization (Required)
 You'll need your [project token](https://dashboard.linkrunner.io/dashboard?m=documentation) to get started!
 
