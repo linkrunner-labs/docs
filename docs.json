@@ -79,6 +79,7 @@
                                 "icon": "apple",
                                 "pages": [
                                     "features/skadnetwork-integration",
+                                    "features/google-skan-setup",
                                     "features/meta-skan-setup",
                                     "features/skadnetwork-conversion-values",
                                     {
