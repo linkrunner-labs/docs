@@ -6,9 +6,9 @@ icon: "apple"
 
 SKAdNetwork (SKAN) is Apple's privacy-preserving framework for iOS attribution. With Linkrunner, SKAN setup happens in three places:
 
-1. **Google Ads Configuration** — connect your Google Ads account and map events for SKAN postbacks
-2. **Meta Ads Configuration** — connect your Meta dataset and configure conversion values in Meta Events Manager
-3. **Linkrunner SDK Configuration** — update SDK versions and add the iOS postback copy endpoints
+1. **Google Ads Configuration**: connect your Google Ads account and map events for SKAN postbacks
+2. **Meta Ads Configuration**: connect your Meta dataset and configure conversion values in Meta Events Manager
+3. **Linkrunner SDK Configuration**: update SDK versions, add the ad network identifiers, and add the iOS postback copy endpoints
 
 Complete all three sections to get SKAN attribution working end-to-end.
 
@@ -45,13 +45,13 @@ Linkrunner needs OAuth access to your Google Ads account to deliver SKAN postbac
 
 ### SKAN Priority Order for Events
 
-Linkrunner converts your event list into SKAN conversion values (0–63). The order you put events in determines their priority — higher-priority events overwrite lower-priority ones in the same measurement window.
+Linkrunner converts your event list into SKAN conversion values (0–63). The order you put events in determines their priority. Higher-priority events overwrite lower-priority ones in the same measurement window.
 
 1. Go to **Settings → SKAN Setup → Events Setup** in the [Linkrunner Dashboard](https://dashboard.linkrunner.io/dashboard/settings/skan-setup?tab=event-setup)
 2. Add the events that matter for optimization (e.g., `Purchase`, `Subscription Started`, `Onboarding Complete`)
-3. Drag rows to set priority — the topmost event has the highest priority
+3. Drag rows to set priority (the topmost event has the highest priority)
 4. For revenue events, set a **min** and **max** range; for occurrence events, set an **average**
-5. Click **Generate SKAN Mapping** — Linkrunner produces the fine and coarse conversion values
+5. Click **Generate SKAN Mapping** to produce the fine and coarse conversion values
 
 Apple's SKAN allows up to **64 conversion values total**. The dashboard shows the combination count in real time and warns if your configuration would exceed the limit.
 
@@ -66,7 +66,7 @@ Map each Linkrunner event to the corresponding Google Ads conversion action so t
 3. Save the mapping
 
 <Note>
-    Linkrunner automatically sends the SKAN schema configuration to Google on your behalf — you don't need to upload
+    Linkrunner automatically sends the SKAN schema configuration to Google on your behalf. You don't need to upload
     conversion values manually in Google Ads.
 </Note>
 
@@ -112,7 +112,7 @@ Connect the Meta Business Manager account whose ad accounts you want Linkrunner 
 
 ### SKAN Event Priority
 
-Meta's SKAN setup uses the same priority order configured under **Settings → SKAN Setup → Events Setup** as Google. If you've already set this up for Google Ads, no extra work is needed — Linkrunner reuses the same schema for Meta.
+Meta's SKAN setup uses the same priority order configured under **Settings → SKAN Setup → Events Setup** as Google. If you've already set this up for Google Ads, no extra work is needed. Linkrunner reuses the same schema for Meta.
 
 If you haven't yet, see [SKAN Priority Order for Events](#skan-priority-order-for-events) above.
 
@@ -165,25 +165,70 @@ You also need to turn **OFF** the **SKAdNetwork for the Facebook SDK** toggle so
 
 ### Minimum SDK Versions
 
-Make sure your app is using at least these SDK versions before enabling SKAN — Linkrunner uses the SDK to update conversion values as users perform events.
+Make sure your app is using at least these SDK versions before enabling SKAN. Linkrunner uses the SDK to update conversion values as users perform events.
 
 <CardGroup cols={2}>
+    <Card title="Native iOS" icon="swift">
+        **linkrunner-ios >=3.1.0**
+    </Card>
     <Card title="React Native" icon="react">
         **rn-linkrunner >=2.3.0**
+    </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+    <Card title="Flutter" icon="flutter">
+        **linkrunner >=3.1.1**
     </Card>
     <Card title="Expo" icon="rocket">
         **expo-linkrunner >=3.2.0**
     </Card>
 </CardGroup>
 
-<CardGroup cols={2}>
-    <Card title="Native iOS" icon="swift">
-        **ios-linkrunner >=3.1.0**
-    </Card>
-    <Card title="Flutter" icon="flutter">
-        **linkrunner >=3.1.1**
-    </Card>
-</CardGroup>
+<Note>
+    Capacitor, Cordova, and Unity apps use the native iOS SDK (LinkrunnerKit) under the hood, so the **linkrunner-ios
+    >=3.1.0** requirement applies to them as well.
+</Note>
+
+### How the SDK updates conversion values
+
+You don't need to call any SKAN APIs yourself. On first launch the SDK registers an initial conversion value (0/low), and every `trackEvent`, `capturePayment`, and `signup` call returns the updated conversion value from Linkrunner, which the SDK applies automatically. On iOS 17.4+ the SDK uses Apple's AdAttributionKit; on iOS 14.0–17.3 it falls back to SKAdNetwork.
+
+### Add Ad Network Identifiers
+
+Apple only generates SKAN postbacks for ad networks listed under `SKAdNetworkItems` in your app's `Info.plist`. Add the identifiers for the networks you run campaigns on:
+
+```xml
+<key>SKAdNetworkItems</key>
+<array>
+    <!-- Google Ads -->
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>cstr6suwn9.skadnetwork</string>
+    </dict>
+    <!-- Meta Ads -->
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>v9wttpbfk9.skadnetwork</string>
+    </dict>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>n38lu8286q.skadnetwork</string>
+    </dict>
+</array>
+```
+
+<Warning>
+    Without these entries, Apple never sends SKAN postbacks for those networks, even if everything else is configured
+    correctly. Identifiers are lowercase and must end in `.skadnetwork`.
+</Warning>
+
+If you run campaigns on other networks, add their identifiers too. Each network publishes its own list (for example, [Google](https://developers.google.com/admob/ios/3p-skadnetworks) and [Meta](https://developers.facebook.com/docs/SKAdNetwork)).
+
+<Info>
+    On Expo, add these under `ios.infoPlist.SKAdNetworkItems` in your `app.json` instead of editing `Info.plist`
+    directly.
+</Info>
 
 ### Configure Postback Copies to Linkrunner
 
@@ -204,7 +249,7 @@ To receive SKAdNetwork postback copies, configure `NSAdvertisingAttributionRepor
 
 #### Expo
 
-The Linkrunner Expo plugin adds this configuration automatically — no additional setup required.
+The Linkrunner Expo plugin adds this configuration automatically. No additional setup required.
 
 <Note>
     These keys tell Apple to send copies of SKAdNetwork postbacks to Linkrunner alongside the ad network, enabling
