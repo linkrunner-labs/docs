@@ -79,6 +79,7 @@
                                 "icon": "apple",
                                 "pages": [
                                     "features/skadnetwork-integration",
+                                    "features/meta-skan-setup",
                                     "features/skadnetwork-conversion-values",
                                     {
                                         "group": "SKAN Dashboard",
@@ -118,7 +119,6 @@
                         "pages": [
                             "ad-networks/google-ads",
                             "ad-networks/meta-ads",
-                            "ad-networks/meta-skan",
                             "ad-networks/tiktok",
                             "ad-networks/snapchat",
                             "ad-networks/reddit-ads",
