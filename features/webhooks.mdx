@@ -56,7 +56,7 @@ Linkrunner sends webhooks for the following events:
 
 The `install` webhook is triggered immediately when Linkrunner attributes an app installation. At this point, your app has just been opened for the first time and the user hasn't had a chance to sign up or log in yet. Because of this, user identity fields such as `user_id`, `name`, `phone`, `email`, and `additional_data` are only included in signup webhooks.
 
-By default, install webhooks fire only for attributed (paid) installs. To also receive webhooks for organic installs, enable **Send webhooks for organic installs** in [Settings → Webhooks](https://dashboard.linkrunner.io/settings?s=webhooks). Organic install webhooks are sent with `network_name` set to `ORGANIC`, `ad_channel` set to `null`, and no campaign details.
+By default, install webhooks fire only for attributed (paid) installs. To also receive webhooks for organic users, enable **Send webhooks for organic users** in [Settings → Webhooks](https://dashboard.linkrunner.io/settings?s=webhooks). This covers both install and signup webhooks. Organic webhooks are sent with `network_name` set to `ORGANIC`, `ad_channel` set to `null`, and no campaign details.
 
 However, the install webhook does include device identifiers (`gaid` for Android, `idfa` for iOS) when available. You can use these to match the install with the user later when they sign up.
 
@@ -71,6 +71,8 @@ Use the install webhook for:
 The `signup` webhook is triggered when you call the `.signup()` method in your app via the Linkrunner SDK. This happens after the user has signed up or logged in, so the `user_id` field will contain the ID you passed to the SDK.
 
 The signup webhook includes device identifiers (`gaid`/`idfa`) along with the `user_id`, giving you a complete picture of both the device and the user. It also includes user identity fields (`name`, `phone`, `email`) and any custom parameters you passed via `additional_data`, such as referral codes or other custom key-value pairs.
+
+Like install webhooks, signup webhooks fire only for attributed users by default. Enabling **Send webhooks for organic users** also delivers signup webhooks for organic users, with `network_name` set to `ORGANIC` and no campaign details.
 
 Use the signup webhook for:
 - Linking attribution data to your user records
@@ -237,7 +239,7 @@ Example:
 
 ### Install Event (Organic)
 
-Sent only when **Send webhooks for organic installs** is enabled:
+Sent only when **Send webhooks for organic users** is enabled:
 
 ```json
 {
