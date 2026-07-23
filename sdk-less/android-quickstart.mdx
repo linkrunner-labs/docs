@@ -361,8 +361,8 @@ object LinkrunnerClient {
 
     suspend fun capturePayment(
         amount: Double,
+        paymentId: String,
         userId: String? = null,
-        paymentId: String? = null,
         type: String = "DEFAULT",
         status: String = "PAYMENT_COMPLETED",
         eventData: Map<String, Any?>? = null,
@@ -371,8 +371,8 @@ object LinkrunnerClient {
             put("amount", amount)
             put("type", type)
             put("status", status)
+            put("payment_id", paymentId)
             if (userId != null) put("user_id", userId)
-            if (paymentId != null) put("payment_id", paymentId)
             if (eventData != null) put("event_data", jsonOf(eventData))
         }
         return post("/api/client/capture-payment", body)
@@ -540,7 +540,7 @@ A retry can send the same request twice if the first attempt reached the server 
 | `capture-event` | Not deduplicated | A retried event can be counted twice. |
 
 <Tip>
-  Always pass a `payment_id` to `capturePayment` so retries cannot double count revenue. Events have no server-side deduplication, so if exact event counts matter, disable retries for those calls.
+  `payment_id` is required for `capturePayment`, and a unique value ensures retries cannot double count revenue. Events have no server-side deduplication, so if exact event counts matter, disable retries for those calls.
 </Tip>
 
 ## Troubleshooting

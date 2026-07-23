@@ -4,6 +4,16 @@ description: "Complete guide for integrating Linkrunner in native Android apps"
 icon: "android"
 ---
 
+<Note>
+  **Prefer to let your AI coding agent do this?** Install the Linkrunner skill and Claude Code, Cursor, GitHub Copilot, or Windsurf will wire up the SDK and deep links for you:
+
+  ```bash
+  npx @linkrunner/skills add android
+  ```
+
+  Then ask your agent to "integrate Linkrunner". See [Linkrunner Agent Skills](https://github.com/linkrunner-labs/skills).
+</Note>
+
 ## Requirements
 
 - Android 5.0 (API level 21) or higher
@@ -344,8 +354,37 @@ data class CampaignData(
     val storeClickAt: String?,
     val groupName: String,
     val assetName: String,
-    val assetGroupName: String
+    val assetGroupName: String,
+    val adNetworkCampaignId: String?, // Ad network campaign ID
+    val adSetId: String?,             // Ad set ID
+    val adSetName: String?,           // Ad set name
+    val adCreativeId: String?,        // Ad creative ID
+    val adCreativeName: String?       // Ad creative name
 )
+```
+
+**Example response:**
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123",
+    "campaignData": {
+        "id": "camp_123",
+        "name": "Summer Sale 2024",
+        "adNetwork": "META",
+        "type": "INORGANIC",
+        "installedAt": "2024-03-20T10:30:00Z",
+        "storeClickAt": "2024-03-20T10:29:45Z",
+        "groupName": "Android Campaign",
+        "assetName": "Banner Ad 1",
+        "assetGroupName": "Product Catalog",
+        "adNetworkCampaignId": "120214682829390250",
+        "adSetId": "120214682829640250",
+        "adSetName": "Productivity",
+        "adCreativeId": "120214682926100250",
+        "adCreativeName": "Static_2"
+    }
+}
 ```
 
 ## Setting User Data
@@ -423,7 +462,7 @@ private fun capturePayment() {
     CoroutineScope(Dispatchers.IO).launch {
         try {
             val paymentData = CapturePaymentRequest(
-                paymentId = "payment_123",  // Optional: Unique payment identifier
+                paymentId = "payment_123",  // Required: Unique payment identifier
                 userId = "user123",         // Required: User identifier
                 amount = 99.99,             // Required: Payment amount
                 type = PaymentType.FIRST_PAYMENT,  // Optional: Defaults to DEFAULT
@@ -533,7 +572,8 @@ private fun trackEvent() {
                     "product_id" to "12345",
                     "category" to "electronics",
                     "amount" to 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
-                )
+                ),
+                eventId = "order_12345" // Optional: Your own unique event identifier
             )
 
             result.onSuccess {
@@ -547,6 +587,12 @@ private fun trackEvent() {
     }
 }
 ```
+
+#### Parameters for `LinkRunner.getInstance().trackEvent`
+
+- `eventName`: `String` (required) - Name of the event to track
+- `eventData`: `Map<String, Any>` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventId`: `String` (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
 
 ### Revenue Sharing with Ad Networks
 

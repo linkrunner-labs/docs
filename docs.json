@@ -15,7 +15,7 @@
                 "groups": [
                     {
                         "group": "Getting Started",
-                        "pages": ["introduction", "quickstart"]
+                        "pages": ["introduction", "quickstart", "ai-agent-skills"]
                     },
                     {
                         "group": "SDK Guides",
@@ -64,9 +64,11 @@
                             "features/deferred-deep-linking",
                             "features/web-to-app-journeys",
                             "features/link-redirection",
+                            "features/deep-link-management",
                             "features/referral-codes",
                             "features/custom-store-listing",
                             "features/uninstall-tracking",
+                            "features/retention",
                             "features/meta-install-referrer",
                             "features/ios-campaign-data-limitations",
                             "features/webhooks",
@@ -77,6 +79,8 @@
                                 "icon": "apple",
                                 "pages": [
                                     "features/skadnetwork-integration",
+                                    "features/google-skan-setup",
+                                    "features/meta-skan-setup",
                                     "features/skadnetwork-conversion-values",
                                     {
                                         "group": "SKAN Dashboard",
@@ -118,9 +122,18 @@
                             "ad-networks/meta-ads",
                             "ad-networks/tiktok",
                             "ad-networks/snapchat",
+                            "ad-networks/reddit-ads",
                             "ad-networks/linkedin-ads",
                             "ad-networks/google-web-to-app",
                             "ad-networks/meta-web-to-app"
+                        ]
+                    },
+                    {
+                        "group": "Affiliate Partners",
+                        "pages": [
+                            "affiliate-partners/overview",
+                            "affiliate-partners/tracking-links",
+                            "affiliate-partners/postbacks"
                         ]
                     },
                     {
@@ -161,7 +174,9 @@
                         "group": "FAQ",
                         "pages": [
                             "testing/testing-attribution-troubleshooting",
-                            "ad-networks/google-ads-discrepancies"
+                            "ad-networks/google-ads-discrepancies",
+                            "ad-networks/meta-ads-discrepancies",
+                            "ad-networks/meta-view-through-attribution"
                         ]
                     }
                 ]

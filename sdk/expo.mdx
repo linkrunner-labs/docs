@@ -4,6 +4,16 @@ description: "Complete guide for integrating Linkrunner in Expo apps"
 icon: "rocket"
 ---
 
+<Note>
+  **Prefer to let your AI coding agent do this?** Install the Linkrunner skill and Claude Code, Cursor, GitHub Copilot, or Windsurf will wire up the SDK and deep links for you:
+
+  ```bash
+  npx @linkrunner/skills add expo
+  ```
+
+  Then ask your agent to "integrate Linkrunner". See [Linkrunner Agent Skills](https://github.com/linkrunner-labs/skills).
+</Note>
+
 This guide will help you install, configure, and use the Linkrunner SDK in your Expo application.
 
 <Info>
@@ -53,10 +63,10 @@ npx expo install expo-linkrunner
 
 When you add `expo-linkrunner` to your `app.json` plugins and run the Expo prebuild step, the config plugin automatically makes the following changes to your iOS project:
 
--   **Adds `NSUserTrackingUsageDescription`** in your iOS Info.plist if not already present.
--   **Automatically applies the `expo-tracking-transparency` plugin** with a default permission message
+-   **Adds `NSUserTrackingUsageDescription`** in your iOS `Info.plist` if not already present (skipped when `disableIdfa` is set).
+-   **Adds the SKAdNetwork postback keys** `NSAdvertisingAttributionReportEndpoint` and `AttributionCopyEndpoint` (both set to `https://linkrunner-skan.com`) in your iOS `Info.plist` if not already present, so Apple sends SKAN postback copies to Linkrunner.
 
-These changes are required for IDFA (Identifier for Advertisers) tracking and to comply with Apple's App Tracking Transparency (ATT) requirements.
+These changes are required for IDFA (Identifier for Advertisers) tracking, Apple's App Tracking Transparency (ATT) compliance, and SKAN attribution. For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
 
 ### Step 3: Prebuild Your Project
 

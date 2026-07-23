@@ -1,0 +1,178 @@
+---
+title: "Retention: Cumulative vs Classic vs Rolling"
+sidebarTitle: "Retention"
+description: "What app retention rate is and how Linkrunner calculates cumulative, classic, and rolling retention, including the formula and a worked example."
+keywords: ["app retention rate", "cumulative retention", "classic retention", "rolling retention", "retention rate formula", "N-day retention", "cohort retention", "Day 1 Day 7 Day 30 retention"]
+icon: "chart-line"
+---
+
+**App retention rate is the percentage of a group of installs (a cohort) that comes back to open the app again after installing, measured a set number of days later.** Linkrunner reports it three ways: **cumulative**, **classic**, and **rolling**. In the dashboard these appear as the **Cumulative Retention**, **Classic Retention**, and **Rolling Retention** columns. This page explains what each one means, how the numbers are calculated, and which one to use.
+
+## What is app retention rate?
+
+Every retention number is built from three things:
+
+- **Cohort**: a group of installs, grouped by their install day. The install day is **Day 0**.
+- **A return**: any time a user opens the app after installing. Opening the app several times on the same day counts once.
+- **Day N**: how many days after install you are measuring (Day 1, Day 7, and so on).
+
+Retention is always a percentage of the cohort.
+
+## How is retention rate calculated?
+
+The retention rate formula is the same for all three methods:
+
+```
+Day N retention = (installs from the cohort that count as retained on Day N) / (cohort size) × 100
+```
+
+The only thing that changes between the three methods is which installs "count as retained" on Day N.
+
+## Cumulative vs classic vs rolling retention: what is the difference?
+
+Here are the three definitions as standalone statements:
+
+- **Cumulative retention** is the percentage of an install cohort that opened the app at least once between Day 1 and Day N.
+- **Classic retention** is the percentage of an install cohort that opened the app on exactly Day N.
+- **Rolling retention** is the percentage of an install cohort that opened the app on Day N or any day after.
+
+| Method | An install counts on Day N if it opened the app... |
+| --- | --- |
+| **Cumulative** | on **any day from Day 1 through Day N** |
+| **Classic** | on **exactly** Day N |
+| **Rolling** | on Day N **or any day after** |
+
+Each method answers a different question:
+
+- **Cumulative Day 7**: "What share of the cohort came back at all during the first 7 days?"
+- **Classic Day 7**: "What share of the cohort opened the app on day 7 specifically?"
+- **Rolling Day 7**: "What share of the cohort was still active on day 7 or later?"
+
+Both cumulative and rolling are always equal to or higher than classic for the same day, because each one includes "exactly Day N" plus more. Cumulative and rolling count different groups, so either one can be higher than the other depending on your users.
+
+## A worked retention example
+
+Five users install your app on the same day (Day 0). Here are the days each of them opened the app afterwards:
+
+| User | Days the app was opened after install |
+| --- | --- |
+| A | 1, 2, 3, 5, 7, 9 |
+| B | 1, 4, 10 |
+| C | 1, 2 |
+| D | 3 |
+| E | (never opened again) |
+
+The cohort size is **5**.
+
+### Day 1
+
+- **Cumulative D1** = opened on any day from 1 to 1 → A, B, C = **3 of 5 = 60%**
+- **Classic D1** = opened on exactly day 1 → A, B, C = **3 of 5 = 60%**
+- **Rolling D1** = opened on day 1 or later → A, B, C, D = **4 of 5 = 80%**
+
+At Day 1, cumulative and classic are identical, because "between day 1 and day 1" is just day 1. D only opened on day 3, so it misses both, but rolling Day 1 counts it because it returned after day 1. E never came back, so no number counts E.
+
+### Day 7
+
+- **Cumulative D7** = opened on any day from 1 to 7 → A, B, C, D = **4 of 5 = 80%**
+- **Classic D7** = opened on exactly day 7 → A = **1 of 5 = 20%**
+- **Rolling D7** = opened on day 7 or later → A (days 7 and 9) and B (day 10) = **2 of 5 = 40%**
+
+Same cohort, three different numbers. Cumulative is high because A, B, C, and D all came back at some point in the first week. Classic is low because only A happened to open on day 7 itself. Rolling sits in between: it counts A and B, who were still active on or after day 7, but not C or D, whose last visit was before day 7.
+
+## What does a date filter do?
+
+A date filter selects cohorts by their **install date**, not by the day users came back. Picking January 1 to January 31 measures the installs that happened in January and how many of them returned, no matter which day they returned on.
+
+- The numerator and the denominator both use the install date, so they always describe the same group of installs.
+- Installs still need a fair chance to reach Day N. If your range ends today, the most recent installs in it have not reached Day 7 or Day 30 yet, so they drop out of those longer windows. To read a complete Day 30 number, pick a range that ended at least 30 days ago.
+
+## Which retention metric should you use?
+
+All three measure retention with different rules, so they answer different questions.
+
+- **Cumulative** counts an install if it returned at all within the first N days. It is the best measure of early engagement: how many of your installs you managed to bring back at least once. It is bounded to the first N days, so once a cohort matures it stops changing.
+- **Classic** measures activity on one specific day. Use it for reports and for comparing against industry Day 1 or Day 7 benchmarks, which are usually defined this way. It is also fixed once a cohort matures.
+- **Rolling** counts an install if it was still active on Day N or later. Use it to gauge long-term stickiness, since it captures users who stayed around even if they skipped the exact day.
+
+<Warning>
+  **Rolling retention keeps changing over time.** Because it counts a return on Day N or any later day, a cohort's rolling Day N value keeps rising as users come back weeks or months later.
+
+  - Older time periods almost always show higher rolling retention than recent ones, because older cohorts have had more time for late returns to add up. A recent period can look worse than an old one purely for this reason, not because retention actually dropped.
+  - A rolling number you record today can go stale. If you export it or write it into a report, it will keep climbing afterwards, so refresh it regularly or it will understate the final value.
+
+  Cumulative and classic retention do not have this problem. Both are bounded (cumulative to the first N days, classic to a single day), so once a cohort matures their values are final.
+</Warning>
+
+## Which retention windows are available?
+
+- **Cumulative retention**: Day 1, Day 7, Day 14, Day 30
+- **Classic retention**: Day 1, Day 7, Day 14, Day 30
+- **Rolling retention**: Day 1, Day 7
+
+In the [Campaign Reporting API](/api-reference/reporting-campaigns), cumulative retention is returned as `retention` (`d1`, `d7`, `d14`, `d30`), rolling retention as `rolling_retention` (`d1`, `d7`), and classic retention as `classic_retention` (`d1`, `d7`, `d14`, `d30`).
+
+## What details affect the retention numbers?
+
+**Days are calendar days in your project's timezone.** Day N is a calendar-day difference, not a rolling 24-hour period. A user who installs at 11:55 PM and opens the app at 12:05 AM the next day is counted on Day 1.
+
+**Retention is counted per install.** Each install is counted once per day, no matter how many times the app is opened. Installs reported by an ad network that never produced a tracked app open are not part of the retention cohort.
+
+## How is the cohort size counted?
+
+The denominator is the same for all three methods: the **cohort size**, or the number of installs being measured. It is not a separate "total installs" figure pulled from somewhere else. It is the installs in view that have had a fair chance to reach Day N.
+
+That "fair chance" is the key rule. An install is only counted in the Day N cohort once it has existed for at least N full days, so each window has its own denominator:
+
+- The **Day 1** cohort = installs that happened at least 1 day ago.
+- The **Day 7** cohort = installs that happened at least 7 days ago.
+- The **Day 30** cohort = installs that happened at least 30 days ago.
+
+An install from 3 days ago is in the Day 1 cohort (it has had more than a day) but not yet in the Day 7 cohort (it has not reached its 7th day), so it is left out of the Day 7 number entirely, on both sides of the formula.
+
+Because this rule is applied to the numerator and the denominator together, an install can only be counted as retained if it is also in the cohort. That is why a retention percentage never goes above 100%.
+
+## Glossary
+
+- **Cohort**: a group of installs grouped by the day they installed. The install day is Day 0.
+- **Day 0**: the install day itself, the starting point for every retention window.
+- **Day N**: the number of days after install at which retention is measured, such as Day 1, Day 7, Day 14, or Day 30.
+- **N-day retention**: any retention figure measured a set number of days (N) after install.
+- **Return**: an app open that happens after Day 0. Multiple opens on the same day count once.
+- **Cohort maturity**: the point at which every install in a cohort has had a full N days to return, so a Day N number can no longer change (for cumulative and classic).
+- **Bounded retention**: a metric that stops changing once a cohort matures. Cumulative and classic are bounded.
+- **Unbounded retention**: a metric that keeps rising as late returns accumulate. Rolling retention is unbounded.
+
+## Frequently asked questions
+
+**What is app retention rate?**
+
+App retention rate is the percentage of a group of installs (a cohort) that comes back to open the app again after installing, measured a set number of days later.
+
+**How is retention rate calculated?**
+
+Day N retention = (installs from the cohort that count as retained on Day N) / (cohort size) × 100. The only thing that changes between methods is which installs count as retained on Day N.
+
+**What is the difference between cumulative, classic, and rolling retention?**
+
+Cumulative retention counts an install that opened the app on any day from Day 1 through Day N. Classic retention counts an install that opened the app on exactly Day N. Rolling retention counts an install that opened the app on Day N or any day after.
+
+**Why does rolling retention keep going up for the same period?**
+
+Rolling retention counts a return on Day N and every day after, so late returns keep adding to it. Use cumulative or classic retention if you need a number that stays fixed once a cohort matures.
+
+**Why is retention lower than my total install count?**
+
+Retention only counts installs that opened the app and were tracked by the Linkrunner SDK. Installs reported by an ad network without a tracked app open are excluded from the cohort.
+
+## Troubleshooting
+
+**The Cumulative, Classic, and Rolling Retention columns show different numbers.** This is expected. Cumulative counts installs that returned at any point in the first N days, classic counts only installs that returned on day N exactly, and rolling counts installs that returned on day N or later. Each answers a different question, so the numbers rarely match.
+
+**Day 14 or Day 30 retention looks empty or low.** Your recent cohorts have not matured yet. Widen the date range to include older installs that have had a full 14 or 30 days to return.
+
+**Rolling retention keeps going up for the same period.** This is expected. Rolling counts Day N and every day after, so late returns keep adding to it. Use cumulative or classic retention if you need a number that stays fixed once a cohort matures.
+
+**Retention is lower than your total install count suggests.** Retention only counts installs that opened the app and were tracked by the Linkrunner SDK. Installs reported by an ad network without a tracked app open are excluded from the cohort.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

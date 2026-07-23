@@ -4,6 +4,16 @@ description: "Guide for integrating Linkrunner in Unity apps using native Androi
 icon: "unity"
 ---
 
+<Note>
+  **Prefer to let your AI coding agent do this?** Install the Linkrunner skill and Claude Code, Cursor, GitHub Copilot, or Windsurf will wire up the native bridges and deep links for you:
+
+  ```bash
+  npx @linkrunner/skills add unity
+  ```
+
+  Then ask your agent to "integrate Linkrunner". See [Linkrunner Agent Skills](https://github.com/linkrunner-labs/skills).
+</Note>
+
 Linkrunner does not have a dedicated Unity SDK. This guide walks you through integrating the native Android and iOS SDKs into your Unity project using platform bridge plugins.
 
 ## Prerequisites
@@ -433,7 +443,7 @@ After building your Unity project for iOS and opening the generated Xcode projec
    https://github.com/linkrunner-labs/linkrunner-ios.git
    ```
 3. Select the latest version (3.8.0+)
-4. Click **Add Package** and choose the **LinkrunnerStatic** library
+4. Click **Add Package** and choose the **LinkrunnerKitStatic** library
 
 <Tip>
 You'll need to add the SPM dependency each time you regenerate the Xcode project from Unity. Consider using a post-build script to automate this — see the [Automation Tips](#automating-ios-dependency-with-a-post-build-script) section.
@@ -463,7 +473,7 @@ Create `Assets/Plugins/iOS/LinkrunnerUnityBridge.swift`:
 
 ```swift
 import Foundation
-import Linkrunner
+import LinkrunnerKit
 
 // MARK: - Unity interop
 
@@ -896,7 +906,7 @@ public class LinkrunnerSDK : MonoBehaviour
     /// <summary>
     /// Track a payment/revenue event.
     /// </summary>
-    public static void CapturePayment(string userId, double amount, string paymentId = "",
+    public static void CapturePayment(string userId, double amount, string paymentId,
         string type = "DEFAULT", string status = "PAYMENT_COMPLETED", string eventDataJson = "")
     {
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -1300,6 +1310,8 @@ LinkrunnerSDK.CapturePayment(
 );
 ```
 
+**`paymentId`** is required and must be unique for each payment. It is used for idempotent deduplication, so retries cannot double count revenue.
+
 **Payment types:** `FIRST_PAYMENT`, `SECOND_PAYMENT`, `WALLET_TOPUP`, `FUNDS_WITHDRAWAL`, `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `ONE_TIME`, `RECURRING`, `DEFAULT`
 
 **Payment statuses:** `PAYMENT_INITIATED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, `PAYMENT_CANCELLED`
@@ -1418,7 +1430,7 @@ For detailed testing steps, see the [Integration Testing Guide](/testing/integra
 - **Swift file not compiling**: Unity does not automatically compile `.swift` files. After generating the Xcode project, add `LinkrunnerUnityBridge.swift` to the **UnityFramework** target's **Compile Sources** build phase manually.
 - **"Use of unresolved identifier 'LinkrunnerSDK'"**: The LinkrunnerKit SPM package hasn't been added to the Xcode project. Add it via File → Add Package Dependencies.
 - **Bridging header issues**: When Xcode prompts to create a bridging header after adding the first Swift file, accept it. Ensure `SWIFT_VERSION` is set to `5.0` or higher in UnityFramework build settings.
-- **Linker errors**: Ensure you selected **LinkrunnerStatic** (not the dynamic variant) when adding the SPM package.
+- **Linker errors**: Ensure you selected **LinkrunnerKitStatic** (not the dynamic variant) when adding the SPM package.
 - **ATT dialog not showing**: The `NSUserTrackingUsageDescription` key must be present in Info.plist. The SDK handles requesting permission automatically during initialization.
 
 ### General

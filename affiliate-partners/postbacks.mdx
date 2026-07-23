@@ -1,0 +1,186 @@
+---
+title: "Postbacks and Macros"
+description: "The macros Linkrunner fills into your postback URLs, with examples for each conversion"
+icon: "satellite-dish"
+---
+
+## Overview
+
+When a conversion is attributed to your click, Linkrunner sends a server-to-server postback to your endpoint. You give Linkrunner a postback URL that contains macros. Linkrunner replaces each macro with the real value and sends the request.
+
+You provide one URL template per conversion you want to receive (install, signup, in-app event). Linkrunner sends the request as an HTTP `GET`.
+
+<Note>
+  These are postback URL macros. They are different from the macros your
+  platform may use in the click tracking link. Your platform must resolve click
+  macros before sending traffic to Linkrunner.
+</Note>
+
+## Click tracking link
+
+The Linkrunner dashboard shows a click tracking link for your campaign. For affiliate campaigns, the click link uses Linkrunner's click parameters:
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}&s3={publisher_id}&gaid={gaid}
+```
+
+Your platform resolves the placeholders before redirecting the user to Linkrunner. The actual click should look like this:
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid=a1b2c3d4e5&s2=camp_88&s3=pub_4471&gaid=38400000-8cf0-11bd-b23e-10b96e40000d
+```
+
+| Parameter        | Use                                                                                              |
+| ---------------- | ------------------------------------------------------------------------------------------------ |
+| `c`              | Linkrunner campaign identifier. Keep the value from the dashboard.                               |
+| `tid`            | Your click ID. Linkrunner returns this in postbacks as `{click_id}` and `{tid}`.                 |
+| `s2`, `s3`, `s4` | Optional passthrough values. Linkrunner returns them in postbacks as `{s2}`, `{s3}`, and `{s4}`. |
+| `gaid`           | Android Google Advertising ID, when available.                                                   |
+| `idfa`           | iOS advertising ID, when available.                                                              |
+
+Use these parameter names in the URL. For example, use `tid={click_id}` instead of `utm_id={click_id}`, and use `s2={campaign_id}` instead of `cc={campaign_id}`.
+
+Do not add postback-only values such as `postbackKey`, `event`, `event_name`, or `crc` to the click tracking link. If your postback endpoint requires a secret key, configure it privately with Linkrunner.
+
+## Macro syntax
+
+Macros are written in lowercase inside curly braces:
+
+```
+{macro_name}
+```
+
+Rules:
+
+- Linkrunner replaces every macro it recognizes with the conversion's value.
+- Values are URL-encoded automatically. Do not encode the macros yourself.
+- A macro with no value for a given conversion is replaced with an empty string. For example, `{idfa}` is empty on an Android install.
+- Text that is not a recognized macro is left untouched, so static query parameters are safe.
+
+<Warning>
+  Only use the postback macros listed below in your postback URL template.
+  Linkrunner leaves unsupported campaign, event, platform, sub, and secret
+  placeholders unchanged.
+</Warning>
+
+## Macro reference
+
+### Identifiers
+
+| Macro          | Description                                                                                  |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| `{click_id}`   | The `tid` value you sent on the tracking link. Use this to match the postback to your click. |
+| `{tid}`        | Same value as `{click_id}`.                                                                  |
+| `{install_id}` | Linkrunner's unique identifier for the install.                                              |
+
+### Event
+
+| Macro          | Description                                                                                  |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| `{event_name}` | The conversion name: `install`, `signup`, or the in-app event name (for example `purchase`). |
+| `{event}`      | Same value as `{event_name}`.                                                                |
+| `{timestamp}`  | Time when Linkrunner builds the postback, as a Unix timestamp in seconds.                    |
+
+### Revenue
+
+| Macro           | Description                                                                                                                        |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `{revenue}`     | Revenue amount in major currency units, with two decimal places (for example `9.99`). Populated only on events that carry revenue. |
+| `{sale_amount}` | Same value as `{revenue}`.                                                                                                         |
+| `{amount}`      | Same value as `{revenue}`.                                                                                                         |
+| `{currency}`    | ISO 4217 currency code (for example `USD`, `INR`).                                                                                 |
+
+<Warning>
+  `{revenue}` is in major currency units, not minor units. `9.99` means 9.99,
+  not 9.99 cents. Parse it as a decimal amount.
+</Warning>
+
+### Device
+
+| Macro    | Description                      |
+| -------- | -------------------------------- |
+| `{gaid}` | Google Advertising ID (Android). |
+| `{idfa}` | iOS Advertising ID (Apple).      |
+
+### Click passthrough
+
+| Macro  | Description                                   |
+| ------ | --------------------------------------------- |
+| `{s2}` | The `s2` value you sent on the tracking link. |
+| `{s3}` | The `s3` value you sent on the tracking link. |
+| `{s4}` | The `s4` value you sent on the tracking link. |
+
+### Static values
+
+If your endpoint needs a fixed query parameter, add it as plain text in the URL template:
+
+```
+https://partner.example.com/postback?tid={click_id}&source=linkrunner
+```
+
+Do not use `{secret.postbackKey}`. If your endpoint requires a secret key, configure it privately with Linkrunner so it is not shown in dashboard tracking links or public examples.
+
+## Examples
+
+### Install postback
+
+Your template:
+
+```
+https://partner.example.com/postback?tid={click_id}&event={event_name}&gaid={gaid}&s2={s2}&ts={timestamp}
+```
+
+What Linkrunner sends:
+
+```
+https://partner.example.com/postback?tid=a1b2c3d4e5&event=install&gaid=38400000-8cf0-11bd-b23e-10b96e40000d&s2=camp_88&ts=1751021400
+```
+
+### Signup postback
+
+```
+https://partner.example.com/postback?tid={click_id}&event={event_name}&s2={s2}&ts={timestamp}
+```
+
+### Purchase postback with revenue
+
+Your template:
+
+```
+https://partner.example.com/postback?tid={click_id}&event={event_name}&amount={revenue}&currency={currency}&ts={timestamp}
+```
+
+What Linkrunner sends:
+
+```
+https://partner.example.com/postback?tid=a1b2c3d4e5&event=purchase&amount=9.99&currency=USD&ts=1751025000
+```
+
+## Deduplication
+
+Linkrunner retries a postback if your endpoint does not respond with a success status. Treat postbacks as at-least-once. Deduplicate on your click ID plus event name, or use a fixed value you send in `s4` on the click link.
+
+## Formatting reference
+
+| Value                      | Format                                     |
+| -------------------------- | ------------------------------------------ |
+| Timestamps (`{timestamp}`) | Unix seconds.                              |
+| Revenue (`{revenue}`)      | Decimal, two places, major currency units. |
+| Currency (`{currency}`)    | ISO 4217 three-letter code.                |
+| All values                 | URL-encoded.                               |
+
+## Troubleshooting
+
+**A macro arrives empty.**
+The value was not available for that conversion. For example, `{idfa}` is empty on Android, and `{revenue}` is `0` on events without revenue. Device advertising IDs depend on the value being present on the click and on user consent.
+
+**A macro arrives as literal text.**
+That macro is not supported by the current Linkrunner postback renderer. Use one of the macros listed on this page.
+
+**You receive the same conversion twice.**
+Postbacks are at-least-once. Deduplicate on your click ID plus event name, or use a fixed value you send in `s4` on the click link.
+
+**Revenue looks 100x too large or too small.**
+`{revenue}` is in major units (`9.99`), not minor units. Do not multiply or divide by 100.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

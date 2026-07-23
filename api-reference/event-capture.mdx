@@ -4,6 +4,16 @@ description: "Documentation for Linkrunner Event Capture API"
 icon: "shuffle"
 ---
 
+<Note>
+  **Using an AI coding agent?** Let it instrument your events and revenue correctly (taxonomy, dedupe, refunds, and these server-side APIs):
+
+  ```bash
+  npx @linkrunner/skills add events
+  ```
+
+  See [Linkrunner Agent Skills](/ai-agent-skills).
+</Note>
+
 This documentation is for tracking custom events from your backend only! For tracking events from your app please go through the [Flutter](https://docs.linkrunner.io/sdk/flutter/usage#tracking-custom-events) or [React Native](https://docs.linkrunner.io/sdk/react-native/usage#tracking-custom-events) documentation.
 
 <Note>
@@ -44,15 +54,17 @@ POST: /capture-event
     "currency": "USD",
     "is_featured": true
   },
-  "user_id": "user_12345"
+  "user_id": "user_12345",
+  "event_id": "evt_12345"
 }
 ```
 
-| Parameter  | Type   | Description                                               |
-| ---------- | ------ | --------------------------------------------------------- |
-| event_name | string | **Required**. Name of the event to track                  |
-| event_data | object | **Optional**. Additional data associated with the event   |
-| user_id    | string | **Required**. User identifier to associate with the event |
+| Parameter  | Type   | Description                                                                            |
+| ---------- | ------ | ------------------------------------------------------------------------------------- |
+| event_name | string | **Required**. Name of the event to track                                              |
+| event_data | object | **Optional**. Additional data associated with the event                               |
+| user_id    | string | **Required**. User identifier to associate with the event                             |
+| event_id   | string | **Optional**. Your own unique identifier for the event, useful for deduplication and correlating with your backend |
 
 ### Responses
 

@@ -125,7 +125,7 @@ final class LinkrunnerClient {
     func capturePayment(
         amount: Double,
         userId: String,
-        paymentId: String? = nil,
+        paymentId: String,
         type: String = "DEFAULT",
         status: String = "PAYMENT_COMPLETED",
         eventData: [String: Any]? = nil
@@ -135,7 +135,7 @@ final class LinkrunnerClient {
         body["user_id"] = userId
         body["type"] = type
         body["status"] = status
-        if let paymentId { body["payment_id"] = paymentId }
+        body["payment_id"] = paymentId
         if let eventData { body["event_data"] = eventData }
         body["time_since_app_install"] = timeSinceInstall()
         body["data"] = ["device_data": await deviceData()]
@@ -396,7 +396,7 @@ A retry can send the same request twice if the first attempt reached the server 
 | `capture-event` | Not deduplicated | A retried event can be counted twice. |
 
 <Tip>
-  Always pass a `paymentId` to `capturePayment` so retries cannot double count revenue. Events have no server-side deduplication, so if exact event counts matter, disable retries for those calls.
+  `paymentId` is required for `capturePayment`, and a unique value ensures retries cannot double count revenue. Events have no server-side deduplication, so if exact event counts matter, disable retries for those calls.
 </Tip>
 
 ## Troubleshooting

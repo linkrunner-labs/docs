@@ -138,10 +138,10 @@ object LinkrunnerMinimal {
             base(context).put("event_name", name).apply { if (data != null) put("event_data", data) }
         )
 
-    suspend fun capturePayment(context: Context, userId: String, amount: Double) =
+    suspend fun capturePayment(context: Context, userId: String, amount: Double, paymentId: String) =
         post(
             "/api/client/capture-payment",
-            base(context).put("user_id", userId).put("amount", amount).put("status", "PAYMENT_COMPLETED")
+            base(context).put("user_id", userId).put("amount", amount).put("payment_id", paymentId).put("status", "PAYMENT_COMPLETED")
         )
 }
 ```
@@ -187,7 +187,7 @@ CoroutineScope(Dispatchers.IO).launch {
 
 // 5. Capture a payment
 CoroutineScope(Dispatchers.IO).launch {
-    LinkrunnerMinimal.capturePayment(context, userId = "user_123", amount = 99.99)
+    LinkrunnerMinimal.capturePayment(context, userId = "user_123", amount = 99.99, paymentId = "payment_123")
 }
 ```
 

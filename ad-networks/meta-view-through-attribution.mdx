@@ -1,0 +1,87 @@
+---
+title: "Meta View-Through Attribution FAQ"
+description: "When Linkrunner receives view-through install data from Meta, and why Meta Ads Manager can show view-through conversions that Linkrunner does not"
+icon: "circle-question"
+---
+
+A view-through install happens when a user sees your ad, does not click it, and installs the app later. Meta attributes these installs in its own dashboard, but only shares view-through data with measurement partners like Linkrunner under specific campaign conditions. This page explains those conditions.
+
+For setup instructions, see the [Meta Install Referrer guide](/features/meta-install-referrer). For general number differences between Meta and Linkrunner, see the [Meta Ads FAQ and Discrepancies](/ad-networks/meta-ads-discrepancies).
+
+<Note>
+    Meta documents this mechanism in [Meta Install Referrer](https://developers.facebook.com/docs/app-ads/meta-install-referrer/). It is the only channel through which Meta shares view-through install data, and it applies to campaigns "where the objective is app installs" (the **App promotion** objective in Ads Manager).
+</Note>
+
+## When Meta shares view-through data
+
+All of the following must be true for an install to arrive with view-through attribution:
+
+<Steps>
+<Step title="Campaign objective is App promotion">
+Only campaigns created with the **App promotion** objective generate view-through install referrer data. Sales, Leads, Traffic and other objectives do not, even when their ads open the app store and drive installs.
+</Step>
+<Step title="Targeting is broad">
+Meta requires broad targeting: Advantage+ app campaigns, or manual App promotion campaigns with default age and gender (18-65+, all genders). If detailed targeting or custom audiences are applied, the Advantage versions are required. Narrow geo, age or gender targeting disqualifies the campaign from view-through data.
+</Step>
+<Step title="Meta Install Referrer is configured">
+Your app needs the [Meta Install Referrer setup](/features/meta-install-referrer): a supported SDK version, the Facebook App ID in `AndroidManifest.xml`, the install referrer decryption key added in Linkrunner, and a recent Facebook or Instagram app on the user's device.
+</Step>
+</Steps>
+
+When these conditions are met, the Facebook or Instagram app stores an attribution record on the device for ad impressions as well as clicks. The Linkrunner SDK reads it on first launch and the install is attributed as view-through.
+
+## Meta View-Through FAQ
+
+<AccordionGroup>
+
+<Accordion title="Meta shows view-through conversions but Linkrunner shows none. Why?">
+Meta Ads Manager and the install referrer are two separate systems.
+
+Ads Manager numbers are computed inside Meta. Meta logs every ad impression, receives your app's events through the Meta SDK or Conversions API, and joins the two within the ad set's attribution setting (for example 7-day click, 1-day view). This works for any campaign objective.
+
+The install referrer is the only data Meta shares with measurement partners on the device. For campaigns that are not App promotion with broad targeting, Meta writes click records only. So Ads Manager can credit view-through conversions to a Sales campaign while no view-through evidence ever reaches the device, which is why Linkrunner (or any MMP) cannot report them.
+</Accordion>
+
+<Accordion title="My campaign drives app installs from the app store. Isn't that an app campaign?">
+Not necessarily. A Sales objective campaign can use the app as its conversion location and optimize for in-app purchases. Its ads open the app store and installs happen, but the objective is still Sales, so Meta does not generate view-through install referrer data for it.
+
+Check the **Objective** column in Ads Manager. Campaign and ad set names are free text, so a campaign named "App Promotion" can still be a Sales campaign underneath.
+</Accordion>
+
+<Accordion title="Does this affect click-through attribution?">
+No. Clicks that open the app store carry the install referrer for any objective, and Linkrunner attributes them normally. Only view-through data is restricted to App promotion campaigns with broad targeting.
+</Accordion>
+
+<Accordion title="Which attribution setting should my ad sets use?">
+The ad set's attribution setting (for example 7-day click, 1-day view) controls how Meta counts conversions in its own reporting. It does not enable view-through install referrer data on its own. A Sales ad set with a 1-day view window still produces no view-through data for Linkrunner.
+</Accordion>
+
+<Accordion title="Does view-through attribution work on iOS?">
+No. The Meta Install Referrer is Android only. On iOS, view-through installs are only reflected through [SKAdNetwork](/features/skadnetwork-integration) postbacks.
+</Accordion>
+
+<Accordion title="How do I get view-through data flowing?">
+<Steps>
+<Step title="Run App promotion campaigns">
+Move install-driving budget to campaigns created with the **App promotion** objective, ideally Advantage+ app campaigns.
+</Step>
+<Step title="Keep targeting broad">
+Use default age and gender. If you need detailed targeting or custom audiences, use their Advantage versions.
+</Step>
+<Step title="Complete the Meta Install Referrer setup">
+Follow the [Meta Install Referrer guide](/features/meta-install-referrer) to add the Facebook App ID and decryption key.
+</Step>
+</Steps>
+</Accordion>
+
+</AccordionGroup>
+
+## References
+
+- [Meta Install Referrer](https://developers.facebook.com/docs/app-ads/meta-install-referrer/) (Meta for Developers)
+- [Install Referrer](https://developers.facebook.com/docs/app-ads/install-referrer/) (Meta for Developers, Play Store referrer)
+- [Branch: Meta Content Provider Install Referrer Support](https://help.branch.io/docs/new-metafacebook-content-provider-install-referrer-support) (documents the broad targeting requirement)
+
+---
+
+For any questions or assistance, please contact us at [support@linkrunner.io](mailto:support@linkrunner.io).

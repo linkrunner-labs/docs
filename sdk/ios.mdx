@@ -4,6 +4,16 @@ description: "Complete guide for integrating Linkrunner in native iOS apps"
 icon: "apple"
 ---
 
+<Note>
+  **Prefer to let your AI coding agent do this?** Install the Linkrunner skill and Claude Code, Cursor, GitHub Copilot, or Windsurf will wire up the SDK and deep links for you:
+
+  ```bash
+  npx @linkrunner/skills add ios
+  ```
+
+  Then ask your agent to "integrate Linkrunner". See [Linkrunner Agent Skills](https://github.com/linkrunner-labs/skills).
+</Note>
+
 ## Requirements
 
 -   iOS 15.0 or higher
@@ -23,13 +33,13 @@ The Linkrunner SDK can be installed via Swift Package Manager (SPM), which is in
     ```
 3. Select the version you want to use (we recommend using the latest version)
 4. Click **Add Package**
-5. Choose the library type **LinkrunnerStatic**
+5. Choose the library type **LinkrunnerKitStatic**
 
 Alternatively, you can add the package dependency to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "3.0.2")
+    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "3.12.0")
 ]
 ```
 
@@ -40,7 +50,7 @@ targets: [
     .target(
         name: "YourApp",
         dependencies: [
-            .product(name: "Linkrunner", package: "linkrunner-ios")
+            .product(name: "LinkrunnerKitStatic", package: "linkrunner-ios")
         ]
     )
 ]
@@ -51,8 +61,12 @@ targets: [
 After installation, you can import the SDK in your Swift files:
 
 ```swift
-import Linkrunner
+import LinkrunnerKit
 ```
+
+<Note>
+Use `import LinkrunnerKit` for v3.0.0 and later. The public API remains `LinkrunnerSDK.shared`.
+</Note>
 
 ### Required Permissions
 
@@ -76,7 +90,7 @@ To enable SKAdNetwork postback copies to be sent to Linkrunner, add the followin
 <string>https://linkrunner-skan.com</string>
 ```
 
-For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/sdk/skadnetwork-integration).
+For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
 
 #### Network Access
 
@@ -90,7 +104,7 @@ You can find your project token [here](https://dashboard.linkrunner.io/dashboard
 Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
 
 ```swift
-import Linkrunner
+import LinkrunnerKit
 import SwiftUI
 
 @main
@@ -279,22 +293,63 @@ func getAttributionInfo() async {
 ```
 
 ```swift
-struct AttributionData: Codable, Sendable {
-    let deeplink: String?
-    let campaignData: CampaignData
-    let attributionSource: String
+// getAttributionData() returns this type
+public struct LRAttributionDataResponse: Codable, Sendable {
+    public let deeplink: String?
+    public let campaignData: CampaignData?
+    public let attributionSource: String
 }
 
-struct CampaignData: Codable, Sendable {
-    let id: String
-    let name: String
-    let adNetwork: String?
-    let type: String
-    let installedAt: String
-    let storeClickAt: String?
-    let groupName: String
-    let assetName: String
-    let assetGroupName: String
+public struct CampaignData: Codable, Sendable {
+    public let id: String
+    public let name: String
+    public let type: CampaignType        // .organic ("ORGANIC") | .inorganic ("INORGANIC")
+    public let adNetwork: AdNetwork?      // .meta ("META") | .google ("GOOGLE")
+    public let groupName: String?
+    public let assetGroupName: String?
+    public let adNetworkCampaignId: String? // Ad network campaign ID
+    public let adSetId: String?             // Ad set ID
+    public let adSetName: String?           // Ad set name
+    public let adCreativeId: String?        // Ad creative ID
+    public let adCreativeName: String?      // Ad creative name
+    public let assetName: String?
+    public let installedAt: Date?
+    public let storeClickAt: Date?
+}
+
+public enum CampaignType: String, Codable, Sendable {
+    case organic = "ORGANIC"
+    case inorganic = "INORGANIC"
+}
+
+public enum AdNetwork: String, Codable, Sendable {
+    case meta = "META"
+    case google = "GOOGLE"
+}
+```
+
+**Example response** (raw values — `type`/`adNetwork` decode to enums, `installedAt`/`storeClickAt` to `Date`):
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123",
+    "campaignData": {
+        "id": "camp_123",
+        "name": "Summer Sale 2024",
+        "adNetwork": "META",
+        "type": "INORGANIC",
+        "installedAt": "2024-03-20T10:30:00Z",
+        "storeClickAt": "2024-03-20T10:29:45Z",
+        "groupName": "iOS Campaign",
+        "assetName": "Banner Ad 1",
+        "assetGroupName": "Product Catalog",
+        "adNetworkCampaignId": "120214682829390250",
+        "adSetId": "120214682829640250",
+        "adSetName": "Productivity",
+        "adCreativeId": "120214682926100250",
+        "adCreativeName": "Static_2"
+    },
+    "attributionSource": "META"
 }
 ```
 
@@ -359,7 +414,7 @@ func capturePayment() async {
         try await LinkrunnerSDK.shared.capturePayment(
             amount: 99.99, // Payment amount
             userId: "user123", // User identifier
-            paymentId: "payment456", // Optional: Unique payment identifier
+            paymentId: "payment456", // Required: Unique payment identifier
             type: .firstPayment, // optional
             status: .completed, // optional
             eventData: [        // Optional: Ecommerce/custom event data
@@ -451,7 +506,8 @@ func trackEvent() async {
                 "product_id": "12345",
                 "category": "electronics",
                 "amount": 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
-            ]
+            ],
+            eventId: "order_12345" // Optional: Your own unique event identifier
         )
         print("Event tracked successfully")
     } catch {
@@ -459,6 +515,12 @@ func trackEvent() async {
     }
 }
 ```
+
+#### Parameters for `LinkrunnerSDK.shared.trackEvent`
+
+- `eventName`: `String` (required) - Name of the event to track
+- `eventData`: `[String: Any]` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventId`: `String` (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
 
 ### Revenue Sharing with Ad Networks
 
@@ -657,7 +719,7 @@ Connect APNs with Linkrunner
 
             ```swift
             import UIKit
-            import Linkrunner
+            import LinkrunnerKit
 
             class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -691,7 +753,7 @@ Connect APNs with Linkrunner
 
             ```swift
             import SwiftUI
-            import Linkrunner
+            import LinkrunnerKit
 
             @main
             struct MyApp: App {
@@ -750,7 +812,7 @@ You can find your project token [here](https://dashboard.linkrunner.io/dashboard
 
 ```swift
 import SwiftUI
-import Linkrunner
+import LinkrunnerKit
 
 @main
 struct MyApp: App {

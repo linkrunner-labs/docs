@@ -4,6 +4,16 @@ description: "Complete guide for integrating Linkrunner in Flutter apps"
 icon: "flutter"
 ---
 
+<Note>
+  **Prefer to let your AI coding agent do this?** Install the Linkrunner skill and Claude Code, Cursor, GitHub Copilot, or Windsurf will wire up the SDK and deep links for you:
+
+  ```bash
+  npx @linkrunner/skills add flutter
+  ```
+
+  Then ask your agent to "integrate Linkrunner". See [Linkrunner Agent Skills](https://github.com/linkrunner-labs/skills).
+</Note>
+
 <div
     className="video-container"
     style={{
@@ -129,6 +139,17 @@ platform :ios, '15.0'
 <key>NSUserTrackingUsageDescription</key>
 <string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
 ```
+
+3. To enable SKAdNetwork postback copies to be sent to Linkrunner, add the following keys to your `Info.plist` file:
+
+```xml
+<key>NSAdvertisingAttributionReportEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+<key>AttributionCopyEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+```
+
+For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
 
 ## Initialization (Required)
 You'll need your [project token](https://dashboard.linkrunner.io/dashboard?m=documentation) to get started!
@@ -348,6 +369,11 @@ class CampaignData {
   final String? adNetwork;           // Optional: "META" | "GOOGLE" | null
   final String? groupName;           // Optional: Campaign group name
   final String? assetGroupName;      // Optional: Asset group name
+  final String? adNetworkCampaignId; // Optional: Ad network campaign ID
+  final String? adSetId;             // Optional: Ad set ID
+  final String? adSetName;           // Optional: Ad set name
+  final String? adCreativeId;        // Optional: Ad creative ID
+  final String? adCreativeName;      // Optional: Ad creative name
   final String? assetName;           // Optional: Asset name
   final String type;                 // Required: Campaign type ("ORGANIC" | "INORGANIC")
   final String installedAt;          // Required: Installation timestamp
@@ -358,18 +384,24 @@ class CampaignData {
 Example response:
 
 ```dart
+// getAttributionData() returns a typed AttributionData object — access fields in camelCase.
 {
   "deeplink": "https://app.yourdomain.com/product/123",
-  "campaign_data": {
+  "campaignData": {
     "id": "camp_123",
     "name": "Summer Sale 2024",
-    "ad_network": "META",
-    "group_name": "iOS Campaign",
-    "asset_group_name": "Product Catalog",
-    "asset_name": "Banner Ad 1",
+    "adNetwork": "META",
+    "groupName": "iOS Campaign",
+    "assetGroupName": "Product Catalog",
+    "assetName": "Banner Ad 1",
+    "adNetworkCampaignId": "120214682829390250",
+    "adSetId": "120214682829640250",
+    "adSetName": "Productivity",
+    "adCreativeId": "120214682926100250",
+    "adCreativeName": "Static_2",
     "type": "INORGANIC",
-    "installed_at": "2024-03-20T10:30:00Z",
-    "store_click_at": "2024-03-20T10:29:45Z"
+    "installedAt": "2024-03-20T10:30:00Z",
+    "storeClickAt": "2024-03-20T10:29:45Z"
   }
 }
 ```
@@ -445,7 +477,7 @@ Future<void> capturePayment() async {
       capturePayment: LRCapturePayment(
         amount: 99.99, // Required: Payment amount
         userId: 'user123', // Required: User identifier
-        paymentId: 'payment456', // Optional: Unique payment identifier
+        paymentId: 'payment456', // Required: Unique payment identifier
         type: PaymentType.FIRST_PAYMENT, // Optional: Payment type
         // type: PaymentType.SECOND_PAYMENT, // Optional: Payment type
         status: PaymentStatus.PAYMENT_COMPLETED, // Optional: Payment status
@@ -477,7 +509,7 @@ Future<void> capturePayment() async {
 
 - `amount`: double (required) - The payment amount
 - `userId`: String (required) - Identifier for the user making the payment
-- `paymentId`: String (optional) - Unique identifier for the payment
+- `paymentId`: String (required) - Unique identifier for the payment, used to deduplicate transactions
 - `type`: PaymentType (optional) - Type of payment. Available options:
   - `PaymentType.FIRST_PAYMENT` - First payment made by the user
   - `PaymentType.SECOND_PAYMENT` - Second payment made by the user
@@ -654,6 +686,7 @@ Future<void> trackEvent() async {
         'category': 'electronics',
         'amount': 99.99, // Include amount as a number for revenue sharing with ad networks like Google and Meta
       },
+      eventId: 'order_12345', // Optional: Your own unique event identifier (String or num)
     );
     print('Event tracked successfully');
   } catch (e) {
@@ -661,6 +694,12 @@ Future<void> trackEvent() async {
   }
 }
 ```
+
+#### Parameters for `LinkRunner().trackEvent`
+
+- `eventName`: `String` (required) - Name of the event to track
+- `eventData`: `Map<String, dynamic>` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventId`: `Object` (optional) - Your own unique identifier for the event (`String` or `num`), useful for deduplication and correlating with your backend
 
 ### Revenue Sharing with Ad Networks
 
