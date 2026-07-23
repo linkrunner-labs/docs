@@ -1,171 +1,18 @@
 ---
 title: "SKAN Setup"
-description: "Configure SKAdNetwork for Google Ads, Meta Ads, and the Linkrunner SDK to enable privacy-preserving iOS attribution"
+description: "Configure SKAdNetwork for the Linkrunner SDK and your ad networks to enable privacy-preserving iOS attribution"
 icon: "apple"
 ---
 
 SKAdNetwork (SKAN) is Apple's privacy-preserving framework for iOS attribution. With Linkrunner, SKAN setup happens in three places:
 
-1. **Google Ads Configuration**: connect your Google Ads account and map events for SKAN postbacks
-2. **Meta Ads Configuration**: connect your Meta dataset and configure conversion values in Meta Events Manager
-3. **Linkrunner SDK Configuration**: update SDK versions, add the ad network identifiers, and add the iOS postback copy endpoints
+1. **Your app**: update the SDK and add the SKAN keys to `Info.plist`
+2. **Linkrunner**: configure the SKAN schema (events, priority, ranges)
+3. **Your ad networks**: complete the Google Ads and Meta Ads specific steps
 
-Complete all three sections to get SKAN attribution working end-to-end.
+This page covers the first two, which are shared across all networks. Then follow the network guide for each platform you advertise on.
 
-<Note>
-    The SKAN schema (priority order, ranges, conversion value mapping) is configured once under **Settings → SKAN
-    Setup** in the [Linkrunner Dashboard](https://dashboard.linkrunner.io/dashboard/settings/skan-setup). Linkrunner
-    automatically generates the fine and coarse conversion values from your schema for both Google and Meta.
-</Note>
-
-## 1. Google Ads Configuration
-
-Use the **Google Ads SKAN Integration Checklist** in the dashboard to track progress: [Settings → Integrations → Google Ads → SKAN Integration](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=skan_integration).
-
-<Tip>For a step-by-step walkthrough of the Google side, see the dedicated [Google Ads SKAN Setup](/features/google-skan-setup) guide.</Tip>
-
-### iOS Link ID Configuration
-
-A Google Ads iOS link ID enables data sharing between Linkrunner and Google Ads for your iOS app.
-
-1. In Google Ads, go to **Tools → Data Manager → Third-party app Analytics** (or visit [ads.google.com/aw/productlinks/thirdpartyappanalytics](https://ads.google.com/aw/productlinks/thirdpartyappanalytics))
-2. Click **+ Create link ID**
-3. Select **Other provider** and enter provider ID `9936233049`
-4. Choose the **iOS** platform and select your app
-5. Click **Create link ID**, then copy the generated ID
-6. In the Linkrunner Dashboard, open **Settings → Integrations → Google Ads** and paste the iOS link ID
-
-See the full walkthrough in [Google Ads → Create Link ID](/ad-networks/google-ads#2-create-link-id-for-android%2Fios-app).
-
-### Connecting Google Ads Account
-
-Linkrunner needs OAuth access to your Google Ads account to deliver SKAN postbacks and conversion values.
-
-1. In the Linkrunner Dashboard, open **Settings → Integrations → Google Ads**
-2. Click **Connect Google Ads Account** and authenticate with the Google account that manages your ads
-3. Select the customer account(s) you want to connect
-
-### SKAN Priority Order for Events
-
-Linkrunner converts your event list into SKAN conversion values (0–63). The order you put events in determines their priority. Higher-priority events overwrite lower-priority ones in the same measurement window.
-
-1. Go to **Settings → SKAN Setup → Events Setup** in the [Linkrunner Dashboard](https://dashboard.linkrunner.io/dashboard/settings/skan-setup?tab=event-setup)
-2. Add the events that matter for optimization (e.g., `Purchase`, `Subscription Started`, `Onboarding Complete`)
-3. Drag rows to set priority (the topmost event has the highest priority)
-4. For revenue events, set a **min** and **max** range; for occurrence events, set an **average**
-5. Click **Generate SKAN Mapping** to produce the fine and coarse conversion values
-
-Apple's SKAN allows up to **64 conversion values total**. The dashboard shows the combination count in real time and warns if your configuration would exceed the limit.
-
-For background on how this maps to SKAN 4.0, see [Conversion Values in SKAdNetwork](/features/skadnetwork-conversion-values).
-
-### Event Mapping
-
-Map each Linkrunner event to the corresponding Google Ads conversion action so that postbacks land against the right conversion in your Google Ads account.
-
-1. Open **Settings → Integrations → Google Ads → Event Mapping** in the Linkrunner Dashboard
-2. For each event in your SKAN schema, select the Google Ads conversion action it should map to
-3. Save the mapping
-
-<Note>
-    Linkrunner automatically sends the SKAN schema configuration to Google on your behalf. You don't need to upload
-    conversion values manually in Google Ads.
-</Note>
-
-## 2. Meta Ads Configuration
-
-Use the **Meta SKAN Integration Checklist** in the dashboard to track progress: [Settings → Integrations → Meta Ads → SKAN Integration](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=skan_integration).
-
-<Tip>For a step-by-step walkthrough of the Meta side, see the dedicated [Meta SKAN Setup](/features/meta-skan-setup) guide.</Tip>
-
-### Dataset ID Configuration
-
-Your Meta dataset ID identifies the event dataset Linkrunner sends SKAN postbacks to.
-
-1. In Meta Events Manager, open your dataset and copy the **Dataset ID**
-2. In the Linkrunner Dashboard, open **Settings → Integrations → Meta Ads → Ad Account** and paste the Dataset ID
-
-### CAPI Access Token Configuration
-
-The Conversions API (CAPI) access token lets Linkrunner forward events to Meta on behalf of your dataset.
-
-1. In Meta Events Manager, go to your dataset → **Settings → Conversions API → Generate access token**
-2. Copy the generated token
-3. In the Linkrunner Dashboard, open **Settings → Integrations → Meta Ads → Ad Account** and paste the CAPI access token
-
-### App ID Configuration
-
-Your Meta App ID identifies the Facebook app associated with your iOS app.
-
-1. In [Meta for Developers](https://developers.facebook.com/), open your app and go to **Settings → Basic**
-2. Copy the **App ID**
-3. In the Linkrunner Dashboard, open **Settings → Integrations → Meta Ads → Integration** and paste the App ID
-
-### Connect Meta Ad Account
-
-Connect the Meta Business Manager account whose ad accounts you want Linkrunner to attribute against.
-
-1. In the Linkrunner Dashboard, open **Settings → Integrations → Meta Ads → Ad Account**
-2. Click **Connect Meta Account** and complete the OAuth flow
-3. Select the ad account(s) you want to enable
-
-<Note>
-    For Linkrunner to configure the SKAN schema on Meta on your behalf, also grant access to **access@linkrunner.io**
-    in your Meta Business Manager.
-</Note>
-
-### SKAN Event Priority
-
-Meta's SKAN setup uses the same priority order configured under **Settings → SKAN Setup → Events Setup** as Google. If you've already set this up for Google Ads, no extra work is needed. Linkrunner reuses the same schema for Meta.
-
-If you haven't yet, see [SKAN Priority Order for Events](#skan-priority-order-for-events) above.
-
-### Event Mapping
-
-Map each Linkrunner event to the corresponding Meta event (e.g., `Purchase`, `AddToCart`, `ViewContent`) so postbacks are tagged correctly in Meta Events Manager.
-
-1. Open **Settings → Integrations → Meta Ads → Event Mapping** in the Linkrunner Dashboard
-2. For each event in your SKAN schema, select the Meta event it should map to
-3. Enable **Send Revenue** for revenue events and select the currency
-4. Save the mapping
-
-See the full walkthrough in [Meta Ads → Event Mapping](/ad-networks/meta-ads#2-set-up-event-mapping).
-
-### SKAN Configuration in Meta
-
-After generating the SKAN mapping in Linkrunner, copy the fine and coarse conversion values into Meta Events Manager so Meta uses them when receiving postbacks.
-
-1. Open **Settings → SKAN Setup → Meta SKAN Configuration** in the [Linkrunner Dashboard](https://dashboard.linkrunner.io/dashboard/settings/skan-setup?tab=meta-skan-configuration) to view the generated fine and coarse conversion values
-
-#### How to Configure on Meta Ads
-
-1. Go to **Meta Events Manager** → Select your app
-2. Navigate to **Settings → iOS SKAdNetwork**
-3. Click **Configure Conversion Values**
-4. Copy the fine and coarse conversion values from the Linkrunner Dashboard and paste them into Meta's configuration
-5. Save your changes in Meta Events Manager
-
-<Warning>
-    Only perform this configuration once the Linkrunner SDK with the versions listed in [Linkrunner SDK
-    Configuration](#3-linkrunner-sdk-configuration) is live in your app.
-</Warning>
-
-#### Disable SKAdNetwork for the Facebook SDK
-
-You also need to turn **OFF** the **SKAdNetwork for the Facebook SDK** toggle so Meta routes SKAN postbacks through Linkrunner rather than the Facebook SDK:
-
-1. Navigate to **Events Manager → Datasets → [Your Dataset Name]**
-2. Open the **Apple's SKAdNetwork** section
-3. Find **Extra Settings → SKAdNetwork for the Facebook SDK** and toggle it **OFF**
-
-![SKAdNetwork Setting Toggle on Meta Dashboard](/images/SKAdNetwork-meta-dashboard-toggle.png)
-
-<Note>
-    When this toggle is ON, Meta receives app activity via SKAdNetwork directly from the Facebook SDK and Linkrunner
-    cannot deliver accurate postbacks.
-</Note>
-
-## 3. Linkrunner SDK Configuration
+## 1. Prepare Your App
 
 ### Minimum SDK Versions
 
@@ -259,6 +106,40 @@ The Linkrunner Expo plugin adds this configuration automatically. No additional 
     These keys tell Apple to send copies of SKAdNetwork postbacks to Linkrunner alongside the ad network, enabling
     accurate attribution and reporting in your Linkrunner dashboard.
 </Note>
+
+## 2. Configure the SKAN Schema
+
+Linkrunner converts your event list into SKAN conversion values (0–63). The order you put events in determines their priority. Higher-priority events overwrite lower-priority ones in the same measurement window.
+
+1. Go to **Settings → SKAN Setup → Events Setup** in the [Linkrunner Dashboard](https://dashboard.linkrunner.io/dashboard/settings/skan-setup?tab=event-setup)
+2. Add the events that matter for optimization (e.g., `Purchase`, `Subscription Started`, `Onboarding Complete`)
+3. Drag rows to set priority (the topmost event has the highest priority)
+4. For revenue events, set a **min** and **max** range; for occurrence events, set an **average**
+5. Click **Generate SKAN Mapping** to produce the fine and coarse conversion values
+
+Apple's SKAN allows up to **64 conversion values total**. The dashboard shows the combination count in real time and warns if your configuration would exceed the limit.
+
+<Note>
+    The schema is configured once and shared. Linkrunner automatically generates the fine and coarse conversion values
+    from it for both Google and Meta.
+</Note>
+
+For background on how this maps to SKAN 4.0, see [Conversion Values in SKAdNetwork](/features/skadnetwork-conversion-values).
+
+## 3. Complete Your Ad Network Setup
+
+Follow the dedicated guide for each network you advertise on:
+
+<CardGroup cols={2}>
+    <Card title="Google Ads SKAN Setup" icon="/images/logos/google.webp" href="/features/google-skan-setup">
+        iOS link ID, account connection, and event mapping to conversion actions.
+    </Card>
+    <Card title="Meta SKAN Setup" icon="/images/logos/meta.webp" href="/features/meta-skan-setup">
+        Conversion values in Events Manager and the Facebook SDK toggle.
+    </Card>
+</CardGroup>
+
+Once postbacks start flowing, view them in the [SKAN dashboard](/features/skan-dashboard/overview).
 
 ## Support
 
