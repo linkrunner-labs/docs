@@ -56,6 +56,8 @@ Linkrunner sends webhooks for the following events:
 
 The `install` webhook is triggered immediately when Linkrunner attributes an app installation. At this point, your app has just been opened for the first time and the user hasn't had a chance to sign up or log in yet. Because of this, user identity fields such as `user_id`, `name`, `phone`, `email`, and `additional_data` are only included in signup webhooks.
 
+By default, install webhooks fire only for attributed (paid) installs. To also receive webhooks for organic installs, enable **Send webhooks for organic installs** in [Settings → Webhooks](https://dashboard.linkrunner.io/settings?s=webhooks). Organic install webhooks are sent with `network_name` set to `ORGANIC`, `ad_channel` set to `null`, and no campaign details.
+
 However, the install webhook does include device identifiers (`gaid` for Android, `idfa` for iOS) when available. You can use these to match the install with the user later when they sign up.
 
 Use the install webhook for:
@@ -225,6 +227,31 @@ Example:
     "publisher_platform": "facebook",
     "platform_position": "feed"
   },
+  "google_campaign_details": null,
+  "apple_search_ads_details": null,
+  "campaign_details": null,
+  "gaid": "bk9384xs-p449-96ds-r132",
+  "idfa": null
+}
+```
+
+### Install Event (Organic)
+
+Sent only when **Send webhooks for organic installs** is enabled:
+
+```json
+{
+  "event_type": "install",
+  "campaign_id": "",
+  "ad_channel": null,
+  "network_name": "ORGANIC",
+  "app_version": "2.4.1",
+  "campaign_name": null,
+  "attributed_on": "2026-03-24T08:11:00.464Z",
+  "installed_at": "2026-03-24T08:11:00.464Z",
+  "store_click_at": null,
+  "link": null,
+  "meta_campaign_details": null,
   "google_campaign_details": null,
   "apple_search_ads_details": null,
   "campaign_details": null,
