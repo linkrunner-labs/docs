@@ -19,7 +19,7 @@ This is the traditional MMP "activity" view. It answers: "what happened in my ap
 
 Conversions are counted on the install date of the user who converted. The same July 10 purchase from a July 2 install appears on July 2.
 
-This matches how Google Ads and Meta report conversions: both attribute a conversion back to the date of the ad interaction, not the date the conversion happened. If you compare Linkrunner against your ads dashboards, use this view. It answers: "what did the users I acquired on this day eventually do?"
+This matches how Google Ads and Meta report user-acquisition conversions: both attribute a conversion back to the date of the ad interaction, not the date the conversion happened. For UA campaigns the ad interaction is the click that drove the install, so Install Date is the closest equivalent. If you compare Linkrunner UA numbers against your ads dashboards, use this view. It answers: "what did the users I acquired on this day eventually do?"
 
 <Note>
 Other MMPs offer the same concept under different names: AppsFlyer calls it LTV data (their Overview dashboard default), Adjust calls it cohort metrics, and Branch calls it Cohorts. In Linkrunner it is a toggle on the same reports rather than a separate report.
@@ -41,6 +41,18 @@ These are unchanged in both views, because they are already dated by the install
 - Active users
 
 Totals over all time are identical in both views. Switching only changes which day a conversion is counted on, never whether it is counted.
+
+## Retargeting view always uses Event Date
+
+The Install Date option is disabled while the campaigns page is in the **Retargeting** view, and the page reports by Event Date there.
+
+This is intentional. Retargeting conversions are credited to the re-engagement, and ad networks date them to that recent ad interaction. A user who installed in January and was re-engaged by a retargeting ad in July shows up in Meta and Google on the July interaction date, which is (almost always) the date of the conversion itself: the Event Date. Re-dating that conversion to the January install would move it outside the retargeting campaign's own lifetime and away from every network's reporting.
+
+AppsFlyer and Adjust follow the same convention: their retargeting cohorts are anchored to the re-engagement or reattribution date, never the user's original install date.
+
+<Note>
+Practical rule for reconciling with ads dashboards: compare UA campaigns using Install Date, and retargeting campaigns using Event Date. Linkrunner's view switcher and Report by toggle enforce this pairing automatically.
+</Note>
 
 ## Where the toggle applies
 
@@ -75,5 +87,6 @@ Install Date view removes the date-shift discrepancy, which is usually the large
 - **Numbers changed after switching the toggle.** Expected. The two views distribute the same conversions across different days.
 - **Yesterday's revenue in Install Date view is lower than Event Date view.** Expected. Recent cohorts have not finished converting. The gap closes over time.
 - **All-time totals differ between views.** They should not. If you see this with no date filter applied, contact support.
+- **The Install Date option is disabled.** You are in the Retargeting view, which always reports by Event Date (see above).
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
