@@ -98,6 +98,7 @@ Numeric fields are returned as **formatted strings** (`"3,201"`, `"$12,540.50"`)
 | `platform`        | string  | (both)             | `ios` or `android`.                                                                        |
 | `search`          | string  | (none)             | Matches name, display ID, domain, deeplink, or full tracking URL.                          |
 | `view`            | string  | `user_acquisition` | `user_acquisition` (new users: `installs`, `cost_per_install`) or `retargeting` (re-engaged users: `reinstalls`, `reengagements`, `cost_per_reinstall`). |
+| `reporting`       | string  | `event_date`       | `event_date` (conversions counted on the date they happened) or `install_date` (counted on the install date of the user, matching Google and Meta reporting). See [Event Date vs Install Date Reporting](/features/reporting-time). |
 | `sort_field`      | string  | `installs`         | `clicks`, `installs`, `signups`, `revenue`, `spend`, `created_at`, `uninstalls`, `conversion`, `suspicious_installs`, `roas`. |
 | `sort_order`      | string  | `descending`       | `ascending` or `descending`.                                                               |
 | `page`            | number  | `1`                | 1-indexed.                                                                                  |

@@ -1,0 +1,79 @@
+---
+title: "Event Date vs Install Date Reporting"
+description: "Choose whether conversions are counted on the date they happened or on the install date of the user, to align Linkrunner with Google and Meta ads reporting."
+icon: "calendar-days"
+sidebarTitle: "Reporting Time"
+---
+
+Linkrunner can report post-install conversions (sign ups, custom events, payment events, and revenue) on two different date bases. Use the **Report by** toggle on the campaigns page to switch between them.
+
+## The two views
+
+### Event Date (default)
+
+Conversions are counted on the date they actually happened. A purchase made on July 10 by a user who installed on July 2 appears on July 10.
+
+This is the traditional MMP "activity" view. It answers: "what happened in my app on this day?"
+
+### Install Date
+
+Conversions are counted on the install date of the user who converted. The same July 10 purchase from a July 2 install appears on July 2.
+
+This matches how Google Ads and Meta report conversions: both attribute a conversion back to the date of the ad interaction, not the date the conversion happened. If you compare Linkrunner against your ads dashboards, use this view. It answers: "what did the users I acquired on this day eventually do?"
+
+<Note>
+Other MMPs offer the same concept under different names: AppsFlyer calls it LTV data (their Overview dashboard default), Adjust calls it cohort metrics, and Branch calls it Cohorts. In Linkrunner it is a toggle on the same reports rather than a separate report.
+</Note>
+
+## What changes between the views
+
+| Metric | Event Date | Install Date |
+| --- | --- | --- |
+| Sign Ups | Date of the sign up | Install date of the user |
+| Custom events | Date of the event | Install date of the user |
+| Payment events and Revenue | Date of the payment | Install date of the paying user |
+| CR, ROAS, cost per event | Derived from event-dated conversions | Derived from install-dated conversions (cohort based, like ad networks) |
+
+These are unchanged in both views, because they are already dated by the install or ad interaction itself:
+
+- Clicks, Impressions, Installs, Spend, CPI
+- Retention and uninstalls
+- Active users
+
+Totals over all time are identical in both views. Switching only changes which day a conversion is counted on, never whether it is counted.
+
+## Where the toggle applies
+
+Switching **Report by** on the campaigns page updates everything on it together:
+
+- The campaign table, totals row, and Organic row
+- The campaign details drawer: metric cards, chart, and the user list
+- The Overview panel (current month numbers and trends)
+- Exports started from the page: campaign CSV export and the **All Onboarded Users** / **Paying Users** downloads
+- The [Reporting API](/api-reference/reporting-campaigns) via the `reporting` query parameter
+
+## Recent days look lower in Install Date view
+
+A cohort keeps generating conversions for days or weeks after install. In Install Date view, recent install dates have not had time to convert yet, so their numbers start low and grow as conversions arrive. Yesterday's revenue in this view is not final; it will keep increasing.
+
+This is the same behavior you see in Google and Meta dashboards, and it is the main reason those dashboards "restate" past days.
+
+<Tip>
+When comparing against an ads dashboard, use a closed window that ended at least a week ago, so both sides have had time to mature.
+</Tip>
+
+## Why numbers still may not match ad networks exactly
+
+Install Date view removes the date-shift discrepancy, which is usually the largest one. Remaining differences come from:
+
+- **Modeled and view-through conversions.** Meta includes modeled conversions and view-through attribution that no MMP observes directly.
+- **Attribution windows.** The network's click-through and view-through windows may differ from your Linkrunner conversion windows.
+- **Timezones.** Compare using the same timezone on both sides. Linkrunner uses your project timezone.
+
+## Troubleshooting
+
+- **Numbers changed after switching the toggle.** Expected. The two views distribute the same conversions across different days.
+- **Yesterday's revenue in Install Date view is lower than Event Date view.** Expected. Recent cohorts have not finished converting. The gap closes over time.
+- **All-time totals differ between views.** They should not. If you see this with no date filter applied, contact support.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
