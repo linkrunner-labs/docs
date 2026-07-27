@@ -69,6 +69,7 @@
                             "features/custom-store-listing",
                             "features/uninstall-tracking",
                             "features/retention",
+                            "features/reporting-time",
                             "features/meta-install-referrer",
                             "features/ios-campaign-data-limitations",
                             "features/webhooks",
