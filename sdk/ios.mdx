@@ -681,18 +681,20 @@ Set this up if you run Google App Campaigns and have users in those regions. Oth
     </Tabs>
   </Step>
 
-  <Step title="Add the -ObjC linker flag">
-    Add this to **Build Settings** → **Other Linker Flags** on your app target:
+  <Step title="Add the -ObjC linker flag (Swift Package Manager only)">
+    <Note>
+        Using CocoaPods? Skip this step. CocoaPods adds the required flags for you.
+    </Note>
+
+    If you added Google's SDK with Swift Package Manager, add this to **Build Settings** → **Other Linker Flags** on your app target:
 
     ```
     -ObjC
     ```
 
     <Warning>
-        Required no matter how you added the SDK, including CocoaPods. Linkrunner finds Google's class through the Objective-C runtime, so nothing references it at link time. Google ships a static library, and linkers only include static library members that something references. Without `-ObjC` the class is stripped, and ICM silently does nothing while your build succeeds.
+        Without it, ICM silently does nothing and your build still succeeds. Linkrunner finds Google's class through the Objective-C runtime, so nothing references it at link time, and the linker drops it from Google's static library.
     </Warning>
-
-    You do not need `-lc++`. Google's SDK applies it for you.
   </Step>
 
   <Step title="Provide consent">
@@ -753,7 +755,7 @@ Initialize with `debug: true` and look for this line in the Xcode console:
 Linkrunner: odm_available=true odm_fetch_result=success odm_fetch_latency_ms=124
 ```
 
-`odm_available=false` with `odm_fetch_result=unavailable` means either Google's SDK is not linked or the `-ObjC` flag is missing. Check the flag first, because a missing flag produces no build warning.
+`odm_available=false` with `odm_fetch_result=unavailable` means Google's SDK is not linked. On Swift Package Manager, check the `-ObjC` flag first, because a missing flag strips the class with no build warning.
 
 ## Enhanced Privacy Controls
 
