@@ -657,6 +657,100 @@ func capturePurchase() async {
 
 > **Note:** For more information on testing and verifying your ecommerce events, please see our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
 
+## Google Integrated Conversion Measurement (Optional)
+
+Integrated Conversion Measurement (ICM) improves Google App Campaign attribution for users in the European Economic Area, the United Kingdom, and Switzerland. It lets Google attribute installs when no click identifier or advertising ID is available.
+
+Set this up if you run Google App Campaigns and have users in those regions. Otherwise you can skip it.
+
+<Steps>
+  <Step title="Add Google's On-Device Measurement SDK">
+    Linkrunner does not bundle this SDK, so apps that skip ICM carry none of its weight. Add it to your app yourself.
+
+    If you already use the Firebase iOS SDK 11.14.0 or later, you have it and can move to the next step.
+
+    <Tabs>
+      <Tab title="Swift Package Manager">
+        Add `https://github.com/googleads/google-ads-on-device-conversion-ios-sdk` in **File** → **Add Package Dependencies...** and select the `GoogleAdsOnDeviceConversion` product.
+      </Tab>
+      <Tab title="CocoaPods">
+        ```ruby
+        pod 'GoogleAdsOnDeviceConversion'
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Add the required linker flags">
+    Google's framework needs these in **Build Settings** → **Other Linker Flags** on your app target:
+
+    ```
+    -ObjC -lc++
+    ```
+
+    CocoaPods adds them for you. Swift Package Manager does not.
+  </Step>
+
+  <Step title="Provide consent">
+    Google requires consent signals for users in these regions. See [Consent](#consent) below.
+  </Step>
+</Steps>
+
+That is the whole integration. Linkrunner detects the SDK at runtime and there is no API to call. Attribution comes back through [`getAttributionData`](#getting-attribution-data) as usual.
+
+<Note>
+    ICM complements SKAdNetwork, it does not replace it. Keep your existing [SKAdNetwork integration](/features/skadnetwork-integration) in place.
+</Note>
+
+### Consent
+
+Google needs to know whether European regulations apply to a user and what that user agreed to. Pass the values from your Consent Management Platform (CMP) before you call `initialize`, and again whenever the user changes their choice.
+
+```swift
+LinkrunnerSDK.shared.setConsent(
+    LinkrunnerConsent(
+        isEEA: .granted,
+        hasConsentForDataUsage: .granted,
+        hasConsentForAdsPersonalization: .denied
+    )
+)
+
+await LinkrunnerSDK.shared.initialize(token: "YOUR_PROJECT_TOKEN")
+```
+
+| Parameter | Meaning |
+| --- | --- |
+| `isEEA` | European regulations apply to this user (the EEA, the UK, or Switzerland) |
+| `hasConsentForDataUsage` | The user agreed to their data being sent to Google for advertising |
+| `hasConsentForAdsPersonalization` | The user agreed to their data being used to personalize ads |
+
+Each takes `.granted`, `.denied`, or `.unknown`. Anything left `.unknown` is omitted rather than reported as a denial, so Linkrunner never reports a choice your user did not make.
+
+<Warning>
+    Consent is stored between launches. Call `setConsent` again whenever your CMP state changes, otherwise the previous value keeps being sent after your user has withdrawn it.
+</Warning>
+
+#### Using a TCF Consent Management Platform
+
+If your CMP supports IAB TCF v2.2 or v2.3, Linkrunner can read consent directly instead:
+
+```swift
+LinkrunnerSDK.shared.enableTCFConsentCollection(true)
+await LinkrunnerSDK.shared.initialize(token: "YOUR_PROJECT_TOKEN")
+```
+
+Anything you set explicitly with `setConsent` still takes priority, per signal. This setting is not stored between launches, so call it on every launch before `initialize`.
+
+### Verifying your setup
+
+Initialize with `debug: true` and look for this line in the Xcode console:
+
+```
+Linkrunner: odm_available=true odm_fetch_result=success odm_fetch_latency_ms=124
+```
+
+`odm_available=false` with `odm_fetch_result=unavailable` means Google's SDK is not linked. Recheck step 1.
+
 ## Enhanced Privacy Controls
 
 The SDK offers options to enhance user privacy:
