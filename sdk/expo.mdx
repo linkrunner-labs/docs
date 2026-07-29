@@ -85,6 +85,75 @@ For Android apps, the SDK provides backup rules to exclude Shared Preferences da
 
 For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android/installation#backup-configuration).
 
+## Google Integrated Conversion Measurement (Optional)
+
+Integrated Conversion Measurement (ICM) improves Google App Campaign attribution for users in the European Economic Area, the United Kingdom, and Switzerland. It lets Google attribute installs when no click identifier or advertising ID is available. See [Google ICM](/features/google-icm) for how it works.
+
+Set this up if you run Google App Campaigns and have users in those regions. Otherwise you can skip it. Requires `rn-linkrunner` 3.1.0 or later.
+
+<Note>
+    ICM also needs an **iOS link ID** configured in your Google Ads integration. Google has nowhere to send the conversion without one. See [Prerequisites](/features/google-icm#prerequisites).
+</Note>
+
+<Steps>
+  <Step title="Add Google's On-Device Measurement SDK to the iOS build">
+    `rn-linkrunner` does not bundle this SDK, so apps that skip ICM carry none of its weight. Expo generates the `Podfile`, so add the pod through `expo-build-properties`:
+
+    ```bash
+    npx expo install expo-build-properties
+    ```
+
+    ```json
+    {
+        "expo": {
+            "plugins": [
+                [
+                    "expo-build-properties",
+                    {
+                        "ios": {
+                            "extraPods": [{ "name": "GoogleAdsOnDeviceConversion" }]
+                        }
+                    }
+                ]
+            ]
+        }
+    }
+    ```
+
+    If your app already uses the Firebase iOS SDK 11.14.0 or later, the `FirebaseAnalytics` pod brings it in and you can skip this step. CocoaPods adds the `-ObjC` and `-lc++` linker flags for you, so there are no Xcode Build Settings to change.
+
+    <Note>
+        If you manage `ios/` yourself instead of generating it, add `pod 'GoogleAdsOnDeviceConversion'` to `ios/Podfile` and run `pod install`.
+    </Note>
+  </Step>
+
+  <Step title="Rebuild your development client">
+    ```bash
+    npx expo prebuild --clean
+    ```
+
+    ICM needs native code, so it does not work in Expo Go. Build a development client or run an EAS build.
+  </Step>
+
+  <Step title="Report consent">
+    Pass the values from your Consent Management Platform (CMP) before you call `init`:
+
+    ```javascript
+    import linkrunner from "rn-linkrunner";
+
+    linkrunner.setConsent({
+        isEEA: "granted",
+        hasConsentForDataUsage: "granted",
+        hasConsentForAdsPersonalization: "denied",
+    });
+
+    await linkrunner.init("YOUR_PROJECT_TOKEN");
+    ```
+
+    See [Google Integrated Conversion Measurement](/sdk/react-native#google-integrated-conversion-measurement-optional) in the React Native guide for what each signal means, the TCF Consent Management Platform option, and how to verify the setup.
+  </Step>
+</Steps>
+
 ## SDK Usage
 
 <Note>

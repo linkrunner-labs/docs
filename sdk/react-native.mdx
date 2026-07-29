@@ -560,6 +560,89 @@ const trackPurchaseEvent = async () => {
     string.
 </Note>
 
+## Google Integrated Conversion Measurement (Optional)
+
+Integrated Conversion Measurement (ICM) improves Google App Campaign attribution for users in the European Economic Area, the United Kingdom, and Switzerland. It lets Google attribute installs when no click identifier or advertising ID is available. See [Google ICM](/features/google-icm) for how it works.
+
+Set this up if you run Google App Campaigns and have users in those regions. Otherwise you can skip it. Requires `rn-linkrunner` 3.1.0 or later.
+
+<Note>
+    ICM also needs an **iOS link ID** configured in your Google Ads integration. Google has nowhere to send the conversion without one. See [Prerequisites](/features/google-icm#prerequisites).
+</Note>
+
+<Steps>
+  <Step title="Add Google's On-Device Measurement SDK (iOS)">
+    `rn-linkrunner` does not bundle this SDK, so apps that skip ICM carry none of its weight. Add it to your `ios/Podfile`:
+
+    ```ruby
+    pod 'GoogleAdsOnDeviceConversion'
+    ```
+
+    Then install the pods:
+
+    ```bash
+    cd ios && pod install
+    ```
+
+    If your app already uses the Firebase iOS SDK 11.14.0 or later, the `FirebaseAnalytics` pod brings it in and you can skip this step. CocoaPods adds the `-ObjC` and `-lc++` linker flags for you, so there are no Build Settings to change.
+  </Step>
+
+  <Step title="Report consent">
+    Pass the values from your Consent Management Platform (CMP) before you call `init`, and again whenever the user changes their choice:
+
+    ```javascript
+    import linkrunner from "rn-linkrunner";
+
+    linkrunner.setConsent({
+        isEEA: "granted",
+        hasConsentForDataUsage: "granted",
+        hasConsentForAdsPersonalization: "denied",
+    });
+
+    await linkrunner.init("YOUR_PROJECT_TOKEN");
+    ```
+
+    Each signal takes `"granted"`, `"denied"`, or `"unknown"`. Anything omitted or left `"unknown"` is dropped from the payload rather than reported as a denial, so Linkrunner never reports a choice your user did not make.
+
+    | Parameter | Meaning |
+    | --- | --- |
+    | `isEEA` | European regulations apply to this user (the EEA, the UK, or Switzerland) |
+    | `hasConsentForDataUsage` | The user agreed to their data being sent to Google for advertising |
+    | `hasConsentForAdsPersonalization` | The user agreed to their data being used to personalize ads |
+
+    Google treats these as required whenever their value is known. `hasConsentForDataUsage` decides whether Google may use the conversion at all, `hasConsentForAdsPersonalization` decides whether it may feed audiences and remarketing, and `isEEA` tells Google which rules apply. Read them from your CMP rather than hardcoding them.
+
+    `setConsent` works on both iOS and Android. Android has no ODM SDK to add, but its installs reach Google through the App Conversion API, which reads the same signals.
+  </Step>
+</Steps>
+
+That is the whole integration. The native SDK fetches the value at initialization and there is no other API to call. Attribution comes back through [`getAttributionData`](#getting-attribution-data) as usual.
+
+<Warning>
+    Consent is stored between launches. Call `setConsent` again whenever your CMP state changes, otherwise the previous value keeps being sent after the user has withdrawn it.
+</Warning>
+
+### Using a TCF Consent Management Platform
+
+If your CMP supports IAB TCF v2.2 or v2.3, Linkrunner can read consent directly instead:
+
+```javascript
+linkrunner.enableTCFConsentCollection(true);
+await linkrunner.init("YOUR_PROJECT_TOKEN");
+```
+
+Anything you set explicitly with `setConsent` still takes priority, per signal. This setting is iOS only and is not stored between launches, so call it on every launch before `init`.
+
+### Verifying your setup
+
+Initialize with debug mode on and look for this line in the Xcode console:
+
+```
+Linkrunner: odm_available=true odm_fetch_result=success odm_fetch_latency_ms=124
+```
+
+`odm_available=false` with `odm_fetch_result=unavailable` means Google's SDK is not linked. Check that `pod install` picked up `GoogleAdsOnDeviceConversion`.
+
 ## Enhanced Privacy Controls
 
 The SDK offers options to enhance user privacy:

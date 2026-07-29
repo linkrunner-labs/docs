@@ -39,7 +39,7 @@ Alternatively, you can add the package dependency to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "3.12.0")
+    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "4.1.0")
 ]
 ```
 
@@ -659,15 +659,19 @@ func capturePurchase() async {
 
 ## Google Integrated Conversion Measurement (Optional)
 
-Integrated Conversion Measurement (ICM) improves Google App Campaign attribution for users in the European Economic Area, the United Kingdom, and Switzerland. It lets Google attribute installs when no click identifier or advertising ID is available.
+Integrated Conversion Measurement (ICM) improves Google App Campaign attribution for users in the European Economic Area, the United Kingdom, and Switzerland. It lets Google attribute installs when no click identifier or advertising ID is available. See [Google ICM](/features/google-icm) for how it works.
 
-Set this up if you run Google App Campaigns and have users in those regions. Otherwise you can skip it.
+Set this up if you run Google App Campaigns and have users in those regions. Otherwise you can skip it. Requires LinkrunnerKit 4.1.0 or later.
+
+<Note>
+    ICM also needs an **iOS link ID** configured in your Google Ads integration. Google has nowhere to send the conversion without one. See [Prerequisites](/features/google-icm#prerequisites).
+</Note>
 
 <Steps>
   <Step title="Add Google's On-Device Measurement SDK">
     Linkrunner does not bundle this SDK, so apps that skip ICM carry none of its weight. Add it to your app yourself.
 
-    If you already use the Firebase iOS SDK 11.14.0 or later, you have it and can move to the next step.
+    If you already use the Firebase iOS SDK 11.14.0 or later, the `FirebaseAnalytics` pod brings it in and you can move to the next step.
 
     <Tabs>
       <Tab title="Swift Package Manager">
@@ -683,7 +687,7 @@ Set this up if you run Google App Campaigns and have users in those regions. Oth
 
   <Step title="Add the -ObjC linker flag (Swift Package Manager only)">
     <Note>
-        Using CocoaPods? Skip this step. CocoaPods adds the required flags for you.
+        Using CocoaPods? Skip this step. CocoaPods adds `-ObjC` and `-lc++` for you when it links Google's static framework. The one exception is an app target whose **Other Linker Flags** no longer contain `$(inherited)`, in which case add `-ObjC` yourself.
     </Note>
 
     If you added Google's SDK with Swift Package Manager, add this to **Build Settings** → **Other Linker Flags** on your app target:
@@ -703,6 +707,10 @@ Set this up if you run Google App Campaigns and have users in those regions. Oth
 </Steps>
 
 That is the whole integration. Linkrunner detects the SDK at runtime and there is no API to call. Attribution comes back through [`getAttributionData`](#getting-attribution-data) as usual.
+
+<Tip>
+    ODM matches on the time of first launch, which Linkrunner records when you call `initialize`. Call it as early in the launch sequence as you can, ideally in `application(_:didFinishLaunchingWithOptions:)`.
+</Tip>
 
 <Note>
     ICM complements SKAdNetwork, it does not replace it. Keep your existing [SKAdNetwork integration](/features/skadnetwork-integration) in place.
@@ -731,6 +739,8 @@ await LinkrunnerSDK.shared.initialize(token: "YOUR_PROJECT_TOKEN")
 | `hasConsentForAdsPersonalization` | The user agreed to their data being used to personalize ads |
 
 Each takes `.granted`, `.denied`, or `.unknown`. Anything left `.unknown` is omitted rather than reported as a denial, so Linkrunner never reports a choice your user did not make.
+
+Google treats these as required whenever their value is known. `hasConsentForDataUsage` decides whether Google may use the conversion at all, `hasConsentForAdsPersonalization` decides whether it may feed audiences and remarketing, and `isEEA` tells Google which rules apply. Read them from your CMP rather than hardcoding them. App Tracking Transparency is not a substitute, because it governs IDFA access only and is reported separately.
 
 <Warning>
     Consent is stored between launches. Call `setConsent` again whenever your CMP state changes, otherwise the previous value keeps being sent after your user has withdrawn it.
