@@ -21,7 +21,7 @@ Walk through this checklist.
 
 <Steps>
 <Step title="Confirm the Google Ads integration is active in Linkrunner">
-Open [Settings → Google Ads integration](https://dashboard.linkrunner.io/settings?s=google-ads-integration) and verify the Link ID is saved for the correct platform (Android or iOS).
+Open [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?p_id=89), open the three-dot menu on the Google Ads row, and verify the link ID is saved for the correct platform (Android or iOS).
 </Step>
 <Step title="Import first_open in Google Ads">
 On the Google Ads [Conversions summary](https://ads.google.com/aw/conversions) page, confirm the `first_open` conversion event is imported. If it was previously deleted, follow [Re-enabling Previously Deleted Events](/ad-networks/google-ads#re-enabling-previously-deleted-events). Full setup: [Importing Events for Conversion Actions Setup](/ad-networks/google-ads#4-importing-events-for-conversion-actions-setup).
@@ -80,7 +80,7 @@ Google is a Self-Reporting Network (SRN), so Google Ads reports its own attribut
 
 - **Android:** Requires GAID collection. The Linkrunner SDK captures GAID automatically when the user has not opted out.
 - **iOS:** Measurement happens via **SKAdNetwork (SKAN)**. Google Ads sends SKAN postbacks to Linkrunner, and installs with `did_win=TRUE` are counted. Deterministic SDK attribution only works when the user grants ATT and the IDFA is available. See [SKAdNetwork integration](/features/skadnetwork-integration) and [iOS Campaign Data Limitations](/features/ios-campaign-data-limitations).
-- **iOS in the EEA, UK, and Switzerland:** [Integrated Conversion Measurement](/sdk/ios#google-integrated-conversion-measurement-optional) can attribute installs in these regions even when ATT is denied and no IDFA is available. It complements SKAN rather than replacing it, and needs setup in your iOS app.
+- **iOS without ATT consent:** [Integrated Conversion Measurement](/sdk/ios#google-integrated-conversion-measurement-optional) can attribute installs even when ATT is denied and no IDFA is available. It complements SKAN rather than replacing it, and needs setup in your iOS app. Google keeps it inactive for users in the EEA, the UK, and Switzerland.
 
 See the [Google Ads integration guide](/ad-networks/google-ads) for full setup on each platform.
 </Accordion>
@@ -99,7 +99,7 @@ Google Ads dates conversions to the **ad click**. Linkrunner dates them to the *
 As an SRN, Google attributes every install that follows any Google Ads engagement within its window. Linkrunner uses **last-click attribution**, deduplicates across networks, and counts one install per user.
 </Card>
 <Card title="iOS (SKAN)" icon="apple">
-On iOS, Linkrunner counts only SKAN postbacks with `did_win=TRUE`. Google Ads treats all SKAN events the same, so its dashboard typically reports more iOS installs. [Integrated Conversion Measurement](/sdk/ios#google-integrated-conversion-measurement-optional) narrows this gap in the EEA, UK, and Switzerland.
+On iOS, Linkrunner counts only SKAN postbacks with `did_win=TRUE`. Google Ads treats all SKAN events the same, so its dashboard typically reports more iOS installs. [Integrated Conversion Measurement](/sdk/ios#google-integrated-conversion-measurement-optional) narrows this gap for users who declined ATT.
 </Card>
 </CardGroup>
 

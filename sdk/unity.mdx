@@ -785,11 +785,15 @@ func linkrunnerHandleDeeplink(_ deeplinkUrl: UnsafePointer<CChar>?) {
 Alternatively, you can automate this with a Unity `PostProcessBuild` script — see the [Automation Tips](#automating-ios-dependency-with-a-post-build-script) section.
 </Warning>
 
-## Google Integrated Conversion Measurement (Optional)
+### Google Integrated Conversion Measurement (Optional)
 
-Integrated Conversion Measurement (ICM) improves Google App Campaign attribution for users in the European Economic Area, the United Kingdom, and Switzerland. It lets Google attribute installs when no click identifier or advertising ID is available. See [Google ICM](/features/google-icm) for how it works.
+Integrated Conversion Measurement (ICM) recovers Google App Campaign installs on iOS that Google cannot attribute because there is no click identifier and no IDFA to match on. Google's On-Device Measurement (ODM) SDK turns the click context into an encrypted signal that never leaves the device, and Linkrunner sends it with the install. See [Google ICM](/features/google-icm) for how it works.
 
-Set this up if you run Google App Campaigns and have users in those regions. Otherwise you can skip it. Requires LinkrunnerKit 4.1.0 or later and `io.linkrunner:android-sdk:4.1.0` or later.
+Set this up if you run Google App Campaigns for your iOS app. Requires LinkrunnerKit 4.1.0 or later and `io.linkrunner:android-sdk:4.1.0` or later.
+
+<Note>
+    Google keeps ODM inactive for users in the European Economic Area, the United Kingdom, and Switzerland, so ICM recovers nothing for that traffic. Elsewhere, Google reports improved coverage for iOS 14+ users.
+</Note>
 
 <Note>
     ICM also needs an **iOS link ID** configured in your Google Ads integration. Google has nowhere to send the conversion without one. See [Prerequisites](/features/google-icm#prerequisites).
@@ -821,7 +825,7 @@ Set this up if you run Google App Campaigns and have users in those regions. Oth
   </Step>
 
   <Step title="Report consent">
-    Call `SetConsent` with the values from your Consent Management Platform (CMP) before `Initialize`, and again whenever the user changes their choice:
+    Call `SetConsent` with your consent values before `Initialize`, and again whenever the user changes their choice:
 
     ```csharp
     LinkrunnerSDK.SetConsent(
@@ -841,11 +845,11 @@ Set this up if you run Google App Campaigns and have users in those regions. Oth
     | `hasConsentForDataUsage` | The user agreed to their data being sent to Google for advertising |
     | `hasConsentForAdsPersonalization` | The user agreed to their data being used to personalize ads |
 
-    Google treats these as required whenever their value is known. `hasConsentForDataUsage` decides whether Google may use the conversion at all, `hasConsentForAdsPersonalization` decides whether it may feed audiences and remarketing, and `isEEA` tells Google which rules apply. Read them from your CMP rather than hardcoding them.
+    Google treats these as required whenever their value is known. `hasConsentForDataUsage` decides whether Google may use the conversion at all, `hasConsentForAdsPersonalization` decides whether it may feed audiences and remarketing, and `isEEA` tells Google which rules apply. Set them from your app's real consent state rather than hardcoding them. **For users outside the EEA, the UK, and Switzerland, report `isEEA` as denied and leave the other two unset.** See [Send Consent](/features/send-consent).
   </Step>
 </Steps>
 
-### Verifying your setup
+#### Verifying your setup
 
 Initialize with debug mode on and look for this line in the Xcode console:
 
@@ -1090,7 +1094,7 @@ public class LinkrunnerSDK : MonoBehaviour
 
     /// <summary>
     /// Report Google Ads consent. Each value is "granted", "denied", or "unknown".
-    /// Call before Initialize(), and again whenever your CMP state changes.
+    /// Call before Initialize(), and again whenever the user's consent state changes.
     /// </summary>
     public static void SetConsent(string isEEA, string hasConsentForDataUsage,
         string hasConsentForAdsPersonalization)
@@ -1484,7 +1488,7 @@ LinkrunnerSDK.SetDisableAaidCollection(true);
 | `CapturePayment` | Payment flow | When payment succeeds |
 | `RemovePayment` | Refund flow | When payment is reversed |
 | `SetPushToken` | After token refresh | When push token changes |
-| `SetConsent` | Before `Initialize` | At launch and whenever your CMP state changes |
+| `SetConsent` | Before `Initialize` | At launch and whenever consent changes |
 | `HandleDeeplink` | Deeplink entry points | When app is opened via a deeplink |
 
 ---

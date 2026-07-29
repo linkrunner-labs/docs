@@ -71,6 +71,7 @@
                             "features/retention",
                             "features/meta-install-referrer",
                             "features/google-icm",
+                            "features/send-consent",
                             "features/ios-campaign-data-limitations",
                             "features/webhooks",
                             "features/mcp",
