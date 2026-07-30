@@ -25,22 +25,22 @@ On Android there is nothing to install. Google applies the same ICM improvements
 
 ## Prerequisites
 
-Four things have to be in place. ICM stays inactive until all four are done, and it fails quietly rather than loudly, so work through them in order.
+ICM requires a supported Linkrunner SDK version and three setup steps. It stays inactive until everything is in place, and it fails quietly rather than loudly.
+
+### Minimum SDK versions
+
+Older versions do not collect `odm_info` or provide the consent API.
+
+| Platform | Minimum supported version |
+| --- | --- |
+| Android | `io.linkrunner:android-sdk:4.1.0` |
+| iOS | LinkrunnerKit 4.1.0 |
+| React Native | `rn-linkrunner` 3.1.0 |
+| Flutter | `linkrunner` 4.1.0 |
+| Expo | `rn-linkrunner` 3.1.0 |
+| Unity | LinkrunnerKit 4.1.0 and `io.linkrunner:android-sdk:4.1.0` |
 
 <Steps>
-  <Step title="Update to an ICM-capable SDK version">
-    ICM shipped in the 4.1.0 line of the native SDKs. Anything older collects no `odm_info` and has no consent API.
-
-    | Platform | Minimum version |
-    | --- | --- |
-    | Android | `io.linkrunner:android-sdk:4.1.0` |
-    | iOS | LinkrunnerKit 4.1.0 |
-    | React Native | `rn-linkrunner` 3.1.0 |
-    | Flutter | `linkrunner` 4.1.0 |
-    | Expo | `rn-linkrunner` 3.1.0 |
-    | Unity | LinkrunnerKit 4.1.0 and `io.linkrunner:android-sdk:4.1.0` |
-  </Step>
-
   <Step title="Create an iOS link ID in Google Ads">
     Link IDs are per platform. An Android link ID does not cover your iOS app, and without an iOS one Google has nowhere to send the conversion, so ICM produces nothing no matter what the app does.
 
