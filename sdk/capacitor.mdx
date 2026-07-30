@@ -4,6 +4,16 @@ description: "Complete guide for integrating Linkrunner in Capacitor apps"
 icon: "/images/icons/capacitor.svg"
 ---
 
+<Note>
+  **Prefer to let your AI coding agent do this?** Install the Linkrunner skill and Claude Code, Cursor, GitHub Copilot, or Windsurf will wire up the SDK and deep links for you:
+
+  ```bash
+  npx @linkrunner/skills add capacitor
+  ```
+
+  Then ask your agent to "integrate Linkrunner". See [Linkrunner Agent Skills](https://github.com/linkrunner-labs/skills).
+</Note>
+
 ## Installation
 
 ### Step 1: Install the Package
@@ -51,6 +61,10 @@ To enable SKAdNetwork postback copies to be sent to Linkrunner, add the followin
 ```
 
 For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
+
+<Note>
+    **Google Integrated Conversion Measurement (ICM)** is not available in the Capacitor plugin yet. `capacitor-linkrunner` 2.1.1 pins LinkrunnerKit 4.0.x and `io.linkrunner:android-sdk:4.0.1`, and ICM needs 4.1.0 on both. If you run Google App Campaigns for your iOS app, contact [support@linkrunner.io](mailto:support@linkrunner.io). See [Google ICM](/features/google-icm) for what it does.
+</Note>
 
 ### Step 5: Android Backup Configuration
 
@@ -249,6 +263,35 @@ The `getAttributionData` function returns:
         groupName: string;
         assetName: string;
         assetGroupName: string;
+        adNetworkCampaignId?: string; // Ad network campaign ID
+        adSetId?: string; // Ad set ID
+        adSetName?: string; // Ad set name
+        adCreativeId?: string; // Ad creative ID
+        adCreativeName?: string; // Ad creative name
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123",
+    "campaignData": {
+        "id": "camp_123",
+        "name": "Summer Sale 2024",
+        "type": "INORGANIC",
+        "adNetwork": "META",
+        "installedAt": "2024-03-20T10:30:00Z",
+        "storeClickAt": "2024-03-20T10:29:45Z",
+        "groupName": "iOS Campaign",
+        "assetName": "Banner Ad 1",
+        "assetGroupName": "Product Catalog",
+        "adNetworkCampaignId": "120214682829390250",
+        "adSetId": "120214682829640250",
+        "adSetName": "Productivity",
+        "adCreativeId": "120214682926100250",
+        "adCreativeName": "Static_2"
     }
 }
 ```

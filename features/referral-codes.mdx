@@ -1,110 +1,151 @@
 ---
-title: "Referral Code Tracking"
-description: "Track referral sources and campaign parameters using query strings on your Linkrunner subdomain"
+title: "Set Up Referral Tracking"
+sidebarTitle: "Referral Tracking"
+description: "Pass a referral code through install, read it in your app, and record the referral"
 icon: "user-group"
 ---
 
-## Overview
+Linkrunner carries a referral code from a clicked link through install. Your app reads the code from the `deeplink` returned by `getAttributionData()` and sends it to your backend.
 
-Add query parameters to your Linkrunner subdomain URL to track referrals, campaigns, or custom data. When users click your link and install the app, retrieve these parameters through `getAttributionData()`.
+Your app is responsible for creating referral codes, validating them, and applying rewards.
 
-**Works for both Android & iOS**
+## Before you start
 
-## Quick Example
+- [Configure a Linkrunner subdomain](/features/subdomain-setup), such as `get.example.com`.
+- [Set up deep linking](/features/deep-linking-setup) for your app.
+- Choose one query parameter name, such as `referrer`, and use it consistently.
 
-Create a link with query parameters:
+## 1. Create a referral link
 
+Add the referring user's code or ID to your Linkrunner subdomain:
+
+```text
+https://get.example.com?referrer=user_123
 ```
-get.yourdomain.com?referrer=user_123&campaign=summer2024
+
+You can include an app destination in the same link:
+
+```text
+https://get.example.com/product/987?referrer=user_123
 ```
 
-When the user installs your app, call `getAttributionData()` to get the full URL and parse the parameters.
-
-## Setup
-
-### 1. Configure Your Subdomain
-
-1. Go to [Linkrunner Settings → Domains](https://dashboard.linkrunner.io/settings?s=domains)
-2. Add your subdomain (e.g., `get.yourdomain.com`)
-3. Complete domain verification
+Generate the link in your app or backend when a user opens your referral or invite screen. URL-encode the value before adding it to the link.
 
 <Note>
-    No need to create campaigns in the dashboard. Just add query parameters to your subdomain URL and they'll be
-    automatically captured.
+  You do not need to create a campaign to pass a referral code. Direct subdomain links do not appear in campaign reporting.
 </Note>
 
-### 2. Create Your Links
+## 2. Share the link
 
-**Basic referral:**
+Let the referring user share the complete link. Keep the `referrer` parameter intact through any redirect or URL shortener.
 
-```
-get.yourdomain.com?referrer=user_1
-```
+When the recipient opens the link, Linkrunner sends them to the app or store. After install, the original URL is available in `getAttributionData()`:
 
-**Multiple parameters:**
-
-```
-get.yourdomain.com?referrer=user_1&campaign=summer2024&source=instagram
+```json
+{
+  "deeplink": "https://get.example.com?referrer=user_123"
+}
 ```
 
-**With deep linking:**
+## 3. Read the referral code
 
-```
-get.yourdomain.com/product/123?referrer=user_456
-```
-
-## Retrieving Data
-
-Call `getAttributionData()` early in your app lifecycle, then parse the `deeplink` field to extract your query parameters.
+Call `getAttributionData()` after the Linkrunner SDK is initialized. Parse the returned `deeplink` and read the `referrer` query parameter.
 
 <Tabs>
   <Tab title="Android">
-Use `android.net.Uri` to parse the URL and `getQueryParameter()` to extract values.
 
-[See Android Usage Guide →](/sdk/android/usage#getting-attribution-data)
+```kotlin
+val referralCode = attributionData.deeplink
+    ?.let { Uri.parse(it).getQueryParameter("referrer") }
+```
+
+[Get attribution data on Android](/sdk/android#getting-attribution-data)
 
   </Tab>
   <Tab title="iOS">
-Use `URLComponents` to parse the URL and access the `queryItems` array.
 
-[See iOS Usage Guide →](/sdk/ios/usage#getting-attribution-data)
+```swift
+let referralCode = URLComponents(string: deeplink)?
+    .queryItems?
+    .first(where: { $0.name == "referrer" })?
+    .value
+```
+
+[Get attribution data on iOS](/sdk/ios#getting-attribution-data)
 
   </Tab>
   <Tab title="React Native">
-Use JavaScript's `URL` and `URLSearchParams` to parse and extract parameters.
 
-[See React Native Usage Guide →](/sdk/react-native/usage#getting-attribution-data)
+```javascript
+const referralCode = new URL(attributionData.deeplink)
+  .searchParams.get("referrer");
+```
+
+[Get attribution data in React Native](/sdk/react-native#getting-attribution-data)
 
   </Tab>
   <Tab title="Flutter">
-Use `Uri.parse()` and access the `queryParameters` map.
 
-[See Flutter Usage Guide →](/sdk/flutter/usage#getting-attribution-data)
+```dart
+final referralCode = Uri.parse(attributionData.deeplink!)
+    .queryParameters['referrer'];
+```
+
+[Get attribution data in Flutter](/sdk/flutter#getting-attribution-data)
 
   </Tab>
 </Tabs>
 
-## Common Use Cases
+Store the code until the recipient signs up or completes the event that qualifies the referral.
 
-**Referral programs:** `?referrer=user_12345`
+## 4. Record the referral
 
-**Influencer tracking:** `?influencer=john_doe&platform=youtube`
+Send the referral code and the recipient's user ID to your backend. Validate the relationship and record it before applying a reward.
 
-**Campaign attribution:** `?campaign=summer_sale&source=instagram`
+At a minimum, reject:
 
-**Promo codes:** `?promo=SAVE20&referrer=email_campaign`
+- Invalid or expired codes
+- Self-referrals
+- A recipient using more than one referral code
+- The same qualifying event being rewarded twice
+
+<Tip>
+  Validate referrals and grant rewards on your backend. Do not trust a referral code submitted only by the client.
+</Tip>
+
+## Add campaign reporting
+
+If you also need click and install reporting in Linkrunner, append the referral parameter to a generated campaign link instead of using the subdomain directly.
+
+```text
+https://get.example.com/AbCdEf?referrer=user_123
+```
+
+See [Deep Link Management](/features/deep-link-management) for the campaign setup and parameter precedence rules.
 
 ## Testing
 
-1. Create a test link with query parameters
-2. Uninstall your app completely
-3. Click the link and install from the store
-4. Verify parameters in `getAttributionData()`
+1. Create a referral link with a test code.
+2. Uninstall the app from a real device.
+3. Open the referral link, then install and open the app.
+4. Confirm that `getAttributionData()` returns the link in `deeplink`.
+5. Confirm that your app extracts the referral code.
+6. Sign up and confirm that your backend records the correct referrer and recipient.
 
-<Warning>Always uninstall before testing. Attribution data is cached from the first install.</Warning>
+<Warning>
+  Deferred attribution is stored from the first install. Uninstall the app before repeating a test with a different referral code.
+</Warning>
 
 ## Troubleshooting
 
-**No parameters showing up?** Verify your subdomain is configured correctly in the [dashboard](https://dashboard.linkrunner.io/settings?s=domains) and that the app was installed via your link (not directly from the store).
+**`deeplink` is null.** Confirm that the SDK was initialized before calling `getAttributionData()` and that the app was installed through the referral link.
+
+**The referral parameter is missing.** Open the final URL before the store redirect and confirm that no redirect or URL shortener removed it.
+
+**The previous referral code is returned.** Uninstall the app before testing another link. Attribution data is cached from the first install.
+
+**The referral is not visible in campaign reporting.** Direct subdomain links are not associated with a campaign. Use a generated campaign link when you need dashboard reporting.
+
+**The code is present but no referral is recorded.** Check the app-to-backend request and your referral validation logic. Linkrunner forwards the code but does not apply referral rules or rewards.
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

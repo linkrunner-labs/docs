@@ -4,6 +4,16 @@ description: "Complete guide for integrating Linkrunner in React Native apps"
 icon: "react"
 ---
 
+<Note>
+  **Prefer to let your AI coding agent do this?** Install the Linkrunner skill and Claude Code, Cursor, GitHub Copilot, or Windsurf will wire up the SDK and deep links for you:
+
+  ```bash
+  npx @linkrunner/skills add react-native
+  ```
+
+  Then ask your agent to "integrate Linkrunner". See [Linkrunner Agent Skills](https://github.com/linkrunner-labs/skills).
+</Note>
+
 ## Installation
 
 ### Step 1: Install the Package
@@ -65,6 +75,90 @@ If you are upgrading from an earlier version, the SDK will transparently migrate
 ### Expo Support
 
 If you are using Expo, follow the above steps to install the required packages. After this, you will need to use development builds since the Linkrunner SDK relies on native libraries. Follow the [Expo Development Builds Documentation](https://docs.expo.dev/develop/development-builds/introduction/) to get started.
+
+### Google Integrated Conversion Measurement (Optional)
+
+Integrated Conversion Measurement (ICM) recovers Google App Campaign installs on iOS that Google cannot attribute because there is no click identifier and no IDFA to match on. Google's On-Device Measurement (ODM) SDK turns the click context into an encrypted signal that never leaves the device, and Linkrunner sends it with the install. See [Google ICM](/features/google-icm) for how it works.
+
+Set this up if you run Google App Campaigns for your iOS app. Requires `rn-linkrunner` 3.1.0 or later.
+
+<Note>
+    Google keeps ODM inactive for users in the European Economic Area, the United Kingdom, and Switzerland, so ICM recovers nothing for that traffic. Elsewhere, Google reports improved coverage for iOS 14+ users.
+</Note>
+
+<Note>
+    ICM also needs an **iOS link ID** configured in your Google Ads integration. Google has nowhere to send the conversion without one. See [Prerequisites](/features/google-icm#prerequisites).
+</Note>
+
+<Steps>
+  <Step title="Add Google's On-Device Measurement SDK (iOS)">
+    <Note>
+        Already using the Firebase iOS SDK 11.14.0 or later? The `FirebaseAnalytics` pod brings this SDK in for you. Skip this step.
+    </Note>
+
+    `rn-linkrunner` does not bundle this SDK, so apps that skip ICM carry none of its weight. Add it inside your app target in `ios/Podfile`:
+
+    ```ruby
+    target 'YourApp' do
+      # ...your existing config
+
+      pod 'GoogleAdsOnDeviceConversion'
+    end
+    ```
+
+    Then install the pods:
+
+    ```bash
+    cd ios && pod install
+    ```
+
+    CocoaPods adds the `-ObjC` and `-lc++` linker flags for you, so there are no Build Settings to change.
+  </Step>
+
+  <Step title="Report consent">
+    Set the values with `setConsent` before you call `init`, and again whenever the user changes their choice:
+
+    ```javascript
+    import linkrunner from "rn-linkrunner";
+
+    linkrunner.setConsent({
+        isEEA: "granted",
+        hasConsentForDataUsage: "granted",
+        hasConsentForAdsPersonalization: "denied",
+    });
+
+    await linkrunner.init("YOUR_PROJECT_TOKEN");
+    ```
+
+    Each signal takes `"granted"`, `"denied"`, or `"unknown"`. Anything omitted or left `"unknown"` is dropped from the payload rather than reported as a denial, so Linkrunner never reports a choice your user did not make.
+
+    | Parameter | Meaning |
+    | --- | --- |
+    | `isEEA` | European regulations apply to this user (the EEA, the UK, or Switzerland) |
+    | `hasConsentForDataUsage` | The user agreed to their data being sent to Google for advertising |
+    | `hasConsentForAdsPersonalization` | The user agreed to their data being used to personalize ads |
+
+    Google treats these as required whenever their value is known. `hasConsentForDataUsage` decides whether Google may use the conversion at all, `hasConsentForAdsPersonalization` decides whether it may feed audiences and remarketing, and `isEEA` tells Google which rules apply. Set them from your app's real consent state rather than hardcoding them. **For users outside the EEA, the UK, and Switzerland, report `isEEA` as denied and leave the other two unset.** See [Send Consent](/features/send-consent).
+
+    `setConsent` works on both iOS and Android. Android has no ODM SDK to add, but its installs reach Google through the App Conversion API, which reads the same signals.
+  </Step>
+</Steps>
+
+That is the whole integration. The native SDK fetches the value at initialization and there is no other API to call. Attribution comes back through [`getAttributionData`](#getting-attribution-data) as usual.
+
+<Warning>
+    Consent is stored between launches. Call `setConsent` again whenever the user's consent state changes, otherwise the previous value keeps being sent after the user has withdrawn it.
+</Warning>
+
+#### Verifying your setup
+
+Initialize with debug mode on and look for this line in the Xcode console:
+
+```
+Linkrunner: odm_available=true odm_fetch_result=success odm_fetch_latency_ms=124
+```
+
+`odm_available=false` with `odm_fetch_result=unavailable` means Google's SDK is not linked. Check that `pod install` picked up `GoogleAdsOnDeviceConversion`.
 
 ## Initialization (Required)
 To initialize the Linkrunner SDK, add this code to your `App.tsx` component:
@@ -241,6 +335,35 @@ The `getAttributionData` function returns:
         groupName?: string;
         assetName?: string;
         assetGroupName?: string;
+        adNetworkCampaignId?: string | null; // Ad network campaign ID
+        adSetId?: string | null; // Ad set ID
+        adSetName?: string | null; // Ad set name
+        adCreativeId?: string | null; // Ad creative ID
+        adCreativeName?: string | null; // Ad creative name
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123",
+    "campaignData": {
+        "id": "camp_123",
+        "name": "Summer Sale 2024",
+        "type": "INORGANIC",
+        "adNetwork": "META",
+        "installedAt": "2024-03-20T10:30:00Z",
+        "storeClickAt": "2024-03-20T10:29:45Z",
+        "groupName": "iOS Campaign",
+        "assetName": "Banner Ad 1",
+        "assetGroupName": "Product Catalog",
+        "adNetworkCampaignId": "120214682829390250",
+        "adSetId": "120214682829640250",
+        "adSetName": "Productivity",
+        "adCreativeId": "120214682926100250",
+        "adCreativeName": "Static_2"
     }
 }
 ```
@@ -706,6 +829,7 @@ Connect APNs with Linkrunner
 | `linkrunner.removePayment`      | Refund flow                    | When payment needs to be removed               |
 | `linkrunner.setPushToken`       | Push notification setup        | When FCM/APNs token is available               |
 | `linkrunner.handleDeeplink`     | Deep link entry points         | When app is opened via a deep link             |
+| `linkrunner.setConsent`         | App initialization or consent flow | Before `init`, and again when consent changes |
 
 ## Next Steps
 
