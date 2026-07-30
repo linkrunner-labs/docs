@@ -33,12 +33,12 @@ Older versions do not collect `odm_info` or provide the consent API.
 
 | Platform | Minimum supported version |
 | --- | --- |
-| Android | `io.linkrunner:android-sdk:4.1.0` |
-| iOS | LinkrunnerKit 4.1.0 |
-| React Native | `rn-linkrunner` 3.1.0 |
-| Flutter | `linkrunner` 4.1.0 |
-| Expo | `rn-linkrunner` 3.1.0 |
-| Unity | LinkrunnerKit 4.1.0 and `io.linkrunner:android-sdk:4.1.0` |
+| [Android](/sdk/android#google-ads-consent) | `io.linkrunner:android-sdk:4.1.0` |
+| [iOS](/sdk/ios#google-integrated-conversion-measurement-optional) | LinkrunnerKit 4.1.0 |
+| [React Native](/sdk/react-native#google-integrated-conversion-measurement-optional) | `rn-linkrunner` 3.1.0 |
+| [Flutter](/sdk/flutter#google-integrated-conversion-measurement-optional) | `linkrunner` 4.1.0 |
+| [Expo](/sdk/expo#google-integrated-conversion-measurement-optional) | `rn-linkrunner` 3.1.0 |
+| [Unity](/sdk/unity#google-integrated-conversion-measurement-optional) | LinkrunnerKit 4.1.0 and `io.linkrunner:android-sdk:4.1.0` |
 
 <Steps>
   <Step title="Create an iOS link ID in Google Ads">
@@ -116,5 +116,82 @@ See [Send Consent](/features/send-consent) for what to report for users outside 
     Add the pod and report consent
   </Card>
 </CardGroup>
+
+## Upgrade from a pre-ICM SDK version
+
+Update the Linkrunner SDK before adding Google's ODM SDK or calling `setConsent`.
+
+<Tabs>
+  <Tab title="Android">
+    Update the dependency in your app's `build.gradle`:
+
+    ```gradle
+    dependencies {
+        implementation 'io.linkrunner:android-sdk:4.1.0'
+    }
+    ```
+
+    Sync Gradle, then follow the [Google Ads consent setup](/sdk/android#google-ads-consent). Android does not need the ODM SDK.
+  </Tab>
+
+  <Tab title="iOS">
+    In Xcode, update the `linkrunner-ios` package to LinkrunnerKit 4.1.0 or later. If you use `Package.swift`, set the minimum version:
+
+    ```swift
+    .package(
+        url: "https://github.com/linkrunner-labs/linkrunner-ios.git",
+        from: "4.1.0"
+    )
+    ```
+
+    Keep `LinkrunnerKitStatic` linked to your app target, then complete the [iOS ICM setup](/sdk/ios#google-integrated-conversion-measurement-optional).
+  </Tab>
+
+  <Tab title="React Native">
+    Upgrade `rn-linkrunner`, then reinstall the iOS pods:
+
+    ```bash
+    npm install rn-linkrunner@latest
+    cd ios && pod install
+    ```
+
+    Confirm the installed version is 3.1.0 or later, then complete the [React Native ICM setup](/sdk/react-native#google-integrated-conversion-measurement-optional).
+  </Tab>
+
+  <Tab title="Flutter">
+    Upgrade the package to 4.1.0 or later:
+
+    ```bash
+    flutter pub add linkrunner:^4.1.0
+    ```
+
+    Then complete the [Flutter ICM setup](/sdk/flutter#google-integrated-conversion-measurement-optional).
+  </Tab>
+
+  <Tab title="Expo">
+    Upgrade both packages and regenerate the native projects:
+
+    ```bash
+    npm install rn-linkrunner@latest
+    npx expo install expo-linkrunner
+    npx expo prebuild --clean
+    ```
+
+    Confirm `rn-linkrunner` is 3.1.0 or later, then complete the [Expo ICM setup](/sdk/expo#google-integrated-conversion-measurement-optional). If you are upgrading from Expo SDK 1.x or 2.x, follow the [Expo migration guide](/sdk/expo#migration-guide) first.
+  </Tab>
+
+  <Tab title="Unity">
+    Update both native dependencies:
+
+    - Set `io.linkrunner:android-sdk` to 4.1.0 or later in `Assets/Plugins/Android/mainTemplate.gradle`.
+    - Update the `linkrunner-ios` Swift package to LinkrunnerKit 4.1.0 or later in the generated Xcode project.
+
+    Then complete the [Unity ICM setup](/sdk/unity#google-integrated-conversion-measurement-optional).
+  </Tab>
+</Tabs>
+
+<Note>
+    Capacitor and Cordova do not support ICM yet.
+</Note>
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
