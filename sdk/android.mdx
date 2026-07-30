@@ -28,7 +28,7 @@ Add the Linkrunner SDK to your app's `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation 'io.linkrunner:android-sdk:3.10.0'
+    implementation 'io.linkrunner:android-sdk:4.1.0'
 }
 ```
 
@@ -732,6 +732,47 @@ private fun capturePurchase() {
 
 > **Note:** For more information on testing and verifying your ecommerce events, please see our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
 
+## Google Ads Consent
+
+<Note>
+  **SDK Version Requirement:** Requires Android SDK version 4.1.0 or higher.
+</Note>
+
+If you run Google App Campaigns, report your users' consent choices. Google's App Conversion API treats these values as required whenever they are known, and reads them when it matches your installs, so an install with no consent state attached is harder to attribute. This matters most for users in the European Economic Area, the United Kingdom, and Switzerland.
+
+Set the values with `setConsent` before you call `init`, and again whenever the user changes their choice:
+
+```kotlin
+import io.linkrunner.sdk.models.ConsentStatus
+import io.linkrunner.sdk.models.LinkrunnerConsent
+
+LinkRunner.getInstance().setConsent(
+    LinkrunnerConsent(
+        isEEA = ConsentStatus.GRANTED,
+        hasConsentForDataUsage = ConsentStatus.GRANTED,
+        hasConsentForAdsPersonalization = ConsentStatus.DENIED
+    )
+)
+```
+
+| Parameter | Meaning |
+| --- | --- |
+| `isEEA` | European regulations apply to this user (the EEA, the UK, or Switzerland) |
+| `hasConsentForDataUsage` | The user agreed to their data being sent to Google for advertising |
+| `hasConsentForAdsPersonalization` | The user agreed to their data being used to personalize ads |
+
+Each takes `ConsentStatus.GRANTED`, `ConsentStatus.DENIED`, or `ConsentStatus.UNKNOWN`. Anything left `UNKNOWN` is dropped from the payload rather than reported as a denial, so Linkrunner never reports a choice your user did not make.
+
+Google treats these as required whenever their value is known. `hasConsentForDataUsage` decides whether Google may use the conversion at all, `hasConsentForAdsPersonalization` decides whether it may feed audiences and remarketing, and `isEEA` tells Google which rules apply. Set them from your app's real consent state rather than hardcoding them. **For users outside the EEA, the UK, and Switzerland, report `isEEA` as denied and leave the other two unset.** See [Send Consent](/features/send-consent). A missing advertising ID is not a consent signal and is never treated as one.
+
+<Warning>
+  Consent is stored between launches. Call `setConsent` again whenever the user's consent state changes, otherwise the previous value keeps being sent after the user has withdrawn it.
+</Warning>
+
+<Note>
+  There is no extra SDK to add to your Android build. Android installs reach Google through the App Conversion API, which reads the consent signals above.
+</Note>
+
 ## Enhanced Privacy Controls
 
 The SDK offers options to enhance user privacy:
@@ -923,6 +964,7 @@ Connect Firebase Cloud Messaging (FCM) with Linkrunner
 | `LinkRunner.getInstance().removePayment`            | Refund flow                            | When payment needs to be removed               |
 | `LinkRunner.getInstance().setPushToken`             | Push notification setup                | When FCM token is available                    |
 | `LinkRunner.getInstance().handleDeeplink`           | Deep link entry points                 | When app is opened via a deep link             |
+| `LinkRunner.getInstance().setConsent`               | App initialization or consent flow     | Before `init`, and again when consent changes |
 | `LinkRunner.getInstance().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection       |
 | `LinkRunner.getInstance().isAaidCollectionDisabled` | Privacy settings or compliance checks  | When you need to check AAID collection status  |
 

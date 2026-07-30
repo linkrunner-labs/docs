@@ -39,7 +39,7 @@ Alternatively, you can add the package dependency to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "3.12.0")
+    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "4.1.0")
 ]
 ```
 
@@ -95,6 +95,119 @@ For complete SKAdNetwork integration details, see the [SKAdNetwork Integration G
 #### Network Access
 
 The SDK requires network access to communicate with Linkrunner services. Make sure your app has the appropriate permissions for network access.
+
+### Google Integrated Conversion Measurement (Optional)
+
+Integrated Conversion Measurement (ICM) recovers Google App Campaign installs that Google cannot attribute because there is no click identifier and no IDFA to match on. Google's On-Device Measurement (ODM) SDK turns the click context into an encrypted signal that never leaves the device, and Linkrunner sends it with the install. See [Google ICM](/features/google-icm) for how it works.
+
+Set this up if you run Google App Campaigns for your iOS app. Requires LinkrunnerKit 4.1.0 or later.
+
+<Note>
+    Google keeps ODM inactive for users in the European Economic Area, the United Kingdom, and Switzerland, so ICM recovers nothing for that traffic. Elsewhere, Google reports improved coverage for iOS 14+ users.
+</Note>
+
+<Note>
+    ICM also needs an **iOS link ID** configured in your Google Ads integration. Google has nowhere to send the conversion without one. See [Prerequisites](/features/google-icm#prerequisites).
+</Note>
+
+<Steps>
+  <Step title="Add Google's On-Device Measurement SDK">
+    <Note>
+        Already using the Firebase iOS SDK 11.14.0 or later? The `FirebaseAnalytics` pod brings this SDK in for you. Skip to the next step.
+    </Note>
+
+    Linkrunner does not bundle this SDK, so apps that skip ICM carry none of its weight. Add it to your app yourself.
+
+    <Tabs>
+      <Tab title="Swift Package Manager">
+        Add `https://github.com/googleads/google-ads-on-device-conversion-ios-sdk` in **File** → **Add Package Dependencies...** and select the `GoogleAdsOnDeviceConversion` product.
+      </Tab>
+      <Tab title="CocoaPods">
+        Add the pod inside your app target in the `Podfile`:
+
+        ```ruby
+        target 'YourApp' do
+          # ...your existing pods
+
+          pod 'GoogleAdsOnDeviceConversion'
+        end
+        ```
+
+        Then run `pod install`.
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Add the -ObjC linker flag (Swift Package Manager only)">
+    <Note>
+        Using CocoaPods? Skip this step. CocoaPods adds `-ObjC` and `-lc++` for you when it links Google's static framework. The one exception is an app target whose **Other Linker Flags** no longer contain `$(inherited)`, in which case add `-ObjC` yourself.
+    </Note>
+
+    If you added Google's SDK with Swift Package Manager, add this to **Build Settings** → **Other Linker Flags** on your app target:
+
+    ```
+    -ObjC
+    ```
+
+    <Warning>
+        Without it, ICM silently does nothing and your build still succeeds. Linkrunner finds Google's class through the Objective-C runtime, so nothing references it at link time, and the linker drops it from Google's static library.
+    </Warning>
+  </Step>
+
+  <Step title="Provide consent">
+    Google reads consent signals when it matches your installs. See [Consent](#consent) below.
+  </Step>
+</Steps>
+
+That is the whole integration. Linkrunner detects the SDK at runtime and there is no API to call. Attribution comes back through [`getAttributionData`](#getting-attribution-data) as usual.
+
+<Tip>
+    ODM matches on the time of first launch, which Linkrunner records when you call `initialize`.
+</Tip>
+
+<Note>
+    ICM complements SKAdNetwork, it does not replace it. Keep your existing [SKAdNetwork integration](/features/skadnetwork-integration) in place.
+</Note>
+
+#### Consent
+
+Google needs to know whether European regulations apply to a user and what that user agreed to. Set the values with `setConsent` before you call `initialize`, and again whenever the user changes their choice.
+
+```swift
+LinkrunnerSDK.shared.setConsent(
+    LinkrunnerConsent(
+        isEEA: .granted,
+        hasConsentForDataUsage: .granted,
+        hasConsentForAdsPersonalization: .denied
+    )
+)
+
+await LinkrunnerSDK.shared.initialize(token: "YOUR_PROJECT_TOKEN")
+```
+
+| Parameter | Meaning |
+| --- | --- |
+| `isEEA` | European regulations apply to this user (the EEA, the UK, or Switzerland) |
+| `hasConsentForDataUsage` | The user agreed to their data being sent to Google for advertising |
+| `hasConsentForAdsPersonalization` | The user agreed to their data being used to personalize ads |
+
+Each takes `.granted`, `.denied`, or `.unknown`. Anything left `.unknown` is omitted rather than reported as a denial, so Linkrunner never reports a choice your user did not make.
+
+Google treats these as required whenever their value is known. `hasConsentForDataUsage` decides whether Google may use the conversion at all, `hasConsentForAdsPersonalization` decides whether it may feed audiences and remarketing, and `isEEA` tells Google which rules apply. Set them from your app's real consent state rather than hardcoding them. **For users outside the EEA, the UK, and Switzerland, report `isEEA` as denied and leave the other two unset.** See [Send Consent](/features/send-consent). App Tracking Transparency is not a substitute, because it governs IDFA access only and is reported separately.
+
+<Warning>
+    Consent is stored between launches. Call `setConsent` again whenever the user's consent state changes, otherwise the previous value keeps being sent after your user has withdrawn it.
+</Warning>
+
+#### Verifying your setup
+
+Initialize with `debug: true` and look for this line in the Xcode console:
+
+```
+Linkrunner: odm_available=true odm_fetch_result=success odm_fetch_latency_ms=124
+```
+
+`odm_available=false` with `odm_fetch_result=unavailable` means Google's SDK is not linked. On Swift Package Manager, check the `-ObjC` flag first, because a missing flag strips the class with no build warning.
 
 ## Initialization (Required)
 Initialize the Linkrunner SDK in your app's startup code, typically in your `AppDelegate` or `SceneDelegate`:
@@ -803,6 +916,7 @@ Connect APNs with Linkrunner
 | `LinkrunnerSDK.shared.removePayment`         | Refund flow                    | When payment needs to be removed               |
 | `LinkrunnerSDK.shared.setPushToken`          | Push notification setup        | When APNs token is available                   |
 | `LinkrunnerSDK.shared.handleDeeplink`        | SceneDelegate deep link entry points | When app is opened via a deep link       |
+| `LinkrunnerSDK.shared.setConsent`            | App initialization or consent flow | Before `initialize`, and again when consent changes |
 
 ## Complete Example
 

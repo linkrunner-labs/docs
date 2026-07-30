@@ -83,6 +83,10 @@ For complete SKAdNetwork integration details, see the [SKAdNetwork Integration G
 
 For detailed Android backup configuration instructions, refer to the [Android SDK Backup Configuration](/sdk/android#backup-configuration).
 
+<Note>
+    **Google Integrated Conversion Measurement (ICM)** is not available in the Cordova plugin yet. `cordova-linkrunner` 1.2.0 pins LinkrunnerKit 4.0.x and `io.linkrunner:android-sdk:4.0.1`, and ICM needs 4.1.0 on both. If you run Google App Campaigns for your iOS app, contact [support@linkrunner.io](mailto:support@linkrunner.io). See [Google ICM](/features/google-icm) for what it does.
+</Note>
+
 ## Initialization (Required)
 To initialize the Linkrunner SDK, add this code inside the `deviceready` event. No import or require is needed — `linkrunner` is globally available after plugin installation.
 
