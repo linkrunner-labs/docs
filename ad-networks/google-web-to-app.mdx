@@ -1,12 +1,13 @@
 ---
 title: "Google Web to App"
-description: "Run Google web-to-app campaigns and attribute installs from Search, Display, and Performance Max ads through a Linkrunner landing page."
+
+description: "Run Google web-to-app campaigns and attribute installs from Search, Display, and Demand Gen ads through your website."
 icon: "/images/logos/google.webp"
 ---
 
 ## Overview
 
-Google Web to App lets you run Search, Display, or Performance Max campaigns that drive app installs through the web. Your ad's Final URL is your Linkrunner domain. Google appends the click parameters automatically, and Linkrunner returns a landing page that opens your app or its store listing. No code on your website is required.
+Google Web to App lets you run Search, Display, or Demand Gen campaigns that drive app installs through the web. Your ad's Final URL is your Linkrunner domain: Google appends the click parameters to it automatically, Linkrunner records the click, sends mobile users into your app or its store listing, and forwards desktop users to your website. No code on your website is required.
 
 **Works for both Android and iOS apps.**
 
@@ -25,7 +26,7 @@ Connecting your Google Ads account lets Linkrunner sync your campaigns and spend
 Go to [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads), click **Add Google Account**, and choose how to connect:
 
 - **Google App Ads**: campaign sync and spend reporting.
-- **Google Web to App Ads**: everything above, plus permission to upload in-app conversions to your Google Ads conversion actions. Choose this for web-to-app so Google can optimize Search and Performance Max campaigns on real in-app events.
+- **Google Web to App Ads**: everything above, plus permission to upload in-app conversions to your Google Ads conversion actions. Choose this for web-to-app so Google can optimize your web-to-app campaigns on real in-app events.
 
 Click **Google Web to App Ads** for this setup, then sign in with a Google account that has access to your Google Ads account and approve the requested permissions.
 
@@ -159,11 +160,17 @@ In Google Ads, click **New campaign**. On **What's your campaign objective?**, s
 
 </Step>
 
-<Step title="Select Performance Max" id="select-performance-max">
+<Step title="Select Demand Gen" id="select-demand-gen">
 
-On **Select a campaign type**, choose **Performance Max**.
+On **Select a campaign type**, choose **Demand Gen**.
 
-![Google Ads campaign type screen with Performance Max selected](/images/google_ads/web-to-app/campaign-type-performance-max.png)
+![Google Ads campaign type screen with Demand Gen selected](/images/google_ads/web-to-app/campaign-type-demand-gen.png)
+
+<Note>
+  **Why Demand Gen?** Performance Max campaigns do not support targeting iOS
+  users only. Demand Gen supports OS-level device targeting, so you can serve
+  the campaign to iOS devices only.
+</Note>
 
 </Step>
 
@@ -175,9 +182,32 @@ Pick the conversion goals this campaign should optimize for (for example **Sign-
 
 </Step>
 
+<Step title="Set device targeting" id="set-device-targeting">
+
+Attribution needs the ad click and the install to happen on the same device. Target only the devices that can install your app:
+
+- **Mobile Phones**: check this. It is the right choice for almost every app.
+- **Tablets**: check this only if your app is available on tablets and you want tablet installs. If not, a tablet click cannot become an attributable install.
+- **Computers and TV screens**: leave unchecked. These devices cannot install your app, so their clicks spend budget without ever producing an attributable install.
+
+In your campaign settings, expand the **Devices** section:
+
+1. Select **Set specific targeting for devices**
+2. Check **Mobile Phones** (and **Tablets** if your app supports them)
+3. Under **Advanced targeting for devices**, click **Operating Systems** and select **iOS**
+
+![Google Ads Demand Gen Devices section with Mobile Phones checked and iOS selected under Operating Systems](/images/google_ads/web-to-app/demand-gen-device-targeting-ios.png)
+
+<Note>
+  Run one campaign per platform. For your Android campaign, select **Android**
+  instead of iOS.
+</Note>
+
+</Step>
+
 <Step title="Add your destination link" id="add-destination-link">
 
-When Google asks **Where should people go after clicking your ads?**, enter your Linkrunner domain as the destination URL:
+When you create your ad, set its **Final URL** to your Linkrunner domain:
 
 ```
 https://<your-linkrunner-domain>/
@@ -185,7 +215,7 @@ https://<your-linkrunner-domain>/
 
 Grab the exact URL from [Integrations → Google Ads → Web to App](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=web_to_app) using the **Copy** button. Do not paste the Final URL suffix in this field. Keep the suffix in **Tracking → Final URL suffix** at the account or campaign level.
 
-![Google Ads screen asking where people should go after clicking your ads, with the destination URL field](/images/google_ads/web-to-app/campaign-destination-link.png)
+![Demand Gen ad Final URL field with the Linkrunner domain filled in](/images/google_ads/web-to-app/demand-gen-ad-final-url.png)
 
 </Step>
 
@@ -193,7 +223,7 @@ Grab the exact URL from [Integrations → Google Ads → Web to App](https://das
 
 ## Send in-app conversions to Google
 
-After installs are attributed, Linkrunner can upload in-app conversions (such as purchases or sign-ups) back to Google Ads. Google uses them to optimize your Search and Performance Max campaigns on real outcomes, not just installs.
+After installs are attributed, Linkrunner can upload in-app conversions (such as purchases or sign-ups) back to Google Ads. Google uses them to optimize your Search and Demand Gen campaigns on real outcomes, not just installs.
 
 This requires connecting with **Google Web to App Ads** so Linkrunner has permission to send conversions.
 
