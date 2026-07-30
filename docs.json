@@ -11,11 +11,11 @@
     "navigation": {
         "tabs": [
             {
-                "tab": "Documentation",
+                "tab": "Guides",
                 "groups": [
                     {
                         "group": "Getting Started",
-                        "pages": ["introduction", "quickstart"]
+                        "pages": ["introduction", "quickstart", "ai-agent-skills"]
                     },
                     {
                         "group": "SDK Guides",
@@ -29,6 +29,81 @@
                             "sdk/android",
                             "sdk/expo",
                             "sdk/unity"
+                        ]
+                    },
+                    {
+                        "group": "Links & Journeys",
+                        "pages": [
+                            "features/subdomain-setup",
+                            "features/deep-linking-setup",
+                            "features/deferred-deep-linking",
+                            "features/web-to-app-journeys",
+                            "features/link-redirection",
+                            "features/deep-link-management",
+                            "features/referral-codes",
+                            "features/custom-store-listing",
+                            "features/social-media-intermediary-page"
+                        ]
+                    },
+                    {
+                        "group": "Measurement & Privacy",
+                        "pages": [
+                            "features/uninstall-tracking",
+                            "features/retention",
+                            "features/meta-install-referrer",
+                            "features/send-consent",
+                            "features/ios-campaign-data-limitations",
+                            {
+                                "group": "SKAdNetwork",
+                                "icon": "apple",
+                                "pages": [
+                                    "features/skadnetwork-integration",
+                                    "features/google-skan-setup",
+                                    "features/meta-skan-setup",
+                                    "features/skadnetwork-conversion-values",
+                                    {
+                                        "group": "SKAN Dashboard",
+                                        "icon": "gauge",
+                                        "pages": [
+                                            "features/skan-dashboard/overview",
+                                            "features/skan-dashboard/stats-cards",
+                                            "features/skan-dashboard/privacy-tiers",
+                                            "features/skan-dashboard/conversion-values",
+                                            "features/skan-dashboard/trend-graph",
+                                            "features/skan-dashboard/conversion-table"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "group": "Remarketing",
+                        "pages": [
+                            "features/remarketing-guide",
+                            "features/remarketing",
+                            {
+                                "group": "Creating Audience Segments",
+                                "pages": [
+                                    "features/remarketing-audience-segments",
+                                    "features/remarketing-audience-events",
+                                    "features/remarketing-audience-upload"
+                                ]
+                            },
+                            "features/remarketing-campaigns"
+                        ]
+                    },
+                    {
+                        "group": "Billing",
+                        "pages": ["billing/overview"]
+                    },
+                    {
+                        "group": "Troubleshooting",
+                        "pages": [
+                            "testing/testing-attribution-troubleshooting",
+                            "ad-networks/google-ads-discrepancies",
+                            "ad-networks/meta-ads-discrepancies",
+                            "ad-networks/meta-view-through-attribution"
                         ]
                     },
                     {
@@ -55,70 +130,21 @@
                             },
                             "sdk-less/api-reference"
                         ]
-                    },
-                    {
-                        "group": "Core Features",
-                        "pages": [
-                            "features/subdomain-setup",
-                            "features/deep-linking-setup",
-                            "features/deferred-deep-linking",
-                            "features/web-to-app-journeys",
-                            "features/link-redirection",
-                            "features/referral-codes",
-                            "features/custom-store-listing",
-                            "features/uninstall-tracking",
-                            "features/retention",
-                            "features/meta-install-referrer",
-                            "features/ios-campaign-data-limitations",
-                            "features/webhooks",
-                            "features/mcp",
-                            "features/social-media-intermediary-page",
-                            {
-                                "group": "SKAdNetwork",
-                                "icon": "apple",
-                                "pages": [
-                                    "features/skadnetwork-integration",
-                                    "features/skadnetwork-conversion-values",
-                                    {
-                                        "group": "SKAN Dashboard",
-                                        "icon": "gauge",
-                                        "pages": [
-                                            "features/skan-dashboard/overview",
-                                            "features/skan-dashboard/stats-cards",
-                                            "features/skan-dashboard/privacy-tiers",
-                                            "features/skan-dashboard/conversion-values",
-                                            "features/skan-dashboard/trend-graph",
-                                            "features/skan-dashboard/conversion-table"
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "group": "Remarketing",
-                                "icon": "bullseye",
-                                "pages": [
-                                    "features/remarketing-guide",
-                                    "features/remarketing",
-                                    {
-                                        "group": "Creating Audience Segments",
-                                        "pages": [
-                                            "features/remarketing-audience-segments",
-                                            "features/remarketing-audience-events",
-                                            "features/remarketing-audience-upload"
-                                        ]
-                                    },
-                                    "features/remarketing-campaigns"
-                                ]
-                            }
-                        ]
-                    },
+                    }
+                ]
+            },
+            {
+                "tab": "Integrations",
+                "groups": [
                     {
                         "group": "Ad Networks",
                         "pages": [
                             "ad-networks/google-ads",
+                            "features/google-icm",
                             "ad-networks/meta-ads",
                             "ad-networks/tiktok",
                             "ad-networks/snapchat",
+                            "ad-networks/reddit-ads",
                             "ad-networks/linkedin-ads",
                             "ad-networks/google-web-to-app",
                             "ad-networks/meta-web-to-app"
@@ -152,7 +178,12 @@
                         "pages": [
                             "ecommerce-manager/meta-commerce-manager"
                         ]
-                    },
+                    }
+                ]
+            },
+            {
+                "tab": "API Reference",
+                "groups": [
                     {
                         "group": "API Reference",
                         "pages": [
@@ -164,15 +195,10 @@
                         ]
                     },
                     {
-                        "group": "Billing",
-                        "pages": ["billing/overview"]
-                    },
-                    {
-                        "group": "FAQ",
+                        "group": "Developer Tools",
                         "pages": [
-                            "testing/testing-attribution-troubleshooting",
-                            "ad-networks/google-ads-discrepancies",
-                            "ad-networks/meta-ads-discrepancies"
+                            "features/webhooks",
+                            "features/mcp"
                         ]
                     }
                 ]

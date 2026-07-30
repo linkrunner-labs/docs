@@ -6,14 +6,15 @@
     "scripts": {
         "dev": "mintlify dev --port 3001",
         "build": "mintlify build",
+        "check:routes": "node scripts/check-doc-routes.mjs",
         "preview": "mintlify preview",
         "install-mintlify": "npm install -g mintlify",
         "export": "next build && next export"
     },
     "dependencies": {
+        "jsonc-parser": "^3.3.1",
         "mintlify": "latest"
     },
-    "devDependencies": {},
     "keywords": [
         "documentation",
         "mintlify",

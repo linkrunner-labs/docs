@@ -67,7 +67,7 @@ When using the CDN version, configure via script attributes:
 For manual initialization or when using NPM:
 
 ```javascript
-window.LinkrunnerSDK.init({
+window.LinkrunnerSDK.configure({
     token: "YOUR_PROJECT_TOKEN",
 });
 ```
@@ -78,7 +78,7 @@ After initialization, you can use the `getStoreLink` function:
 
 ```javascript
 // Initialize the SDK first
-window.LinkrunnerSDK.init({
+window.LinkrunnerSDK.configure({
     token: "YOUR_PROJECT_TOKEN",
 });
 

@@ -1,0 +1,25 @@
+name: Docs route guard
+
+on:
+  pull_request:
+    paths:
+      - "**/*.md"
+      - "**/*.mdx"
+      - "docs.json"
+      - "scripts/check-doc-routes.mjs"
+      - ".github/workflows/docs-route-guard.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check-routes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check published documentation routes
+        run: node scripts/check-doc-routes.mjs "${{ github.event.pull_request.base.sha }}"
