@@ -199,6 +199,14 @@ Google treats these as required whenever their value is known. `hasConsentForDat
     Consent is stored between launches. Call `setConsent` again whenever the user's consent state changes, otherwise the previous value keeps being sent after your user has withdrawn it.
 </Warning>
 
+**Reading consent from a TCF CMP.** If your Consent Management Platform is IAB TCF v2.2/v2.3 compliant, you can skip the mapping above. Call `enableTCFConsentCollection` before `initialize` and the SDK derives all three signals from the CMP's standard `IABTCF_*` keys, using Google's published purpose mapping — `hasConsentForDataUsage` from purposes 1 and 7, `hasConsentForAdsPersonalization` from purposes 3 and 4, both gated on vendor consent for Google (TCF vendor 755).
+
+```swift
+LinkrunnerSDK.shared.enableTCFConsentCollection(true)
+```
+
+Anything you set explicitly with `setConsent` still wins, per signal. It is opt-in rather than automatic because interpreting a TC string on your behalf is a legal judgement — only enable it with a TCF-compliant CMP. Custom consent screens and Firebase Consent Mode do not write these keys. The flag is not persisted, so call it on every launch before `initialize`.
+
 #### Verifying your setup
 
 Initialize with `debug: true` and look for this line in the Xcode console:
@@ -917,6 +925,7 @@ Connect APNs with Linkrunner
 | `LinkrunnerSDK.shared.setPushToken`          | Push notification setup        | When APNs token is available                   |
 | `LinkrunnerSDK.shared.handleDeeplink`        | SceneDelegate deep link entry points | When app is opened via a deep link       |
 | `LinkrunnerSDK.shared.setConsent`            | App initialization or consent flow | Before `initialize`, and again when consent changes |
+| `LinkrunnerSDK.shared.enableTCFConsentCollection` | App initialization or consent flow | Before `initialize`, on every launch, when using a TCF CMP |
 
 ## Complete Example
 
