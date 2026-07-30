@@ -149,7 +149,8 @@
                             "analytics-integrations/moengage",
                             "analytics-integrations/netcore",
                             "analytics-integrations/posthog",
-                            "analytics-integrations/revenuecat"
+                            "analytics-integrations/revenuecat",
+                            "analytics-integrations/webengage"
                         ]
                     },
                     {
