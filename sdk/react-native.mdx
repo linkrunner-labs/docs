@@ -78,6 +78,16 @@ If you are using Expo, follow the above steps to install the required packages. 
 
 ### Google Integrated Conversion Measurement (Optional)
 
+<Note>
+  **Prefer to let your AI coding agent do this?** The React Native skill already covers ICM — adding the pod and wiring `setConsent`:
+
+  ```bash
+  npx @linkrunner/skills add react-native
+  ```
+
+  See [Linkrunner Agent Skills](/ai-agent-skills).
+</Note>
+
 Integrated Conversion Measurement (ICM) recovers Google App Campaign installs on iOS that Google cannot attribute because there is no click identifier and no IDFA to match on. Google's On-Device Measurement (ODM) SDK turns the click context into an encrypted signal that never leaves the device, and Linkrunner sends it with the install. See [Google ICM](/features/google-icm) for how it works.
 
 Set this up if you run Google App Campaigns for your iOS app. Requires `rn-linkrunner` 3.1.0 or later.
