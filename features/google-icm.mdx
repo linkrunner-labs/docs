@@ -5,6 +5,16 @@ icon: "google"
 sidebarTitle: "Google ICM"
 ---
 
+<Note>
+  **Using an AI coding agent?** The Linkrunner skill for your platform already includes ICM setup — adding Google's ODM SDK where needed and wiring `setConsent`:
+
+  ```bash
+  npx @linkrunner/skills add ios          # or react-native, flutter, android
+  ```
+
+  See [Linkrunner Agent Skills](/ai-agent-skills).
+</Note>
+
 ## What it is
 
 Google App Campaigns lose iOS installs when there is no click identifier and no IDFA to match on, which is the normal state once a user declines App Tracking Transparency. Integrated Conversion Measurement (ICM) closes that gap.
