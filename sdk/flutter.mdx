@@ -151,6 +151,103 @@ platform :ios, '15.0'
 
 For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
 
+### Google Integrated Conversion Measurement (Optional)
+
+<Note>
+  **Prefer to let your AI coding agent do this?** The Flutter skill already covers ICM — adding the pod and wiring `setConsent`:
+
+  ```bash
+  npx @linkrunner/skills add flutter
+  ```
+
+  See [Linkrunner Agent Skills](/ai-agent-skills).
+</Note>
+
+Integrated Conversion Measurement (ICM) recovers Google App Campaign installs on iOS that Google cannot attribute because there is no click identifier and no IDFA to match on. Google's On-Device Measurement (ODM) SDK turns the click context into an encrypted signal that never leaves the device, and Linkrunner sends it with the install. See [Google ICM](/features/google-icm) for how it works.
+
+Set this up if you run Google App Campaigns for your iOS app. Requires `linkrunner` 4.1.0 or later.
+
+<Note>
+    Google keeps ODM inactive for users in the European Economic Area, the United Kingdom, and Switzerland, so ICM recovers nothing for that traffic. Elsewhere, Google reports improved coverage for iOS 14+ users.
+</Note>
+
+<Note>
+    ICM also needs an **iOS link ID** configured in your Google Ads integration. Google has nowhere to send the conversion without one. See [Prerequisites](/features/google-icm#prerequisites).
+</Note>
+
+<Steps>
+  <Step title="Add Google's On-Device Measurement SDK (iOS)">
+    <Note>
+        Already using the Firebase iOS SDK 11.14.0 or later? The `FirebaseAnalytics` pod brings this SDK in for you. Skip this step.
+    </Note>
+
+    The plugin does not bundle this SDK, so apps that skip ICM carry none of its weight. Add it inside the `Runner` target in `ios/Podfile`:
+
+    ```ruby
+    target 'Runner' do
+      # ...your existing config
+
+      pod 'GoogleAdsOnDeviceConversion'
+    end
+    ```
+
+    Then install the pods:
+
+    ```bash
+    cd ios && pod install
+    ```
+
+    CocoaPods adds the `-ObjC` and `-lc++` linker flags for you, so there are no Xcode Build Settings to change.
+  </Step>
+
+  <Step title="Report consent">
+    Set the values with `setConsent` before you call `init`, and again whenever the user changes their choice:
+
+    ```dart
+    import 'package:linkrunner/linkrunner.dart';
+    import 'package:linkrunner/models/lr_consent.dart';
+
+    await LinkRunner().setConsent(
+      LRConsent(
+        isEEA: ConsentStatus.GRANTED,
+        hasConsentForDataUsage: ConsentStatus.GRANTED,
+        hasConsentForAdsPersonalization: ConsentStatus.DENIED,
+      ),
+    );
+
+    await LinkRunner().init('YOUR_PROJECT_TOKEN');
+    ```
+
+    Each signal takes `ConsentStatus.GRANTED`, `ConsentStatus.DENIED`, or `ConsentStatus.UNKNOWN`. Anything omitted or left `UNKNOWN` is dropped from the payload rather than reported as a denial, so Linkrunner never reports a choice your user did not make.
+
+    | Parameter | Meaning |
+    | --- | --- |
+    | `isEEA` | European regulations apply to this user (the EEA, the UK, or Switzerland) |
+    | `hasConsentForDataUsage` | The user agreed to their data being sent to Google for advertising |
+    | `hasConsentForAdsPersonalization` | The user agreed to their data being used to personalize ads |
+
+    Google treats these as required whenever their value is known. `hasConsentForDataUsage` decides whether Google may use the conversion at all, `hasConsentForAdsPersonalization` decides whether it may feed audiences and remarketing, and `isEEA` tells Google which rules apply. Set them from your app's real consent state rather than hardcoding them. **For users outside the EEA, the UK, and Switzerland, report `isEEA` as denied and leave the other two unset.** See [Send Consent](/features/send-consent).
+
+    `setConsent` works on both iOS and Android. Android has no ODM SDK to add, but its installs reach Google through the App Conversion API, which reads the same signals.
+  </Step>
+</Steps>
+
+That is the whole integration. The native SDK fetches the value at initialization and there is no other Dart API to call. Attribution comes back through [`getAttributionData`](#getting-attribution-data) as usual.
+
+<Warning>
+    Consent is stored between launches. Call `setConsent` again whenever the user's consent state changes, otherwise the previous value keeps being sent after the user has withdrawn it.
+</Warning>
+
+#### Verifying your setup
+
+Initialize with `debug` set to `true` and look for this line in the Xcode console:
+
+```
+Linkrunner: odm_available=true odm_fetch_result=success odm_fetch_latency_ms=124
+```
+
+`odm_available=false` with `odm_fetch_result=unavailable` means Google's SDK is not linked. Check that `pod install` picked up `GoogleAdsOnDeviceConversion`.
+
 ## Initialization (Required)
 You'll need your [project token](https://dashboard.linkrunner.io/dashboard?m=documentation) to get started!
 
@@ -949,6 +1046,7 @@ Connect APNs with Linkrunner
 | `LinkRunner().capturePayment`           | Payment processing                     | When user makes a payment                      |
 | `LinkRunner().removePayment`            | Refund flow                            | When payment needs to be removed               |
 | `LinkRunner().handleDeeplink`           | Deep link entry points                 | When app is opened via a deep link             |
+| `LinkRunner().setConsent`               | App initialization or consent flow     | Before `init`, and again when consent changes |
 | `LinkRunner().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection       |
 | `LinkRunner().isAaidCollectionDisabled` | Privacy settings or compliance checks  | When you need to check AAID collection status  |
 

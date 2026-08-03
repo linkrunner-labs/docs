@@ -271,9 +271,8 @@ GET /attributed-users
 | Parameter       | Type   | Required | Description                                                                                              |
 | --------------- | ------ | -------- | -------------------------------------------------------------------------------------------------------- |
 | display_id      | string | Yes      | The display ID of the campaign to retrieve attributed users for                                          |
-| start_timestamp | string | No       | Start time in ISO 8601 format (e.g., "2025-06-23T10:29:26.074")                                          |
-| end_timestamp   | string | No       | End time in ISO 8601 format (e.g., "2025-06-23T10:29:26.074")                                            |
-| timezone        | string | No       | IANA timezone identifier. See [IANA Time Zone Database](https://nodatime.org/TimeZones) (default: `UTC`) |
+| start_timestamp | string | No       | Start time in RFC 3339 format with a UTC or offset suffix (e.g., `2025-06-23T10:29:26Z` or `2025-06-23T10:29:26+05:30`) |
+| end_timestamp   | string | No       | End time in RFC 3339 format with a UTC or offset suffix (e.g., `2025-06-24T10:29:26Z` or `2025-06-24T10:29:26+05:30`)   |
 | page            | number | No       | The page number to retrieve. Must be a positive integer. (default: `1`)                                  |
 | limit           | number | No       | The number of users to return per page. Must be between 1 and 1000. (default: `50`, max: `1000`)         |
 
@@ -287,10 +286,15 @@ Pagination is automatically applied to all requests with the following defaults:
 
 #### Time Format Details
 
--   **ISO 8601 Format**: Use `YYYY-MM-DDThh:mm:ss.SSS` format (e.g., `2025-06-23T10:29:26.074`)
--   **IANA Timezone**: Standard timezone identifiers like `America/New_York`, `Asia/Tokyo`, `Asia/Kolkata`
--   **Default Timezone**: UTC is used when timezone parameter is not provided
+-   **RFC 3339 Format**: Use `YYYY-MM-DDThh:mm:ssZ` for UTC (e.g., `2025-06-23T10:29:26Z`) or include an explicit UTC offset (e.g., `2025-06-23T10:29:26+05:30`)
+-   **Offset is required**: Timestamps without a `Z` or offset suffix are rejected with a `400` error
+-   **Timezone handling**: Express your local time window through the offset. For example, June 23 midnight to June 24 midnight IST is `2025-06-23T00:00:00+05:30` to `2025-06-24T00:00:00+05:30`
 -   **Time Range**: Both start and end timestamps are optional; you can filter by start time only, end time only, or both
+
+<Note>
+    The legacy `timezone` query parameter is accepted for backward compatibility
+    but has no effect. Use an explicit offset in the timestamps instead.
+</Note>
 
 #### Example Requests
 
@@ -300,10 +304,10 @@ Pagination is automatically applied to all requests with the following defaults:
 GET /attributed-users?display_id=XYZ123
 ```
 
-2. **With Time Range and Timezone**:
+2. **With Time Range** (UTC):
 
 ```
-GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-23T10:29:26.074&end_timestamp=2025-06-24T10:29:26.074&timezone=Asia/Kolkata
+GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-23T10:29:26Z&end_timestamp=2025-06-24T10:29:26Z
 ```
 
 3. **With Pagination**:
@@ -312,10 +316,10 @@ GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-23T10:29:26.074&
 GET /attributed-users?display_id=XYZ123&page=2&limit=100
 ```
 
-4. **With All Parameters**:
+4. **With All Parameters** (timestamps in IST, URL-encode `+` as `%2B`):
 
 ```
-GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-23T10:29:26.074&end_timestamp=2025-06-24T10:29:26.074&timezone=America/New_York&page=3&limit=200
+GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-23T00:00:00%2B05:30&end_timestamp=2025-06-24T00:00:00%2B05:30&page=3&limit=200
 ```
 
 #### Response
@@ -381,8 +385,7 @@ GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-23T10:29:26.074&
 
 | Status Code | Error Message                                                      | Description                               |
 | ----------- | ------------------------------------------------------------------ | ----------------------------------------- |
-| 400         | "Invalid timezone format."                                         | Invalid IANA timezone identifier provided |
-| 400         | "Invalid timestamp format."                                        | Invalid start or end timestamp format     |
+| 400         | "Invalid timestamp format."                                        | Timestamp is not RFC 3339 or is missing a `Z`/offset suffix |
 | 401         | "Authentication failed."                                           | Invalid or missing API key                |
 | 404         | "Resource not found."                                              | Campaign does not exist in the project    |
 | 422         | "Required parameter missing."                                      | Missing required display_id parameter     |
@@ -612,7 +615,7 @@ interface AttributionResultResponse {
 
 ## Notes
 
--   All timestamps are in ISO 8601 format.
+-   Request timestamps use RFC 3339 format with a `Z` or offset suffix; response timestamps are returned in ISO 8601 UTC.
 -   The `device_data` object contains detailed information about the user's device.
 -   The `active` field in the campaign data indicates whether the campaign is currently active.
 -   The `attributed_users` field in the campaign data shows the number of users attributed to that campaign.
