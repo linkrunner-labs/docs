@@ -26,22 +26,29 @@ Webhooks allow you to receive real-time HTTP notifications when attribution even
 
 ## Configuration
 
-### Setting Up Your Webhook URL
+![Data Export settings with the Webhooks tab and organic user toggle](/images/webhooks/data-export-organic-webhooks.png)
 
-1. Go to [Linkrunner Settings → Webhooks](https://dashboard.linkrunner.io/settings?s=webhooks)
-2. Enter your webhook endpoint URL
-3. Save the configuration
+<Steps>
+  <Step title="Open webhook settings">
+    In the dashboard, go to **Settings → Data Export**, then select the **Webhooks** tab. You can also [open Webhook settings directly](https://dashboard.linkrunner.io/settings?s=webhooks).
+  </Step>
+
+  <Step title="Add your endpoint">
+    Enter your public webhook URL, then click **Update Webhook**.
+  </Step>
+
+  <Step title="Test the endpoint">
+    Click **Test Webhook**. Your endpoint must accept JSON POST requests and return a direct 2xx response.
+  </Step>
+
+  <Step title="Include organic users">
+    Turn on **Send webhooks for organic users** to receive install and signup webhooks for organic users. These payloads use `network_name: "ORGANIC"`.
+  </Step>
+</Steps>
 
 <Note>
-Your endpoint must be publicly accessible and respond with a 2xx status code to acknowledge receipt.
+Your endpoint must be publicly accessible. Linkrunner retries failed requests up to three times, but does not follow redirects.
 </Note>
-
-### Testing Your Endpoint
-
-Before going live, verify your endpoint can:
-1. Accept POST requests with JSON body
-2. Respond within a reasonable time (recommended under 5 seconds)
-3. Return a 2xx status code on success
 
 ## Webhook Events
 
