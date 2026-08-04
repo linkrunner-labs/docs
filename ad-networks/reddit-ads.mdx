@@ -1,7 +1,7 @@
 ---
 title: "Reddit Ads"
 description: "Run Reddit Ads with Linkrunner attribution, Reddit click IDs, Conversions API postbacks, and deferred deep linking"
-icon: "reddit"
+icon: "/images/logos/reddit.svg"
 ---
 
 ## Overview
@@ -14,7 +14,7 @@ The recommended flow is:
 2. Create a Reddit Pixel and Conversion Access Token in Reddit Events Manager.
 3. Add the Reddit Pixel ID and Conversion Access Token in Linkrunner.
 4. Create a Linkrunner campaign link for each Reddit ad or destination you want to measure.
-5. Use the Linkrunner campaign link as the destination URL in Reddit Ads Manager.
+5. After the Linkrunner campaign link is created, use it as the destination URL in Reddit Ads Manager.
 6. Test the full click, install, first open, and event flow before scaling spend.
 
 <Note>
@@ -142,7 +142,7 @@ Use **Advanced Options** to set the ad channel and any campaign metadata you nee
 
 ## 5. Create the Reddit campaign
 
-In [Reddit Ads Manager](https://ads.reddit.com), create the campaign that will use your Linkrunner link.
+After the Linkrunner campaign link is created, go to [Reddit Ads Manager](https://ads.reddit.com) and create the campaign that will use that link.
 
 ### Step 1: Open Ads Manager
 
@@ -169,7 +169,7 @@ Enter a clear campaign name. Choose the objective based on how you want Reddit t
 
 For most Linkrunner CAPI setups, select **Conversions**.
 
-![Reddit campaign with Conversions selected](/images/reddit-ads/reddit-campaign-conversions-selected.png)
+![Create a Reddit Conversions campaign](/images/reddit-ads/reddit-create-conversions-campaign.png)
 
 Set the campaign budget, schedule, and bidding strategy. Keep the budget low while testing the first campaign.
 
@@ -199,6 +199,8 @@ On the ad setup screen, add the creative that Reddit users will see:
 3. In the destination URL field, paste the **Linkrunner campaign link** you created earlier.
 4. Keep all URL parameters intact.
 5. Preview the ad.
+
+![Paste the Linkrunner campaign link in Reddit Ads Manager](/images/reddit-ads/reddit-paste-linkrunner-url.png)
 
 <Warning>
   Do not replace the Linkrunner campaign link with the App Store URL, Play Store URL, or your website URL. Reddit must send the click to Linkrunner first so Linkrunner can capture `rdt_cid`, redirect the user, attribute the install, and send Reddit CAPI postbacks.
