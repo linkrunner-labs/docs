@@ -140,8 +140,10 @@
                         "group": "Ad Networks",
                         "pages": [
                             "ad-networks/google-ads",
+                            "ad-networks/google-ads-first-campaign",
                             "features/google-icm",
                             "ad-networks/meta-ads",
+                            "ad-networks/meta-ads-first-campaign",
                             "ad-networks/tiktok",
                             "ad-networks/snapchat",
                             "ad-networks/reddit-ads",
