@@ -144,28 +144,44 @@ With the integration configured, launch an App Promotion campaign in Meta Ads Ma
 
 1. Open [Meta Ads Manager](https://business.facebook.com/adsmanager) and select the ad account you connected to Linkrunner
 2. Click **+ Create**
-3. Select the **App promotion** objective and click **Continue**
-4. If Meta asks how to create the campaign, either setup works. **Manual app promotion campaign** gives you full control over audience and placements; Advantage+ automates them. Linkrunner attributes both the same way.
-5. Enter a campaign name and click **Next**
+
+![Meta Ads Manager Campaigns tab with the Create button highlighted](/images/meta/first-campaign/create-button.png)
+
+3. Keep the buying type as **Auction**, select the **App promotion** objective, and click **Continue**
+
+![Create new campaign dialog with the App promotion objective selected](/images/meta/first-campaign/objective-app-promotion.png)
+
+4. Enter a campaign name and click **Next**
+
+<Note>
+    Meta enables **Advantage+** by default, which automates audience and placements. You can switch to a manual setup
+    during configuration. Linkrunner attributes both the same way.
+</Note>
 
 ### Step 2: Configure the Ad Set
 
-1. Under **App**, select the app store (**Google Play** or **App Store**) and your app
+1. Under **App promotion**, select your **Mobile app store** (**Google Play Store** or **App Store**) and search for your app under **App name**
+
+![Ad set editor with the Mobile app store dropdown and App name field highlighted](/images/meta/first-campaign/ad-set-app-store.png)
+
 2. Set your **Budget & schedule**. Keep the budget low for the first campaign.
 3. Define your **Audience** (locations, age, interests)
 4. Leave **Advantage+ placements** on unless you have a reason not to
 5. Click **Next**
 
 <Note>
-    If your app is not listed under **App**, it is not registered with Meta or not linked to this ad account.
+    If your app is not listed under **App name**, it is not registered with Meta or not linked to this ad account.
 </Note>
 
 ### Step 3: Create the Ad
 
 1. Choose the Facebook Page and Instagram account for the ad's **Identity**
 2. Upload your creative and write the primary text and headline
-3. In **Destination**, choose **App**
+3. In **Destination**, keep **Main destination** as **App**
 4. To open a specific screen after install, add your link in **Deferred deep link**. See [Deferred Deep Linking](#5-deferred-deep-linking) below.
+
+![Ad editor Destination section with the Deferred deep link field highlighted](/images/meta/first-campaign/ad-destination-deferred-deep-link.png)
+
 5. Click **Publish**
 
 ### Step 4: Verify the Campaign in Linkrunner
@@ -173,8 +189,10 @@ With the integration configured, launch an App Promotion campaign in Meta Ads Ma
 Campaigns and spend sync automatically from your connected ad account. Attribution rows appear after the campaign receives its first install.
 
 1. Open the [**Campaigns** section](https://dashboard.linkrunner.io/dashboard) in your Linkrunner dashboard
-2. Filter by **Meta** to see your campaign
+2. Click **All Channels** and select **Meta** to filter your campaigns
 3. Open the campaign to view installs, events, and revenue attributed to it, broken down by ad set and ad creative
+
+![Linkrunner Campaigns section with the channel filter open and Meta selected](/images/meta/first-campaign/linkrunner-campaigns-meta-filter.png)
 
 <Note>
     Campaign, ad set, and ad creative rows appear after they receive at least one install, not immediately at launch.
