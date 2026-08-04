@@ -26,22 +26,29 @@ Webhooks allow you to receive real-time HTTP notifications when attribution even
 
 ## Configuration
 
-### Setting Up Your Webhook URL
+![Data Export settings with the Webhooks tab and organic user toggle](/images/webhooks/data-export-organic-webhooks.png)
 
-1. Go to [Linkrunner Settings → Webhooks](https://dashboard.linkrunner.io/settings?s=webhooks)
-2. Enter your webhook endpoint URL
-3. Save the configuration
+<Steps>
+  <Step title="Open webhook settings">
+    In the dashboard, go to **Settings → Data Export**, then select the **Webhooks** tab. You can also [open Webhook settings directly](https://dashboard.linkrunner.io/settings?s=webhooks).
+  </Step>
+
+  <Step title="Add your endpoint">
+    Enter your public webhook URL, then click **Update Webhook**.
+  </Step>
+
+  <Step title="Test the endpoint">
+    Click **Test Webhook**. Your endpoint must accept JSON POST requests and return a direct 2xx response.
+  </Step>
+
+  <Step title="Include organic users">
+    Turn on **Send webhooks for organic users** to receive install and signup webhooks for organic users. These payloads use `network_name: "ORGANIC"`.
+  </Step>
+</Steps>
 
 <Note>
-Your endpoint must be publicly accessible and respond with a 2xx status code to acknowledge receipt.
+Your endpoint must be publicly accessible. Linkrunner retries failed requests up to three times, but does not follow redirects.
 </Note>
-
-### Testing Your Endpoint
-
-Before going live, verify your endpoint can:
-1. Accept POST requests with JSON body
-2. Respond within a reasonable time (recommended under 5 seconds)
-3. Return a 2xx status code on success
 
 ## Webhook Events
 
@@ -56,7 +63,7 @@ Linkrunner sends webhooks for the following events:
 
 The `install` webhook is triggered immediately when Linkrunner attributes an app installation. At this point, your app has just been opened for the first time and the user hasn't had a chance to sign up or log in yet. Because of this, user identity fields such as `user_id`, `name`, `phone`, `email`, and `additional_data` are only included in signup webhooks.
 
-By default, install webhooks fire only for attributed (paid) installs. To also receive webhooks for organic installs, enable **Send webhooks for organic installs** in [Settings → Webhooks](https://dashboard.linkrunner.io/settings?s=webhooks). Organic install webhooks are sent with `network_name` set to `ORGANIC`, `ad_channel` set to `null`, and no campaign details.
+By default, install webhooks fire only for attributed (paid) installs. To also receive webhooks for organic users, enable **Send webhooks for organic users** in [Settings → Webhooks](https://dashboard.linkrunner.io/settings?s=webhooks). This covers both install and signup webhooks. Organic webhooks are sent with `network_name` set to `ORGANIC`, `ad_channel` set to `null`, and no campaign details.
 
 However, the install webhook does include device identifiers (`gaid` for Android, `idfa` for iOS) when available. You can use these to match the install with the user later when they sign up.
 
@@ -71,6 +78,8 @@ Use the install webhook for:
 The `signup` webhook is triggered when you call the `.signup()` method in your app via the Linkrunner SDK. This happens after the user has signed up or logged in, so the `user_id` field will contain the ID you passed to the SDK.
 
 The signup webhook includes device identifiers (`gaid`/`idfa`) along with the `user_id`, giving you a complete picture of both the device and the user. It also includes user identity fields (`name`, `phone`, `email`) and any custom parameters you passed via `additional_data`, such as referral codes or other custom key-value pairs.
+
+Like install webhooks, signup webhooks fire only for attributed users by default. Enabling **Send webhooks for organic users** also delivers signup webhooks for organic users, with `network_name` set to `ORGANIC` and no campaign details.
 
 Use the signup webhook for:
 - Linking attribution data to your user records
@@ -237,7 +246,7 @@ Example:
 
 ### Install Event (Organic)
 
-Sent only when **Send webhooks for organic installs** is enabled:
+Sent only when **Send webhooks for organic users** is enabled:
 
 ```json
 {
