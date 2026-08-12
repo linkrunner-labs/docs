@@ -10,6 +10,17 @@ When a conversion is attributed to your click, Linkrunner sends a server-to-serv
 
 You provide one URL template per conversion you want to receive (install, signup, in-app event). Linkrunner sends the request as an HTTP `GET`.
 
+## Allowlist Linkrunner postback IPs
+
+If your endpoint restricts incoming traffic by source IP, allowlist both Linkrunner production egress addresses:
+
+```
+8.234.94.188/32
+8.234.80.204/32
+```
+
+Postbacks may originate from either address. Add both before testing or activating your integration.
+
 <Note>
   These are postback URL macros. They are different from the macros your
   platform may use in the click tracking link. Your platform must resolve click
