@@ -49,7 +49,7 @@ Measure how well your push notifications perform by attributing app opens to a L
     }
     ```
 
-    <Info>If your provider supports a "launch URL" or "deep link" field (OneSignal, Braze, CleverTap all do), you can put the campaign link there instead. The OS then opens your app with the link, and your existing deep link listeners receive it.</Info>
+    <Info>If your provider supports a "launch URL" or "deep link" field (OneSignal, Braze, CleverTap all do), you can put the campaign link there instead. The OS then opens your app with the link, and your existing deep link listeners receive it. Using CleverTap, WebEngage, or MoEngage? See [Push Notification Providers](/features/push-notification-providers) for exact steps.</Info>
   </Step>
   <Step title="Pass the link to handleDeeplink">
     When the user taps the notification, read the link from the payload and pass it to `handleDeeplink`.
