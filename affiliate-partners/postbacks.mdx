@@ -12,14 +12,14 @@ You provide one URL template per conversion you want to receive (install, signup
 
 ## Allowlist Linkrunner postback IPs
 
-If your endpoint restricts incoming traffic by source IP, allowlist both Linkrunner production egress addresses:
+If your endpoint restricts incoming traffic by source IP, allowlist both reserved Linkrunner production egress addresses:
 
 ```
 8.234.94.188/32
 8.234.80.204/32
 ```
 
-Postbacks may originate from either address. Add both before testing or activating your integration.
+Add both addresses before testing or activating your integration. Linkrunner will confirm when static egress is active for your integration. Until then, use the source IP shared by the Linkrunner team during onboarding.
 
 <Note>
   These are postback URL macros. They are different from the macros your
