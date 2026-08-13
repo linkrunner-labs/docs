@@ -51,13 +51,13 @@ If you send push notifications through CleverTap, WebEngage, or MoEngage, you ca
   <Tab title="MoEngage">
     When creating a push campaign in MoEngage:
 
-    1. In the campaign's **Content** step, open the [**Navigation**](https://help.moengage.com/hc/en-us/articles/28297425891476-Create-Navigation-DeepLinks-and-Rich-Landing) setting
-    2. Select **Deep Linking** and paste your Linkrunner campaign link
+    1. In **Step 2: Messaging**, open the [**Actions**](https://help.moengage.com/hc/en-us/articles/208703456-Notification-Actions) tab
+    2. Set the default click action to **Deep-link to URI** and paste your Linkrunner campaign link
     3. Send the campaign as usual
 
     On tap, MoEngage opens the link, your app receives it, and `handleDeeplink` attributes the open.
 
-    **Using key-value pairs instead:** add custom key-value pairs (for example, `link` = your campaign link) in the campaign. Then implement MoEngage's [push callback](https://developers.moengage.com/hc/en-us/articles/11738008910996-Push-Callback), read the value from the clicked action's key-value pairs, and pass it to `handleDeeplink`.
+    **Using key-value pairs instead:** add custom key-value pairs (for example, `link` = your campaign link) in the campaign. Then extend MoEngage's [`PushMessageListener`](https://moengage.com/docs/developer-guide/android-sdk/push/advanced/callbacks-and-customisation), read the value from the payload in `onNotificationClick`, and pass it to `handleDeeplink`.
   </Tab>
 </Tabs>
 
