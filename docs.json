@@ -47,6 +47,10 @@
                         ]
                     },
                     {
+                        "group": "Analytics",
+                        "pages": ["features/users-tab", "features/events-tab"]
+                    },
+                    {
                         "group": "Measurement & Privacy",
                         "pages": [
                             "features/uninstall-tracking",
