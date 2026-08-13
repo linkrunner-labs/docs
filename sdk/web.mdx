@@ -21,6 +21,16 @@ Before installing the SDK, you'll need to obtain your Web SDK token:
 
 ## Installation
 
+<Info>
+    **Current version: 0.1.12.** Last-touch UTMs (`utm_source`, `utm_campaign`, `utm_id`, …) now
+    survive a payment-gateway or 3-D Secure redirect for up to 24 hours, so a purchase that fires on
+    a post-payment return page keeps the campaign that earned it. Before 0.1.12 those values lived
+    only in `sessionStorage` and were lost whenever the gateway returned the visitor in a new tab.
+
+    The CDN URL always serves the latest build and is cached for up to 24 hours, so allow a day for
+    the rollout. No integration changes are required.
+</Info>
+
 ### CDN
 
 Add the Linkrunner SDK to your HTML:
