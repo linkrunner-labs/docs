@@ -1,0 +1,78 @@
+---
+title: "Push Notification Providers"
+description: "Configure CleverTap, WebEngage, or MoEngage to send Linkrunner campaign links in push notifications"
+icon: "paper-plane"
+---
+
+If you send push notifications through CleverTap, WebEngage, or MoEngage, you can track notification opens in Linkrunner without writing custom push-handling code. You set the campaign link as the notification's click action in the provider's dashboard, and your existing `handleDeeplink` setup does the rest.
+
+<Note>Start with [Push Notification Tracking](/features/push-notification-tracking) if you haven't yet. You need a Linkrunner campaign link and `handleDeeplink` implemented in your app before configuring a provider.</Note>
+
+## How it works with a provider
+
+1. Create a campaign in the [Linkrunner Dashboard](https://dashboard.linkrunner.io/dashboard?m=create-campaign) and copy its link
+2. In the provider's campaign composer, set the campaign link as the notification's click action (each provider calls this something different, see below)
+3. On tap, the OS opens your app with the link and your `handleDeeplink` listeners pass it to Linkrunner
+4. The open shows up in your campaign analytics
+
+<Warning>This flow relies on [deep linking](/features/deep-linking-setup) being set up for your campaign link domain. Without it, tapping the notification opens the browser instead of your app.</Warning>
+
+## Provider setup
+
+<Tabs>
+  <Tab title="CleverTap">
+    When creating a push campaign in CleverTap:
+
+    1. In the **What** step of the campaign, find the **On click, navigate to** setting
+    2. Select **Deep Link/URL** and paste your Linkrunner campaign link
+    3. Send the campaign as usual
+
+    On tap, CleverTap opens the link, your app receives it, and `handleDeeplink` attributes the open.
+
+    **Using key-value pairs instead:** add a custom key-value pair (for example, `link` = your campaign link) under the campaign's advanced settings. Then implement CleverTap's [`CTPushNotificationListener`](https://developer.clevertap.com/docs/android-push), read the value from the payload in `onNotificationClickedPayloadReceived`, and pass it to `handleDeeplink`:
+
+    ```kotlin
+    override fun onNotificationClickedPayloadReceived(payload: HashMap<String, Any>?) {
+        val link = payload?.get("link") as? String
+        if (link != null) LinkRunner.getInstance().handleDeeplink(link)
+    }
+    ```
+  </Tab>
+  <Tab title="WebEngage">
+    When creating a push campaign in WebEngage:
+
+    1. In the campaign's **Message** step, set the **Click Action** (primary CTA) to your Linkrunner campaign link
+    2. Send the campaign as usual
+
+    On tap, WebEngage opens the link, your app receives it, and `handleDeeplink` attributes the open.
+
+    **Using key-value pairs instead:** add a custom key-value pair (for example, `link` = your campaign link) in the campaign body. Then register a [push notification callback](https://docs.webengage.com/docs/android-callbacks), read the value from `getCustomData()` in the click callback, and pass it to `handleDeeplink`.
+  </Tab>
+  <Tab title="MoEngage">
+    When creating a push campaign in MoEngage:
+
+    1. In the campaign's **Content** step, open the [**Navigation**](https://help.moengage.com/hc/en-us/articles/28297425891476-Create-Navigation-DeepLinks-and-Rich-Landing) setting
+    2. Select **Deep Linking** and paste your Linkrunner campaign link
+    3. Send the campaign as usual
+
+    On tap, MoEngage opens the link, your app receives it, and `handleDeeplink` attributes the open.
+
+    **Using key-value pairs instead:** add custom key-value pairs (for example, `link` = your campaign link) in the campaign. Then implement MoEngage's [push callback](https://developers.moengage.com/hc/en-us/articles/11738008910996-Push-Callback), read the value from the clicked action's key-value pairs, and pass it to `handleDeeplink`.
+  </Tab>
+</Tabs>
+
+<Tip>Use one Linkrunner campaign per push campaign so each provider campaign's opens roll up separately in your analytics.</Tip>
+
+## Other providers
+
+Any provider that supports a click action URL, launch URL, or custom key-value pairs (Firebase, OneSignal, Braze, Netcore, etc.) works the same way. Follow the generic setup in [Push Notification Tracking](/features/push-notification-tracking).
+
+## Troubleshooting
+
+**Tapping the notification opens the browser?** Your campaign link domain is not set up for [deep linking](/features/deep-linking-setup), so the OS treats it as a web URL. Set up deep linking, or switch to the key-value pair approach.
+
+**Opens are not showing up in the campaign?** Log the value reaching `handleDeeplink` and confirm it is the exact campaign link. If you use key-value pairs, check the key name matches what your code reads.
+
+---
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

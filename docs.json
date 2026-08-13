@@ -39,6 +39,7 @@
                             "features/deferred-deep-linking",
                             "features/web-to-app-journeys",
                             "features/push-notification-tracking",
+                            "features/push-notification-providers",
                             "features/link-redirection",
                             "features/deep-link-management",
                             "features/referral-codes",
