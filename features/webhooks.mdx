@@ -65,7 +65,7 @@ The `install` webhook is triggered immediately when Linkrunner attributes an app
 
 By default, install webhooks fire only for attributed (paid) installs. To also receive webhooks for organic users, enable **Send webhooks for organic users** in [Settings → Webhooks](https://dashboard.linkrunner.io/settings?s=webhooks). This covers both install and signup webhooks. Organic webhooks are sent with `network_name` set to `ORGANIC`, `ad_channel` set to `null`, and no campaign details.
 
-However, the install webhook does include device identifiers (`gaid` for Android, `idfa` for iOS) when available. You can use these to match the install with the user later when they sign up.
+However, the install webhook does include `lr_install_id` (Linkrunner's ID for the install) and device identifiers (`gaid` for Android, `idfa` for iOS) when available. You can use these to match the install with the user later when they sign up.
 
 Use the install webhook for:
 - Tracking install counts by campaign
@@ -77,7 +77,7 @@ Use the install webhook for:
 
 The `signup` webhook is triggered when you call the `.signup()` method in your app via the Linkrunner SDK. This happens after the user has signed up or logged in, so the `user_id` field will contain the ID you passed to the SDK.
 
-The signup webhook includes device identifiers (`gaid`/`idfa`) along with the `user_id`, giving you a complete picture of both the device and the user. It also includes user identity fields (`name`, `phone`, `email`) and any custom parameters you passed via `additional_data`, such as referral codes or other custom key-value pairs.
+The signup webhook includes `lr_install_id` and device identifiers (`gaid`/`idfa`) along with the `user_id`, giving you a complete picture of both the device and the user. Because the install webhook carries the same `lr_install_id`, you can join the two payloads without relying on device identifiers. It also includes user identity fields (`name`, `phone`, `email`) and any custom parameters you passed via `additional_data`, such as referral codes or other custom key-value pairs.
 
 Like install webhooks, signup webhooks fire only for attributed users by default. Enabling **Send webhooks for organic users** also delivers signup webhooks for organic users, with `network_name` set to `ORGANIC` and no campaign details.
 
@@ -107,6 +107,7 @@ All webhooks are sent as POST requests with a JSON body.
 | Field | Type | Description |
 |-------|------|-------------|
 | `event_type` | `"install"` \| `"signup"` | The type of attribution event |
+| `lr_install_id` | `string` | Linkrunner's unique ID for the install |
 | `user_id` | `string` \| `null` | Customer user ID for signup webhooks |
 | `campaign_id` | `string` | Unique identifier for the campaign |
 | `campaign_name` | `string` \| `null` | Human-readable campaign name |
@@ -132,6 +133,16 @@ All webhooks are sent as POST requests with a JSON body.
   The `name`, `phone`, and `email` fields are populated from `user_data` passed to the SDK's `.signup()` or `.trigger()` methods.  
   The `additional_data` field is populated from the SDK `data` object.  
   Fields that are not available can be `null` or omitted from the payload.
+</Note>
+
+### Install ID
+
+`lr_install_id` identifies a single install of your app. Both webhooks for that install carry the same value, so it is the join key between them: store it from the install webhook, then look it up when the signup webhook for the same install arrives.
+
+It is also the `install_instance_id` used by the [SDK-less API](/sdk-less/api-reference), so a webhook payload can be matched to the `attribution-data` response for the same install.
+
+<Note>
+A user who reinstalls or reuses your app on another device produces a new install, and therefore a new `lr_install_id`. Use `user_id` to group installs by user.
 </Note>
 
 ### Meta Campaign Details
@@ -214,6 +225,7 @@ Example:
 ```json
 {
   "event_type": "install",
+  "lr_install_id": "e1c0f4a2-5b7d-4c19-9a3f-2d8e6b1c7a04",
   "campaign_id": "camp_XYZ123",
   "ad_channel": "META",
   "network_name": "META",
@@ -251,6 +263,7 @@ Sent only when **Send webhooks for organic users** is enabled:
 ```json
 {
   "event_type": "install",
+  "lr_install_id": "7f3b9d61-24ae-4f08-b512-c9a70e3d8b45",
   "campaign_id": "",
   "ad_channel": null,
   "network_name": "ORGANIC",
@@ -274,6 +287,7 @@ Sent only when **Send webhooks for organic users** is enabled:
 ```json
 {
   "event_type": "signup",
+  "lr_install_id": "a48d2c07-6e91-4b33-8f5a-1b0c9de74265",
   "user_id": "test_user_webhook_002",
   "campaign_id": "OgWmhiSXhG",
   "ad_channel": "META",
@@ -365,7 +379,7 @@ After 3 failed attempts, the webhook is marked as failed. Ensure your endpoint i
     Return a 2xx status code as fast as possible. Process the webhook data asynchronously to avoid timeouts.
   </Step>
   <Step title="Implement idempotency">
-    Store processed webhook events using `event_type`, `campaign_id`, `user_id` when present, and the relevant device identifier or timestamp.
+    Store processed webhook events using `event_type` and `lr_install_id`, plus `user_id` when present.
   </Step>
   <Step title="Validate authentication">
     Always verify the `linkrunner-key` header matches your private key before processing.
