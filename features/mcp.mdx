@@ -15,6 +15,8 @@ dashboard, add it as a Custom Connector in Claude.ai, and ask things like:
 - "Compare my Meta vs Google performance for the last 7 days."
 - "Which campaigns should I cut based on ROAS?"
 - "Why did installs drop yesterday?"
+- "How much of my growth is organic?"
+- "Where do users drop off between install and checkout?"
 
 The connector is read-only. Claude can query the same metrics surfaced in your
 dashboard (campaigns, installs, revenue, attribution, events) but cannot make
@@ -77,14 +79,30 @@ based on your question.
 | Tool | Use it for |
 |------|------------|
 | `get_project_info` | Project name, timezone, display currency. |
-| `get_project_stats` | Headline KPIs (clicks, installs, onboards, revenue) and trend graph. |
-| `list_campaigns` | Campaign-level metrics with filters (date range, network, platform, search). |
-| `list_events` | Custom and revenue event names you've defined. |
+| `get_project_stats` | Headline KPIs (clicks, installs, sign-ups, revenue) as lifetime and current-month totals. |
+| `get_metrics_trend` | Day-by-day trend for clicks, organic installs, sign-ups, and revenue. Current calendar month only. |
+| `list_campaigns` | One row per campaign, with filters (date range, network, platform, search) and selectable metrics. |
+| `find_campaign` | Resolve a campaign name to its `display_id`, with no metrics computed. |
+| `get_campaign_details` | One named campaign day by day, over any date range. |
+| `get_channel_performance` | One row per acquisition channel (Meta, Google, TikTok, Snapchat, Apple Search Ads, Linkrunner Links, Organic). |
+| `get_organic_performance` | Installs, sign-ups, and revenue carrying no campaign, as a single organic total. |
+| `list_event_names` | Custom and revenue event names you've defined. |
+| `search_event_log` | Individual event rows with timestamp, user, campaign, platform, and device. |
+| `list_funnels` | Names and step definitions of the funnels saved in your dashboard. |
+| `run_funnel` | Step-to-step conversion and drop-off, for a saved funnel or an ad-hoc one you describe in chat. |
 | `lookup_attribution` | Attribution result for a single user or device: campaign, ad network, ad set, creative, keyword (Apple Search Ads), organic vs inorganic flag, device IDs (gaid/idfa), and click/install timestamps. |
 | `get_billing_usage` | Free-install allowance and current-month usage. Only fetched when you explicitly ask about billing. |
 
 Claude reads these tools' descriptions and decides which to call. You don't
 need to invoke them manually.
+
+<Note>
+`list_campaigns`, `get_channel_performance`, and `get_organic_performance`
+return only the metric groups Claude asks for (installs, spend, retention,
+custom events, and so on). A group that wasn't requested is absent from the
+response rather than reported as zero, so Claude never mistakes "not fetched"
+for "measured zero". Ask for a metric by name and Claude will fetch it.
+</Note>
 
 ## Built-in prompts
 
