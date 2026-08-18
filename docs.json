@@ -28,7 +28,8 @@
                             "sdk/ios",
                             "sdk/android",
                             "sdk/expo",
-                            "sdk/unity"
+                            "sdk/unity",
+                            "sdk/shopify"
                         ]
                     },
                     {
