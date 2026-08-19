@@ -144,8 +144,8 @@ brought the shopper in.
                         value: Number(checkout.totalPrice && checkout.totalPrice.amount) || 0,
                         currency: checkout.currencyCode || "",
                         order_id: (checkout.order && checkout.order.id) || "",
-                        // email: checkout.email || "",
-                        // phone: checkout.phone || "",
+                        email: checkout.email || "",
+                        phone: checkout.phone || "",
                     },
                     visitor_id: await local("lr_vid"),
                     session_id: await session("lr_sid"),
@@ -196,14 +196,15 @@ brought the shopper in.
         </Note>
 
         <Warning>
-            **Customer email and phone are commented out by default.** Uncommenting them sends
-            your shoppers' contact details to Linkrunner, where they are used to key audience
-            exports to an identifiable person. Attribution, campaign reporting, and revenue all
-            work without them.
+            **This sends your shoppers' email and phone to Linkrunner.** They are what link a
+            purchase to an identifiable person, so audience exports and person-level reporting
+            depend on them.
 
-            Only enable them if you actually need person-level exports, your privacy notice
-            covers sharing contact details with Linkrunner, and your data processing agreement
-            with us is in place.
+            Make sure your privacy notice covers sharing customer contact details with
+            Linkrunner and your data processing agreement with us is in place. If you would
+            rather not send them, comment out the `email` and `phone` lines in `event_data`.
+            Attribution, campaign reporting, and revenue all work without them; you lose
+            person-level audiences.
         </Warning>
 
         Above the code box, check the two **Customer privacy** settings. The defaults are
@@ -343,7 +344,7 @@ settings, and cannot be worked around.
 | ----- | ---- |
 | Storefront pages | Page views, traffic source, campaign, ad click IDs, first and last touch |
 | Cart | Visitor ID attached for checkout matching |
-| Checkout | `purchase` event with order value, currency, order ID, and item count. Customer email and phone are optional and off by default |
+| Checkout | `purchase` event with order value, currency, order ID, item count, and the customer's email and phone (used for person-level audiences) |
 
 <Card title="Web SDK reference" icon="globe" href="/sdk/web">
     Configuration options, custom events, and identifying logged-in customers.
