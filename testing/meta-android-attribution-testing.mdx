@@ -72,6 +72,10 @@ Use a published App Promotion ad or inject an ad preview into Facebook or Instag
 Do not stop at the side-by-side browser preview. Open the injected ad inside Facebook or Instagram before tapping the call to action.
 </Warning>
 
+<Note>
+If you are also testing a deferred deep link, save and publish it on the exact ad used for the test. Then wait up to 30 minutes for Linkrunner's Meta creative sync. A value visible in the Ads Manager editor or preview does not confirm that Meta's API exposes it to Linkrunner.
+</Note>
+
 See Meta's [ad preview instructions](https://www.facebook.com/business/help/788849608374258) and [Meta Install Referrer verification guide](https://developers.facebook.com/documentation/app-ads/meta-install-referrer) for the current Meta workflow.
 
 ## 3. Install and open your app
@@ -186,7 +190,13 @@ An empty `deeplink` does not mean attribution failed. It means the ad did not pr
 
 ### Campaign data is present but `deeplink` is empty
 
-This is expected when the ad has no deferred deep link. Add one only when the app should open a specific screen after installation. See [Deferred Deep Linking](/ad-networks/meta-ads#5-deferred-deep-linking).
+This is expected when the ad has no deferred deep link. If you expected one:
+
+- Confirm the value was saved and published on the exact ad returned in `campaignData`.
+- Wait up to 30 minutes for Linkrunner's Meta creative sync before repeating the install test.
+- Confirm the published ad, not only the Ads Manager editor or preview, exposes the deferred deep link.
+
+See [Deferred Deep Linking](/ad-networks/meta-ads#5-deferred-deep-linking) for configuration details.
 
 ### The SDK cannot read Meta Install Referrer
 
