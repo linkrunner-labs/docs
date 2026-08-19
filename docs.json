@@ -21,6 +21,7 @@
                         "group": "SDK Guides",
                         "pages": [
                             "testing/integration-testing",
+                            "testing/event-and-revenue-testing",
                             "sdk/react-native",
                             "sdk/flutter",
                             "sdk/capacitor",
