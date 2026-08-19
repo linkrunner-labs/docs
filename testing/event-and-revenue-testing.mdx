@@ -166,6 +166,10 @@ curl -X POST https://api.linkrunner.io/api/v1/remove-payment \
   -d '{ "payment_id": "lr_test_payment_001" }'
 ```
 
+<Note>
+The API does not define a partial-refund adjustment flow. Contact support before using `removePayment` for a partial refund.
+</Note>
+
 <Warning>
 Do not test removal with only `user_id` unless you intend to remove every payment attributed to that user.
 </Warning>
