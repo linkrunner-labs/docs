@@ -11,13 +11,33 @@ Linkrunner gives the advertiser a tracking link for each campaign. You point you
 A tracking link looks like this. The domain is the advertiser's own tracking domain, so always use the exact link Linkrunner provides. The example below uses `track.example.com` as a placeholder.
 
 ```
-https://track.example.com/?c=CAMPAIGN_ID&tid=YOUR_CLICK_ID&s2=YOUR_CAMPAIGN_ID
+https://track.example.com/?c=CAMPAIGN_ID&tid={click_id}&s2={campaign_id}
 ```
 
 `c` is the Linkrunner campaign identifier, set by the advertiser when they create the link. You add the rest.
 
+The values in braces are **your own platform's macros**, written in whatever syntax your platform uses. This is the template you save on your side, and it is what Linkrunner shows you in your partner dashboard.
+
+## The two forms of the link
+
+The same link exists in two states, and mixing them up is the most common cause of missing attribution.
+
+**The template you configure**, carrying your macros:
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}
+```
+
+**The URL that actually reaches Linkrunner**, after your platform substitutes them:
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid=a1b2c3d4e5&s2=camp_88
+```
+
+Macro syntax varies by platform. `{click_id}`, `{TID}`, `##CLICKID##` and `[clickid]` are all common. Use whatever your own platform expands; Linkrunner never expands it for you.
+
 <Warning>
-Your platform must replace its own click macros before the click reaches Linkrunner. If the final URL still contains a value like `{click_id}` or `{campaign_id}`, Linkrunner stores it as text. Linkrunner only fills macros in the server-to-server postback URL.
+Your platform must replace its own click macros before the click reaches Linkrunner. If the final URL still contains a value like `{click_id}` or `{campaign_id}`, Linkrunner stores it as text and the conversion cannot be matched back to your click. Linkrunner only fills macros in the server-to-server postback URL.
 </Warning>
 
 ## Parameters
