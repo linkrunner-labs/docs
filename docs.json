@@ -161,6 +161,7 @@
                         "group": "Affiliate Partners",
                         "pages": [
                             "affiliate-partners/overview",
+                            "affiliate-partners/create-account",
                             "affiliate-partners/tracking-links",
                             "affiliate-partners/postbacks"
                         ]
