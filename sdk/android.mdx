@@ -268,7 +268,7 @@ private fun onSignup() {
                 email = "user@example.com", // Optional
                 mixpanelDistinctId = "mixpanel_distinct_id", // Optional - Mixpanel Distinct ID
                 amplitudeDeviceId = "amplitude_device_id", // Optional - Amplitude User ID
-                posthogDistinctId = "posthog_distinct_id" // Optional - PostHog Distinct ID
+                posthogDistinctId = "posthog_distinct_id", // Optional - PostHog Distinct ID
                 userCreatedAt = "2024-01-01T00:00:00Z", // Optional
                 isFirstTimeUser = true, // Optional
             )
@@ -450,7 +450,7 @@ private fun setIntegrationData() {
 ## Revenue Tracking
 
 <Note>
-    Revenue data is only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before capturing payments. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
+    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 </Note>
 
 ### Capturing Payments
@@ -557,7 +557,7 @@ private fun removePayment() {
 </Note>
 
 <Note>
-    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
 </Note>
 
 Track custom events in your app:

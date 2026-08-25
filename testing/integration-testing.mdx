@@ -10,8 +10,6 @@ This guide helps you verify your Linkrunner integration end-to-end using a real 
 
 For mobile SDKs, [Open SDK Console](https://dashboard.linkrunner.io/dashboard/sdk-console/register-test-device) in the dashboard. It lets you register a test device and verify SDK initialization, attribution data, signup, custom events, and revenue events from one place.
 
-<Note>The SDK Console is currently in beta.</Note>
-
 You'll confirm that:
 
 -   A **click** is tracked when you open the campaign link on a device
@@ -19,8 +17,7 @@ You'll confirm that:
 -   A **signup** is tracked when you call the SDK signup method (recommended)
 
 <Note>
-    **Event tracking for attributed users only:** Linkrunner only stores and processes events for attributed users. To
-    attribute a user, complete the testing flow described in this guide (click → install → open app).
+    **Attribution is not required for event tracking.** Linkrunner stores events for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Complete the flow in this guide (click → install → open app) to see events attributed to a campaign.
 </Note>
 
 ## Video walkthrough

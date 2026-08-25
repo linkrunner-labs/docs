@@ -30,7 +30,7 @@ Webhooks allow you to receive real-time HTTP notifications when attribution even
 
 <Steps>
   <Step title="Open webhook settings">
-    In the dashboard, go to **Settings → Data Export**, then select the **Webhooks** tab. You can also [open Webhook settings directly](https://dashboard.linkrunner.io/settings?s=webhooks).
+    In the dashboard, go to **Settings → Data Export**, then select the **Webhooks** tab. You can also [open Webhook settings directly](https://dashboard.linkrunner.io/dashboard/settings/data-export?tab=webhooks).
   </Step>
 
   <Step title="Add your endpoint">
@@ -63,7 +63,7 @@ Linkrunner sends webhooks for the following events:
 
 The `install` webhook is triggered immediately when Linkrunner attributes an app installation. At this point, your app has just been opened for the first time and the user hasn't had a chance to sign up or log in yet. Because of this, user identity fields such as `user_id`, `name`, `phone`, `email`, and `additional_data` are only included in signup webhooks.
 
-By default, install webhooks fire only for attributed (paid) installs. To also receive webhooks for organic users, enable **Send webhooks for organic users** in [Settings → Webhooks](https://dashboard.linkrunner.io/settings?s=webhooks). This covers both install and signup webhooks. Organic webhooks are sent with `network_name` set to `ORGANIC`, `ad_channel` set to `null`, and no campaign details.
+By default, install webhooks fire only for attributed (paid) installs. To also receive webhooks for organic users, enable **Send webhooks for organic users** in [Settings → Webhooks](https://dashboard.linkrunner.io/dashboard/settings/data-export?tab=webhooks). This covers both install and signup webhooks. Organic webhooks are sent with `network_name` set to `ORGANIC`, `ad_channel` set to `null`, and no campaign details.
 
 However, the install webhook does include `lr_install_id` (Linkrunner's ID for the install) and device identifiers (`gaid` for Android, `idfa` for iOS) when available. You can use these to match the install with the user later when they sign up.
 

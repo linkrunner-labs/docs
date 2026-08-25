@@ -63,13 +63,15 @@ from the dashboard if it leaks, and generate a new one.
 
 ### 2. Add the connector in Claude
 
-1. Click **Add to Claude** in the dashboard. This copies the URL and opens
-   Claude's "Add custom connector" dialog in a new tab.
-2. Paste the URL into the **URL** field.
-3. Give the connector a name (e.g. "Linkrunner — MyApp").
-4. Leave authentication as **No authentication**. The token is already part of
-   the URL.
-5. Click **Connect**.
+Under **Register the Linkrunner MCP server**, the dashboard shows a ready-made
+command with your server URL already filled in. Copy it and run it in a
+terminal:
+
+```bash
+claude mcp add linkrunner --scope user --transport http "<YOUR_SERVER_URL>"
+```
+
+The token is part of the URL, so no separate authentication step is needed.
 
 <Note>
 You only need one connector per project. If you manage several Linkrunner
@@ -316,7 +318,7 @@ behind, which changes the channel's reporting name and splits its history.
 ## What this is not
 
 - Not a full write API. Claude can make the changes listed above, and nothing
-  else. Use the [Linkrunner data API](/api-reference/introduction) for
+  else. Use the [Linkrunner data API](/api-reference/data-apis) for
   programmatic writes.
 - Not a way to delete things. Campaigns, funnels, domains, and projects can only
   be deleted from the dashboard.

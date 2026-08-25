@@ -234,17 +234,13 @@ import SwiftUI
 struct MyApp: App {
     init() {
         Task {
-            do {
-                try await LinkrunnerSDK.shared.initialize(
-                    token: "YOUR_PROJECT_TOKEN",
-                    secretKey: "YOUR_SECRET_KEY", // Optional: Required for SDK signing
-                    keyId: "YOUR_KEY_ID", // Optional: Required for SDK signing
-                    debug: true // Optional: Enable debug mode for development (defaults to false)
-                )
-                print("Linkrunner initialized successfully")
-            } catch {
-                print("Error initializing Linkrunner:", error)
-            }
+            await LinkrunnerSDK.shared.initialize(
+                token: "YOUR_PROJECT_TOKEN",
+                secretKey: "YOUR_SECRET_KEY", // Optional: Required for SDK signing
+                keyId: "YOUR_KEY_ID", // Optional: Required for SDK signing
+                debug: true // Optional: Enable debug mode for development (defaults to false)
+            )
+            print("Linkrunner initialized successfully")
         }
     }
 
@@ -302,34 +298,30 @@ It is strongly recommended to use the integrated platform's identify function to
 
 If the platform's identifier function is not called, you must provide a user identifier for Mixpanel, PostHog, and Amplitude integration.
 
--   mixpanelDistinctId for Mixpanel
+-   mixPanelDistinctId for Mixpanel
 -   amplitudeDeviceId for Amplitude
 -   posthogDistinctId for PostHog
 
 ```swift
 func onSignup() async {
-    do {
-        let userData = UserData(
-            id: "123", // Required: User ID
-            name: "John Doe", // Optional
-            phone: "9876543210", // Optional
-            email: "user@example.com", // Optional
-            isFirstTimeUser: isFirstTimeUser,
-            userCreatedAt: "2022-01-01T00:00:00Z", // Optional
-            mixpanelDistinctId: "mixpanelDistinctId", // Optional - Mixpanel Distinct ID
-            amplitudeDeviceId: "amplitudeDeviceId", // Optional - Amplitude Device ID
-            posthogDistinctId: "posthogDistinctId" // Optional - PostHog Distinct ID
-        )
+    let userData = UserData(
+        id: "123", // Required: User ID
+        name: "John Doe", // Optional
+        phone: "9876543210", // Optional
+        email: "user@example.com", // Optional
+        isFirstTimeUser: isFirstTimeUser,
+        userCreatedAt: "2022-01-01T00:00:00Z", // Optional
+        mixPanelDistinctId: "mixpanelDistinctId", // Optional - Mixpanel Distinct ID
+        amplitudeDeviceId: "amplitudeDeviceId", // Optional - Amplitude Device ID
+        posthogDistinctId: "posthogDistinctId" // Optional - PostHog Distinct ID
+    )
 
-        try await LinkrunnerSDK.shared.signup(
-            userData: userData,
-            additionalData: [:] // Optional: Any additional data
-        )
+    await LinkrunnerSDK.shared.signup(
+        userData: userData,
+        additionalData: [:] // Optional: Any additional data
+    )
 
-        print("Signup successful")
-    } catch {
-        print("Error during signup:", error)
-    }
+    print("Signup successful")
 }
 ```
 
@@ -398,19 +390,15 @@ To get attribution data and deeplink information for the current installation, u
 
 ```swift
 func getAttributionInfo() async {
-    do {
-        let attributionData = try await LinkrunnerSDK.shared.getAttributionData()
-        print("Attribution data:", attributionData)
+    let attributionData = await LinkrunnerSDK.shared.getAttributionData()
+    print("Attribution data:", attributionData)
 
-        // Attribution data includes:
-        // - deeplink: The deep link URL that led to app installation
-        // - campaignData: Campaign information
-        if let deeplink = attributionData.deeplink {
-            print("Deeplink:", deeplink)
-            // Handle the deeplink in your app
-        }
-    } catch {
-        print("Error getting attribution data:", error)
+    // Attribution data includes:
+    // - deeplink: The deep link URL that led to app installation
+    // - campaignData: Campaign information
+    if let deeplink = attributionData.deeplink {
+        print("Deeplink:", deeplink)
+        // Handle the deeplink in your app
     }
 }
 ```
@@ -486,19 +474,15 @@ Call `setUserData` each time the app opens and the user is logged in:
 
 ```swift
 func setUserData() async {
-    do {
-        let userData = UserData(
-            id: "123", // Required: User ID
-            name: "John Doe", // Optional
-            phone: "9876543210", // Optional
-            email: "user@example.com" // Optional
-        )
+    let userData = UserData(
+        id: "123", // Required: User ID
+        name: "John Doe", // Optional
+        phone: "9876543210", // Optional
+        email: "user@example.com" // Optional
+    )
 
-        try await LinkrunnerSDK.shared.setUserData(userData)
-        print("User data set successfully")
-    } catch {
-        print("Error setting user data:", error)
-    }
+    await LinkrunnerSDK.shared.setUserData(userData)
+    print("User data set successfully")
 }
 ```
 
@@ -508,23 +492,19 @@ Use `setAdditionalData` to add CleverTap ID to the SDK:
 
 ```swift
 func setAdditionalData() async {
-    do {
-        let integrationData = IntegrationData(
-            clevertapId:clevertapId
-        )
+    let integrationData = IntegrationData(
+        clevertapId:clevertapId
+    )
 
-        try await LinkrunnerSDK.shared.setAdditionalData(integrationData)
-        print("CleverTap ID set successfully")
-    } catch {
-        print("Error setting cleverTap ID:", error)
-    }
+    await LinkrunnerSDK.shared.setAdditionalData(integrationData)
+    print("CleverTap ID set successfully")
 }
 ```
 
 ## Revenue Tracking
 
 <Note>
-    Revenue data is only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before capturing payments. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
+    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 </Note>
 
 ### Capturing Payments
@@ -533,33 +513,29 @@ Track payment information:
 
 ```swift
 func capturePayment() async {
-    do {
-        try await LinkrunnerSDK.shared.capturePayment(
-            amount: 99.99, // Payment amount
-            userId: "user123", // User identifier
-            paymentId: "payment456", // Required: Unique payment identifier
-            type: .firstPayment, // optional
-            status: .completed, // optional
-            eventData: [        // Optional: Ecommerce/custom event data
-                "content_ids": ["product_123"],
-                "content_type": "product",
-                "currency": "USD",
-                "value": 99.99,
-                "num_items": 1,
-                "order_id": "order_12345",
-                "contents": [
-                    [
-                        "id": "product_123",
-                        "quantity": 1,
-                        "item_price": 99.99
-                    ]
+    await LinkrunnerSDK.shared.capturePayment(
+        amount: 99.99, // Payment amount
+        userId: "user123", // User identifier
+        paymentId: "payment456", // Required: Unique payment identifier
+        type: .firstPayment, // optional
+        status: .completed, // optional
+        eventData: [        // Optional: Ecommerce/custom event data
+            "content_ids": ["product_123"],
+            "content_type": "product",
+            "currency": "USD",
+            "value": 99.99,
+            "num_items": 1,
+            "order_id": "order_12345",
+            "contents": [
+                [
+                    "id": "product_123",
+                    "quantity": 1,
+                    "item_price": 99.99
                 ]
             ]
-        )
-        print("Payment captured successfully")
-    } catch {
-        print("Error capturing payment:", error)
-    }
+        ]
+    )
+    print("Payment captured successfully")
 }
 ```
 
@@ -596,15 +572,11 @@ Remove payment records (for refunds or cancellations):
 
 ```swift
 func removePayment() async {
-    do {
-        try await LinkrunnerSDK.shared.removePayment(
-            userId: "user123", // User identifier
-            paymentId: "payment456" // Optional: Unique payment identifier
-        )
-        print("Payment removed successfully")
-    } catch {
-        print("Error removing payment:", error)
-    }
+    await LinkrunnerSDK.shared.removePayment(
+        userId: "user123", // User identifier
+        paymentId: "payment456" // Optional: Unique payment identifier
+    )
+    print("Payment removed successfully")
 }
 ```
 
@@ -615,27 +587,23 @@ func removePayment() async {
 </Note>
 
 <Note>
-    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
 </Note>
 
 Track custom events in your app:
 
 ```swift
 func trackEvent() async {
-    do {
-        try await LinkrunnerSDK.shared.trackEvent(
-            eventName: "purchase_initiated", // Event name
-            eventData: [ // Optional: Event data
-                "product_id": "12345",
-                "category": "electronics",
-                "amount": 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
-            ],
-            eventId: "order_12345" // Optional: Your own unique event identifier
-        )
-        print("Event tracked successfully")
-    } catch {
-        print("Error tracking event:", error)
-    }
+    await LinkrunnerSDK.shared.trackEvent(
+        eventName: "purchase_initiated", // Event name
+        eventData: [ // Optional: Event data
+            "product_id": "12345",
+            "category": "electronics",
+            "amount": 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
+        ],
+        eventId: "order_12345" // Optional: Your own unique event identifier
+    )
+    print("Event tracked successfully")
 }
 ```
 
@@ -651,19 +619,15 @@ To enable revenue sharing with ad networks like Google Ads and Meta, include an 
 
 ```swift
 func trackPurchaseEvent() async {
-    do {
-        try await LinkrunnerSDK.shared.trackEvent(
-            eventName: "purchase_completed",
-            eventData: [
-                "product_id": "12345",
-                "category": "electronics",
-                "amount": 149.99 // Revenue amount as a number
-            ]
-        )
-        print("Purchase event with revenue tracked successfully")
-    } catch {
-        print("Error tracking purchase event:", error)
-    }
+    await LinkrunnerSDK.shared.trackEvent(
+        eventName: "purchase_completed",
+        eventData: [
+            "product_id": "12345",
+            "category": "electronics",
+            "amount": 149.99 // Revenue amount as a number
+        ]
+    )
+    print("Purchase event with revenue tracked successfully")
 }
 ```
 
@@ -686,28 +650,24 @@ Use the `trackEvent` method to send an `AddToCart` event:
 
 ```swift
 func trackAddToCart() async {
-    do {
-        try await LinkrunnerSDK.shared.trackEvent(
-            eventName: "add_to_cart", // Map this custom event to "AddToCart" in the Linkrunner Dashboard
-            eventData: [
-                "content_ids": ["product_123"],
-                "contents": [
-                    [
-                        "id": "product_123", // Matches content_ids
-                        "quantity": 1,
-                        "item_price": 49.99
-                    ]
-                ],
-                "content_type": "product",
-                "currency": "USD",
-                "value": 49.99,
-                "num_items": 1
-            ]
-        )
-        print("Add To Cart event tracked successfully")
-    } catch {
-        print("Error tracking Add To Cart event:", error)
-    }
+    await LinkrunnerSDK.shared.trackEvent(
+        eventName: "add_to_cart", // Map this custom event to "AddToCart" in the Linkrunner Dashboard
+        eventData: [
+            "content_ids": ["product_123"],
+            "contents": [
+                [
+                    "id": "product_123", // Matches content_ids
+                    "quantity": 1,
+                    "item_price": 49.99
+                ]
+            ],
+            "content_type": "product",
+            "currency": "USD",
+            "value": 49.99,
+            "num_items": 1
+        ]
+    )
+    print("Add To Cart event tracked successfully")
 }
 ```
 
@@ -717,28 +677,24 @@ Use the `trackEvent` method to send a `ViewContent` event:
 
 ```swift
 func trackViewContent() async {
-    do {
-        try await LinkrunnerSDK.shared.trackEvent(
-            eventName: "view_item", // Map this custom event to "ViewContent" in the Linkrunner Dashboard
-            eventData: [
-                "content_ids": ["product_123"],
-                "contents": [
-                    [
-                        "id": "product_123", // Matches content_ids
-                        "quantity": 1,
-                        "item_price": 49.99
-                    ]
-                ],
-                "content_type": "product",
-                "currency": "USD",
-                "value": 49.99,
-                "num_items": 1
-            ]
-        )
-        print("View Content event tracked successfully")
-    } catch {
-        print("Error tracking View Content event:", error)
-    }
+    await LinkrunnerSDK.shared.trackEvent(
+        eventName: "view_item", // Map this custom event to "ViewContent" in the Linkrunner Dashboard
+        eventData: [
+            "content_ids": ["product_123"],
+            "contents": [
+                [
+                    "id": "product_123", // Matches content_ids
+                    "quantity": 1,
+                    "item_price": 49.99
+                ]
+            ],
+            "content_type": "product",
+            "currency": "USD",
+            "value": 49.99,
+            "num_items": 1
+        ]
+    )
+    print("View Content event tracked successfully")
 }
 ```
 
@@ -748,33 +704,29 @@ Use the `capturePayment` method to send a `Purchase` event containing the ecomme
 
 ```swift
 func capturePurchase() async {
-    do {
-        try await LinkrunnerSDK.shared.capturePayment(
-            amount: 49.99,
-            userId: "user123",
-            paymentId: "payment_456",
-            type: .firstPayment, // Map this payment type to "Purchase" in the Linkrunner Dashboard
-            status: .completed,
-            eventData: [
-                "content_ids": ["product_123"],
-                "contents": [
-                    [
-                        "id": "product_123", // Matches content_ids
-                        "quantity": 1,
-                        "item_price": 49.99
-                    ]
-                ],
-                "content_type": "product",
-                "currency": "USD",
-                "value": 49.99,
-                "num_items": 1,
-                "order_id": "order_abc123" // Required for Purchase events
-            ]
-        )
-        print("Purchase captured successfully")
-    } catch {
-        print("Error capturing purchase:", error)
-    }
+    await LinkrunnerSDK.shared.capturePayment(
+        amount: 49.99,
+        userId: "user123",
+        paymentId: "payment_456",
+        type: .firstPayment, // Map this payment type to "Purchase" in the Linkrunner Dashboard
+        status: .completed,
+        eventData: [
+            "content_ids": ["product_123"],
+            "contents": [
+                [
+                    "id": "product_123", // Matches content_ids
+                    "quantity": 1,
+                    "item_price": 49.99
+                ]
+            ],
+            "content_type": "product",
+            "currency": "USD",
+            "value": 49.99,
+            "num_items": 1,
+            "order_id": "order_abc123" // Required for Purchase events
+        ]
+    )
+    print("Purchase captured successfully")
 }
 ```
 
@@ -947,12 +899,8 @@ struct MyApp: App {
     }
 
     func initializeLinkrunner() async {
-        do {
-            try await LinkrunnerSDK.shared.initialize(token: "YOUR_PROJECT_TOKEN")
-            print("Linkrunner initialized successfully")
-        } catch {
-            print("Error initializing Linkrunner:", error)
-        }
+        await LinkrunnerSDK.shared.initialize(token: "YOUR_PROJECT_TOKEN")
+        print("Linkrunner initialized successfully")
     }
 
     var body: some Scene {
@@ -981,15 +929,11 @@ struct ContentView: View {
     }
 
     func trackCustomEvent() async {
-        do {
-            try await LinkrunnerSDK.shared.trackEvent(
-                eventName: "button_clicked",
-                eventData: ["screen": "home"]
-            )
-            print("Event tracked successfully")
-        } catch {
-            print("Error tracking event:", error)
-        }
+        await LinkrunnerSDK.shared.trackEvent(
+            eventName: "button_clicked",
+            eventData: ["screen": "home"]
+        )
+        print("Event tracked successfully")
     }
 }
 ```
