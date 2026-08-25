@@ -6,7 +6,7 @@ keywords: ["data export", "csv export", "campaign export", "export report", "onb
 icon: "file-arrow-down"
 ---
 
-**Data Export gives you your Linkrunner data as a CSV file.** You choose what you want, we build the file in the background, and you get an email with a download link when it is ready. Most exports finish in a few minutes.
+**Data Export gives you your Linkrunner data as a CSV file.** You choose what you want, we build the file in the background, and we email it to you as an attachment when it is ready. Most exports finish in a few minutes.
 
 There are two places to export from: **Settings** for a whole project, and the **campaign drawer** for a single campaign.
 
@@ -145,6 +145,30 @@ A few things in these files surprise people. None of them are errors.
   Grouping a project level user file by campaign will not match per campaign numbers on the dashboard. Export from the campaign drawer instead if you want users for one campaign.
 </Accordion>
 
+## How the file reaches you
+
+The CSV arrives as an **attachment on an email**, not as a download link. Files above 10 MB are zipped first.
+
+<Warning>
+  Email has a **25 MB** attachment limit. If an export is still larger than that after zipping, the email cannot be sent and the export is marked failed. Run it again over a shorter date range, or split it into a few exports.
+</Warning>
+
+## Limits
+
+| Limit | Value |
+| --- | --- |
+| Date range in one export | 3 calendar months |
+| Exports per user | 5 every 5 minutes |
+| Attachment size | 25 MB after zipping |
+
+The export limit is per user, not per project, so exporting several different projects in a row shares the same budget.
+
+## Currency
+
+Revenue and spend in an Overall Data file are converted to your project's **display currency**, so the numbers line up with what the dashboard shows.
+
+Spend is converted per campaign, because ad accounts bill in their own currency. ROAS is recalculated from the converted revenue and spend rather than taken as is, since the two move at different rates.
+
 ## Who can export
 
 Only project **admins** and **managers** can run an export.
@@ -152,7 +176,7 @@ Only project **admins** and **managers** can run an export.
 ## Common questions
 
 <Accordion title="How long does an export take?">
-  Usually a few minutes. Larger date ranges take longer. The file is built in the background, so you can close the page and wait for the email.
+  Usually a few minutes. Larger date ranges take longer. The file is built in the background, so you can close the page and carry on working while you wait for the email.
 </Accordion>
 
 <Accordion title="Can I export more than 3 months at once?">
@@ -165,4 +189,16 @@ Only project **admins** and **managers** can run an export.
 
 <Accordion title="Do filters apply to the export?">
   Yes. Network, platform, ad account and date range all carry into the file.
+</Accordion>
+
+<Accordion title="My export failed and the email said it was too large">
+  Email attachments are capped at 25 MB, and that is measured after we zip the file. A wide date range on a busy project can pass it.
+
+  Export a shorter range, or split one export into two or three.
+</Accordion>
+
+<Accordion title="I clicked export several times and nothing happened">
+  You can start 5 exports every 5 minutes. Past that the button will not queue anything new until the window resets.
+
+  Each export takes a few minutes to arrive, so this is usually only reached by clicking repeatedly while waiting.
 </Accordion>
