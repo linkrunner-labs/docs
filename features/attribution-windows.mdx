@@ -1,0 +1,49 @@
+---
+title: "Attribution Windows: Default Click Lookback Windows"
+sidebarTitle: "Attribution Windows"
+description: "The default click-to-install lookback windows Linkrunner uses per ad network, why Google and Meta are 30 days, and how to change them per project."
+keywords: ["attribution window", "click lookback window", "click to install window", "attribution lookback", "click window per ad network", "30 day attribution window", "7 day attribution window"]
+icon: "clock"
+---
+
+**A click window is how far back Linkrunner looks for a click when crediting a new install.** If the matching click is older than the window, it is not used, and the install is recorded as organic instead.
+
+This is applied per ad network, so a click from Google Ads and a click from an affiliate can be judged against different windows.
+
+## Default windows
+
+| Ad network | Default click window |
+| :--- | :--- |
+| Google Ads | 30 days |
+| Meta | 30 days |
+| Every other network | 7 days |
+
+Google and Meta default to 30 days because installs on those networks often report well after the click. Everything else defaults to 7 days.
+
+These defaults apply automatically. You do not need to set anything to get them.
+
+## Change a window
+
+Go to **Settings → Attribution Windows** in the [dashboard](https://dashboard.linkrunner.io/dashboard/settings/attribution-windows).
+
+Each row is one ad network, and shows the window currently in effect along with where that number came from:
+
+- **Default for this network**: the platform default for Google or Meta.
+- **Default**: the 7 day platform default.
+- No label: a value you set for this project.
+
+Click the edit icon on a row, enter a number of days, and save. The change applies to that ad network on this project only. Use the reset icon to return a row to its default.
+
+Changes take effect within about five minutes.
+
+## Limits
+
+Windows can be set from **1 to 30 days**.
+
+The 30 day ceiling is not arbitrary. Linkrunner retains clicks for 30 days, so a click older than that cannot be matched to an install at all, and a longer window would have no effect.
+
+## What this does not cover
+
+This setting governs **click matching only**. View-through and probabilistic attribution are not affected.
+
+It is also separate from the **Lookback Window** on the Remarketing page. That one controls the reattribution window for users who already have your app. This one controls how a brand new install gets credited.
