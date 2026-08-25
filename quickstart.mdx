@@ -17,13 +17,13 @@ icon: "rocket"
 
 This guide walks you through the six steps every Linkrunner integration follows. Each step links out to platform-specific instructions when you need them.
 
-For mobile SDK testing, [Open SDK Console](https://dashboard.linkrunner.io/dashboard/sdk-console/register-test-device) in the dashboard. It is in beta and helps you register a test device and verify SDK events.
+For mobile SDK testing, [Open SDK Console](https://dashboard.linkrunner.io/dashboard/sdk-console/register-test-device) in the dashboard. It helps you register a test device and verify SDK events.
 
 ## 1. Create a Project & Get Your Token
 
 1. Sign in to the [Linkrunner Dashboard](https://dashboard.linkrunner.io).
 2. Create a new project (or open an existing one).
-3. Copy your **Project Token** from [Dashboard → Documentation](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
+3. Copy your **Project Token** from the [SDK Console](https://dashboard.linkrunner.io/dashboard/sdk-console/register-test-device).
 4. (Optional, recommended for production) Grab your **Secret Key** and **Key ID** from [Dashboard → Settings → SDK Signing](https://dashboard.linkrunner.io/settings?s=sdk-signing) to enable request signing.
 
 ## 2. Install the SDK
@@ -64,12 +64,6 @@ implementation("io.linkrunner:sdk:<latest>")
 npx expo install expo-linkrunner rn-linkrunner
 ```
 [Full Expo guide →](/sdk/expo)
-</Tab>
-<Tab title="Web">
-```html
-<script src="https://cdn.linkrunner.io/sdk/v1/linkrunner.min.js" data-token="YOUR_WEB_SDK_TOKEN"></script>
-```
-[Full Web guide →](/sdk/web)
 </Tab>
 <Tab title="Capacitor">
 ```bash

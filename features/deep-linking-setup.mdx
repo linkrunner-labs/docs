@@ -111,12 +111,10 @@ HTTP/HTTPS deep links (including App Links on Android and Universal Links on iOS
 
 Linkrunner hosts your verification files automatically so you don't have to manage server configuration yourself.
 
-1. Log in to your [Linkrunner dashboard](https://dashboard.linkrunner.io/settings?sort_by=activity-1&s=store-verification)
-2. Go to **Project Settings** from the navigation menu
-3. In the **Domain Verification** section:
-    - Paste your `apple-app-site-association` JSON in the **iOS (Only JSON allowed)** text area
-    - Paste your `assetlinks.json` content in the **Android (Only JSON allowed)** text area
-4. Click **Save**
+1. Open [Settings → Deeplinks](https://dashboard.linkrunner.io/dashboard/settings/deeplinks) in your Linkrunner dashboard
+2. Paste your `apple-app-site-association` JSON into **iOS Verification Object**
+3. Paste your `assetlinks.json` content into **Android Verification Object**
+4. Click **Save Changes**
 
 Linkrunner will automatically host these files at:
 - iOS: `https://your-domain.io/.well-known/apple-app-site-association`

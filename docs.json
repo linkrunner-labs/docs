@@ -232,14 +232,6 @@
     },
     "redirects": [
         {
-            "source": "/sdk/web/installation",
-            "destination": "/sdk/web"
-        },
-        {
-            "source": "/sdk/web/framework-integrations",
-            "destination": "/sdk/web"
-        },
-        {
             "source": "/sdk/react-native/installation",
             "destination": "/sdk/react-native"
         },
