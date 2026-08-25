@@ -1,0 +1,168 @@
+---
+title: "Data Export: CSV exports for campaigns and users"
+sidebarTitle: "Data Export"
+description: "How to export Linkrunner campaign and user data to CSV, what each export type contains, and how to read the numbers correctly."
+keywords: ["data export", "csv export", "campaign export", "export report", "onboarded users export", "paying users export", "overall data", "re-engagement export", "install attribution export"]
+icon: "file-arrow-down"
+---
+
+**Data Export gives you your Linkrunner data as a CSV file.** You choose what you want, we build the file in the background, and you get an email with a download link when it is ready. Most exports finish in a few minutes.
+
+There are two places to export from: **Settings** for a whole project, and the **campaign drawer** for a single campaign.
+
+## Export a whole project
+
+Go to **Settings**, open **Data Export**, then the **Export Data** tab. Pick a date range if you want one, then open **Export as CSV** and choose what to export.
+
+<Frame>
+  <img src="/images/data-export/project-level-export-menu.png" alt="The Data Export page in Settings, with the Export as CSV menu open showing Install Attribution and Re-engagement options" />
+</Frame>
+
+The menu is split into two groups, **Install Attribution** and **Re-engagement**, and each group offers the same four datasets. Overall Data has an arrow because it opens into two choices, Campaign and Ad Set and Creative.
+
+<Note>
+  Leaving the date range empty exports the last 3 months. You can export at most 3 calendar months at a time.
+</Note>
+
+## Export a single campaign
+
+Open the **Campaigns** page and click any campaign. In the drawer that opens, click the download icon in the top right. You can pick a date range here too.
+
+<Frame>
+  <img src="/images/data-export/campaign-level-export-menu.png" alt="A campaign drawer with the download menu open, showing All Onboarded Users and Paying Users" />
+</Frame>
+
+A campaign export gives you the two user lists, **All Onboarded Users** and **Paying Users**. Overall Data is a project level export only.
+
+<Warning>
+  **The campaign drawer follows the view the Campaigns page is already on.** There is no separate picker in the drawer. If you switch the Campaigns page to Re-engagement and then export from a campaign, you get re-engagement users. Switch it back to Install Attribution to export install attribution users.
+</Warning>
+
+## Install Attribution or Re-engagement
+
+Every export is one of these two views.
+
+| View | What it covers |
+| --- | --- |
+| **Install Attribution** | How users first arrived. New installs and the campaigns that drove them. |
+| **Re-engagement** | Users you brought back. Re-engagement and retargeting activity only. |
+
+## The four datasets
+
+<CardGroup cols={2}>
+  <Card title="Overall Data (Campaign)" icon="chart-simple">
+    One row per campaign per day. Use this when you want numbers that match the Campaigns dashboard.
+  </Card>
+  <Card title="Overall Data (Ad Set and Creative)" icon="layer-group">
+    Breaks each campaign down into its ad sets, creatives and keywords. Use this to see which ad set did the work.
+  </Card>
+  <Card title="Onboarded Users" icon="user-plus">
+    One row per user who signed up, with their device and campaign details.
+  </Card>
+  <Card title="Paying Users" icon="credit-card">
+    One row per user who paid, with revenue, payment count and payment dates.
+  </Card>
+</CardGroup>
+
+### Which Overall Data should I pick?
+
+Pick **Campaign** if you are reconciling against the dashboard or sharing totals with someone.
+
+Pick **Ad Set and Creative** if you are deciding which ad set or creative to keep running.
+
+They are different on purpose, and the next section explains why the totals will not match.
+
+## Sample files
+
+Download any of these to see the exact columns before you run your own export.
+
+<CardGroup cols={2}>
+  <Card title="Overall Data (Campaign)" icon="file-csv" href="/samples/export-csv/overall-data-campaign.csv">
+    Sample CSV
+  </Card>
+  <Card title="Overall Data (Ad Set and Creative)" icon="file-csv" href="/samples/export-csv/overall-data-adset-creative.csv">
+    Sample CSV
+  </Card>
+  <Card title="Onboarded Users" icon="file-csv" href="/samples/export-csv/onboarded-users.csv">
+    Sample CSV
+  </Card>
+  <Card title="Paying Users" icon="file-csv" href="/samples/export-csv/paying-users.csv">
+    Sample CSV
+  </Card>
+</CardGroup>
+
+<Note>
+  The names, revenue and user details in these samples are made up. The columns and their order are exactly what a real export gives you.
+</Note>
+
+## Reading the numbers correctly
+
+A few things in these files surprise people. None of them are errors.
+
+<Accordion title="Ad Set and Creative totals come out lower than the dashboard">
+  Some spend and installs cannot be tied to a single ad set. Google Performance Max and Meta Advantage+ campaigns report at campaign level only, so that activity has no ad set to sit under.
+
+  The Campaign file includes it. The Ad Set and Creative file cannot, so its totals are lower. The difference between the two files is the amount your ad network did not break down for you.
+
+  This is why we offer both files instead of one.
+</Accordion>
+
+<Accordion title="Sign Ups shows a number on one row and 0 on the rest">
+  Sign Ups counts each user once across the whole date range, not once per day. A user who signs up twice in a month is still one sign up.
+
+  Because of that, the total for the range sits on the campaign's first row and every later row shows 0. Add the column up and you get the correct total, which matches the dashboard. Read a single row on its own and the number will not mean much.
+</Accordion>
+
+<Accordion title="Columns marked per-day, not summable">
+  Some column headers say **(per-day, not summable)**, including installs, ROAS, CPI and active users.
+
+  These count unique things per day, so adding the days together double counts anyone who appears on more than one day. Use the dashboard for a range total on these columns.
+</Accordion>
+
+<Accordion title="Rows showing 0">
+  A row of zeros means the campaign was live that day and had no activity. That is real data, so we keep it.
+
+  Rows with nothing in them at all are removed, so you should not see blank rows in a current export.
+</Accordion>
+
+<Accordion title="Meta and Google iOS campaigns stop at campaign level">
+  Apple's SKAdNetwork does not report an ad set breakdown for iOS. For Meta and Google iOS campaigns, the Ad Set and Creative file shows the campaign row instead of drilling further down.
+</Accordion>
+
+<Accordion title="Apple Search Ads shows keywords instead of creatives">
+  An Apple Search Ads ad group is described by its keywords, so those campaigns show keyword rows where other networks show creative rows.
+</Accordion>
+
+<Accordion title="GAID is empty for iOS users and IDFA is empty for most of them">
+  GAID is an Android advertising ID and IDFA is an iOS one, so each is filled for one platform only.
+
+  IDFA is also only available when the user allows tracking when iOS asks. For most apps that is a small share of iOS users, so expect the IDFA column to be mostly empty.
+</Accordion>
+
+<Accordion title="Campaign columns in a project level user export say Latest">
+  In a project level Onboarded Users or Paying Users file, each user appears once, even if they were active on several campaigns. The campaign columns say **Latest Campaign** because they show where that user was last seen.
+
+  Grouping a project level user file by campaign will not match per campaign numbers on the dashboard. Export from the campaign drawer instead if you want users for one campaign.
+</Accordion>
+
+## Who can export
+
+Only project **admins** and **managers** can run an export.
+
+## Common questions
+
+<Accordion title="How long does an export take?">
+  Usually a few minutes. Larger date ranges take longer. The file is built in the background, so you can close the page and wait for the email.
+</Accordion>
+
+<Accordion title="Can I export more than 3 months at once?">
+  No. A single export covers at most 3 calendar months. Run several exports if you need a longer period.
+</Accordion>
+
+<Accordion title="Why did I get an email saying no rows matched?">
+  There was no data for the view, dataset and filters you chose in that date range. Widening the date range or clearing filters usually explains it.
+</Accordion>
+
+<Accordion title="Do filters apply to the export?">
+  Yes. Network, platform, ad account and date range all carry into the file.
+</Accordion>
