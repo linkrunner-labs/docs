@@ -190,6 +190,25 @@ To verify the SDK is working:
 
 <Note>Enable debug mode during development to see detailed logs.</Note>
 
+## What the collector checks
+
+Every event is validated against your project token before it is accepted. Knowing exactly what is checked tells you which events belong in the browser and which do not.
+
+| Check | Behavior |
+| ----- | -------- |
+| Token | Required. A request without one is rejected with `400`, and an unknown token with `401`. Nothing is recorded without a valid token. |
+| Event type | Each event must carry an `event_type` or an `event_name`. |
+| Size | Requests above 64 KB are rejected with `413`. |
+| Field length | Individual string fields are truncated at 2048 characters. |
+
+Your web SDK token is public by design. It sits in your page source as `data-token="..."`, so treat it as an identifier rather than a secret. A `401` tells you a token is unknown, it does not tell you who sent the request.
+
+<Warning>
+    Do not send events from the browser that you need to be able to trust, such as payments, subscription upgrades, or anything that grants access. Anyone can read your token from your page and post events with it. Send those events server to server from your backend instead, where your credentials are never exposed to a visitor.
+</Warning>
+
+Browser events are the right tool for behavioral analytics: page views, funnel steps, and traffic source attribution. Use the [event capture API](/api-reference/event-capture) from your backend for anything that has to be correct.
+
 ## Framework Integrations
 
 ### React
