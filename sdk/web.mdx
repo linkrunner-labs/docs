@@ -72,6 +72,89 @@ window.LinkrunnerSDK.configure({
 });
 ```
 
+### First-party collection domain (recommended)
+
+Ad blockers match requests by domain, not by path. Events sent to
+`api.linkrunner.io` are blocked in the browser for roughly a quarter of desktop
+visitors, before they reach us.
+
+To avoid this, collect from a subdomain of your own site. You point one at us,
+name it in the script tag, and the SDK posts there instead.
+
+<Steps>
+  <Step title="Register the subdomain">
+    In the dashboard, go to **Settings → Manage Domains** and add the subdomain
+    you want to use, for example `lr.your-domain.com`.
+  </Step>
+  <Step title="Point it at Linkrunner">
+    Add this CNAME record with your DNS provider:
+
+    ```
+    lr.your-domain.com.  CNAME  api.linkrunner.io.
+    ```
+
+    We issue the TLS certificate automatically on the first request.
+  </Step>
+  <Step title="Add data-domain to your script tag">
+    ```html
+    <script
+      src="https://cdn.linkrunner.io/web/v1/lr.js"
+      data-token="YOUR_PROJECT_TOKEN"
+      data-domain="lr.your-domain.com"
+      defer
+    ></script>
+    ```
+
+    With the Next.js component:
+
+    ```tsx
+    <LinkrunnerScript token="YOUR_PROJECT_TOKEN" domain="lr.your-domain.com" />
+    ```
+
+    Or with `window.LinkrunnerConfig`, set before the script loads:
+
+    ```js
+    window.LinkrunnerConfig = {
+      token: 'YOUR_PROJECT_TOKEN',
+      domain: 'lr.your-domain.com',
+    }
+    ```
+  </Step>
+  <Step title="Verify">
+    Confirm the subdomain serves the collector:
+
+    ```bash
+    curl -i -X OPTIONS -H 'Origin: https://your-domain.com' \
+      -H 'Access-Control-Request-Method: POST' https://lr.your-domain.com/web/ingest
+    ```
+
+    Expect `204` with an `access-control-allow-origin` header. Then open your
+    browser's **Network** tab and confirm event POSTs go to
+    `https://lr.your-domain.com/web/ingest`.
+  </Step>
+</Steps>
+
+<Note>
+    Give `data-domain` a hostname (`lr.your-domain.com`), not a URL. The
+    collection path belongs to Linkrunner and can change, so naming only the
+    host means your page keeps working without an edit. A scheme or a trailing
+    slash is accepted and cleaned up, and an internationalized hostname is
+    converted to punycode for you.
+</Note>
+
+<Warning>
+    Two requests per event, one to your subdomain and one to
+    `api.linkrunner.io`, means your subdomain is not serving `/web/ingest` yet.
+    No events are lost, because the SDK retries on our domain when the request
+    fails outright or returns `403`, `404`, `405`, `502`, or `503`. Check the
+    CNAME record, that the domain is registered in the dashboard, and that no
+    WAF or auth proxy in front of the subdomain is refusing the POST.
+</Warning>
+
+If you cannot delegate a subdomain but can proxy requests through your own
+origin, use `data-endpoint` instead. It takes a full URL or a same-origin path
+such as `/lr/ingest`, and it overrides `data-domain` when both are set.
+
 ### Getting Store Links (CDN)
 
 After initialization, you can use the `getStoreLink` function:
