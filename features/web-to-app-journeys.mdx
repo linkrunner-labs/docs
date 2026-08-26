@@ -21,7 +21,7 @@ One thing does the bridging: a **Linkrunner link on your custom subdomain**, pla
 Everything after the open is the mobile SDK's job: `init` records the app open, [`signup`](/sdk/react-native#user-identification-required) registers the user, [`trackEvent`](/sdk/react-native#tracking-custom-events) captures actions, and [`capturePayment`](/sdk/react-native#revenue-tracking) captures revenue.
 
 <Note>
-For paid channels, use the dedicated handoffs instead of building the link yourself. Linkrunner auto-creates and attributes the campaign for you. See [Meta Web to App](/ad-networks/meta-web-to-app) and [Google Web to App](/ad-networks/google-web-to-app).
+For Meta campaigns, use the dedicated handoff instead of building the link yourself. Linkrunner auto-creates and attributes the campaign for you. See [Meta Web to App](/ad-networks/meta-web-to-app).
 </Note>
 
 ### Prerequisites
@@ -129,9 +129,6 @@ Website page views and channel breakdowns are attribution inputs that feed the c
   </Card>
   <Card title="Meta Web to App" icon="meta" href="/ad-networks/meta-web-to-app">
     Run Meta web-to-app ads with CAPI
-  </Card>
-  <Card title="Google Web to App" icon="google" href="/ad-networks/google-web-to-app">
-    Attribute Google web-to-app campaigns
   </Card>
   <Card title="Event Capture" icon="bolt" href="/api-reference/event-capture">
     Track conversions and activation events
