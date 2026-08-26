@@ -153,7 +153,6 @@
                             "ad-networks/snapchat",
                             "ad-networks/reddit-ads",
                             "ad-networks/linkedin-ads",
-                            "ad-networks/google-web-to-app",
                             "ad-networks/meta-web-to-app"
                         ]
                     },
@@ -317,7 +316,11 @@
         },
         {
             "source": "/web-to-app/google",
-            "destination": "/ad-networks/google-web-to-app"
+            "destination": "/ad-networks/google-ads"
+        },
+        {
+            "source": "/ad-networks/google-web-to-app",
+            "destination": "/ad-networks/google-ads"
         }
     ]
 }
