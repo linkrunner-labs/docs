@@ -60,6 +60,7 @@
                             "features/meta-install-referrer",
                             "features/send-consent",
                             "features/ios-campaign-data-limitations",
+                            "features/attribution-windows",
                             {
                                 "group": "SKAdNetwork",
                                 "icon": "apple",
