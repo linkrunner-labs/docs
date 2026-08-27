@@ -167,6 +167,15 @@
                         ]
                     },
                     {
+                        "group": "Agency Partners",
+                        "pages": [
+                            "agency-partners/overview",
+                            "agency-partners/accept-invitation",
+                            "agency-partners/manage-workspace",
+                            "agency-partners/invite-an-agency"
+                        ]
+                    },
+                    {
                         "group": "Analytics Integrations",
                         "pages": [
                             "analytics-integrations/amplitude",
