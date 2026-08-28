@@ -21,6 +21,7 @@
                         "group": "SDK Guides",
                         "pages": [
                             "testing/integration-testing",
+                            "testing/meta-android-attribution-testing",
                             "sdk/react-native",
                             "sdk/flutter",
                             "sdk/capacitor",
@@ -60,6 +61,7 @@
                             "features/meta-install-referrer",
                             "features/send-consent",
                             "features/ios-campaign-data-limitations",
+                            "features/attribution-windows",
                             {
                                 "group": "SKAdNetwork",
                                 "icon": "apple",
@@ -153,7 +155,6 @@
                             "ad-networks/snapchat",
                             "ad-networks/reddit-ads",
                             "ad-networks/linkedin-ads",
-                            "ad-networks/google-web-to-app",
                             "ad-networks/meta-web-to-app"
                         ]
                     },
@@ -161,8 +162,18 @@
                         "group": "Affiliate Partners",
                         "pages": [
                             "affiliate-partners/overview",
+                            "affiliate-partners/create-account",
                             "affiliate-partners/tracking-links",
                             "affiliate-partners/postbacks"
+                        ]
+                    },
+                    {
+                        "group": "Agency Partners",
+                        "pages": [
+                            "agency-partners/overview",
+                            "agency-partners/accept-invitation",
+                            "agency-partners/manage-workspace",
+                            "agency-partners/invite-an-agency"
                         ]
                     },
                     {
@@ -230,14 +241,6 @@
         }
     },
     "redirects": [
-        {
-            "source": "/sdk/web/installation",
-            "destination": "/sdk/web"
-        },
-        {
-            "source": "/sdk/web/framework-integrations",
-            "destination": "/sdk/web"
-        },
         {
             "source": "/sdk/react-native/installation",
             "destination": "/sdk/react-native"
@@ -324,7 +327,11 @@
         },
         {
             "source": "/web-to-app/google",
-            "destination": "/ad-networks/google-web-to-app"
+            "destination": "/ad-networks/google-ads"
+        },
+        {
+            "source": "/ad-networks/google-web-to-app",
+            "destination": "/ad-networks/google-ads"
         }
     ]
 }

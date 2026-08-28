@@ -234,8 +234,17 @@ interface Campaign {
     attributed_users: number;
     link: string;
     shareable_link: string;
+    website: string | null;
     domain: string | null;
     store_listings: StoreListing[];
+    network_account: NetworkAccount | null;
+}
+
+interface NetworkAccount {
+    id: number;
+    name: string | null;
+    status: string;
+    capi_configured: boolean;
 }
 
 interface PaginationInfo {
@@ -573,7 +582,12 @@ If no attribution data is found for the provided identifier, the API returns a `
 | `keyword_id`       | string\|null          | The keyword ID (primarily for Apple Search Ads campaigns)                                               |
 | `keyword_name`     | string\|null          | The keyword name (primarily for Apple Search Ads campaigns)                                             |
 | `ad_network`       | string\|null          | The advertising network. Can be `GOOGLE`, `META`, `TIKTOK`, `APPLE_SEARCH_ADS`, or other network codes |
-| `attribution_type` | "ORGANIC"\|"INORGANIC"|         |
+| `attribution_type` | "ORGANIC"\|"INORGANIC"| Whether the install was matched to a paid or owned source (`INORGANIC`) or not (`ORGANIC`) |
+| `user_id`          | string\|null          | Your identifier for the user, as sent to `signup`                                       |
+| `gaid`             | string\|null          | Google Advertising ID (Android)                                                         |
+| `idfa`             | string\|null          | Identifier for Advertisers (iOS)                                                        |
+| `store_click_at`   | string\|null          | When the store click was recorded (ISO 8601 UTC)                                        |
+| `installed_at`     | string\|null          | When the install was recorded (ISO 8601 UTC)                                            |
 
 
 #### Error Responses
@@ -604,6 +618,11 @@ interface AttributionResult {
     keyword_name: string | null;
     ad_network: AdNetwork | null;
     attribution_type: AttributionType;
+    user_id: string | null;
+    gaid: string | null;
+    idfa: string | null;
+    store_click_at: string | null;
+    installed_at: string | null;
 }
 
 interface AttributionResultResponse {

@@ -479,7 +479,7 @@ class MyApplication : Application() {
 
 ## 6. Identify the user
 
-Call `signup` when the user signs up or logs in. Events and payments are only stored for attributed users.
+Call `signup` when the user signs up or logs in so events and payments are linked to a user.
 
 ```kotlin
 CoroutineScope(Dispatchers.IO).launch {
@@ -550,7 +550,7 @@ A retry can send the same request twice if the first attempt reached the server 
     Make sure `init` ran on the device, not your backend, and that `gaid` and `install_ref` are present in `device_data`. Without them, only organic installs resolve. See [Collecting device data](/sdk-less/android-device-data).
   </Accordion>
   <Accordion title="Events or payments do not appear">
-    Events and payments are only stored for attributed users. Call `signup` first, and use the same `install_instance_id` everywhere.
+    Check that you called `signup` and used the same `install_instance_id` everywhere. Events and payments are stored for all users, including organic ones, so a missing campaign does not mean the event was dropped.
   </Accordion>
   <Accordion title="Every install looks like the same device or location">
     You are likely calling from your backend. The server matches on the calling IP, so calls must come from the user's device.

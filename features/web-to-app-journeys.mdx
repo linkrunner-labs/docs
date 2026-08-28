@@ -21,7 +21,7 @@ One thing does the bridging: a **Linkrunner link on your custom subdomain**, pla
 Everything after the open is the mobile SDK's job: `init` records the app open, [`signup`](/sdk/react-native#user-identification-required) registers the user, [`trackEvent`](/sdk/react-native#tracking-custom-events) captures actions, and [`capturePayment`](/sdk/react-native#revenue-tracking) captures revenue.
 
 <Note>
-For paid channels, use the dedicated handoffs instead of building the link yourself. Linkrunner auto-creates and attributes the campaign for you. See [Meta Web to App](/ad-networks/meta-web-to-app) and [Google Web to App](/ad-networks/google-web-to-app).
+For Meta campaigns, use the dedicated handoff instead of building the link yourself. Linkrunner auto-creates and attributes the campaign for you. See [Meta Web to App](/ad-networks/meta-web-to-app).
 </Note>
 
 ### Prerequisites
@@ -63,7 +63,7 @@ These journeys go through the store. Deferred deep linking carries the original 
 | **Website → Install** | Click → install, with the attributed campaign from `getAttributionData` | **Overview** stat cards (All / Attributed / Organic Installs); Campaigns → **Installs** | Linkrunner link as the store target; `init` + `getAttributionData` after first open |
 | **Website → Install → Signup** | Install + user registration | **Sign-ups** and **Conversion** (sign-ups / installs) columns; user list in the campaign drawer | Call [`signup`](/sdk/react-native#user-identification-required) with `user_data.id` |
 | **Website → Install → Purchase** | Install + revenue | **Revenue**, **ROAS**, **Paying Users**, **Daywise Revenue** columns | [`capturePayment`](/sdk/react-native#revenue-tracking); convert to one currency; map the event for Meta/Google ROAS |
-| **Website → Install → Onboarding** | Install + activation event | Custom **event column**; [Events settings](https://dashboard.linkrunner.io/dashboard/settings/events) | Define the activation event and fire it with [`trackEvent`](/sdk/react-native#tracking-custom-events) |
+| **Website → Install → Onboarding** | Install + activation event | Custom **event column**; [Events](https://dashboard.linkrunner.io/dashboard/events) | Define the activation event and fire it with [`trackEvent`](/sdk/react-native#tracking-custom-events) |
 | **Specific page → Install → Same context** | Deferred deep link carrying the page context through the install | Campaign **Installs**; the link resolves via `getAttributionData().deeplink` | Enable deferred deep linking on the campaign; pass the path into the link; parse `deeplink` in-app |
 | **Referral link → Install** | Install + referral conversion | Campaign per referral; event column | [Referral tracking](/features/referral-codes); add `?referrer=` to the link; handle it in-app |
 
@@ -92,7 +92,7 @@ The end-to-end question (*which campaign drove this user, and what did they even
 | Installs (All / Attributed / Organic / iOS / Android) | Overview stat cards + Installs column |
 | App re-engagement | Campaigns → **Re-engagement** view |
 | Sign-ups / Conversion | Sign-ups and Conversion columns; user list in the campaign drawer |
-| Activation / custom events | Custom event columns; [Events settings](https://dashboard.linkrunner.io/dashboard/settings/events) |
+| Activation / custom events | Custom event columns; [Events](https://dashboard.linkrunner.io/dashboard/events) |
 | Purchase / Revenue / ROAS | Revenue, ROAS, Paying Users, Daywise Revenue columns |
 | Retention (D1, D7, …) | Rolling and Classic Retention columns |
 
@@ -105,7 +105,7 @@ Custom and payment events received from the SDK are listed under **Events settin
 ![Events settings page listing received events and their ad network mappings](/images/web-to-app/events-settings.png)
 
 <Note>
-Website page views and channel breakdowns are attribution inputs that feed the campaign numbers above; they are not a standalone report in the dashboard today. If you want to also collect on-site page views and traffic sources, the optional [Web SDK](/sdk/web) can enrich the journey.
+Website page views and channel breakdowns are attribution inputs that feed the campaign numbers above; they are not a standalone report in the dashboard today.
 </Note>
 
 ## Troubleshooting
@@ -129,9 +129,6 @@ Website page views and channel breakdowns are attribution inputs that feed the c
   </Card>
   <Card title="Meta Web to App" icon="meta" href="/ad-networks/meta-web-to-app">
     Run Meta web-to-app ads with CAPI
-  </Card>
-  <Card title="Google Web to App" icon="google" href="/ad-networks/google-web-to-app">
-    Attribute Google web-to-app campaigns
   </Card>
   <Card title="Event Capture" icon="bolt" href="/api-reference/event-capture">
     Track conversions and activation events
