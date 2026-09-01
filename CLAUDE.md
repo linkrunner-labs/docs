@@ -47,6 +47,7 @@ These are the rules to follow for every new page or edit. Some existing docs vio
 4. **Second person, present tense.** "You" and "your app", not "the user" or "the developer".
 5. **Bold for UI labels** (`**Save**`, `**Settings → Integrations**`), **backticks for code identifiers** (`init`, `getAttributionData`, `AndroidManifest.xml`).
 6. **Use absolute internal links.** `/features/deep-linking-setup`, not relative paths. Dashboard links use `https://dashboard.linkrunner.io/...`.
+7. **Do not repeat the frontmatter description.** Mintlify renders `description` directly below the page title. The opening body paragraph must add new information. Remove it when it only restates the description.
 
 ### Em-dash replacements
 
