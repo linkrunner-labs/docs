@@ -163,6 +163,7 @@
                         "pages": [
                             "affiliate-partners/overview",
                             "affiliate-partners/create-account",
+                            "affiliate-partners/create-campaign-link",
                             "affiliate-partners/tracking-links",
                             "affiliate-partners/postbacks"
                         ]

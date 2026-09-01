@@ -6,17 +6,17 @@ icon: "link"
 
 ## Overview
 
-Linkrunner gives the advertiser a tracking link for each campaign. You point your traffic at that link and append the parameters below. These parameters tell Linkrunner who sent the click so it can attribute the install and return your identifiers on the postback.
+Create each campaign link from **All Campaigns → Create Link** in the affiliate dashboard. Linkrunner generates a tracking-link template with the parameters configured for your affiliate account.
 
-A tracking link looks like this. The domain is the advertiser's own tracking domain, so always use the exact link Linkrunner provides. The example below uses `track.example.com` as a placeholder.
+Copy the exact template into your platform. Do not build the URL or add parameters manually. A generated template may look like this:
 
 ```
 https://track.example.com/?c=CAMPAIGN_ID&tid={click_id}&s2={campaign_id}
 ```
 
-`c` is the Linkrunner campaign identifier, set by the advertiser when they create the link. You add the rest.
+The domain belongs to the advertiser. `c` is the Linkrunner campaign identifier. Values such as `{click_id}` and `{campaign_id}` are your platform's macros, using the syntax configured for your affiliate account.
 
-The values in braces are **your own platform's macros**, written in whatever syntax your platform uses. This is the template you save on your side, and it is what Linkrunner shows you in your partner dashboard.
+Your platform replaces those macros before it sends the click to Linkrunner. Linkrunner does not expand them for you.
 
 ## The two forms of the link
 
