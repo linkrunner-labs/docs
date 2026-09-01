@@ -93,19 +93,41 @@ It should not reach Linkrunner with placeholders such as `{click_id}` or `{campa
 
 ## Troubleshooting
 
-**The advertiser project does not appear.**
-Your affiliate account does not have an active connection to that project. Ask the advertiser or Linkrunner support to connect the project to your approved affiliate account.
+<AccordionGroup>
+  <Accordion
+    title="The advertiser project does not appear"
+    description="Check whether your affiliate account has access to the project."
+  >
+    Your affiliate account does not have an active connection to that project. Ask the advertiser or Linkrunner support to connect the project to your approved affiliate account.
+  </Accordion>
 
-**A campaign link does not appear in your affiliate dashboard.**
-The link was not created under your affiliate account. Create a new link from **All Campaigns → Create Link** in the affiliate dashboard.
+  <Accordion
+    title="A campaign link does not appear in your dashboard"
+    description="Create the link from the correct affiliate workspace."
+  >
+    The link was not created under your affiliate account. Open the advertiser project in the affiliate dashboard, then create a new link from **All Campaigns → Create Link**.
+  </Accordion>
 
-**The generated link is missing a required template parameter.**
-Do not add the parameter manually. Contact Linkrunner support to update the template configuration for your affiliate account, then create a new campaign link.
+  <Accordion
+    title="The generated link is missing a required parameter"
+    description="Update the affiliate template instead of editing the link manually."
+  >
+    Do not add the parameter manually. Contact Linkrunner support to update the template configuration for your affiliate account, then create a new campaign link.
+  </Accordion>
 
-**The final click URL still contains placeholders.**
-Your affiliate platform did not substitute its macros. Check the macro syntax configured on your platform before sending more traffic.
+  <Accordion
+    title="The final click URL still contains placeholders"
+    description="Confirm that your platform replaces every macro before redirecting the click."
+  >
+    Your affiliate platform did not substitute its macros. Check the macro syntax configured on your platform before sending more traffic. The final URL must contain resolved values instead of placeholders such as `{click_id}` or `{campaign_id}`.
+  </Accordion>
 
-**Postbacks have an empty click ID.**
-Confirm that every click sends a unique value in the generated template's click ID parameter. See [Tracking Links](/affiliate-partners/tracking-links) for examples.
+  <Accordion
+    title="Postbacks have an empty click ID"
+    description="Verify that every click sends a unique click ID value."
+  >
+    Confirm that every click sends a unique value in the generated template's click ID parameter. See [Tracking Links](/affiliate-partners/tracking-links) for examples.
+  </Accordion>
+</AccordionGroup>
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
