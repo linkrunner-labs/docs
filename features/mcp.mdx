@@ -200,6 +200,11 @@ A few things to know when you read network numbers:
 - **Meta has no single "conversions" number.** Claude reads the actions Meta
   reports (app installs, purchases, leads and so on) and names the one it is
   quoting.
+- **Google's "Conversions" column is not installs.** It adds up every
+  conversion action the account bids on (installs, trials, purchases). When
+  comparing installs, Claude uses only Google's install conversion actions
+  (the DOWNLOAD category, such as Android first open) and names the action it
+  used.
 - **Answers may come from a short cache.** Closed date ranges are cached for a
   day, open ranges for ten minutes, and object lists for five minutes. Claude
   mentions the age when it matters.
