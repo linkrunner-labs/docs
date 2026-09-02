@@ -146,14 +146,15 @@ for "measured zero". Ask for a metric by name and Claude will fetch it.
 
 ## What Claude can read from your ad accounts
 
-Tokens created with **Read connected ad accounts** get five more tools. They
+Tokens created with **Read connected ad accounts** get six more tools. They
 read from the Meta Marketing API and the Google Ads API using the ad accounts
 already connected to the project under Settings, and nothing else. They cannot
 change anything on Meta or Google.
 
 | Tool | Use it for |
 |------|------------|
-| `get_ad_insights` | Spend, impressions, clicks, CTR, CPC, CPM, reach, frequency, conversions and ROAS as the ad network reports them, at account, campaign, ad set or ad group, or ad level. Optional breakdown by date, device, platform, country, age or gender. |
+| `enrich_campaigns_from_ad_network` | Adds the network's delivery figures (spend, impressions, clicks, reach, frequency, CPM) and its own reported outcomes beside your Linkrunner campaigns, with a note explaining any gap between the two. |
+| `get_ad_insights` | Spend, impressions, clicks, CTR, CPC, CPM, reach and frequency as the ad network reports them, at account, campaign, ad set or ad group, or ad level, with the network's own conversions under `network_reported`. Optional breakdown by date, device, platform, country, age or gender. |
 | `list_ad_entities` | Campaigns, ad sets or ad groups, ads, creatives, audiences, conversion actions and keywords, with status, budget and objective. |
 | `get_ad_entity` | Every readable field of one object, such as an ad set's targeting or a campaign's bidding strategy. |
 | `query_ad_network` | Anything the three tools above cannot express, using the network's own field names: video metrics, impression share, quality rankings, placements, hourly and search-term reports, country, age and gender on Google, attribution-window comparisons on Meta, filters on any field, sorting, and object types such as pixels, labels, saved audiences and asset groups. |
@@ -166,7 +167,27 @@ cannot ask for a field that does not exist, and a name that is wrong comes
 back with suggestions instead of a failed call. Almost everything the two
 reporting APIs expose for reading is reachable this way.
 
-A few things to know when you read these numbers:
+### Which source answers which question
+
+Linkrunner stays the source of truth, and connecting an ad account does not
+change any answer you already get. It adds to them.
+
+| Question | Source | Why |
+|----------|--------|-----|
+| Installs, reinstalls, sign-ups, events, purchases, revenue | Linkrunner | Attributed per device and per user, deduplicated across networks, and the same numbers as the dashboard. |
+| Retention, active users, funnels, attribution detail | Linkrunner only | Only Linkrunner has the user-level history. |
+| Cost per install, cost per sign-up, ROAS | Linkrunner | Synced ad spend divided by Linkrunner outcomes, the same as the dashboard. |
+| Spend, impressions, clicks, reach, frequency, CTR, CPC, CPM | Ad network | The network bills it, and its live figure is the latest. |
+| Status, budgets, bids, targeting, placements, creatives, audiences, keywords | Ad network only | Only the network knows. |
+
+The network's own conversion counts are still available, but always under a
+`network_reported` label, and Claude quotes them as the network's claim
+("Meta reports 12 purchases") rather than as the count. When the two sides
+disagree, Claude explains why (attribution window, view-through, SKAN delay,
+cross-network deduplication, or a campaign that is not linked) instead of
+picking one.
+
+A few things to know when you read network numbers:
 
 - **They are the ad network's numbers.** Meta and Google count conversions
   with their own attribution windows and view-through rules. Linkrunner's
