@@ -18,6 +18,14 @@ dashboard, add it as a Custom Connector in Claude.ai, and ask things like:
 - "How much of my growth is organic?"
 - "Where do users drop off between install and checkout?"
 
+With the ad-accounts capability, Claude can also read straight from the Meta
+and Google accounts you have connected:
+
+- "How much did we spend on Meta last week, by campaign?"
+- "Which Google ad groups are paused right now?"
+- "What targeting does our retargeting ad set use?"
+- "Compare Meta's reported spend with Linkrunner's installs for yesterday."
+
 Claude can also make a defined set of changes for you:
 
 - "Create a Meta campaign for the Diwali sale pointing at our sneakers page."
@@ -50,10 +58,22 @@ connector with a team.
 1. Open the [Linkrunner dashboard](https://dashboard.linkrunner.io) and switch
    to the project you want to connect.
 2. Click **MCP** in the sidebar.
-3. Click **Generate Token**.
-4. The dashboard shows a one-time **Server URL** with the token already
+3. Choose what the token may do:
+   - **Read Linkrunner data** is always on.
+   - **Make changes in Linkrunner** lets Claude use the editing tools listed
+     under [What Claude can change](#what-claude-can-change). Turn it off for
+     a read-only token.
+   - **Read connected ad accounts** lets Claude read your connected Meta and
+     Google accounts. See
+     [What Claude can read from your ad accounts](#what-claude-can-read-from-your-ad-accounts).
+4. Click **Generate Token**.
+5. The dashboard shows a one-time **Server URL** with the token already
    embedded as a query parameter. Copy it now. The full URL will not be shown
    again.
+
+Capabilities are fixed once a token exists. To change them, generate a new
+token and revoke the old one. Tokens created before capabilities existed keep
+read and change access, and no ad-account access.
 
 <Warning>
 The URL contains the token as a query parameter. Treat it like a password:
@@ -123,6 +143,46 @@ custom events, and so on). A group that wasn't requested is absent from the
 response rather than reported as zero, so Claude never mistakes "not fetched"
 for "measured zero". Ask for a metric by name and Claude will fetch it.
 </Note>
+
+## What Claude can read from your ad accounts
+
+Tokens created with **Read connected ad accounts** get four more tools. They
+read from the Meta Marketing API and the Google Ads API using the ad accounts
+already connected to the project under Settings, and nothing else. They cannot
+change anything on Meta or Google.
+
+| Tool | Use it for |
+|------|------------|
+| `get_ad_insights` | Spend, impressions, clicks, CTR, CPC, CPM, reach, frequency, conversions and ROAS as the ad network reports them, at account, campaign, ad set or ad group, or ad level. Optional breakdown by date, device, platform, country, age or gender. |
+| `list_ad_entities` | Campaigns, ad sets or ad groups, ads, creatives, audiences, conversion actions and keywords, with status, budget and objective. |
+| `get_ad_entity` | Every readable field of one object, such as an ad set's targeting or a campaign's bidding strategy. |
+| `ad_network_reference` | The list of metrics, breakdowns and entity types each network supports. Claude reads it before its first ad-account question. |
+
+A few things to know when you read these numbers:
+
+- **They are the ad network's numbers.** Meta and Google count conversions
+  with their own attribution windows and view-through rules. Linkrunner's
+  installs and sign-ups are measured differently. Claude reports the two side
+  by side and will not merge them.
+- **Currency and timezone come from the ad account**, which may differ from
+  your project's display currency.
+- **The last three days are provisional.** Networks keep adjusting spend and
+  conversions for a few days, so recent numbers can move.
+- **Meta has no single "conversions" number.** Claude reads the actions Meta
+  reports (app installs, purchases, leads and so on) and names the one it is
+  quoting.
+- **Answers may come from a short cache.** Closed date ranges are cached for a
+  day, open ranges for ten minutes, and object lists for five minutes. Claude
+  mentions the age when it matters.
+- **Reads are budgeted.** Each token gets a daily allowance of live reads, and
+  Linkrunner reserves part of its Google Ads quota for attribution. When a
+  limit is hit, Claude gets a wait time and a cached copy if one exists,
+  instead of an error loop.
+- **Meta connections expire** roughly every 60 days. If Claude reports that
+  the connection has expired, reconnect Meta under Settings.
+
+Only Meta and Google are covered. Accounts on other networks still appear in
+`list_ad_accounts` for campaign setup but cannot be queried.
 
 ## What Claude can change
 
@@ -241,6 +301,9 @@ project. For each token you can see:
 - The user who created it.
 - The last time it was used (helps spot stale tokens).
 
+Each token also shows its capabilities: **Read**, **Changes**, and **Ad
+accounts**.
+
 Click the trash icon next to a token to revoke it. Anyone using that token in
 Claude will be disconnected immediately. Revocation is not reversible. Mint a
 new token if you need to reconnect.
@@ -256,7 +319,14 @@ revoke an unused token before creating a new one.
   project role, so the connector cannot do anything that person could not do in
   the dashboard.
 - Every change made through the connector is recorded with the action, the
-  token, the person who created it, and what was changed.
+  token, the person who created it, and what was changed. Every ad-account
+  read is recorded the same way, with the account, the query type and the
+  date range, but never the returned data.
+- Ad-account access is read-only and opt-in per token. The Meta and Google
+  credentials stay on Linkrunner's servers; the connector never receives them,
+  and they are removed from every response and log.
+- An ad-account token can only reach accounts connected to its own project.
+  Passing another project's account is refused.
 - Claude cannot delete campaigns, funnels, domains, or projects, cannot manage
   members, and cannot disconnect an ad-network account. Those stay in the
   dashboard.
@@ -267,9 +337,9 @@ revoke an unused token before creating a new one.
 - Per-project token cap of 10 limits the blast radius if one leaks.
 
 <Note>
-A token that can read your data can also change it. If you only want someone to
-read, give them a token created by a project member whose role cannot edit, or
-revoke the token when the work is done.
+If you only want someone to read, turn off **Make changes in Linkrunner** when
+you generate their token. A read-only token does not even list the editing
+tools, so Claude cannot attempt a change with it.
 </Note>
 
 ## Troubleshooting
@@ -304,6 +374,28 @@ Linkrunner only stores an endpoint that answers `200` or `201` to the sample
 payload, and it must answer directly rather than redirecting. An endpoint that
 returns `202` or `204` cannot be saved.
 
+**Claude says the token does not have the ad-accounts capability.**
+The token was generated without **Read connected ad accounts**. Generate a new
+token with it turned on and re-add the connector. Capabilities cannot be added
+to an existing token.
+
+**Claude says the Meta or Google connection has expired.**
+The stored ad-network credential is no longer valid. Open Settings, reconnect
+the account, and ask again. Meta connections expire on their own roughly every
+60 days.
+
+**Claude says it has to wait before reading the ad account again.**
+A rate limit or daily allowance was reached, either on the ad network or on the
+token. Claude is given a wait time and uses a cached answer when one exists.
+Ask again after the wait, or narrow the question so fewer live reads are
+needed.
+
+**Ad-network spend does not match the spend Linkrunner shows.**
+The two are expected to differ. Ad-account tools return what Meta or Google
+report for the ad account, in the account's currency and timezone. Linkrunner's
+campaign spend is synced periodically and shown in your display currency. Ask
+Claude for both and it will label which is which.
+
 **Claude cannot rename a custom channel.**
 Renaming needs the channel's internal id, which Claude only sees right after it
 creates or edits a campaign. In a later chat it has no way to look the id up.
@@ -322,6 +414,8 @@ behind, which changes the channel's reporting name and splits its history.
   programmatic writes.
 - Not a way to delete things. Campaigns, funnels, domains, and projects can only
   be deleted from the dashboard.
+- Not a way to edit ads. The ad-account tools read from Meta and Google; they
+  cannot pause a campaign, change a budget, or edit targeting there.
 - Not a generic SQL/Postgres bridge. It calls the same endpoints the
   dashboard uses, with the same access controls.
 - Not a substitute for webhooks. Use [webhooks](/features/webhooks) for
