@@ -146,7 +146,7 @@ for "measured zero". Ask for a metric by name and Claude will fetch it.
 
 ## What Claude can read from your ad accounts
 
-Tokens created with **Read connected ad accounts** get four more tools. They
+Tokens created with **Read connected ad accounts** get five more tools. They
 read from the Meta Marketing API and the Google Ads API using the ad accounts
 already connected to the project under Settings, and nothing else. They cannot
 change anything on Meta or Google.
@@ -156,7 +156,15 @@ change anything on Meta or Google.
 | `get_ad_insights` | Spend, impressions, clicks, CTR, CPC, CPM, reach, frequency, conversions and ROAS as the ad network reports them, at account, campaign, ad set or ad group, or ad level. Optional breakdown by date, device, platform, country, age or gender. |
 | `list_ad_entities` | Campaigns, ad sets or ad groups, ads, creatives, audiences, conversion actions and keywords, with status, budget and objective. |
 | `get_ad_entity` | Every readable field of one object, such as an ad set's targeting or a campaign's bidding strategy. |
-| `ad_network_reference` | The list of metrics, breakdowns and entity types each network supports. Claude reads it before its first ad-account question. |
+| `query_ad_network` | Anything the three tools above cannot express, using the network's own field names: video metrics, impression share, quality rankings, placements, hourly and search-term reports, country, age and gender on Google, attribution-window comparisons on Meta, filters on any field, sorting, and object types such as pixels, labels, saved audiences and asset groups. |
+| `ad_network_reference` | Searches the field catalogs of both networks. Claude uses it to find exact names before a `query_ad_network` call, and to explain what a metric means. |
+
+The catalogs behind these tools come from the networks themselves: Google's
+own field schema and Meta's official Marketing API field lists. Every name
+Claude passes is checked against them before a request is made, so Claude
+cannot ask for a field that does not exist, and a name that is wrong comes
+back with suggestions instead of a failed call. Almost everything the two
+reporting APIs expose for reading is reachable this way.
 
 A few things to know when you read these numbers:
 
@@ -183,6 +191,11 @@ A few things to know when you read these numbers:
 
 Only Meta and Google are covered. Accounts on other networks still appear in
 `list_ad_accounts` for campaign setup but cannot be queried.
+
+A few Google reports need a specific resource rather than a breakdown. Country
+uses `geographic_view`, age and gender use `age_range_view` and `gender_view`,
+and search queries use `search_term_view`. Claude picks these through
+`query_ad_network` when you ask.
 
 ## What Claude can change
 
