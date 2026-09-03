@@ -151,6 +151,14 @@ Set this up if you run Google App Campaigns for your iOS app. Requires `rn-linkr
     Google treats these as required whenever their value is known. `hasConsentForDataUsage` decides whether Google may use the conversion at all, `hasConsentForAdsPersonalization` decides whether it may feed audiences and remarketing, and `isEEA` tells Google which rules apply. Set them from your app's real consent state rather than hardcoding them. **For users outside the EEA, the UK, and Switzerland, report `isEEA` as denied and leave the other two unset.** See [Send Consent](/features/send-consent).
 
     `setConsent` works on both iOS and Android. Android has no ODM SDK to add, but its installs reach Google through the App Conversion API, which reads the same signals.
+
+    **Reading consent from a TCF CMP.** If your Consent Management Platform is IAB TCF v2.2/v2.3 compliant, you can skip the mapping above. Call `enableTCFConsentCollection` before `init` and the SDK derives all three signals from the CMP's standard `IABTCF_*` keys, using Google's published purpose mapping — `hasConsentForDataUsage` from purposes 1 and 7, `hasConsentForAdsPersonalization` from purposes 3 and 4, both gated on vendor consent for Google (TCF vendor 755). Anything set explicitly with `setConsent` still wins, per signal.
+
+    ```javascript
+    linkrunner.enableTCFConsentCollection(true);
+    ```
+
+    It is opt-in rather than automatic because interpreting a TC string on your behalf is a legal judgement — only enable it with a TCF-compliant CMP. Custom consent screens and Firebase Consent Mode do not write these keys. The flag is not persisted, so call it on every launch before `init`. Works on both iOS and Android.
   </Step>
 </Steps>
 
@@ -838,6 +846,7 @@ Connect APNs with Linkrunner
 | `linkrunner.setPushToken`       | Push notification setup        | When FCM/APNs token is available               |
 | `linkrunner.handleDeeplink`     | Deep link entry points         | When app is opened via a deep link             |
 | `linkrunner.setConsent`         | App initialization or consent flow | Before `init`, and again when consent changes |
+| `linkrunner.enableTCFConsentCollection` | App initialization or consent flow | Before `init`, on every launch, when using a TCF CMP |
 
 ## Next Steps
 
