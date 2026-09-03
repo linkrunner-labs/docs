@@ -51,7 +51,7 @@
                     },
                     {
                         "group": "Analytics",
-                        "pages": ["features/users-tab", "features/events-tab"]
+                        "pages": ["features/users-tab", "features/events-tab", "features/data-export"]
                     },
                     {
                         "group": "Measurement & Privacy",
