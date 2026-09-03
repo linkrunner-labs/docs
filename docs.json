@@ -21,6 +21,7 @@
                         "group": "SDK Guides",
                         "pages": [
                             "testing/integration-testing",
+                            "testing/event-and-revenue-testing",
                             "testing/meta-android-attribution-testing",
                             "sdk/react-native",
                             "sdk/flutter",
@@ -29,6 +30,7 @@
                             "sdk/ios",
                             "sdk/android",
                             "sdk/expo",
+                            "sdk/web",
                             "sdk/unity",
                             "sdk/shopify"
                         ]
@@ -51,7 +53,7 @@
                     },
                     {
                         "group": "Analytics",
-                        "pages": ["features/users-tab", "features/events-tab"]
+                        "pages": ["features/users-tab", "features/events-tab", "features/data-export"]
                     },
                     {
                         "group": "Measurement & Privacy",
@@ -195,7 +197,8 @@
                     {
                         "group": "Ecommerce Manager",
                         "pages": [
-                            "ecommerce-manager/meta-commerce-manager"
+                            "ecommerce-manager/meta-commerce-manager",
+                            "ecommerce-manager/google-commerce-manager"
                         ]
                     }
                 ]
@@ -333,6 +336,10 @@
         {
             "source": "/ad-networks/google-web-to-app",
             "destination": "/ad-networks/google-ads"
+        },
+        {
+            "source": "/ecommerce-manager/google-merchant-center",
+            "destination": "/ecommerce-manager/google-commerce-manager"
         }
     ]
 }
