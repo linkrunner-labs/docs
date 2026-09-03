@@ -1,15 +1,15 @@
 ---
-title: "Linkrunner MCP for Claude"
+title: "Connect Linkrunner to AI assistants"
 sidebarTitle: "MCP"
-description: "Ask Claude questions about your campaigns, attribution, and revenue from chat."
+description: "Connect Linkrunner to Claude, ChatGPT, Claude Code, or Codex with MCP."
 icon: "sparkles"
 ---
 
 ## Overview
 
-Linkrunner ships a Model Context Protocol (MCP) server that lets Claude answer
-questions about your project's data directly from chat. Generate a token in the
-dashboard, add it as a Custom Connector in Claude.ai, and ask things like:
+Linkrunner ships a remote Model Context Protocol (MCP) server. Connect it to a
+supported AI assistant, then ask questions about your project's data directly
+from chat:
 
 - "How did my campaigns perform last week?"
 - "Compare my Meta vs Google performance for the last 7 days."
@@ -18,18 +18,26 @@ dashboard, add it as a Custom Connector in Claude.ai, and ask things like:
 - "How much of my growth is organic?"
 - "Where do users drop off between install and checkout?"
 
-Claude can also make a defined set of changes for you:
+With the ad-accounts capability, the assistant can also read from the Meta and
+Google accounts you have connected:
+
+- "How much did we spend on Meta last week, by campaign?"
+- "Which Google ad groups are paused right now?"
+- "What targeting does our retargeting ad set use?"
+- "Compare Meta's reported spend with Linkrunner's installs for yesterday."
+
+The assistant can also make a defined set of changes for you:
 
 - "Create a Meta campaign for the Diwali sale pointing at our sneakers page."
 - "Pause every campaign with no installs in the last 30 days."
 - "Save a funnel for install, sign up, then purchase."
 
 <Warning>
-Editing tools act on your live project, not a sandbox. Claude can create and
-edit campaigns, funnels, domains, store listings, webhooks, and postback event
-mappings. A few of these send real traffic to third parties or cannot be undone.
-Read [What Claude can change](#what-claude-can-change) before you share the
-connector with a team.
+Editing tools act on your live project, not a sandbox. The connector can create
+and edit campaigns, funnels, domains, store listings, webhooks, and postback
+event mappings. A few of these send real traffic to third parties or cannot be
+undone. Read [What the connector can change](#what-the-connector-can-change)
+before you share the connector with a team.
 </Warning>
 
 ## Prerequisites
@@ -37,11 +45,11 @@ connector with a team.
 - A project on Linkrunner that you have access to.
 - The **Admin** or **Member** role on that project. **Influencers** cannot mint
   MCP tokens.
+- A supported client: Claude Code, Claude on Desktop or web, Codex CLI, or
+  ChatGPT web.
 - Editing tools run as the person who created the token, using that person's
   project permissions. A role that cannot edit in the dashboard cannot edit
-  through Claude either.
-- A Claude.ai account on a plan that supports Custom Connectors (Pro, Team, or
-  Enterprise).
+  through the connector either.
 
 ## Setup
 
@@ -50,10 +58,23 @@ connector with a team.
 1. Open the [Linkrunner dashboard](https://dashboard.linkrunner.io) and switch
    to the project you want to connect.
 2. Click **MCP** in the sidebar.
-3. Click **Generate Token**.
-4. The dashboard shows a one-time **Server URL** with the token already
+3. Choose what the token may do:
+   - **Read Linkrunner data** is always on.
+   - **Make changes in Linkrunner** lets the assistant use the editing tools
+     listed under
+     [What the connector can change](#what-the-connector-can-change). Turn it
+     off for a read-only token.
+   - **Read connected ad accounts** lets the assistant read your connected
+     Meta and Google accounts. See
+     [What the connector can read from your ad accounts](#what-the-connector-can-read-from-your-ad-accounts).
+4. Click **Generate Token**.
+5. The dashboard shows a one-time **Server URL** with the token already
    embedded as a query parameter. Copy it now. The full URL will not be shown
    again.
+
+Capabilities are fixed once a token exists. To change them, generate a new
+token and revoke the old one. Tokens created before capabilities existed keep
+read and change access, and no ad-account access.
 
 <Warning>
 The URL contains the token as a query parameter. Treat it like a password:
@@ -61,35 +82,102 @@ don't paste it into shared documents, screenshots, or chat threads. Revoke it
 from the dashboard if it leaks, and generate a new one.
 </Warning>
 
-### 2. Add the connector in Claude
+### 2. Connect your client
 
-Under **Register the Linkrunner MCP server**, the dashboard shows a ready-made
-command with your server URL already filled in. Copy it and run it in a
-terminal:
+Choose your client in the dashboard to see its setup instructions. The
+token is part of the Server URL, so no separate authentication step is needed.
 
-```bash
-claude mcp add linkrunner --scope user --transport http "<YOUR_SERVER_URL>"
-```
+![Choose a client for the Linkrunner MCP connection](/images/mcp/connect-linkrunner.png)
 
-The token is part of the URL, so no separate authentication step is needed.
+<Tabs>
+  <Tab title="Claude Code">
+    Copy the command under **Register the Linkrunner MCP server** and run it in
+    a terminal:
+
+    ```bash
+    claude mcp add linkrunner --scope user --transport http "<YOUR_SERVER_URL>"
+    ```
+
+    Start a new Claude Code session and run `/mcp` to verify the connection.
+  </Tab>
+
+  <Tab title="Claude Desktop and web">
+    These steps work in Claude Desktop and at [claude.ai](https://claude.ai).
+
+    On Free, Pro, or Max:
+
+    1. Open **Customize → Connectors**.
+    2. Select **+ → Add custom connector** and name it `Linkrunner`.
+    3. Paste the Server URL from the dashboard.
+
+    On Team or Enterprise, an Owner or Primary Owner first adds the Server URL
+    under **Organization settings → Connectors**. Members then open
+    **Customize → Connectors** and connect Linkrunner.
+
+    In a chat, select **+ → Connectors** and enable Linkrunner for that
+    conversation.
+
+    See [Anthropic's custom connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp)
+    for current plan and organization details.
+  </Tab>
+
+  <Tab title="Codex CLI">
+    Copy the command under **Register the Linkrunner MCP server** and run it in
+    a terminal:
+
+    ```bash
+    codex mcp add linkrunner --url "<YOUR_SERVER_URL>"
+    ```
+
+    Start a new Codex session and run `/mcp` to verify the connection.
+  </Tab>
+
+  <Tab title="ChatGPT web">
+    <Warning>
+      Custom MCP apps currently work in ChatGPT on the web. ChatGPT Desktop is
+      not supported. Pro apps can use read and fetch tools only. Turn off
+      **Make changes in Linkrunner** before generating a token on Pro. Full MCP
+      support, including write tools, is rolling out in beta to Business and
+      Enterprise/Edu workspaces.
+    </Warning>
+
+    1. Enable Developer mode:
+       - On Pro, open **Settings → Apps → Advanced settings**.
+       - On Business, an admin or owner enables Developer mode from
+         **Workspace settings → Apps → Create**.
+       - On Enterprise/Edu, an admin grants access under **Permissions & Roles
+         → Connected Data**. Enabled users then turn on Developer mode under
+         **Settings → Apps → Advanced settings**.
+    2. Open **Settings → Apps → Create**. On Business, an admin or owner uses
+       **Workspace settings → Apps → Create** instead.
+    3. Name the app `Linkrunner` and paste the Server URL as the MCP endpoint.
+    4. Choose no authentication, then select **Scan tools** and **Create**.
+    5. Test the draft in a new chat. To make it available to workspace members,
+       an admin or owner opens **Workspace settings → Apps → Drafts** and
+       selects **Publish**.
+    6. Start a chat, select **Apps**, and choose Linkrunner.
+
+    See [OpenAI's MCP apps guide](https://help.openai.com/en/articles/12584461)
+    for current plan and role requirements.
+  </Tab>
+</Tabs>
 
 <Note>
-You only need one connector per project. If you manage several Linkrunner
-projects, generate a token for each project and add a separate Claude
-connector for each one with a clear name. Tokens are scoped to a single
-project.
+You only need one connection per client and project. If you manage several
+Linkrunner projects, generate a token for each project and add a separate
+connection with a clear name. Tokens are scoped to a single project.
 </Note>
 
 ### 3. Try it
 
-Open a new chat in Claude, make sure your Linkrunner connector is enabled in
-the chat's tools, and ask one of the starter prompts above. Claude will fetch
-data through the connector and answer in plain language.
+Open a new chat or CLI session, make sure Linkrunner is enabled, and ask one of
+the starter prompts above. The assistant fetches data through the connector
+and answers in plain language.
 
-## What Claude can answer
+## What you can ask
 
-The connector exposes the following tools. Claude picks them automatically
-based on your question.
+The connector exposes the following tools. Your assistant picks them
+automatically based on your question.
 
 | Tool | Use it for |
 |------|------------|
@@ -113,27 +201,107 @@ based on your question.
 | `list_postback_event_maps` | Event mappings sent to each ad network, and which are network defaults. |
 | `get_webhook` | Whether a webhook is configured, its host, and its organic setting. |
 
-Claude reads these tools' descriptions and decides which to call. You don't
-need to invoke them manually.
+Your assistant reads these tools' descriptions and decides which to call. You
+don't need to invoke them manually.
 
 <Note>
 `list_campaigns`, `get_channel_performance`, and `get_organic_performance`
-return only the metric groups Claude asks for (installs, spend, retention,
-custom events, and so on). A group that wasn't requested is absent from the
-response rather than reported as zero, so Claude never mistakes "not fetched"
-for "measured zero". Ask for a metric by name and Claude will fetch it.
+return only the metric groups your assistant asks for (installs, spend,
+retention, custom events, and so on). A group that wasn't requested is absent
+from the response rather than reported as zero, so the assistant never
+mistakes "not fetched" for "measured zero". Ask for a metric by name and it
+will fetch it.
 </Note>
 
-## What Claude can change
+## What the connector can read from your ad accounts
 
-Ask in plain language ("create a campaign for the Diwali sale") and Claude picks
-the right tool. Describe what you want changed, and confirm the summary it gives
-you before it writes.
+Tokens created with **Read connected ad accounts** get six more tools. They
+read from the Meta Marketing API and the Google Ads API using the ad accounts
+already connected to the project under Settings, and nothing else. They cannot
+change anything on Meta or Google.
+
+| Tool | Use it for |
+|------|------------|
+| `enrich_campaigns_from_ad_network` | Adds the network's delivery figures (spend, impressions, clicks, reach, frequency, CPM) and its own reported outcomes beside your Linkrunner campaigns, with a note explaining any gap between the two. |
+| `get_ad_insights` | Spend, impressions, clicks, CTR, CPC, CPM, reach and frequency as the ad network reports them, at account, campaign, ad set or ad group, or ad level, with the network's own conversions under `network_reported`. Optional breakdown by date, device, platform, country, age or gender. |
+| `list_ad_entities` | Campaigns, ad sets or ad groups, ads, creatives, audiences, conversion actions and keywords, with status, budget and objective. |
+| `get_ad_entity` | Every readable field of one object, such as an ad set's targeting or a campaign's bidding strategy. |
+| `query_ad_network` | Anything the three tools above cannot express, using the network's own field names: video metrics, impression share, quality rankings, placements, hourly and search-term reports, country, age and gender on Google, attribution-window comparisons on Meta, filters on any field, sorting, and object types such as pixels, labels, saved audiences and asset groups. |
+| `ad_network_reference` | Searches the field catalogs of both networks. Your assistant uses it to find exact names before a `query_ad_network` call, and to explain what a metric means. |
+
+The catalogs behind these tools come from the networks themselves: Google's
+own field schema and Meta's official Marketing API field lists. Every name the
+assistant passes is checked against them before a request is made, so it cannot
+ask for a field that does not exist. A wrong name comes back with suggestions
+instead of a failed call. Almost everything the two reporting APIs expose for
+reading is reachable this way.
+
+### Which source answers which question
+
+Linkrunner stays the source of truth, and connecting an ad account does not
+change any answer you already get. It adds to them.
+
+| Question | Source | Why |
+|----------|--------|-----|
+| Installs, reinstalls, sign-ups, events, purchases, revenue | Linkrunner | Attributed per device and per user, deduplicated across networks, and the same numbers as the dashboard. |
+| Retention, active users, funnels, attribution detail | Linkrunner only | Only Linkrunner has the user-level history. |
+| Cost per install, cost per sign-up, ROAS | Linkrunner | Synced ad spend divided by Linkrunner outcomes, the same as the dashboard. |
+| Spend, impressions, clicks, reach, frequency, CTR, CPC, CPM | Ad network | The network bills it, and its live figure is the latest. |
+| Status, budgets, bids, targeting, placements, creatives, audiences, keywords | Ad network only | Only the network knows. |
+
+The network's own conversion counts are still available, but always under a
+`network_reported` label. Your assistant quotes them as the network's claim
+("Meta reports 12 purchases") rather than as the count. When the two sides
+disagree, it explains why (attribution window, view-through, SKAN delay,
+cross-network deduplication, or a campaign that is not linked) instead of
+picking one.
+
+A few things to know when you read network numbers:
+
+- **They are the ad network's numbers.** Meta and Google count conversions
+  with their own attribution windows and view-through rules. Linkrunner's
+  installs and sign-ups are measured differently. Your assistant reports the
+  two side by side and will not merge them.
+- **Currency and timezone come from the ad account**, which may differ from
+  your project's display currency.
+- **The last three days are provisional.** Networks keep adjusting spend and
+  conversions for a few days, so recent numbers can move.
+- **Meta has no single "conversions" number.** Your assistant reads the actions
+  Meta reports (app installs, purchases, leads and so on) and names the one it
+  is quoting.
+- **Google's "Conversions" column is not installs.** It adds up every
+  conversion action the account bids on (installs, trials, purchases). When
+  comparing installs, the assistant uses only Google's install conversion
+  actions (the DOWNLOAD category, such as Android first open) and names the
+  action it used.
+- **Answers may come from a short cache.** Closed date ranges are cached for a
+  day, open ranges for ten minutes, and object lists for five minutes. The
+  assistant mentions the age when it matters.
+- **Reads are budgeted.** Each token gets a daily allowance of live reads, and
+  Linkrunner reserves part of its Google Ads quota for attribution. When a
+  limit is hit, the assistant gets a wait time and a cached copy if one exists,
+  instead of an error loop.
+- **Meta connections expire** roughly every 60 days. If your assistant reports that
+  the connection has expired, reconnect Meta under Settings.
+
+Only Meta and Google are covered. Accounts on other networks still appear in
+`list_ad_accounts` for campaign setup but cannot be queried.
+
+A few Google reports need a specific resource rather than a breakdown. Country
+uses `geographic_view`, age and gender use `age_range_view` and `gender_view`,
+and search queries use `search_term_view`. The assistant picks these through
+`query_ad_network` when you ask.
+
+## What the connector can change
+
+Ask in plain language ("create a campaign for the Diwali sale") and your
+assistant picks the right tool. Describe what you want changed, and confirm the
+summary it gives you before it writes.
 
 <Warning>
-Every tool below writes to your live project. Claude asks before making an
-ambiguous change, but it is worth being specific about what you want, especially
-for the tools marked as sending live traffic or being irreversible.
+Every tool below writes to your live project. Your assistant asks before making
+an ambiguous change, but it is worth being specific about what you want,
+especially for the tools marked as sending live traffic or being irreversible.
 </Warning>
 
 ### Campaigns
@@ -146,7 +314,8 @@ for the tools marked as sending live traffic or being irreversible.
 
 A deep link has to be a full URL on one of your own tracking domains, for
 example `https://links.yourbrand.com/product/sneakers`. An external URL is
-rejected. Ask Claude to list your domains if you are not sure which to use.
+rejected. Ask your assistant to list your domains if you are not sure which to
+use.
 
 <Note>
 Campaigns cannot be deleted through the connector. Pause them with
@@ -193,12 +362,12 @@ first.
 Both tools deliver a real payload to your endpoint. Saving a webhook sends one
 by itself, because Linkrunner only stores an endpoint that answers `200` or
 `201`, so configuring a Slack webhook posts a real message to that channel. Ask
-Claude to test afterwards only if you want a second message.
+your assistant to test afterwards only if you want a second message.
 
 Replacing the URL cannot be undone. A project has one webhook, the new URL
-overwrites the old one, and Claude cannot read the old value back to restore it
-(`get_webhook` hides the path, because a Slack webhook path is itself a
-credential). Keep a copy of the current URL before you replace it.
+overwrites the old one, and the assistant cannot read the old value back to
+restore it (`get_webhook` hides the path, because a Slack webhook path is
+itself a credential). Keep a copy of the current URL before you replace it.
 </Warning>
 
 ### Postback event mappings
@@ -222,12 +391,13 @@ your own mapping for the same event.
 
 ## Built-in prompts
 
-The connector also surfaces three starter prompts in Claude's prompt picker:
+The connector includes three starter prompts. Clients that support MCP prompts
+show them in their prompt picker:
 
-- **Daily briefing** — yesterday's performance summary in 1-2 paragraphs.
-- **Weekly review** — this week vs last week, with anomalies and a
+- **Daily briefing:** yesterday's performance summary in 1-2 paragraphs.
+- **Weekly review:** this week vs last week, with anomalies and a
   keep/cut/scale recommendation list.
-- **Cut list** — the worst-performing active campaigns, with reasoning.
+- **Cut list:** the worst-performing active campaigns, with reasoning.
 
 These are shortcuts. You can always ask the same questions in your own words.
 
@@ -241,9 +411,12 @@ project. For each token you can see:
 - The user who created it.
 - The last time it was used (helps spot stale tokens).
 
-Click the trash icon next to a token to revoke it. Anyone using that token in
-Claude will be disconnected immediately. Revocation is not reversible. Mint a
-new token if you need to reconnect.
+Each token also shows its capabilities: **Read**, **Changes**, and **Ad
+accounts**.
+
+Click the trash icon next to a token to revoke it. Anyone using that token will
+be disconnected immediately. Revocation is not reversible. Mint a new token if
+you need to reconnect.
 
 A project can have up to 10 active tokens at any time. If you hit the cap,
 revoke an unused token before creating a new one.
@@ -256,8 +429,15 @@ revoke an unused token before creating a new one.
   project role, so the connector cannot do anything that person could not do in
   the dashboard.
 - Every change made through the connector is recorded with the action, the
-  token, the person who created it, and what was changed.
-- Claude cannot delete campaigns, funnels, domains, or projects, cannot manage
+  token, the person who created it, and what was changed. Every ad-account
+  read is recorded the same way, with the account, the query type and the
+  date range, but never the returned data.
+- Ad-account access is read-only and opt-in per token. The Meta and Google
+  credentials stay on Linkrunner's servers; the connector never receives them,
+  and they are removed from every response and log.
+- An ad-account token can only reach accounts connected to its own project.
+  Passing another project's account is refused.
+- The connector cannot delete campaigns, funnels, domains, or projects, cannot manage
   members, and cannot disconnect an ad-network account. Those stay in the
   dashboard.
 - The webhook URL is never fully readable. `get_webhook` returns the host but
@@ -267,61 +447,85 @@ revoke an unused token before creating a new one.
 - Per-project token cap of 10 limits the blast radius if one leaks.
 
 <Note>
-A token that can read your data can also change it. If you only want someone to
-read, give them a token created by a project member whose role cannot edit, or
-revoke the token when the work is done.
+If you only want someone to read, turn off **Make changes in Linkrunner** when
+you generate their token. A read-only token does not even list the editing
+tools, so the assistant cannot attempt a change with it.
 </Note>
 
 ## Troubleshooting
 
-**Claude says "Couldn't reach the MCP server."**
+**The client says "Couldn't reach the MCP server."**
 The token may have been revoked, or the URL may be malformed. Generate a new
-token, copy the full URL exactly, and re-add the connector.
+token, copy the full URL exactly, and reconnect Linkrunner.
 
-**Claude says it doesn't have access to the data.**
-Make sure your Linkrunner connector is enabled in the current chat. Open the
-chat's tool/connector menu and toggle it on. New chats don't always inherit
-connector state from previous chats.
+**The client does not show Linkrunner tools.**
+Make sure Linkrunner is enabled in the current chat or session. Open the
+client's app, tool, or connector menu and turn it on. New chats do not always
+inherit connector state from previous chats.
 
 **Numbers don't match the dashboard.**
 The connector reads the same data the dashboard does. If you see a mismatch,
-check that you and Claude are using the same date range and timezone, and
-that any filters (network, platform) match. Linkrunner's ingestion is
+check that you and the assistant are using the same date range and timezone,
+and that any filters (network, platform) match. Linkrunner's ingestion is
 real-time, so there's no lag to account for.
 
 **Generating a token returns "Maximum of 10 active tokens reached."**
 You're at the per-project cap. Revoke an unused token from the same settings
 page before creating a new one.
 
-**Claude says your deep link was rejected.**
+**The assistant says your deep link was rejected.**
 A deep link has to be a full URL on one of your own tracking domains. An
 external address such as `https://example.com/promo` is refused, and so is a
-bare path such as `/promo`. Ask Claude to list your domains and rebuild the URL
-on one of them.
+bare path such as `/promo`. Ask the assistant to list your domains and rebuild
+the URL on one of them.
 
 **Saving a webhook fails with "Endpoint needs to return a status code of 200".**
 Linkrunner only stores an endpoint that answers `200` or `201` to the sample
 payload, and it must answer directly rather than redirecting. An endpoint that
 returns `202` or `204` cannot be saved.
 
-**Claude cannot rename a custom channel.**
-Renaming needs the channel's internal id, which Claude only sees right after it
-creates or edits a campaign. In a later chat it has no way to look the id up.
-Rename the channel in the dashboard instead.
+**The assistant says the token does not have the ad-accounts capability.**
+The token was generated without **Read connected ad accounts**. Generate a new
+token with it turned on and re-add the connector. Capabilities cannot be added
+to an existing token.
+
+**The assistant says the Meta or Google connection has expired.**
+The stored ad-network credential is no longer valid. Open Settings, reconnect
+the account, and ask again. Meta connections expire on their own roughly every
+60 days.
+
+**The assistant says it has to wait before reading the ad account again.**
+A rate limit or daily allowance was reached, either on the ad network or on the
+token. The assistant is given a wait time and uses a cached answer when one
+exists. Ask again after the wait, or narrow the question so fewer live reads
+are needed.
+
+**Ad-network spend does not match the spend Linkrunner shows.**
+The two are expected to differ. Ad-account tools return what Meta or Google
+report for the ad account, in the account's currency and timezone. Linkrunner's
+campaign spend is synced periodically and shown in your display currency. Ask
+your assistant for both and it will label which is which.
+
+**The assistant cannot rename a custom channel.**
+Renaming needs the channel's internal id, which the assistant only sees right
+after it creates or edits a campaign. In a later chat it has no way to look the
+id up. Rename the channel in the dashboard instead.
 
 <Warning>
-Asking Claude to rename a channel by editing the campaign does something
+Asking the assistant to rename a channel by editing the campaign does something
 different. It points the campaign at a new channel and leaves the old one
 behind, which changes the channel's reporting name and splits its history.
 </Warning>
 
 ## What this is not
 
-- Not a full write API. Claude can make the changes listed above, and nothing
-  else. Use the [Linkrunner data API](/api-reference/data-apis) for
+- Not a full write API. The connector can make the changes listed above, and
+  nothing else. Use the [Linkrunner data API](/api-reference/data-apis) for
   programmatic writes.
 - Not a way to delete things. Campaigns, funnels, domains, and projects can only
   be deleted from the dashboard.
+- Not a way to edit ads. The ad-account tools read from Meta and Google; they
+  cannot pause a campaign, change a budget, or edit targeting there.
 - Not a generic SQL/Postgres bridge. It calls the same endpoints the
   dashboard uses, with the same access controls.
 - Not a substitute for webhooks. Use [webhooks](/features/webhooks) for
