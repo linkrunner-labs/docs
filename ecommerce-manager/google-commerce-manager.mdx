@@ -6,7 +6,7 @@ icon: "google"
 
 ## Overview
 
-Google Merchant Center lets you upload your product catalog so it can appear across Google surfaces — Search, Shopping, Display, and more. To run Shopping or Performance Max campaigns, you need to link your Merchant Center account to Google Ads and have your products approved. Once that's done, you can start sending ecommerce event data through Linkrunner for proper attribution.
+Google Merchant Center lets you upload your product catalog so it can appear across Google surfaces such as Search, Shopping, Display, and more. To run Shopping or Performance Max campaigns, you need to link your Merchant Center account to Google Ads and have your products approved. Once that's done, you can start sending ecommerce event data through Linkrunner for proper attribution.
 
 <Note>
 **Before you begin, make sure you have:**
@@ -50,13 +50,13 @@ With your account set up and linked, the next step is adding your products. You 
 
 When adding products, make sure to fill in all required attributes:
 
-- **Title** — clear, descriptive product name
-- **Description** — accurate product details
-- **Link** — the product page URL on your website
-- **Image link** — high-quality product image URL
-- **Price** — must match the price on your website
-- **Availability** — `in stock`, `out of stock`, or `preorder`
-- **Brand**, **GTIN** or **MPN** — for product identification
+- **Title**: clear, descriptive product name
+- **Description**: accurate product details
+- **Link**: the product page URL on your website
+- **Image link**: high-quality product image URL
+- **Price**: must match the price on your website
+- **Availability**: `in stock`, `out of stock`, or `preorder`
+- **Brand**, **GTIN** or **MPN**: for product identification
 
 After uploading, Google will review your products. This typically takes **1–3 business days**. You can monitor the status in **Products** → **All products** in Merchant Center.
 
@@ -95,7 +95,7 @@ When sending events via the [Capture Event API](/api-reference/event-capture), [
 
 | Parameter     | Type   | Required for                              | Description                                                                 |
 | ------------- | ------ | ----------------------------------------- | --------------------------------------------------------------------------- |
-| `content_ids` | array  | `view_item`, `add_to_cart`, `ecommerce_purchase` | Product IDs — must exactly match the **ID (`offer_id`)** in Google Merchant Center |
+| `content_ids` | array  | `view_item`, `add_to_cart`, `ecommerce_purchase` | Product IDs. Must exactly match the **ID (`offer_id`)** in Google Merchant Center |
 | `value`       | number | `add_to_cart`, `ecommerce_purchase`       | Total revenue value. No currency symbols.                                   |
 | `currency`    | string | `add_to_cart`, `ecommerce_purchase`       | 3-letter ISO currency code (e.g., `"INR"`, `"USD"`)                         |
 | `num_items`   | number | `add_to_cart`, `ecommerce_purchase`       | Total quantity of items                                                      |
@@ -142,7 +142,7 @@ await linkrunner.trackEvent(
   "add_to_cart", // Map this custom event to "add_to_cart" in the Linkrunner Dashboard
   {
     content_ids: ["sku_blue_tshirt"], // Must match Merchant Center ID (offer_id)
-    value: 1598,                      // Required — total value (Google uses this as revenue)
+    value: 1598,                      // Required: total value (Google uses this as revenue)
     currency: "INR",                  // Required
     num_items: 2,                     // Required
   },
@@ -158,7 +158,7 @@ await linkrunner.trackEvent(
   "install_instance_id": "abc-123",
   "event_data": {
     "content_ids": ["sku_blue_tshirt"],  // Must match Merchant Center ID (offer_id)
-    "value": 1598,                       // Required — total value (Google uses this as revenue)
+    "value": 1598,                       // Required: total value (Google uses this as revenue)
     "currency": "INR",                   // Required
     "num_items": 2                       // Required
   }
@@ -212,14 +212,14 @@ await linkrunner.capturePayment({
 
 </CodeGroup>
 
-_The SDK examples above use React Native syntax. The same `eventData` fields apply across all SDKs — for platform-specific examples, refer to the Ecommerce Events section in each SDK guide: [React Native](/sdk/react-native#ecommerce-events), [Flutter](/sdk/flutter#ecommerce-events), [iOS](/sdk/ios#ecommerce-events), [Android](/sdk/android#ecommerce-events)._
+_The SDK examples above use React Native syntax. The same `eventData` fields apply across all SDKs. For platform-specific examples, refer to the Ecommerce Events section in each SDK guide: [React Native](/sdk/react-native#ecommerce-events), [Flutter](/sdk/flutter#ecommerce-events), [iOS](/sdk/ios#ecommerce-events), [Android](/sdk/android#ecommerce-events)._
 
 <Warning>
 The `content_ids` you send must exactly match the **ID (`offer_id`)** of the product in Google Merchant Center (the same ID from Step 3). If they don't match, Google won't be able to link the conversion back to the correct product in your catalog.
 </Warning>
 
 <Tip>
-The `amount` field in `capturePayment` and the `value` field in `event_data` should be consistent — both represent the total order value. Google reads `value` from `event_data` for conversion reporting.
+The `amount` field in `capturePayment` and the `value` field in `event_data` should be consistent. Both represent the total order value. Google reads `value` from `event_data` for conversion reporting.
 </Tip>
 
 ## Verifying Events in Google Ads

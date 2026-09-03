@@ -644,7 +644,7 @@ Use the `trackEvent` method to send an `AddToCart` event:
 private fun trackAddToCart() {
     CoroutineScope(Dispatchers.IO).launch {
         LinkRunner.getInstance().trackEvent(
-            eventName = "add_to_cart", // Your custom event name — map to "AddToCart" (Meta) or "add_to_cart" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
+            eventName = "add_to_cart", // Map this custom event to "AddToCart" (Meta) or "add_to_cart" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
             eventData = mapOf(
                 "content_ids" to listOf("product_123"),
                 "contents" to listOf(
@@ -672,7 +672,7 @@ Use the `trackEvent` method to send a `ViewContent` event:
 private fun trackViewContent() {
     CoroutineScope(Dispatchers.IO).launch {
         LinkRunner.getInstance().trackEvent(
-            eventName = "view_item", // Your custom event name — map to "ViewContent" (Meta) or "view_item" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
+            eventName = "view_item", // Map this custom event to "ViewContent" (Meta) or "view_item" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
             eventData = mapOf(
                 "content_ids" to listOf("product_123"),
                 "contents" to listOf(
@@ -704,7 +704,7 @@ private fun capturePurchase() {
                 paymentId = "payment_456",
                 userId = "user123",
                 amount = 49.99,
-                type = PaymentType.FIRST_PAYMENT, // Your payment type — map to "Purchase" (Meta) or "ecommerce_purchase" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
+                type = PaymentType.FIRST_PAYMENT, // Map this payment type to "Purchase" (Meta) or "ecommerce_purchase" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
                 status = PaymentStatus.PAYMENT_COMPLETED,
                 eventData = mapOf(
                     "content_ids" to listOf("product_123"),
