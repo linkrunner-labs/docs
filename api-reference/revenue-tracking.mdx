@@ -5,7 +5,7 @@ icon: "money-bill"
 ---
 
 <Note>
-    Revenue data is only stored and displayed for attributed users. The user must have been registered via the `.signup` function in one of the [SDKs](/sdk/flutter#user-registration) for their payment data to appear on Linkrunner. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
+    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Each request must identify the user with `user_id` or `install_instance_id`. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 </Note>
 
 Use [Test Custom Events and Payments](/testing/event-and-revenue-testing) to verify event classification, payment fields, and deduplication.

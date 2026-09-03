@@ -165,7 +165,7 @@ For complete SKAdNetwork integration details, see the [SKAdNetwork Integration G
 
 Integrated Conversion Measurement (ICM) recovers Google App Campaign installs on iOS that Google cannot attribute because there is no click identifier and no IDFA to match on. Google's On-Device Measurement (ODM) SDK turns the click context into an encrypted signal that never leaves the device, and Linkrunner sends it with the install. See [Google ICM](/features/google-icm) for how it works.
 
-Set this up if you run Google App Campaigns for your iOS app. Requires `linkrunner` 4.1.0 or later.
+Set this up if you run Google App Campaigns for your iOS app. Requires `linkrunner` 4.1.1 or later.
 
 <Note>
     Google keeps ODM inactive for users in the European Economic Area, the United Kingdom, and Switzerland, so ICM recovers nothing for that traffic. Elsewhere, Google reports improved coverage for iOS 14+ users.
@@ -355,6 +355,10 @@ If the platform's identifier function is not called, you must provide a user ide
 -   mixpanelDistinctId for Mixpanel
 -   amplitudeDeviceId for Amplitude
 -   posthogDistinctId for PostHog
+
+<Note>
+    The model classes (`LRUserData`, `LRCapturePayment`, `LRRemovePayment`, `LRConsent`) are not re-exported by `linkrunner.dart`. Import each one directly, for example `import 'package:linkrunner/models/lr_user_data.dart';`.
+</Note>
 
 ```dart
 Future<void> onSignup() async {
@@ -560,7 +564,7 @@ This method allows you to connect user identities across different analytics and
 ## Revenue Tracking
 
 <Note>
-    Revenue data is only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before capturing payments. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
+    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 </Note>
 
 ### Capturing Payments
@@ -576,7 +580,6 @@ Future<void> capturePayment() async {
         userId: 'user123', // Required: User identifier
         paymentId: 'payment456', // Required: Unique payment identifier
         type: PaymentType.FIRST_PAYMENT, // Optional: Payment type
-        // type: PaymentType.SECOND_PAYMENT, // Optional: Payment type
         status: PaymentStatus.PAYMENT_COMPLETED, // Optional: Payment status
         eventData: { // Optional: Ecommerce/custom event data
           'content_ids': ['product_123'],
@@ -609,7 +612,6 @@ Future<void> capturePayment() async {
 - `paymentId`: String (required) - Unique identifier for the payment, used to deduplicate transactions
 - `type`: PaymentType (optional) - Type of payment. Available options:
   - `PaymentType.FIRST_PAYMENT` - First payment made by the user
-  - `PaymentType.SECOND_PAYMENT` - Second payment made by the user
   - `PaymentType.WALLET_TOPUP` - Adding funds to a wallet
   - `PaymentType.FUNDS_WITHDRAWAL` - Withdrawing funds
   - `PaymentType.SUBSCRIPTION_CREATED` - New subscription created
@@ -653,7 +655,7 @@ Note: Either `paymentId` or `userId` must be provided when calling `removePaymen
 
 ## Ecommerce Events
 
-> **Minimum SDK Version:** Ecommerce Event Manager requires `linkrunner-flutter` **v3.7.0** or above. Please ensure your SDK is updated before using this feature.
+> **Minimum SDK Version:** Ecommerce Event Manager requires `linkrunner` **v3.7.0** or above. Please ensure your SDK is updated before using this feature.
 
 If you are tracking Ecommerce events to sync with Meta Catalog Sales, you must format your `eventData` to include Meta's required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
 
@@ -768,7 +770,7 @@ Future<void> capturePurchase() async {
 </Note>
 
 <Note>
-    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
 </Note>
 
 Track custom events in your app:

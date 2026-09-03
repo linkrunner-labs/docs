@@ -17,7 +17,7 @@ icon: "shuffle"
 This documentation is for tracking custom events from your backend only! For tracking events from your app please go through the [Flutter](https://docs.linkrunner.io/sdk/flutter/usage#tracking-custom-events) or [React Native](https://docs.linkrunner.io/sdk/react-native/usage#tracking-custom-events) documentation.
 
 <Note>
-    Events are only stored and displayed for attributed users. The user must have been registered via the `.signup` function in one of the [SDKs](/sdk/flutter#user-registration) for their events to appear on Linkrunner. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [capture-payment](/api-reference/revenue-tracking) API instead of capture-event.
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Each request must identify the user with `user_id` or `install_instance_id`. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. For capturing revenue, it is recommended to use the [capture-payment](/api-reference/revenue-tracking) API instead of capture-event.
 </Note>
 
 Use [Test Custom Events and Payments](/testing/event-and-revenue-testing) to decide whether an action belongs in this API or the Revenue Tracking API.
@@ -65,13 +65,14 @@ POST: /capture-event
 | ---------- | ------ | ------------------------------------------------------------------------------------- |
 | event_name | string | **Required**. Name of the event to track                                              |
 | event_data | object | **Optional**. Additional data associated with the event                               |
-| user_id    | string | **Required**. User identifier to associate with the event                             |
+| user_id    | string | **Required** unless `install_instance_id` is sent. User identifier to associate with the event |
+| install_instance_id | string | **Required** unless `user_id` is sent. Linkrunner's ID for the install |
 | event_id   | string | **Optional**. Your own unique identifier for the event, useful for deduplication and correlating with your backend |
 
 ### Responses
 
-1. **201** Event captured successfully
-2. **400** Missing required parameters
+1. **200** Event captured successfully
+2. **400** Missing required parameters, or neither `user_id` nor `install_instance_id` was sent
 3. **401** Invalid server key
 
 #### Sample Response

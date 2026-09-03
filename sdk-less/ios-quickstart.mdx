@@ -333,7 +333,7 @@ struct MyApp: App {
 
 ## 4. Identify the user
 
-Call `signup` when the user signs up or logs in. Events and payments are only stored for attributed users.
+Call `signup` when the user signs up or logs in so events and payments are linked to a user.
 
 ```swift
 Task {
@@ -409,7 +409,7 @@ A retry can send the same request twice if the first attempt reached the server 
     The IDFA is only available after the user authorizes tracking. Add `NSUserTrackingUsageDescription` and call `requestTrackingAuthorization()` while the app is active.
   </Accordion>
   <Accordion title="Events or payments do not appear">
-    Events and payments are only stored for attributed users. Call `signup` first, and use the same `install_instance_id` everywhere.
+    Check that you called `signup` and used the same `install_instance_id` everywhere. Events and payments are stored for all users, including organic ones, so a missing campaign does not mean the event was dropped.
   </Accordion>
   <Accordion title="Every install looks like the same device or location">
     You are likely calling from your backend. The server matches on the calling IP, so calls must come from the user's device.

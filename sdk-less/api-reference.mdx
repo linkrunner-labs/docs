@@ -171,7 +171,7 @@ Updates user details after signup, for example when the user adds a phone number
 POST /api/client/capture-event
 ```
 
-Tracks a custom event. Events are only stored for attributed users, so call `signup` first.
+Tracks a custom event. Events are stored for all users, including organic ones. Identify the user with `user_id` or `install_instance_id`.
 
 | Field | Type | Description |
 | --- | --- | --- |
