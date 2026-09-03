@@ -4,6 +4,16 @@ description: "Complete guide for integrating Linkrunner in Flutter apps"
 icon: "flutter"
 ---
 
+<Note>
+  **Prefer to let your AI coding agent do this?** Install the Linkrunner skill and Claude Code, Cursor, GitHub Copilot, or Windsurf will wire up the SDK and deep links for you:
+
+  ```bash
+  npx @linkrunner/skills add flutter
+  ```
+
+  Then ask your agent to "integrate Linkrunner". See [Linkrunner Agent Skills](https://github.com/linkrunner-labs/skills).
+</Note>
+
 <div
     className="video-container"
     style={{
@@ -105,6 +115,16 @@ For Android apps, the SDK provides backup rules to exclude Shared Preferences da
 
 For detailed backup configuration instructions, please refer to the [Android SDK Backup Configuration](/sdk/android/installation#backup-configuration).
 
+#### Encrypted SharedPreferences
+
+<Note>
+  **SDK Version Requirement:** Starting from `linkrunner` **v3.9.1**, the SDK automatically encrypts the credentials it stores in Android SharedPreferences (such as the install ID and other persisted SDK state). No additional configuration is required — upgrade to v3.9.1 or above to get this behavior by default.
+</Note>
+
+On Android, values written by the SDK are encrypted at rest, with a hardware-protected key generated on the device and stored in the [Android Keystore](https://developer.android.com/training/articles/keystore). The key never leaves the device and is not bundled with the SDK.
+
+If you are upgrading from an earlier version, the SDK will transparently migrate any existing plaintext entries to the encrypted store on the next read after the upgrade — no code changes are needed on your side.
+
 #### iOS Configuration
 
 1. Update your iOS deployment target to iOS 15.0 or higher in your `ios/Podfile`:
@@ -120,18 +140,116 @@ platform :ios, '15.0'
 <string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
 ```
 
-## Initialization
+3. To enable SKAdNetwork postback copies to be sent to Linkrunner, add the following keys to your `Info.plist` file:
 
+```xml
+<key>NSAdvertisingAttributionReportEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+<key>AttributionCopyEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+```
+
+For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
+
+### Google Integrated Conversion Measurement (Optional)
+
+<Note>
+  **Prefer to let your AI coding agent do this?** The Flutter skill already covers ICM — adding the pod and wiring `setConsent`:
+
+  ```bash
+  npx @linkrunner/skills add flutter
+  ```
+
+  See [Linkrunner Agent Skills](/ai-agent-skills).
+</Note>
+
+Integrated Conversion Measurement (ICM) recovers Google App Campaign installs on iOS that Google cannot attribute because there is no click identifier and no IDFA to match on. Google's On-Device Measurement (ODM) SDK turns the click context into an encrypted signal that never leaves the device, and Linkrunner sends it with the install. See [Google ICM](/features/google-icm) for how it works.
+
+Set this up if you run Google App Campaigns for your iOS app. Requires `linkrunner` 4.1.1 or later.
+
+<Note>
+    Google keeps ODM inactive for users in the European Economic Area, the United Kingdom, and Switzerland, so ICM recovers nothing for that traffic. Elsewhere, Google reports improved coverage for iOS 14+ users.
+</Note>
+
+<Note>
+    ICM also needs an **iOS link ID** configured in your Google Ads integration. Google has nowhere to send the conversion without one. See [Prerequisites](/features/google-icm#prerequisites).
+</Note>
+
+<Steps>
+  <Step title="Add Google's On-Device Measurement SDK (iOS)">
+    <Note>
+        Already using the Firebase iOS SDK 11.14.0 or later? The `FirebaseAnalytics` pod brings this SDK in for you. Skip this step.
+    </Note>
+
+    The plugin does not bundle this SDK, so apps that skip ICM carry none of its weight. Add it inside the `Runner` target in `ios/Podfile`:
+
+    ```ruby
+    target 'Runner' do
+      # ...your existing config
+
+      pod 'GoogleAdsOnDeviceConversion'
+    end
+    ```
+
+    Then install the pods:
+
+    ```bash
+    cd ios && pod install
+    ```
+
+    CocoaPods adds the `-ObjC` and `-lc++` linker flags for you, so there are no Xcode Build Settings to change.
+  </Step>
+
+  <Step title="Report consent">
+    Set the values with `setConsent` before you call `init`, and again whenever the user changes their choice:
+
+    ```dart
+    import 'package:linkrunner/linkrunner.dart';
+    import 'package:linkrunner/models/lr_consent.dart';
+
+    await LinkRunner().setConsent(
+      LRConsent(
+        isEEA: ConsentStatus.GRANTED,
+        hasConsentForDataUsage: ConsentStatus.GRANTED,
+        hasConsentForAdsPersonalization: ConsentStatus.DENIED,
+      ),
+    );
+
+    await LinkRunner().init('YOUR_PROJECT_TOKEN');
+    ```
+
+    Each signal takes `ConsentStatus.GRANTED`, `ConsentStatus.DENIED`, or `ConsentStatus.UNKNOWN`. Anything omitted or left `UNKNOWN` is dropped from the payload rather than reported as a denial, so Linkrunner never reports a choice your user did not make.
+
+    | Parameter | Meaning |
+    | --- | --- |
+    | `isEEA` | European regulations apply to this user (the EEA, the UK, or Switzerland) |
+    | `hasConsentForDataUsage` | The user agreed to their data being sent to Google for advertising |
+    | `hasConsentForAdsPersonalization` | The user agreed to their data being used to personalize ads |
+
+    Google treats these as required whenever their value is known. `hasConsentForDataUsage` decides whether Google may use the conversion at all, `hasConsentForAdsPersonalization` decides whether it may feed audiences and remarketing, and `isEEA` tells Google which rules apply. Set them from your app's real consent state rather than hardcoding them. **For users outside the EEA, the UK, and Switzerland, report `isEEA` as denied and leave the other two unset.** See [Send Consent](/features/send-consent).
+
+    `setConsent` works on both iOS and Android. Android has no ODM SDK to add, but its installs reach Google through the App Conversion API, which reads the same signals.
+  </Step>
+</Steps>
+
+That is the whole integration. The native SDK fetches the value at initialization and there is no other Dart API to call. Attribution comes back through [`getAttributionData`](#getting-attribution-data) as usual.
+
+<Warning>
+    Consent is stored between launches. Call `setConsent` again whenever the user's consent state changes, otherwise the previous value keeps being sent after the user has withdrawn it.
+</Warning>
+
+#### Verifying your setup
+
+Initialize with `debug` set to `true` and look for this line in the Xcode console:
+
+```
+Linkrunner: odm_available=true odm_fetch_result=success odm_fetch_latency_ms=124
+```
+
+`odm_available=false` with `odm_fetch_result=unavailable` means Google's SDK is not linked. Check that `pod install` picked up `GoogleAdsOnDeviceConversion`.
+
+## Initialization (Required)
 You'll need your [project token](https://dashboard.linkrunner.io/dashboard?m=documentation) to get started!
-
-### SDK Signing Parameters (Optional)
-
-For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
-
--   **`secretKey`**: A unique secret key used for request signing and authentication
--   **`keyId`**: A unique identifier for the key pair used in the signing process
-
-You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
 
 Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
 
@@ -163,6 +281,15 @@ void initState() {
 }
 ```
 
+## SDK Signing Parameters (Optional)
+
+For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+
+-   **`secretKey`**: A unique secret key used for request signing and authentication
+-   **`keyId`**: A unique identifier for the key pair used in the signing process
+
+You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
+
 ### Platform-Specific SDK Signing
 
 For applications requiring different signing keys per platform:
@@ -187,9 +314,35 @@ Future<void> initLinkrunnerWithSigning() async {
 }
 ```
 
-## User Registration
+## Setting the Customer User ID
 
-Call the `signup` method once after the user has completed your app's onboarding process:
+Use `setCustomerUserId` to attach your own user identifier to the device **right after `init`**. Once set, the identifier is stored securely on-device and automatically included in every event you track, so you never have to pass it on each `trackEvent` call.
+
+Call it as early as the user's ID is available. This guarantees every event carries a `user_id` from the very first event, and is especially useful for existing users who were already onboarded before this feature shipped.
+
+<Note>
+    Available from **Flutter SDK v3.10.0**.
+</Note>
+
+<Note>
+    **Best practice:** set the Customer User ID as early as possible. The `user_id` is only attached to events tracked **after** it's set, and is not applied retroactively. Use a stable, unique identifier from your own system (for example your internal user ID or a UUID) rather than an email address or other PII.
+</Note>
+
+```dart
+try {
+  await LinkRunner().setCustomerUserId("f47ac10b-58cc-4372-a567-0e02b2c3d479"); // Your unique customer user ID (e.g. a UUID)
+  print('Customer user id set');
+} catch (e) {
+  print('Error setting customer user id: $e');
+}
+```
+
+<Note>
+    The identifier is stored securely on-device and persists across app restarts. Calling `setCustomerUserId` again with a **different** identifier updates the stored value; passing the same identifier is a no-op. `signup()` / `setUserData()` also update it.
+</Note>
+
+## User Identification (Required)
+Call the `signup` method as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 
 It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
 
@@ -202,6 +355,10 @@ If the platform's identifier function is not called, you must provide a user ide
 -   mixpanelDistinctId for Mixpanel
 -   amplitudeDeviceId for Amplitude
 -   posthogDistinctId for PostHog
+
+<Note>
+    The model classes (`LRUserData`, `LRCapturePayment`, `LRRemovePayment`, `LRConsent`) are not re-exported by `linkrunner.dart`. Import each one directly, for example `import 'package:linkrunner/models/lr_user_data.dart';`.
+</Note>
 
 ```dart
 Future<void> onSignup() async {
@@ -225,6 +382,62 @@ Future<void> onSignup() async {
   } catch (e) {
     print('Error during signup: $e');
   }
+}
+```
+
+## Handle Deeplink
+
+To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:app_links/app_links.dart';
+import 'package:linkrunner/linkrunner.dart';
+
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _appLinks = AppLinks();
+
+  @override
+  void initState() {
+    super.initState();
+    _initLinkRunner();
+  }
+
+  Future<void> _initLinkRunner() async {
+    // Init SDK first
+    await LinkRunner().init('your_project_token');
+
+    // Cold start — app was launched by a deeplink
+    final initialLink = await _appLinks.getInitialLink();
+    if (initialLink != null) {
+      LinkRunner().handleDeeplink(initialLink.toString());
+    }
+
+    // Warm start — app was in background, deeplink brought it to foreground
+    _appLinks.uriLinkStream.listen((Uri uri) {
+      LinkRunner().handleDeeplink(uri.toString());
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      // your app content
+    );
+  }
+}
+```
+
+Linkrunner sends the updated deeplink back after processing. For Linkrunner campaign links, use the returned `deeplink` as the resolved destination instead of the original tracking URL.
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123"
 }
 ```
 
@@ -257,6 +470,11 @@ class CampaignData {
   final String? adNetwork;           // Optional: "META" | "GOOGLE" | null
   final String? groupName;           // Optional: Campaign group name
   final String? assetGroupName;      // Optional: Asset group name
+  final String? adNetworkCampaignId; // Optional: Ad network campaign ID
+  final String? adSetId;             // Optional: Ad set ID
+  final String? adSetName;           // Optional: Ad set name
+  final String? adCreativeId;        // Optional: Ad creative ID
+  final String? adCreativeName;      // Optional: Ad creative name
   final String? assetName;           // Optional: Asset name
   final String type;                 // Required: Campaign type ("ORGANIC" | "INORGANIC")
   final String installedAt;          // Required: Installation timestamp
@@ -267,18 +485,24 @@ class CampaignData {
 Example response:
 
 ```dart
+// getAttributionData() returns a typed AttributionData object — access fields in camelCase.
 {
   "deeplink": "https://app.yourdomain.com/product/123",
-  "campaign_data": {
+  "campaignData": {
     "id": "camp_123",
     "name": "Summer Sale 2024",
-    "ad_network": "META",
-    "group_name": "iOS Campaign",
-    "asset_group_name": "Product Catalog",
-    "asset_name": "Banner Ad 1",
+    "adNetwork": "META",
+    "groupName": "iOS Campaign",
+    "assetGroupName": "Product Catalog",
+    "assetName": "Banner Ad 1",
+    "adNetworkCampaignId": "120214682829390250",
+    "adSetId": "120214682829640250",
+    "adSetName": "Productivity",
+    "adCreativeId": "120214682926100250",
+    "adCreativeName": "Static_2",
     "type": "INORGANIC",
-    "installed_at": "2024-03-20T10:30:00Z",
-    "store_click_at": "2024-03-20T10:29:45Z"
+    "installedAt": "2024-03-20T10:30:00Z",
+    "storeClickAt": "2024-03-20T10:29:45Z"
   }
 }
 ```
@@ -286,6 +510,10 @@ Example response:
 ## Setting User Data
 
 Call `setUserData` each time the app opens and the user is logged in:
+
+<Note>
+**`setUserData` is optional and is not a replacement for `signup`.** Always call `signup` first as soon as the user is identified (signup or login). Use `setUserData` afterwards only when additional user details become available later — for example, when the user adds a phone number, email, or completes their profile after identification.
+</Note>
 
 ```dart
 Future<void> setUserData() async {
@@ -336,7 +564,7 @@ This method allows you to connect user identities across different analytics and
 ## Revenue Tracking
 
 <Note>
-    Revenue data is only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before capturing payments. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
+    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 </Note>
 
 ### Capturing Payments
@@ -350,9 +578,8 @@ Future<void> capturePayment() async {
       capturePayment: LRCapturePayment(
         amount: 99.99, // Required: Payment amount
         userId: 'user123', // Required: User identifier
-        paymentId: 'payment456', // Optional: Unique payment identifier
+        paymentId: 'payment456', // Required: Unique payment identifier
         type: PaymentType.FIRST_PAYMENT, // Optional: Payment type
-        // type: PaymentType.SECOND_PAYMENT, // Optional: Payment type
         status: PaymentStatus.PAYMENT_COMPLETED, // Optional: Payment status
         eventData: { // Optional: Ecommerce/custom event data
           'content_ids': ['product_123'],
@@ -382,10 +609,9 @@ Future<void> capturePayment() async {
 
 - `amount`: double (required) - The payment amount
 - `userId`: String (required) - Identifier for the user making the payment
-- `paymentId`: String (optional) - Unique identifier for the payment
+- `paymentId`: String (required) - Unique identifier for the payment, used to deduplicate transactions
 - `type`: PaymentType (optional) - Type of payment. Available options:
   - `PaymentType.FIRST_PAYMENT` - First payment made by the user
-  - `PaymentType.SECOND_PAYMENT` - Second payment made by the user
   - `PaymentType.WALLET_TOPUP` - Adding funds to a wallet
   - `PaymentType.FUNDS_WITHDRAWAL` - Withdrawing funds
   - `PaymentType.SUBSCRIPTION_CREATED` - New subscription created
@@ -429,7 +655,7 @@ Note: Either `paymentId` or `userId` must be provided when calling `removePaymen
 
 ## Ecommerce Events
 
-> **Minimum SDK Version:** Ecommerce Event Manager requires `linkrunner-flutter` **v3.7.0** or above. Please ensure your SDK is updated before using this feature.
+> **Minimum SDK Version:** Ecommerce Event Manager requires `linkrunner` **v3.7.0** or above. Please ensure your SDK is updated before using this feature.
 
 If you are tracking Ecommerce events to sync with Meta or Google, you must format your `eventData` to include the required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
 
@@ -540,7 +766,11 @@ Future<void> capturePurchase() async {
 ## Tracking Custom Events
 
 <Note>
-    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+    From **Flutter SDK v3.10.0**, custom events automatically include the `user_id` you set during `signup()` / `setUserData()`. The SDK stores this identifier securely on-device and attaches it to every `trackEvent` call, so you no longer need to pass it manually. Events tracked before signup are sent without a `user_id`.
+</Note>
+
+<Note>
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
 </Note>
 
 Track custom events in your app:
@@ -555,6 +785,7 @@ Future<void> trackEvent() async {
         'category': 'electronics',
         'amount': 99.99, // Include amount as a number for revenue sharing with ad networks like Google and Meta
       },
+      eventId: 'order_12345', // Optional: Your own unique event identifier (String or num)
     );
     print('Event tracked successfully');
   } catch (e) {
@@ -562,6 +793,12 @@ Future<void> trackEvent() async {
   }
 }
 ```
+
+#### Parameters for `LinkRunner().trackEvent`
+
+- `eventName`: `String` (required) - Name of the event to track
+- `eventData`: `Map<String, dynamic>` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventId`: `Object` (optional) - Your own unique identifier for the event (`String` or `num`), useful for deduplication and correlating with your backend
 
 ### Revenue Sharing with Ad Networks
 
@@ -608,6 +845,10 @@ When PII hashing is enabled, sensitive user data like name, email, and phone num
 </Note>
 
 The SDK provides options to disable AAID (Google Advertising ID) collection. This is useful for apps targeting children or families to comply with Google Play's Family Policy.
+
+<Warning>
+  Disabling AAID collection is not recommended unless absolutely necessary. The GAID is a primary signal for Google Ads attribution and install matching, so disabling it reduces attribution accuracy. Only disable it if your app is built for children or families and must comply with Google Play's Family Policy.
+</Warning>
 
 ### Disable AAID Collection
 
@@ -801,11 +1042,13 @@ Connect APNs with Linkrunner
 | `LinkRunner().init`                     | App initialization                     | Once when app starts                           |
 | `LinkRunner().getAttributionData`       | Attribution data handling flow         | Whenever the attribution data is needed        |
 | `LinkRunner().setAdditionalData`        | Integration code                       | When third-party integration IDs are available |
-| `LinkRunner().signup`                   | Onboarding flow                        | Once after user completes onboarding           |
+| `LinkRunner().signup`                   | Identification flow (signup or login)  | Once when the user is identified               |
 | `LinkRunner().setUserData`              | Authentication logic                   | Every time app opens with logged-in user       |
 | `LinkRunner().trackEvent`               | Throughout app                         | When specific user actions occur               |
 | `LinkRunner().capturePayment`           | Payment processing                     | When user makes a payment                      |
 | `LinkRunner().removePayment`            | Refund flow                            | When payment needs to be removed               |
+| `LinkRunner().handleDeeplink`           | Deep link entry points                 | When app is opened via a deep link             |
+| `LinkRunner().setConsent`               | App initialization or consent flow     | Before `init`, and again when consent changes |
 | `LinkRunner().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection       |
 | `LinkRunner().isAaidCollectionDisabled` | Privacy settings or compliance checks  | When you need to check AAID collection status  |
 
@@ -894,7 +1137,7 @@ class _HomeScreenState extends State<HomeScreen> {
   >
     Validate your setup end-to-end
   </Card>
-  <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking">
+  <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking-setup">
     Configure deep links for your app
   </Card>
 </CardGroup>

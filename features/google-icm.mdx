@@ -1,0 +1,207 @@
+---
+title: "Google Integrated Conversion Measurement"
+description: "Recover Google App Campaign attribution on iOS when no click identifier or advertising ID is available"
+icon: "google"
+sidebarTitle: "Google ICM"
+---
+
+<Note>
+  **Using an AI coding agent?** The Linkrunner skill for your platform already includes ICM setup — adding Google's ODM SDK where needed and wiring `setConsent`:
+
+  ```bash
+  npx @linkrunner/skills add ios          # or react-native, flutter, android
+  ```
+
+  See [Linkrunner Agent Skills](/ai-agent-skills).
+</Note>
+
+## What it is
+
+Google App Campaigns lose iOS installs when there is no click identifier and no IDFA to match on, which is the normal state once a user declines App Tracking Transparency. Integrated Conversion Measurement (ICM) closes that gap.
+
+Google's [On-Device Measurement (ODM) SDK](https://github.com/googleads/google-ads-on-device-conversion-ios-sdk) keeps the ad click context on the device and turns it into an encrypted value, `odm_info`. Linkrunner reads that value when the SDK initializes and sends it with the install, so Google can match the conversion without an identifier ever leaving the device.
+
+Set this up if you run Google App Campaigns for your iOS app. Google's SDK requires iOS 12 or later, and Google reports the improved coverage for users on iOS 14 and later.
+
+<Warning>
+    Google keeps ODM inactive for users located in the European Economic Area, the United Kingdom, and Switzerland. For those users the SDK returns nothing and the field is left out, so ICM recovers no installs there.
+</Warning>
+
+On Android there is nothing to install. Google applies the same ICM improvements automatically through the App Conversion API, mainly for EEA users and users who opt out of device-level permissions.
+
+<Note>
+    ICM complements SKAdNetwork, it does not replace it. Keep your [SKAdNetwork integration](/features/skadnetwork-integration) in place.
+</Note>
+
+## Prerequisites
+
+ICM requires a supported Linkrunner SDK version and three setup steps. It stays inactive until everything is in place, and it fails quietly rather than loudly.
+
+### Minimum SDK versions
+
+Older versions do not collect `odm_info` or provide the consent API.
+
+| Platform | Minimum supported version |
+| --- | --- |
+| [Android](/sdk/android#google-ads-consent) | `io.linkrunner:android-sdk:4.1.0` |
+| [iOS](/sdk/ios#google-integrated-conversion-measurement-optional) | LinkrunnerKit 4.1.0 |
+| [React Native](/sdk/react-native#google-integrated-conversion-measurement-optional) | `rn-linkrunner` 3.1.0 |
+| [Flutter](/sdk/flutter#google-integrated-conversion-measurement-optional) | `linkrunner` 4.1.1 |
+| [Expo](/sdk/expo#google-integrated-conversion-measurement-optional) | `rn-linkrunner` 3.1.0 |
+| [Unity](/sdk/unity#google-integrated-conversion-measurement-optional) | LinkrunnerKit 4.1.0 and `io.linkrunner:android-sdk:4.1.0` |
+
+<Steps>
+  <Step title="Create an iOS link ID in Google Ads">
+    Link IDs are per platform. An Android link ID does not cover your iOS app, and without an iOS one Google has nowhere to send the conversion, so ICM produces nothing no matter what the app does.
+
+    In Google Ads, go to **Tools** → **Data Manager** → **Third-party app analytics**, create a link ID with provider ID `9936233049`, and select the **iOS** platform and your app.
+
+    Then in Linkrunner, go to [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads), open the three-dot menu on the Google Ads row, choose **Setup Link IDs**, and paste it into **iOS Link ID**. Click **Save Link IDs**.
+
+    Full walkthrough with screenshots: [Create Link ID for Android/iOS App](/ad-networks/google-ads#2-create-link-id-for-androidios-app).
+  </Step>
+
+  <Step title="Add Google's ODM SDK to your iOS app">
+    Linkrunner does not bundle it. The SDK is detected at runtime, so apps that skip ICM carry no extra dependency and no size increase.
+
+    Your SDK's installation section has the exact pod or package to add, along with any linker flags: [iOS](/sdk/ios#google-integrated-conversion-measurement-optional), [React Native](/sdk/react-native#google-integrated-conversion-measurement-optional), [Flutter](/sdk/flutter#google-integrated-conversion-measurement-optional), [Expo](/sdk/expo#google-integrated-conversion-measurement-optional), [Unity](/sdk/unity#google-integrated-conversion-measurement-optional).
+
+    If your app already uses the Firebase iOS SDK 11.14.0 or later, the `FirebaseAnalytics` pod brings it in and there is nothing to add.
+  </Step>
+
+  <Step title="Report consent with setConsent">
+    Google's App Conversion API treats the consent parameters as required whenever their value is known, so an install that arrives with no consent state is matched with less information. Call `setConsent` with your consent values before you initialize the SDK, and again whenever the user changes their choice.
+
+    This applies on Android too, even though there is no ODM SDK to add there. See [Consent signals](#consent-signals) below for what each parameter means, and [Send Consent](/features/send-consent) for what to report and how to collect it.
+  </Step>
+</Steps>
+
+Everything else is automatic. There is no ICM API to call and attribution still comes back through `getAttributionData`.
+
+## Platform support
+
+| Platform | Collects `odm_info` | Consent API |
+| --- | --- | --- |
+| [Android](/sdk/android#google-ads-consent) | Not applicable | `setConsent` |
+| [iOS](/sdk/ios#google-integrated-conversion-measurement-optional) | Yes | `setConsent` |
+| [React Native](/sdk/react-native#google-integrated-conversion-measurement-optional) | Yes (iOS) | `setConsent` |
+| [Flutter](/sdk/flutter#google-integrated-conversion-measurement-optional) | Yes (iOS) | `setConsent` |
+| [Expo](/sdk/expo#google-integrated-conversion-measurement-optional) | Yes (iOS) | `setConsent` |
+| [Unity](/sdk/unity#google-integrated-conversion-measurement-optional) | Yes (iOS) | `setConsent` on both platforms |
+| Capacitor, Cordova | Not yet supported | No |
+
+<Note>
+    ODM is an iOS-only SDK. There is no Android equivalent and none is needed, because Android installs reach Google through the App Conversion API. That API reads the same consent signals, so `setConsent` still matters on Android.
+</Note>
+
+## Consent signals
+
+`setConsent` takes three signals, each of which is `granted`, `denied`, or `unknown`. Linkrunner forwards them to Google with your installs and events.
+
+| Parameter | Sent to Google as | What it means |
+| --- | --- | --- |
+| `isEEA` | `eea` | European regulations apply to this user (the EEA, the UK, or Switzerland) |
+| `hasConsentForDataUsage` | `ad_user_data` | The user agreed to their data being sent to Google for advertising |
+| `hasConsentForAdsPersonalization` | `ad_personalization` | The user agreed to their data being used to personalize ads |
+
+A signal left `unknown` is dropped from the request rather than sent as a denial, so Linkrunner never reports a choice your user did not make. Never map `unknown` to `granted`.
+
+App Tracking Transparency is not a substitute: it governs IDFA access, not Google's use of ad user data or personalization, and Linkrunner reports ATT status separately.
+
+See [Send Consent](/features/send-consent) for what to report for users outside the EEA, and how to collect consent manually or from a Consent Management Platform.
+
+## Set it up
+
+<CardGroup cols={2}>
+  <Card title="Android" icon="android" href="/sdk/android#google-ads-consent">
+    Report consent for the App Conversion API
+  </Card>
+  <Card title="iOS" icon="apple" href="/sdk/ios#google-integrated-conversion-measurement-optional">
+    Add the ODM SDK and report consent
+  </Card>
+  <Card title="React Native" icon="react" href="/sdk/react-native#google-integrated-conversion-measurement-optional">
+    Add the pod and report consent
+  </Card>
+  <Card title="Flutter" icon="flutter" href="/sdk/flutter#google-integrated-conversion-measurement-optional">
+    Add the pod and report consent
+  </Card>
+</CardGroup>
+
+## Upgrade from a pre-ICM SDK version
+
+Update the Linkrunner SDK before adding Google's ODM SDK or calling `setConsent`.
+
+<Tabs>
+  <Tab title="Android">
+    Update the dependency in your app's `build.gradle`:
+
+    ```gradle
+    dependencies {
+        implementation 'io.linkrunner:android-sdk:4.1.0'
+    }
+    ```
+
+    Sync Gradle, then follow the [Google Ads consent setup](/sdk/android#google-ads-consent). Android does not need the ODM SDK.
+  </Tab>
+
+  <Tab title="iOS">
+    In Xcode, update the `linkrunner-ios` package to LinkrunnerKit 4.1.0 or later. If you use `Package.swift`, set the minimum version:
+
+    ```swift
+    .package(
+        url: "https://github.com/linkrunner-labs/linkrunner-ios.git",
+        from: "4.1.0"
+    )
+    ```
+
+    Keep `LinkrunnerKitStatic` linked to your app target, then complete the [iOS ICM setup](/sdk/ios#google-integrated-conversion-measurement-optional).
+  </Tab>
+
+  <Tab title="React Native">
+    Upgrade `rn-linkrunner`, then reinstall the iOS pods:
+
+    ```bash
+    npm install rn-linkrunner@latest
+    cd ios && pod install
+    ```
+
+    Confirm the installed version is 3.1.0 or later, then complete the [React Native ICM setup](/sdk/react-native#google-integrated-conversion-measurement-optional).
+  </Tab>
+
+  <Tab title="Flutter">
+    Upgrade the package to 4.1.1 or later:
+
+    ```bash
+    flutter pub add linkrunner:^4.1.1
+    ```
+
+    Then complete the [Flutter ICM setup](/sdk/flutter#google-integrated-conversion-measurement-optional).
+  </Tab>
+
+  <Tab title="Expo">
+    Upgrade both packages and regenerate the native projects:
+
+    ```bash
+    npm install rn-linkrunner@latest
+    npx expo install expo-linkrunner
+    npx expo prebuild --clean
+    ```
+
+    Confirm `rn-linkrunner` is 3.1.0 or later, then complete the [Expo ICM setup](/sdk/expo#google-integrated-conversion-measurement-optional). If you are upgrading from Expo SDK 1.x or 2.x, follow the [Expo migration guide](/sdk/expo#migration-guide) first.
+  </Tab>
+
+  <Tab title="Unity">
+    Update both native dependencies:
+
+    - Set `io.linkrunner:android-sdk` to 4.1.0 or later in `Assets/Plugins/Android/mainTemplate.gradle`.
+    - Update the `linkrunner-ios` Swift package to LinkrunnerKit 4.1.0 or later in the generated Xcode project.
+
+    Then complete the [Unity ICM setup](/sdk/unity#google-integrated-conversion-measurement-optional).
+  </Tab>
+</Tabs>
+
+<Note>
+    Capacitor and Cordova do not support ICM yet.
+</Note>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

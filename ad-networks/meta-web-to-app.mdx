@@ -1,155 +1,190 @@
 ---
-title: "Meta Web to App Integration"
+title: "Meta Web to App"
 description: "Run Meta web-to-app ads for your app with advanced conversion tracking and optimization"
-icon: "meta"
+icon: "/images/logos/meta.webp"
 ---
 
 ## Overview
 
-Meta Web to App integration with Linkrunner enables you to run powerful app growth campaigns through Facebook and Instagram while tracking conversions and optimizing on real in-app events. This integration allows you to leverage Meta's Conversions API (CAPI) for accurate attribution and seamless user experiences across web-to-app flows.
+Meta Web to App integration with Linkrunner lets you run app growth campaigns through Facebook and Instagram using a standard Sales (Website) objective, while Linkrunner handles attribution, spend sync, and CAPI event delivery. Linkrunner automatically creates one campaign per Meta Campaign on first click, so there is no manual campaign setup required on the Linkrunner side.
 
-**📱 Works for both Android & iOS Apps**
+**Works for both Android and iOS apps.**
+
+<video
+    src="https://media.assets.linkrunner.io/web-to-app.mp4"
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{ maxHeight: 480, width: "100%", borderRadius: 8 }}
+/>
 
 ### What You'll Get
 
--   **Web-to-app conversion tracking** — Track installs, sign-ups, purchases, and custom events from Meta ads
--   **Conversions API (CAPI) integration** — Enhanced tracking accuracy and resilience against browser limitations
--   **Deferred deep linking** — Drop users into the right screen after first open, even if they need to install the app first
--   **Cross-platform consistency** — Track installs across iOS and Android with one unified flow
--   **Real-time optimization** — Meta can optimize campaigns based on actual in-app events
+- **Web-to-app conversion tracking.** Track installs, sign-ups, purchases, and custom events from Meta ads.
+- **Conversions API (CAPI) integration.** Enhanced tracking accuracy and resilience against browser limitations.
+- **Deferred deep linking.** Drop users into the right screen after first open, even if they need to install the app first.
+- **Cross-platform consistency.** Track installs across iOS and Android with one unified flow.
+- **Automatic campaign creation.** Linkrunner mirrors your Meta Campaign hierarchy on first click, no manual setup needed.
 
-## Setup Process
+### How It Works
 
-Setting up Meta Web to App integration involves three main steps: integrating your Meta account with Linkrunner, generating access tokens, and creating campaign links.
+A user taps your Meta ad, lands on your Linkrunner subdomain, and is routed to the App Store. Linkrunner tracks the click, matches it to the install, and attributes the campaign.
 
-## 1. Integrate Your Meta Account on Linkrunner
+<video
+    src="https://media.assets.linkrunner.io/meta-web-to-app-flow.mp4"
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{ width: "100%", borderRadius: 8 }}
+/>
 
-Connect your Meta advertising account with Linkrunner to enable seamless data sharing and conversion tracking.
+## Setup
 
-### Step 1: Access Meta Integration Settings
+<Steps>
 
-1. Go to [Linkrunner Settings → Meta Integration](https://dashboard.linkrunner.io/settings?sort_by=activity-1&s=meta-integration&meta_tab=meta-ad-account)
-2. Click on **"Add account"**
-3. Log in with your Facebook account credentials
+<Step title="Connect your Meta ad account">
 
-![Meta Integration - Add Account](/images/meta/meta-integration.webp)
+Connect your Meta advertising account with Linkrunner to enable spend sync and CAPI event delivery. This is the same OAuth connection used for Meta App Ads.
 
-### Step 2: Configure CAPI for Meta Account
+1. Go to [Linkrunner Settings → Meta Integration](https://dashboard.linkrunner.io/settings?s=meta-integration&meta_tab=meta-ad-account)
+2. Click **"Add account"**
+3. Log in with your Facebook account credentials and grant the requested permissions
 
-After connecting your Meta account, you'll need to configure the Conversions API (CAPI) to enable server-side event tracking:
-
-1. Navigate to [Facebook Events Manager](https://business.facebook.com/events_manager2/list)
-2. [Follow the prompts to set up CAPI for your Meta account](/ad-networks/meta-ads#2-generate-access-token)
-3. This enables enhanced conversion tracking and improves attribution accuracy
+![Meta Integration - Add Account](/images/meta/meta-integration.png)
 
 <Note>
-    Configuring CAPI is essential for accurate tracking and to ensure your conversion data is properly reported to
-    Meta's advertising platform.
+    Linkrunner needs access to your Meta ad account to pull spend data from the Marketing API and to send CAPI conversion events back to Meta. Without this connection, cost and ROAS figures will not appear in your Linkrunner dashboard.
 </Note>
 
-## 2. Generate Access Token
+</Step>
 
-Access tokens are required to authenticate API calls between Linkrunner and Meta's advertising platform.
+<Step title="Add your Linkrunner domain">
 
-### Follow the Token Generation Process
+Linkrunner uses your custom subdomain as the destination URL in your Meta ads. If you have not set one up yet, go to [Settings → Domains](https://dashboard.linkrunner.io/settings?s=domains) and add a subdomain.
 
-Complete the access token generation steps as shown in your Meta Business settings:
+For full instructions on configuring the CNAME record, see the [Subdomain Setup guide](/features/subdomain-setup).
+
+Once your subdomain is active (CNAME verified and SSL active), you are ready for the next step. You can also find your ready-to-paste destination URL under [Integrations → Meta Ads → Web to App](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=web_to_app).
+
+</Step>
+
+<Step title="Set the destination URL in your Meta ad">
+
+In Meta Ads Manager, paste your Linkrunner destination URL directly as the ad's **Website URL** (in the ad destination section, not the Tracking field).
+
+Use this template, replacing `<your-linkrunner-domain>` with your actual subdomain:
+
+```
+https://<your-linkrunner-domain>/?utm_source=facebook&utm_medium=paid_social&campaign_id={{campaign.id}}&adset_id={{adset.id}}&ad_id={{ad.id}}&placement={{placement}}&site_source={{site_source_name}}
+```
+
+Meta substitutes the `{{...}}` macros with real campaign, ad set, ad, and placement IDs at delivery time. Linkrunner reads those values on each click to:
+
+1. **Auto-create a Linkrunner campaign** mirroring your Meta Campaign on first click. No manual campaign creation is needed.
+2. **Sync Meta spend** into your Linkrunner dashboard. The `campaign_id` macro is what the spend sync uses to pull cost data from Meta's Marketing API.
+3. **Break out reports by ad set, ad, and placement** using `adset_id`, `ad_id`, `placement`, and `site_source`.
+
+<Note>
+    A ready-to-paste version of this URL (with your subdomain pre-filled) is available under [Integrations → Meta Ads → Web to App](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=web_to_app). Pick the destination domain there and copy the URL directly.
+</Note>
+
+<Warning>
+    Paste this URL as the **Website URL** in the ad destination section, not into the Tracking field. Without the `campaign_id` macro in the destination URL, Meta spend will not sync into Linkrunner reports and campaign-level breakdowns will be missing.
+</Warning>
+
+**How to configure the ad in Meta Ads Manager:**
+
+1. Go to [Meta Ads Manager](https://business.facebook.com/adsmanager) and create or edit a campaign
+2. Set the campaign objective to **Sales**
+3. In the ad set, set **Conversion location** to **Website**, **Performance goal** to **Maximise number of conversions**, and select your **Dataset** (Meta pixel)
+
+    ![Ad Set Configuration](/images/meta/sales_ad_set.png)
+
+4. Select an ad set. Under **Placements**, open **Devices and operating systems** and select **Mobile** only. **Desktop** should not be selected.
+
+    ![Meta placements device targeting with Mobile selected and Desktop not selected](/images/meta/web-to-app-mobile-devices.png)
+
+5. In the ad, paste the destination URL above as the **Website URL**
+6. Add your creative assets and publish
+
+<Note>
+    Even though the conversion location is set to Website, the Linkrunner link automatically redirects mobile users to your app. Meta treats it as a website click and Linkrunner handles the redirect to the appropriate app store or directly into the app.
+</Note>
+
+</Step>
+
+</Steps>
+
+## Set Up Conversions API for Event Sending
+
+Configuring CAPI is optional but strongly recommended. It enables server-side event delivery to Meta, which improves attribution accuracy and campaign optimization.
+
+### Generate an Access Token
+
+Complete the access token setup in Facebook Events Manager:
 
 ![Meta Access Token - Step 1](/images/meta/access-token-1.webp)
 
 ![Meta Access Token - Step 2](/images/meta/access-token-2.webp)
 
+1. Navigate to [Facebook Events Manager](https://business.facebook.com/events_manager2/list)
+2. Follow the [CAPI token generation steps](/ad-networks/meta-ads#2-generate-access-token) as shown in the Meta Ads setup guide
+3. Paste the token into your Linkrunner [Meta Integration settings](https://dashboard.linkrunner.io/settings?s=meta-integration)
+
 <Tip>
-    Keep your access tokens secure and never share them publicly. These tokens provide access to your Meta advertising
-    data.
+    Keep your access token secure and never share it publicly. This token provides access to your Meta advertising data.
 </Tip>
-
-## 3. Create Campaign Link in Linkrunner
-
-Set up your campaign link in Linkrunner with the Meta integration enabled.
-
-### Step 1: Create New Campaign
-
-1. Go to your Linkrunner Dashboard
-2. Create a new campaign link
-3. Select **"Web to App"** as the campaign type
-4. Choose the Meta account you integrated in the previous steps
-
-![Campaign Link Creation - Select Meta Account](/images/meta/campaign-link.webp)
-
-### Step 2: Configure Campaign Settings
-
-1. Set up your deep linking parameters (optional)
-2. Configure attribution settings
-3. Copy the generated campaign link
-
-## 4. Create Campaign on Meta Ads Manager
-
-With your Linkrunner campaign link ready, create your ad campaign in Meta Ads Manager.
-
-### Step 1: Create a Sales Campaign
-
-1. Go to [Meta Ads Manager](https://business.facebook.com/adsmanager)
-2. Click **"Create"** to start a new campaign
-3. Select **"Sales"** as your campaign objective
-
-![Sales Campaign Objective](/images/meta/sales_campaign.png)
-
-### Step 2: Configure the Ad Set
-
-1. Set **Conversion location** to **Website**
-2. Set **Performance goal** to **Maximise number of conversions**
-3. Select your **Dataset** (this is your Meta pixel)
-4. Configure your targeting, budget, and schedule as needed
-
-![Ad Set Configuration](/images/meta/sales_ad_set.png)
-
-### Step 3: Set Up the Ad
-
-1. Paste the Linkrunner campaign link you created earlier as the **Website URL** in the ad destination
-2. Add your creative assets (images, videos, ad copy)
-3. Review and publish your campaign
-
-<Note>
-    Even though the conversion location is set to Website, the Linkrunner link will automatically redirect users to your app when opened from a mobile device. This is how web-to-app campaigns work — Meta treats it as a website click, but Linkrunner handles the redirection to your app seamlessly.
-</Note>
 
 ## Why Run Meta Web to App Ads?
 
-Running **Meta web-to-app ads** gives you more flexibility and control over your campaigns:
+Running Meta web-to-app ads gives you more flexibility and control over your campaigns:
 
--   **Better attribution** — CAPI provides server-side tracking that's more reliable than browser-based tracking
--   **Cross-platform reach** — Run campaigns across Facebook, Instagram, Messenger, and Audience Network
--   **Advanced optimization** — Meta's algorithm can optimize based on your actual in-app conversion events
--   **Deferred deep linking** — Users land on the right content inside your app after installation
--   **iOS 14.5+ compatibility** — Enhanced tracking solution that works around iOS privacy limitations
+- **Better attribution.** CAPI provides server-side tracking that is more reliable than browser-based tracking.
+- **Cross-platform reach.** Run campaigns across Facebook, Instagram, Messenger, and Audience Network.
+- **Advanced optimization.** Meta's algorithm can optimize based on your actual in-app conversion events.
+- **Deferred deep linking.** Users land on the right content inside your app after installation.
+- **iOS 14.5+ compatibility.** Enhanced tracking that works within iOS privacy constraints.
 
 ## Important Notes
 
 <Note>
-    After setting up the integration, it may take a few hours for conversion data to start flowing from Linkrunner to
-    Meta. This is normal processing time.
+    After connecting your Meta account and running the first click, it may take a few hours for conversion data to start flowing from Linkrunner to Meta. This is normal processing time.
+</Note>
+
+<Note>
+    Automatic Meta app-link sync is for Meta App Promotion campaigns. For Meta Web to App, keep using the Linkrunner destination URL as the ad **Website URL**.
 </Note>
 
 <Tip>
-    Start with simple conversion events like app installs or sign-ups before optimizing for more complex events like
-    purchases. This gives Meta's algorithm time to learn and gather sufficient data.
+    Start with simple conversion events like app installs or sign-ups before optimizing for more complex events like purchases. This gives Meta's algorithm time to learn and gather sufficient data.
 </Tip>
 
 ## Troubleshooting
 
 ### Conversions Not Tracking
 
--   Verify your Meta account is properly connected in Linkrunner settings
--   Ensure CAPI is configured correctly in Facebook Events Manager
--   Check that your access token is valid and hasn't expired
--   Confirm your app is sending events to Linkrunner SDK
+- Verify your Meta account is properly connected in Linkrunner Settings → Meta Integration
+- Ensure CAPI is configured correctly in Facebook Events Manager
+- Check that your access token is valid and has not expired
+- Confirm your app is sending events to the Linkrunner SDK
 
-### Campaign Link Issues
+### Campaign Not Appearing in Linkrunner Dashboard
 
--   Make sure you selected "Web to App" as the campaign type
--   Verify the correct Meta account is selected in the campaign settings
--   Test the link before launching your campaign
+Linkrunner auto-creates a campaign on the first click that carries a valid `campaign_id` in the destination URL. If no campaign appears after the first click:
+
+- Verify the destination URL includes `campaign_id={{campaign.id}}` with the correct macro syntax
+- Check that the URL is pasted as the **Website URL** (not the Tracking field)
+- Make sure the Linkrunner subdomain is active (CNAME verified and SSL active)
+
+### Spend Not Syncing
+
+- Confirm the `campaign_id` macro is present in the destination URL
+- Verify the Meta ad account connected in Linkrunner matches the account running the campaign
+- Allow up to a few hours for the first spend data to appear after campaign launch
 
 ---
 

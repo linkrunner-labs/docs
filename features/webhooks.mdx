@@ -4,6 +4,16 @@ description: "Receive real-time notifications when attribution events occur"
 icon: "webhook"
 ---
 
+<Note>
+  **Using an AI coding agent?** Have it write your webhook receiver for you:
+
+  ```bash
+  npx @linkrunner/skills add webhooks
+  ```
+
+  The skill generates a handler for your backend that verifies the `linkrunner-key` header and processes install/signup payloads. See [Linkrunner Agent Skills](/ai-agent-skills).
+</Note>
+
 ## Overview
 
 Webhooks allow you to receive real-time HTTP notifications when attribution events occur in your app. When a user installs your app or signs up, Linkrunner sends a POST request to your configured endpoint with detailed attribution data.
@@ -16,22 +26,29 @@ Webhooks allow you to receive real-time HTTP notifications when attribution even
 
 ## Configuration
 
-### Setting Up Your Webhook URL
+![Data Export settings with the Webhooks tab and organic user toggle](/images/webhooks/data-export-organic-webhooks.png)
 
-1. Go to [Linkrunner Settings → Webhooks](https://dashboard.linkrunner.io/settings?s=webhooks)
-2. Enter your webhook endpoint URL
-3. Save the configuration
+<Steps>
+  <Step title="Open webhook settings">
+    In the dashboard, go to **Settings → Data Export**, then select the **Webhooks** tab. You can also [open Webhook settings directly](https://dashboard.linkrunner.io/dashboard/settings/data-export?tab=webhooks).
+  </Step>
+
+  <Step title="Add your endpoint">
+    Enter your public webhook URL, then click **Update Webhook**.
+  </Step>
+
+  <Step title="Test the endpoint">
+    Click **Test Webhook**. Your endpoint must accept JSON POST requests and return a direct 2xx response.
+  </Step>
+
+  <Step title="Include organic users">
+    Turn on **Send webhooks for organic users** to receive install and signup webhooks for organic users. These payloads use `network_name: "ORGANIC"`.
+  </Step>
+</Steps>
 
 <Note>
-Your endpoint must be publicly accessible and respond with a 2xx status code to acknowledge receipt.
+Your endpoint must be publicly accessible. Linkrunner retries failed requests up to three times, but does not follow redirects.
 </Note>
-
-### Testing Your Endpoint
-
-Before going live, verify your endpoint can:
-1. Accept POST requests with JSON body
-2. Respond within a reasonable time (recommended under 5 seconds)
-3. Return a 2xx status code on success
 
 ## Webhook Events
 
@@ -44,9 +61,11 @@ Linkrunner sends webhooks for the following events:
 
 ### Install Webhook
 
-The `install` webhook is triggered immediately when Linkrunner attributes an app installation. At this point, your app has just been opened for the first time and the user hasn't had a chance to sign up or log in yet. Because of this, the `user_id` field will be `null` in install webhooks.
+The `install` webhook is triggered immediately when Linkrunner attributes an app installation. At this point, your app has just been opened for the first time and the user hasn't had a chance to sign up or log in yet. Because of this, user identity fields such as `user_id`, `name`, `phone`, `email`, and `additional_data` are only included in signup webhooks.
 
-However, the install webhook does include device identifiers (`gaid` for Android, `idfa` for iOS) when available. You can use these to match the install with the user later when they sign up.
+By default, install webhooks fire only for attributed (paid) installs. To also receive webhooks for organic users, enable **Send webhooks for organic users** in [Settings → Webhooks](https://dashboard.linkrunner.io/dashboard/settings/data-export?tab=webhooks). This covers both install and signup webhooks. Organic webhooks are sent with `network_name` set to `ORGANIC`, `ad_channel` set to `null`, and no campaign details.
+
+However, the install webhook does include `lr_install_id` (Linkrunner's ID for the install) and device identifiers (`gaid` for Android, `idfa` for iOS) when available. You can use these to match the install with the user later when they sign up.
 
 Use the install webhook for:
 - Tracking install counts by campaign
@@ -58,7 +77,9 @@ Use the install webhook for:
 
 The `signup` webhook is triggered when you call the `.signup()` method in your app via the Linkrunner SDK. This happens after the user has signed up or logged in, so the `user_id` field will contain the ID you passed to the SDK.
 
-The signup webhook includes device identifiers (`gaid`/`idfa`) along with the `user_id`, giving you a complete picture of both the device and the user. It also includes user identity fields (`name`, `phone`, `email`) and any custom parameters you passed via `additional_data`, such as referral codes or other custom key-value pairs.
+The signup webhook includes `lr_install_id` and device identifiers (`gaid`/`idfa`) along with the `user_id`, giving you a complete picture of both the device and the user. Because the install webhook carries the same `lr_install_id`, you can join the two payloads without relying on device identifiers. It also includes user identity fields (`name`, `phone`, `email`) and any custom parameters you passed via `additional_data`, such as referral codes or other custom key-value pairs.
+
+Like install webhooks, signup webhooks fire only for attributed users by default. Enabling **Send webhooks for organic users** also delivers signup webhooks for organic users, with `network_name` set to `ORGANIC` and no campaign details.
 
 Use the signup webhook for:
 - Linking attribution data to your user records
@@ -86,7 +107,8 @@ All webhooks are sent as POST requests with a JSON body.
 | Field | Type | Description |
 |-------|------|-------------|
 | `event_type` | `"install"` \| `"signup"` | The type of attribution event |
-| `user_id` | `string` \| `null` | Customer user ID (if provided via SDK) |
+| `lr_install_id` | `string` | Linkrunner's unique ID for the install |
+| `user_id` | `string` \| `null` | Customer user ID for signup webhooks |
 | `campaign_id` | `string` | Unique identifier for the campaign |
 | `campaign_name` | `string` \| `null` | Human-readable campaign name |
 | `network_name` | `string` \| `null` | Attribution network: `ORGANIC`, `META`, `GOOGLE`, etc. |
@@ -104,11 +126,23 @@ All webhooks are sent as POST requests with a JSON body.
 | `additional_data` | `object` \| `null` | Custom parameters and device data (from the `data` field passed to the SDK) |
 | `meta_campaign_details` | `object` \| `null` | Meta Ads campaign details (see below) |
 | `google_campaign_details` | `object` \| `null` | Google Ads campaign details (see below) |
+| `apple_search_ads_details` | `object` \| `null` | Apple Search Ads campaign details (see below) |
+| `campaign_details` | `object` \| `null` | Generic ad network campaign details (see below) |
 
 <Note>
   The `name`, `phone`, and `email` fields are populated from `user_data` passed to the SDK's `.signup()` or `.trigger()` methods.  
   The `additional_data` field is populated from the SDK `data` object.  
-  For `install` events, these fields are `null` since user-level signup data is not yet available.
+  Fields that are not available can be `null` or omitted from the payload.
+</Note>
+
+### Install ID
+
+`lr_install_id` identifies a single install of your app. Both webhooks for that install carry the same value, so it is the join key between them: store it from the install webhook, then look it up when the signup webhook for the same install arrives.
+
+It is also the `install_instance_id` used by the [SDK-less API](/sdk-less/api-reference), so a webhook payload can be matched to the `attribution-data` response for the same install.
+
+<Note>
+A user who reinstalls or reuses your app on another device produces a new install, and therefore a new `lr_install_id`. Use `user_id` to group installs by user.
 </Note>
 
 ### Meta Campaign Details
@@ -141,6 +175,32 @@ When the attribution is from Google Ads, `google_campaign_details` contains:
 | `ad_group_id` | `string` \| `null` | Ad group ID |
 | `ad_group_name` | `string` \| `null` | Ad group name |
 
+### Apple Search Ads Details
+
+When the attribution is from Apple Search Ads, `apple_search_ads_details` contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ad_group_id` | `string` \| `null` | Apple Search Ads ad group ID |
+| `ad_group_name` | `string` \| `null` | Ad group name |
+| `keyword_id` | `string` \| `null` | Keyword ID |
+| `keyword_name` | `string` \| `null` | Keyword name |
+| `ad_id` | `string` \| `null` | Ad creative ID |
+| `ad_name` | `string` \| `null` | Ad creative name |
+| `country_or_region` | `string` \| `null` | Country or region for the attribution |
+
+### Campaign Details
+
+For supported non-Meta and non-Google ad networks, `campaign_details` contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ad_network_code` | `string` \| `null` | Internal ad network code |
+| `ad_network_name` | `string` \| `null` | Ad network name |
+| `campaign_id` | `string` \| `null` | Network campaign ID, when available |
+| `adset_id` | `string` \| `null` | Network ad set ID, when available |
+| `ad_creative_id` | `string` \| `null` | Network ad creative ID, when available |
+
 ### Additional Data
 
 The `additional_data` object contains custom parameters and device data passed through the SDK. This is useful for forwarding arbitrary key-value pairs like referral codes or custom identifiers through the attribution flow.
@@ -165,7 +225,7 @@ Example:
 ```json
 {
   "event_type": "install",
-  "user_id": null,
+  "lr_install_id": "e1c0f4a2-5b7d-4c19-9a3f-2d8e6b1c7a04",
   "campaign_id": "camp_XYZ123",
   "ad_channel": "META",
   "network_name": "META",
@@ -175,14 +235,50 @@ Example:
   "installed_at": "2026-03-24T08:11:00.464Z",
   "store_click_at": "2026-03-24T08:11:00.464Z",
   "link": "https://dl.linkrunner.io/?c=camp_XYZ123",
-  "meta_campaign_details": { ... },
+  "meta_campaign_details": {
+    "ad_creative_id": "cr_987654321",
+    "ad_creative_name": "Summer Sale Creative",
+    "ad_set_id": "as_12345",
+    "ad_set_name": "Mobile Users Segment",
+    "campaign_group_id": null,
+    "campaign_group_name": null,
+    "account_id": "acc_1122334455",
+    "ad_objective_name": "APP_INSTALLS",
+    "is_instagram": null,
+    "publisher_platform": "facebook",
+    "platform_position": "feed"
+  },
   "google_campaign_details": null,
+  "apple_search_ads_details": null,
+  "campaign_details": null,
   "gaid": "bk9384xs-p449-96ds-r132",
-  "idfa": null,
-  "name": null,
-  "phone": null,
-  "email": null,
-  "additional_data": null
+  "idfa": null
+}
+```
+
+### Install Event (Organic)
+
+Sent only when **Send webhooks for organic users** is enabled:
+
+```json
+{
+  "event_type": "install",
+  "lr_install_id": "7f3b9d61-24ae-4f08-b512-c9a70e3d8b45",
+  "campaign_id": "",
+  "ad_channel": null,
+  "network_name": "ORGANIC",
+  "app_version": "2.4.1",
+  "campaign_name": null,
+  "attributed_on": "2026-03-24T08:11:00.464Z",
+  "installed_at": "2026-03-24T08:11:00.464Z",
+  "store_click_at": null,
+  "link": null,
+  "meta_campaign_details": null,
+  "google_campaign_details": null,
+  "apple_search_ads_details": null,
+  "campaign_details": null,
+  "gaid": "bk9384xs-p449-96ds-r132",
+  "idfa": null
 }
 ```
 
@@ -191,10 +287,11 @@ Example:
 ```json
 {
   "event_type": "signup",
+  "lr_install_id": "a48d2c07-6e91-4b33-8f5a-1b0c9de74265",
   "user_id": "test_user_webhook_002",
   "campaign_id": "OgWmhiSXhG",
   "ad_channel": "META",
-  "network_name": "ORGANIC",
+  "network_name": "META",
   "app_version": "1.0.0",
   "campaign_name": "TOF - Free trial - AAA - DSDT - 17/12",
   "attributed_on": "2026-03-25T15:52:00.007Z",
@@ -203,6 +300,8 @@ Example:
   "link": "https://dl.linkrunner.io/?c=OgWmhiSXhG&utm_source=meta_ads",
   "meta_campaign_details": null,
   "google_campaign_details": null,
+  "apple_search_ads_details": null,
+  "campaign_details": null,
   "gaid": "5faa2433-d7e1-4a8e-9a1c-a5880c26ab5c",
   "idfa": null,
   "name": "Test User",
@@ -225,7 +324,7 @@ Example:
 Every webhook request includes a `linkrunner-key` header containing your project's private key. Use this to verify that requests are genuinely from Linkrunner.
 
 ```javascript
-// Example: Verifying the webhook signature
+// Example: Verifying the webhook key
 const PRIVATE_KEY = process.env.LINKRUNNER_PRIVATE_KEY;
 
 app.post('/webhook', (req, res) => {
@@ -254,7 +353,7 @@ Linkrunner automatically formats webhook payloads for Slack when your URL contai
 - Attribution timestamps
 - Device identifiers (GAID/IDFA)
 - User identity (name, phone, email)
-- Meta campaign details (if applicable)
+- Meta, Google, Apple Search Ads, or generic campaign details, when available
 
 To set up Slack notifications:
 1. Create an [Incoming Webhook](https://api.slack.com/messaging/webhooks) in your Slack workspace
@@ -263,13 +362,13 @@ To set up Slack notifications:
 
 ## Retry Behavior
 
-If your endpoint fails to respond with a 2xx status code, Linkrunner retries the webhook with exponential backoff:
+If your endpoint fails to respond with a 2xx status code, Linkrunner makes up to 3 attempts total with exponential backoff:
 
 | Attempt | Delay |
 |---------|-------|
-| 1st retry | 1 second |
-| 2nd retry | 2 seconds |
-| 3rd retry | 4 seconds |
+| 1st attempt | Immediate |
+| 2nd attempt | 1 second after the first failure |
+| 3rd attempt | 2 seconds after the second failure |
 
 After 3 failed attempts, the webhook is marked as failed. Ensure your endpoint is reliable to avoid missing events.
 
@@ -280,7 +379,7 @@ After 3 failed attempts, the webhook is marked as failed. Ensure your endpoint i
     Return a 2xx status code as fast as possible. Process the webhook data asynchronously to avoid timeouts.
   </Step>
   <Step title="Implement idempotency">
-    Store processed `campaign_id` + `user_id` combinations to handle potential duplicate deliveries gracefully.
+    Store processed webhook events using `event_type` and `lr_install_id`, plus `user_id` when present.
   </Step>
   <Step title="Validate authentication">
     Always verify the `linkrunner-key` header matches your private key before processing.
@@ -306,5 +405,6 @@ After 3 failed attempts, the webhook is marked as failed. Ensure your endpoint i
 - `user_id` requires SDK configuration to be passed
 - Device identifiers (`gaid`/`idfa`) depend on user consent and SDK implementation
 - `additional_data` requires passing a `data` object to the SDK and contains those custom parameters
+- Network-specific detail objects are only populated when that network provided attribution data
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

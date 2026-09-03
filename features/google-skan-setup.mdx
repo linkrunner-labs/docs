@@ -1,0 +1,186 @@
+---
+title: "Google Ads SKAN Setup"
+description: "Set up SKAdNetwork attribution for Google Ads iOS App Campaigns with Linkrunner"
+icon: "/images/logos/google.webp"
+sidebarTitle: "Google SKAN Setup"
+---
+
+SKAdNetwork (SKAN) is Apple's privacy-preserving framework for iOS attribution. Google Ads uses SKAN postbacks to measure and optimize iOS App Campaigns. This guide walks you through the complete Google Ads SKAN setup with Linkrunner.
+
+Track your progress with the **Google Ads SKAN Integration Checklist**: [Integrations → Google Ads → SKAN Integration](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=skan_integration).
+
+<Note>
+    This guide covers the Google-specific SKAN setup. If you haven't connected Google Ads to Linkrunner yet, start with
+    the [Google Ads integration guide](/ad-networks/google-ads).
+</Note>
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- A [connected Google Ads integration](/ad-networks/google-ads)
+- Your app live with a SKAN-ready Linkrunner SDK version (see [minimum versions](/features/skadnetwork-integration#minimum-sdk-versions))
+- Admin access to the Google Ads account that runs your iOS campaigns
+
+## 1. Prepare Your App
+
+### Update the SDK
+
+Your app must run a SKAN-ready SDK version. The SDK updates conversion values automatically as users perform events, so no SKAN code is needed on your side. Check the [minimum SDK versions](/features/skadnetwork-integration#minimum-sdk-versions).
+
+### Add Google's Ad Network Identifier
+
+Apple only generates SKAN postbacks for ad networks listed in your app's `Info.plist`. Add Google's identifier under `SKAdNetworkItems`:
+
+```xml
+<key>SKAdNetworkItems</key>
+<array>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>cstr6suwn9.skadnetwork</string>
+    </dict>
+</array>
+```
+
+<Info>On Expo, add these under `ios.infoPlist.SKAdNetworkItems` in your `app.json`.</Info>
+
+### Add the Postback Copy Endpoints
+
+Add these keys to your `Info.plist` so Apple sends copies of SKAN postbacks to Linkrunner:
+
+```xml
+<key>NSAdvertisingAttributionReportEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+<key>AttributionCopyEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+```
+
+<Info>The Linkrunner Expo plugin adds these keys automatically.</Info>
+
+## 2. Create an iOS Link ID
+
+A Google Ads iOS link ID enables data sharing between Linkrunner and Google Ads for your iOS app.
+
+<Steps>
+    <Step title="Open Third-party app Analytics">
+        In Google Ads, go to **Tools → Data Manager → Third-party app Analytics**, or visit
+        [ads.google.com/aw/productlinks/thirdpartyappanalytics](https://ads.google.com/aw/productlinks/thirdpartyappanalytics).
+    </Step>
+    <Step title="Create the link ID">
+        Click **+ Create link ID**, select **Other provider**, and enter provider ID `9936233049`.
+    </Step>
+    <Step title="Select your iOS app">
+        Choose the **iOS** platform, select your app, then click **Create link ID** and copy the generated ID.
+    </Step>
+    <Step title="Paste it into Linkrunner">
+        In the Linkrunner Dashboard, open [Integrations → Google
+        Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads) and paste the iOS link ID.
+    </Step>
+</Steps>
+
+See the full walkthrough in [Google Ads → Create Link ID](/ad-networks/google-ads#2-create-link-id-for-android%2Fios-app).
+
+## 3. Connect Your Google Ads Account
+
+Linkrunner needs OAuth access to your Google Ads account to deliver SKAN postbacks and conversion values.
+
+<Steps>
+    <Step title="Open the Google Ads integration">
+        In the Linkrunner Dashboard, open [Integrations → Google
+        Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads).
+    </Step>
+    <Step title="Authenticate">
+        Click **Connect Google Ads Account** and authenticate with the Google account that manages your ads.
+    </Step>
+    <Step title="Select accounts">Select the customer account(s) you want to connect.</Step>
+</Steps>
+
+## 4. Configure the SKAN Schema in Linkrunner
+
+Linkrunner converts your event list into SKAN conversion values (0-63) and sends the schema to Google automatically.
+
+<Steps>
+    <Step title="Set up event priority">
+        Go to **Settings → SKAN Setup → Events Setup** in the [Linkrunner
+        Dashboard](https://dashboard.linkrunner.io/dashboard/settings/skan-setup?tab=event-setup). Add the events that
+        matter for optimization and drag rows to set priority. The topmost event has the highest priority.
+    </Step>
+    <Step title="Set ranges">
+        For revenue events, set a **min** and **max** range. For occurrence events, set an **average**.
+    </Step>
+    <Step title="Generate the mapping">
+        Click **Generate SKAN Mapping**. The dashboard shows the combination count in real time and warns if your
+        configuration would exceed Apple's limit of 64 conversion values.
+    </Step>
+</Steps>
+
+<Note>
+    If you already configured the schema for Meta Ads, no extra work is needed. Linkrunner reuses the same schema for
+    Google.
+</Note>
+
+For background on how this maps to SKAN 4.0, see [Conversion Values in SKAdNetwork](/features/skadnetwork-conversion-values).
+
+## 5. Map Events to Google Ads
+
+Map each Linkrunner event to the corresponding Google Ads conversion action so postbacks land against the right conversion in your Google Ads account.
+
+<Steps>
+    <Step title="Open event mapping">
+        Go to [Integrations → Google Ads → Event
+        Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping).
+    </Step>
+    <Step title="Map each event">
+        For each event in your SKAN schema, select the Google Ads conversion action it should map to.
+    </Step>
+    <Step title="Save">Save the mapping.</Step>
+</Steps>
+
+<Note>
+    Linkrunner automatically sends the SKAN schema configuration to Google on your behalf. You don't need to upload
+    conversion values manually in Google Ads.
+</Note>
+
+<Tip>
+    If an event is not available as a conversion action in Google Ads, fire a test event from Linkrunner, then import it
+    from **Goals → Conversions → Summary** after Google finishes processing it.
+</Tip>
+
+## 6. Verify the Setup
+
+<Steps>
+    <Step title="Check the checklist">
+        Confirm every item is complete in the [Google Ads SKAN Integration
+        Checklist](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=skan_integration).
+    </Step>
+    <Step title="Run an iOS campaign">
+        SKAN postbacks only flow once a Google Ads iOS App Campaign is live and driving installs.
+    </Step>
+    <Step title="Watch the SKAN dashboard">
+        Postbacks appear in the [SKAN dashboard](/features/skan-dashboard/overview) as Apple delivers them. Apple delays
+        postbacks by design, so expect data 24 to 48 hours after installs begin.
+    </Step>
+</Steps>
+
+## Troubleshooting
+
+### No postbacks in the SKAN dashboard
+
+- Confirm the `Info.plist` keys from [section 1](#1-prepare-your-app) are in the live app build
+- Confirm the SKAN-ready SDK version is live and rolled out to 100% of users
+- Wait 24 to 48 hours. Apple delays SKAN postbacks by design
+
+### Conversions not showing in Google Ads
+
+- Confirm the iOS link ID is pasted correctly in Linkrunner
+- Confirm your Google Ads account is connected via OAuth
+- Confirm the event is mapped to a conversion action in [Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping)
+- Wait up to 12 hours. Google processes third-party app analytics events with a delay
+
+### iOS campaign numbers differ from Linkrunner
+
+This is expected with SKAN. See [Google Ads FAQ and Discrepancies](/ad-networks/google-ads-discrepancies) and [iOS Campaign Data Limitations](/features/ios-campaign-data-limitations).
+
+---
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

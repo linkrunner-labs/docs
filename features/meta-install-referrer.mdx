@@ -4,6 +4,16 @@ description: "Receive ad campaign metadata from device storage for improved attr
 icon: "meta"
 ---
 
+<Note>
+  **Using an AI coding agent?** Have it set this up for you:
+
+  ```bash
+  npx @linkrunner/skills add meta-install-referrer
+  ```
+
+  The skill adds the Facebook App ID to your Android manifest and verifies the wiring. See [Linkrunner Agent Skills](/ai-agent-skills).
+</Note>
+
 ## Overview
 
 Meta install referrer allows Linkrunner to receive ad campaign metadata from a device's local storage.
@@ -14,6 +24,10 @@ The basic flow of the Meta install referrer mechanism is as follows:
 
 1. Once the SDK initializes, it uses the app's Facebook App ID to make a request to the Meta Content Provider API, retrieving the stored metadata from the Facebook app.
 2. Linkrunner SDK sends the install event, along with the attribution data, to the Linkrunner servers.
+
+<Tip>
+Use the [Meta Android attribution testing guide](/testing/meta-android-attribution-testing) to verify the complete Ads Manager preview, install, and `getAttributionData()` flow.
+</Tip>
 
 ## Prerequisites
 

@@ -1,0 +1,153 @@
+---
+title: "Push Notification Tracking"
+description: "Track push notification opens and attribute them to campaigns using handleDeeplink"
+icon: "bell"
+---
+
+Measure how well your push notifications perform by attributing app opens to a Linkrunner campaign. You put a campaign link inside the notification, and when the user taps it, your app passes the link to the SDK's `handleDeeplink` function.
+
+## How it works
+
+1. You create a campaign in Linkrunner and copy its link
+2. You send a push notification that carries the link
+3. The user taps the notification and your app opens
+4. Your app passes the link to `handleDeeplink`
+5. Linkrunner attributes the app open to the campaign, and it shows up in your campaign analytics
+
+## Prerequisites
+
+- Linkrunner SDK installed and initialized in your app. See your platform's guide: [Android](/sdk/android), [iOS](/sdk/ios), [React Native](/sdk/react-native), [Flutter](/sdk/flutter), [Expo](/sdk/expo).
+- `handleDeeplink` implemented in your app. Refer to your SDK guide ([Android](/sdk/android#handle-deeplink), [iOS](/sdk/ios#handle-deeplink), [React Native](/sdk/react-native#handle-deeplink), [Flutter](/sdk/flutter#handle-deeplink)) for the base setup.
+- A push notification provider (Firebase Cloud Messaging, OneSignal, Braze, CleverTap, etc.) already sending notifications to your app.
+
+## Setup
+
+<Steps>
+  <Step title="Create a campaign">
+    In the [Linkrunner Dashboard](https://dashboard.linkrunner.io/dashboard?m=create-campaign):
+
+    1. Click **"Create Campaign"**
+    2. Name it after the notification or push campaign (for example, `Diwali Sale Push`)
+    3. Copy the campaign link
+
+    ![Create Campaign Screenshot](/images/create-campaign.png)
+
+    <Tip>Create one campaign per push campaign, not one per notification. All opens from that push campaign then roll up under a single campaign in your analytics.</Tip>
+  </Step>
+  <Step title="Add the link to your push notification">
+    Include the campaign link in the notification's data payload under a key your app reads on tap (for example, `link`).
+
+    ```json
+    {
+      "notification": {
+        "title": "Diwali Sale is live!",
+        "body": "Up to 50% off, today only."
+      },
+      "data": {
+        "link": "https://get.yourdomain.com/diwali-sale"
+      }
+    }
+    ```
+
+    <Info>If your provider supports a "launch URL" or "deep link" field (OneSignal, Braze, CleverTap all do), you can put the campaign link there instead. The OS then opens your app with the link, and your existing deep link listeners receive it. Using CleverTap, WebEngage, or MoEngage? See [Push Notification Providers](/features/push-notification-providers) for exact steps.</Info>
+  </Step>
+  <Step title="Pass the link to handleDeeplink">
+    When the user taps the notification, read the link from the payload and pass it to `handleDeeplink`.
+
+    <Tabs>
+      <Tab title="Android">
+        With Firebase Cloud Messaging, data payload keys arrive as intent extras in your launcher activity:
+
+        ```kotlin
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            trackPushOpen(intent)
+        }
+
+        override fun onNewIntent(intent: Intent) {
+            super.onNewIntent(intent)
+            trackPushOpen(intent)
+        }
+
+        private fun trackPushOpen(intent: Intent) {
+            intent.extras?.getString("link")?.let { link ->
+                LinkRunner.getInstance().handleDeeplink(link)
+            }
+        }
+        ```
+      </Tab>
+      <Tab title="iOS">
+        Read the link from the notification's `userInfo` in your `UNUserNotificationCenterDelegate`:
+
+        ```swift
+        func userNotificationCenter(
+            _ center: UNUserNotificationCenter,
+            didReceive response: UNNotificationResponse
+        ) async {
+            let userInfo = response.notification.request.content.userInfo
+            if let link = userInfo["link"] as? String {
+                await LinkrunnerSDK.shared.handleDeeplink(url: link)
+            }
+        }
+        ```
+      </Tab>
+      <Tab title="React Native">
+        With `@react-native-firebase/messaging`:
+
+        ```javascript
+        import messaging from '@react-native-firebase/messaging';
+        import linkrunner from 'rn-linkrunner';
+
+        // App opened from the background by a notification tap
+        messaging().onNotificationOpenedApp((message) => {
+          const link = message?.data?.link;
+          if (link) linkrunner.handleDeeplink(link);
+        });
+
+        // App opened from a killed state by a notification tap
+        messaging()
+          .getInitialNotification()
+          .then((message) => {
+            const link = message?.data?.link;
+            if (link) linkrunner.handleDeeplink(link);
+          });
+        ```
+      </Tab>
+      <Tab title="Flutter">
+        With `firebase_messaging`:
+
+        ```dart
+        // App opened from the background by a notification tap
+        FirebaseMessaging.onMessageOpenedApp.listen((message) {
+          final link = message.data['link'];
+          if (link != null) LinkRunner().handleDeeplink(link);
+        });
+
+        // App opened from a killed state by a notification tap
+        final message = await FirebaseMessaging.instance.getInitialMessage();
+        final initialLink = message?.data['link'];
+        if (initialLink != null) LinkRunner().handleDeeplink(initialLink);
+        ```
+      </Tab>
+    </Tabs>
+
+    <Note>If your provider opens the campaign link as a launch URL instead, you don't need the code above. Your existing `handleDeeplink` deep link listeners already receive the link.</Note>
+  </Step>
+  <Step title="Test it">
+    1. Send a test notification with the campaign link in the payload to your own device
+    2. Tap the notification
+    3. Open the campaign in the [dashboard](https://dashboard.linkrunner.io/dashboard/campaigns) and verify the app open appears in its analytics
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+**Opens are not showing up in the campaign?** Log the value you pass to `handleDeeplink` and confirm it is the exact campaign link. A missing or misspelled payload key (`link`) is the most common cause.
+
+**Works when the app is in the background but not from a killed state?** Cold starts need their own handling (`getInitialNotification` on React Native, `getInitialMessage` on Flutter, `onCreate` extras on Android). Make sure `handleDeeplink` is called after the SDK is initialized.
+
+**The notification opens the browser instead of the app?** Your provider is treating the link as a web URL. Use the data payload approach, or set up [deep linking](/features/deep-linking-setup) so the campaign link domain opens your app directly.
+
+---
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

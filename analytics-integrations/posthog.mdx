@@ -23,22 +23,22 @@ Every time a user is attributed by Linkrunner, we automatically send a request t
 | Requirement | Description |
 |---|---|
 | Linkrunner account | A Linkrunner account is required to take advantage of this integration. |
-| PostHog account | A PostHog account with API access. |
+| PostHog account | A PostHog account with access to the Project Token. |
 | iOS or Android app | This integration supports iOS and Android apps. |
 | Linkrunner SDK | You must have the [Linkrunner SDK](/introduction) installed in your app. |
 
 ## Steps to setup
 
 <Steps>
-  <Step title="Get API Key from PostHog and Configure in Linkrunner">
-    First, you need to get your API key from your PostHog dashboard.
+  <Step title="Get Project Token from PostHog and Configure in Linkrunner">
+    First, you need to get your Project Token from your PostHog dashboard.
 
-    1. In your PostHog dashboard, navigate to **Project Settings** > **Project API Key**
-    2. Copy your **API Key**
+    1. In your PostHog dashboard, navigate to **Settings** > **General** > **Project Token**
+    2. Copy your **Project Token** (starts with `phc_`)
 
     3. In Linkrunner, navigate to **Integrations** from the left-hand panel
     4. Under **Analytics**, click **Configure** for PostHog
-    5. Enter your **API Key**
+    5. Enter your **Project Token**
   </Step>
 
   <Step title="Map User Identifiers in SDK">
@@ -66,7 +66,7 @@ Every time a user is attributed by Linkrunner, we automatically send a request t
 
       <Tab title="iOS (Swift)">
         ```swift
-        import Linkrunner
+        import LinkrunnerKit
 
         let userData = UserData(
             id: "123", // Your user ID (same as PostHog identify)
@@ -117,7 +117,7 @@ Every time a user is attributed by Linkrunner, we automatically send a request t
   <Step title="Sync with PostHog (Optional)">
     Use the **Sync** feature in the following scenarios:
 
-    - First time after adding your PostHog API Key
+    - First time after adding your PostHog Project Token
     - If you see discrepancies in attribution data on PostHog profiles
 
     To sync, click the **Sync with PostHog** button in the Linkrunner integration settings. This process may take a while depending on the number of users.

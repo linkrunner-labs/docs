@@ -1,0 +1,295 @@
+---
+title: "Reddit Ads"
+description: "Run Reddit Ads with Linkrunner attribution, Reddit click IDs, Conversions API postbacks, and deferred deep linking"
+icon: "/images/logos/reddit.svg"
+---
+
+## Overview
+
+Use Reddit Ads with Linkrunner when you want to send Reddit traffic through one Linkrunner campaign link, attribute installs and in-app events, and send server-side conversions back to Reddit through the Reddit Conversions API.
+
+The recommended flow is:
+
+1. Create or prepare your Reddit Ads account.
+2. Create a Reddit Pixel and Conversion Access Token in Reddit Events Manager.
+3. Add the Reddit Pixel ID and Conversion Access Token in Linkrunner.
+4. Create a Linkrunner campaign link for each Reddit ad or destination you want to measure.
+5. After the Linkrunner campaign link is created, use it as the destination URL in Reddit Ads Manager.
+6. Test the full click, install, first open, and event flow before scaling spend.
+
+<Note>
+  Linkrunner captures Reddit's `rdt_cid` click ID when a user clicks your Reddit ad. Reddit appends this value to the destination URL, so keep the Linkrunner campaign link intact and do not remove query parameters.
+</Note>
+
+## What you need
+
+- A Linkrunner project with the Linkrunner SDK installed in your app
+- Android and iOS store URLs configured in Linkrunner
+- Deep linking configured if the ad should open a specific in-app screen
+- Access to a Reddit Ads account
+- A Reddit Pixel ID
+- A Reddit Conversion Access Token for Conversions API
+
+<Note>
+  Linkrunner's Reddit CAPI setup does not require a Reddit Advertiser ID or Ad Account ID. Use the Reddit account only to create the Pixel, generate the Conversion Access Token, and run the ad campaign.
+</Note>
+
+## 1. Prepare your Reddit Ads account
+
+Go to [Reddit Ads](https://ads.reddit.com) and sign in to the advertiser account that will run the campaign. If this is your first Reddit campaign, complete the business, billing, and advertiser setup required by Reddit.
+
+![Reddit Ads account registration](/images/reddit-ads/reddit-ads-register.png)
+
+In Reddit Ads Manager, keep these values ready:
+
+- **Pixel ID** - this identifies the Reddit Pixel that should receive conversions.
+- **Conversion Access Token** - this authorizes Linkrunner to send Reddit Conversions API events.
+
+You can create or manage these from Reddit Events Manager.
+
+## 2. Add Reddit CAPI credentials in Linkrunner
+
+Open your Linkrunner project and go to **Dashboard > Integrations > Reddit Ads**.
+
+Complete the Linkrunner setup in this order:
+
+1. Open **Pixel Management**.
+2. Add the Reddit Pixel ID and Conversion Access Token.
+3. Open **Event Mapping** after the credentials are saved.
+
+
+
+Paste the Reddit Pixel ID and Conversion Access Token from Reddit Events Manager, then click **Save Configuration**.
+
+![Add Reddit CAPI credentials in Linkrunner](/images/reddit-ads/linkrunner-add-reddit-capi-credentials.png)
+
+After the credentials are saved, Linkrunner shows the Reddit Pixel row on **Pixel Management** with a configured CAPI status.
+
+![Linkrunner Reddit CAPI credentials page](/images/reddit-ads/linkrunner-reddit-capi-credentials.png)
+
+After saving, Linkrunner uses these credentials to send Reddit Conversions API events for attributed installs and mapped in-app events.
+
+<Warning>
+  Use the Pixel ID and Conversion Access Token from the same Reddit advertiser account. A mismatched Pixel or token can prevent Reddit from accepting or matching events.
+</Warning>
+
+## 3. Map events for Reddit
+
+Open the **Event Mapping** tab inside the Reddit Ads integration page. This tab becomes available after the Reddit Pixel ID and Conversion Access Token are saved.
+
+![Reddit event mapping table in Linkrunner](/images/reddit-ads/linkrunner-reddit-event-mapping.png)
+
+Click **Add Mapping** for each app event you want Reddit to optimize or report on.
+
+![Add a Reddit event mapping in Linkrunner](/images/reddit-ads/linkrunner-add-reddit-event-mapping.png)
+
+Create or review your mappings:
+
+1. Review the default install mapping. Linkrunner sends installs and first opens to Reddit as a custom event named `Install`.
+2. In **Your Events**, choose the Linkrunner event captured by your SDK, such as `registration`, `purchase`, `search`, or `add_to_cart`.
+3. In **Reddit Ads Event**, choose the matching Reddit event key, such as `SIGN_UP`, `PURCHASE`, `SEARCH`, or `ADD_TO_CART`.
+4. For purchase or revenue events, enable **Send Revenue** and choose the currency that should be sent to Reddit.
+5. Save the mapping.
+6. Use Reddit Events Manager's test flow or Linkrunner's test-event action to confirm the mapped event reaches Reddit before increasing spend.
+
+Linkrunner sends install and first-open defaults as a Reddit custom event named `Install`. Signup and registration defaults use Reddit's `SIGN_UP` event. For purchase and other post-install events, create explicit mappings so Linkrunner knows which Reddit event to send.
+
+Recommended starting mappings:
+
+| Linkrunner event | Reddit event key |
+| --- | --- |
+| Install or first open | Custom event named `Install` |
+| Registration or signup | `SIGN_UP` |
+| Purchase | `PURCHASE` |
+| Search | `SEARCH` |
+| Add to cart | `ADD_TO_CART` |
+| Lead form or qualified lead | `LEAD` |
+| Custom app event | Custom Reddit event name |
+
+<Tip>
+  Start with the default install/signup behavior and a purchase mapping. Add search, add-to-cart, lead, or custom mappings after your first campaign is sending clean traffic and Reddit Events Manager shows successful event delivery.
+</Tip>
+
+## 4. Create a Linkrunner campaign link
+
+Before you create the Reddit ad, create the Linkrunner campaign link that Reddit will send users to.
+
+1. Go to **App Campaigns** in Linkrunner.
+2. Click **Create Link**.
+3. Enter a clear campaign name and destination setup.
+4. Add the app route or deferred deep link if the ad should open a specific in-app screen after install.
+5. Open **Advanced Options**.
+6. Select **Reddit Ads** as the ad channel when the option is available.
+7. Create the campaign and copy the shareable Linkrunner campaign link.
+
+![Create a Linkrunner campaign link](/images/reddit-ads/linkrunner-create-campaign.png)
+
+Use **Advanced Options** to set the ad channel and any campaign metadata you need for reporting.
+
+![Linkrunner campaign advanced options](/images/reddit-ads/linkrunner-create-campaign-advanced.png)
+
+<Note>
+  Create a new Linkrunner campaign for every new Reddit destination link that should be valid and measured independently. For example, use different Linkrunner campaign links for different creatives, landing destinations, audiences, or experiments.
+</Note>
+
+<Tip>
+  Create different links for different ad creatives to track creative-level metrics. You can easily duplicate campaigns once created for every ad creative, making it faster to create multiple campaigns with different tracking links.
+</Tip>
+
+<Warning>
+  Do not paste the App Store or Play Store URL directly into Reddit Ads if you want Linkrunner attribution, deferred deep linking, or Reddit CAPI postbacks. Reddit should send the user to the Linkrunner campaign link first.
+</Warning>
+
+## 5. Create the Reddit campaign
+
+After the Linkrunner campaign link is created, go to [Reddit Ads Manager](https://ads.reddit.com) and create the campaign that will use that link.
+
+### Step 1: Open Ads Manager
+
+Go to [Reddit Ads Manager](https://ads.reddit.com) and select the ad account that owns the Pixel you configured in Linkrunner.
+
+![Reddit Ads Manager dashboard](/images/reddit-ads/reddit-ads-manager-dashboard.png)
+
+Click **Create Campaign**.
+
+### Step 2: Use Advanced Create
+
+If Reddit asks how you want to create the campaign, choose **Advanced Create**. This gives you access to objective, audience, bidding, conversion goal, and destination URL controls.
+
+![Reddit campaign creation start screen](/images/reddit-ads/reddit-create-campaign-start.png)
+
+### Step 3: Configure campaign details
+
+Enter a clear campaign name. Choose the objective based on how you want Reddit to optimize delivery:
+
+- **Conversions** - recommended when your Reddit Pixel and Linkrunner CAPI events are ready, and you want Reddit to optimize toward mapped events like Sign Up, Lead, or Purchase.
+- **Traffic** - useful for an early click-through test before event optimization.
+
+![Reddit campaign details and objective](/images/reddit-ads/reddit-campaign-details-objective.png)
+
+For most Linkrunner CAPI setups, select **Conversions**.
+
+![Create a Reddit Conversions campaign](/images/reddit-ads/reddit-create-conversions-campaign.png)
+
+Set the campaign budget, schedule, and bidding strategy. Keep the budget low while testing the first campaign.
+
+### Step 4: Configure the ad group
+
+In the ad group, configure the audience and delivery settings:
+
+1. Add an ad group name.
+2. Choose audience suggestions such as keywords, communities, custom audiences, and locations.
+3. Choose placements. **Auto placements** is a good default for the first test.
+4. Set the ad group budget and schedule.
+5. In **Bidding & optimization**, select the conversion goal that matches the Reddit event you mapped in Linkrunner.
+6. Choose the conversion optimization window, such as 7-day click and 1-day view, unless your team has a stricter attribution policy.
+
+![Reddit ad group setup](/images/reddit-ads/reddit-ad-group-setup.png)
+
+<Tip>
+  The conversion goal should match the event you want Reddit to optimize for. For example, if Linkrunner maps registration to Reddit **Sign Up**, choose that Sign Up conversion goal in Reddit when it is available.
+</Tip>
+
+### Step 5: Create the ad
+
+On the ad setup screen, add the creative that Reddit users will see:
+
+1. Enter the ad name.
+2. Add the headline, media, body copy, and call to action.
+3. In the destination URL field, paste the **Linkrunner campaign link** you created earlier.
+4. Keep all URL parameters intact.
+5. Preview the ad.
+
+![Paste the Linkrunner campaign link in Reddit Ads Manager](/images/reddit-ads/reddit-paste-linkrunner-url.png)
+
+<Warning>
+  Do not replace the Linkrunner campaign link with the App Store URL, Play Store URL, or your website URL. Reddit must send the click to Linkrunner first so Linkrunner can capture `rdt_cid`, redirect the user, attribute the install, and send Reddit CAPI postbacks.
+</Warning>
+
+### Step 6: Review and publish
+
+Review the campaign, ad group, and ad before publishing.
+
+1. Confirm the ad account owns the same Reddit Pixel configured in Linkrunner.
+2. Confirm the Pixel and conversion goal match the Pixel configured in Linkrunner.
+3. Confirm the destination URL is the Linkrunner campaign link.
+4. Confirm the budget is intentionally low for the first test.
+5. Publish the campaign when everything is correct.
+
+<Tip>
+  If you create multiple Reddit ads in the same ad group, create a separate Linkrunner campaign link for each ad when you want ad-level reporting in Linkrunner.
+</Tip>
+
+## How attribution and CAPI work
+
+When a Reddit user clicks your ad, Reddit appends `rdt_cid` to the destination URL. Linkrunner captures that click ID on the campaign link click and carries it through install attribution.
+
+For attributed installs and mapped in-app events, Linkrunner sends a Reddit Conversions API event that includes:
+
+- The Reddit click ID (`rdt_cid`)
+- The mapped Reddit event name
+- Event time
+- Deduplication ID
+- Hashed user identifiers when available
+- Value, currency, item count, and other event metadata when available
+
+This lets Reddit match the server-side conversion back to the ad click while Linkrunner continues to show attribution and campaign performance in your dashboard.
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Why are my Reddit campaigns not showing up on Linkrunner?">
+    Unlike Meta campaigns, Reddit campaigns do not appear automatically on the Linkrunner dashboard. They show up after users click the Linkrunner campaign links you set as destination URLs in your Reddit ads.
+
+    To fix this, confirm each Reddit ad uses a Linkrunner campaign link, the ad is active and receiving traffic, and your app is live with the Linkrunner SDK installed.
+  </Accordion>
+
+  <Accordion title="Why are my Reddit events not appearing in Reddit Events Manager?">
+    Confirm the Pixel ID and Conversion Access Token are from the same Reddit advertiser account. Then verify that the Reddit ad sends users to the Linkrunner campaign link and that the click URL preserves `rdt_cid`.
+
+    Reddit Events Manager may show Linkrunner events under **CAPI Direct**. Pixel source events appear only when you also install Reddit's browser Pixel on your website; Linkrunner's server-side postbacks do not require that browser Pixel source.
+  </Accordion>
+
+  <Accordion title="Do Reddit campaigns appear automatically like Meta campaigns?">
+    No. Reddit uses a web-to-app flow where the Linkrunner campaign link acts as the tracking mechanism. Campaigns appear on the dashboard when users click through these links.
+  </Accordion>
+
+  <Accordion title="What is rdt_cid and why is it important?">
+    `rdt_cid` is Reddit's click ID. Reddit appends it to the destination URL when a user clicks an ad, and Linkrunner captures it from the campaign link click for attribution and Reddit CAPI postbacks.
+
+    Keep the Linkrunner campaign link intact and do not remove URL parameters. Without `rdt_cid`, Linkrunner cannot match the install or event back to the Reddit ad click.
+  </Accordion>
+
+  <Accordion title="Can I use the same campaign link for multiple Reddit ads?">
+    You can, but it is not recommended when you want creative-level reporting. Create separate Linkrunner campaign links for each Reddit ad, creative, destination, or experiment you want to split in reporting. Update each Reddit ad destination URL with the correct Linkrunner campaign link.
+
+    You can quickly duplicate campaigns in Linkrunner to create multiple links for different ad creatives.
+  </Accordion>
+
+  <Accordion title="The ad click opens the wrong destination">
+    Check the Linkrunner campaign's store URLs, platform routing, and deferred deep link configuration. If you changed the campaign after publishing the Reddit ad, click the Reddit ad again to test the current redirect behavior.
+  </Accordion>
+
+  <Accordion title="Can I track revenue and purchase events from Reddit campaigns?">
+    Yes. Linkrunner can send mapped purchase and revenue events to Reddit when your app sends revenue events through the Linkrunner SDK and the event is mapped to Reddit's `PURCHASE` event.
+
+    For purchase or revenue events, enable **Send Revenue** in the Reddit event mapping and choose the currency that should be sent to Reddit.
+  </Accordion>
+
+  <Accordion title="How do I verify Linkrunner is sending events to Reddit?">
+    Use Linkrunner's SDK testing flow to verify installs and events first. Then use [Reddit's event verification workflow for test events](https://ads-api.reddit.com/docs/v3/capi-verify-events) to confirm events are reaching Reddit Events Manager.
+  </Accordion>
+</AccordionGroup>
+
+## Related setup
+
+<CardGroup cols={2}>
+  <Card title="Deep Linking Setup" icon="link" href="/features/deep-linking-setup">
+    Configure Android App Links and iOS Universal Links.
+  </Card>
+  <Card title="Deferred Deep Linking" icon="route" href="/features/deferred-deep-linking">
+    Read deferred deep link data after first app open.
+  </Card>
+</CardGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

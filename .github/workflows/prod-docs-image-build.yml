@@ -1,0 +1,91 @@
+name: Build and Push Prod Docs Image
+
+# Trigger: push tag matching prod-v*.*.*
+# Builds the linkrunner-labs/docs image and bumps the tag in
+# ops/k8s/overlays/prod/helm-apps/docs/values.yaml so ArgoCD rolls it out.
+
+on:
+  push:
+    tags:
+      - 'prod-v*'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  GCP_REGION: asia-south1
+  GCP_PROJECT_ID: lr-prod-482009
+  GCP_AR_REPOSITORY: docs
+  OPS_REPO: https://github.com/linkrunner-labs/ops.git
+
+jobs:
+  build-and-push:
+    name: Build, Push, and Deploy Prod Docs Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Parse tag
+        id: parse-tag
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          commit_hash=$(echo "$GITHUB_SHA" | cut -c1-7)
+          timestamp=$(date +%Y%m%d%H%M%S)
+          image_tag="${TAG}-${commit_hash}-${timestamp}"
+          echo "image_tag=$image_tag" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_AR_REPOSITORY }}/docs:${{ steps.parse-tag.outputs.image_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Update prod overlay in ops repo
+        run: |
+          git config --global user.email "ci@linkrunner.io"
+          git config --global user.name "Docs CI"
+
+          git clone https://x-access-token:${{ secrets.OPS_DEPLOY_TOKEN }}@github.com/linkrunner-labs/ops.git ops-repo
+          cd ops-repo
+
+          IMAGE_TAG="${{ steps.parse-tag.outputs.image_tag }}"
+
+          OVERLAY="k8s/overlays/prod/helm-apps/docs/values.yaml"
+          sed -i "s|^  tag: .*|  tag: \"${IMAGE_TAG}\"|" "${OVERLAY}"
+          git add "${OVERLAY}"
+
+          git commit -m "chore(ci): bump docs image to ${IMAGE_TAG} [skip ci]"
+
+          # Retry push with rebase to handle concurrent CI runs
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push origin main && break
+            echo "Push attempt $i failed, retrying..."
+            sleep $((i * 5))
+          done

@@ -1,0 +1,293 @@
+---
+title: "API Reference"
+description: "Every Linkrunner client endpoint used for SDK-less Android integration."
+icon: "code"
+---
+
+All endpoints are `POST` requests to `https://api.linkrunner.io` with a JSON body and `Content-Type: application/json`.
+
+## Authentication
+
+Send your project token in the body of every request as `token`. That is the only credential these endpoints need.
+
+```json
+{ "token": "YOUR_PROJECT_TOKEN" }
+```
+
+## Common fields
+
+These fields appear on most requests. Send them on every call once your install is registered.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `token` | string | **Required**. Your project token. |
+| `platform` | string | Use `"ANDROID"` or `"IOS"`. |
+| `install_instance_id` | string | The UUID you generate once and reuse. See [Install instance ID](/sdk-less/introduction#install-instance-id). |
+
+## Rules
+
+- **Rate limit:** 25 requests per second per token. Over the limit returns `429`.
+- **Response envelope:** most endpoints return `{ "msg": string, "status": number, "data": object }`. `init` is the exception (see below).
+- **Call from the device** so Linkrunner sees the device IP.
+
+<Note>
+  This reference uses Android examples. On iOS, send `"platform": "IOS"` and a different `device_data` shape (IDFA, IDFV, and `adservices_attribution_token` instead of GAID and the install referrer). The `init`, `trigger`, `capture-event`, and `capture-payment` responses may also include SKAdNetwork values (`fine_conversion_value`, `coarse_conversion_value`, `lock_postback`). See [iOS device data](/sdk-less/ios-device-data).
+</Note>
+
+---
+
+## init
+
+```
+POST /api/client/init
+```
+
+Registers an install or app open and starts attribution. Call once on app start.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `token` | string | **Required**. |
+| `install_instance_id` | string | The persisted UUID. Send it so events tie to this install. |
+| `device_data` | object | Device signals. See [Collecting device data](/sdk-less/android-device-data). |
+| `platform` | string | `"ANDROID"`. |
+| `app_version` | string | Your app's version name. |
+| `package_version` | string | A version string for your integration. |
+| `link` | string | Optional. The deeplink the app was opened with, if any. |
+| `debug` | boolean | Optional. |
+
+Returns `202`. Attribution runs in the background, so the response only acknowledges receipt.
+
+```json
+{
+  "processing_id": "f1e2...c9",
+  "status": "accepted",
+  "message": "Install event accepted for processing",
+  "success": true
+}
+```
+
+<Note>
+  To read the attribution result, poll [`attribution-data`](#attribution-data) with the same `install_instance_id`.
+</Note>
+
+## attribution-data
+
+```
+POST /api/client/attribution-data
+```
+
+Returns the attribution result for an install. Safe to poll. The result is cached for 24 hours.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `token` | string | **Required**. |
+| `install_instance_id` | string | The install to look up. |
+| `device_data` | object | Optional. Include `install_ref` so the Meta referrer can be resolved. |
+| `platform` | string | `"ANDROID"`. |
+
+```json
+{
+  "msg": "Attribution data retrieved successfully!",
+  "status": 200,
+  "data": {
+    "deeplink": "https://app.example.com/product/123",
+    "campaign_data": {
+      "id": "1234",
+      "name": "summer_sale",
+      "type": "INORGANIC",
+      "ad_network": "META",
+      "group_name": "prospecting",
+      "asset_group_name": "video_ads",
+      "asset_name": "reel_01",
+      "installed_at": "2026-06-14T10:00:00Z",
+      "store_click_at": "2026-06-14T09:55:00Z"
+    },
+    "attribution_source": "META"
+  }
+}
+```
+
+For an organic install, `campaign_data` is `null` and `attribution_source` is `"ORGANIC"`.
+
+## trigger (signup)
+
+```
+POST /api/client/trigger
+```
+
+Identifies the user and ties the install to your user ID. Call when the user signs up or logs in.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `token` | string | **Required**. |
+| `user_data` | object | The user, see below. |
+| `data` | object | Pass-through bag. Include `device_data` inside it. |
+| `install_instance_id` | string | The persisted UUID. |
+| `platform` | string | `"ANDROID"`. |
+| `customer_created_at` | string | Optional. ISO date the user account was created. |
+| `is_first_time_customer` | boolean | Optional. |
+
+`user_data` fields (only `id` is needed):
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | string | Your user ID. |
+| `name`, `email`, `phone` | string | User details. |
+| `mixpanel_distinct_id`, `amplitude_device_id`, `posthog_distinct_id`, `braze_device_id` | string | Analytics IDs for those integrations. |
+| `ga_app_instance_id`, `ga_session_id` | string | Google Analytics IDs. |
+
+```json
+{
+  "token": "YOUR_PROJECT_TOKEN",
+  "platform": "ANDROID",
+  "install_instance_id": "f1e2...c9",
+  "user_data": { "id": "user_123", "email": "user@example.com" },
+  "data": { "device_data": { "...": "..." } }
+}
+```
+
+```json
+{ "msg": "Trigger processed successfully", "status": 200, "data": { "deeplink": "", "trigger": true } }
+```
+
+## set-user-data
+
+```
+POST /api/client/set-user-data
+```
+
+Updates user details after signup, for example when the user adds a phone number. Not a replacement for `signup`.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `token` | string | **Required**. |
+| `user_data` | object | Same shape as `signup`. |
+| `install_instance_id` | string | The persisted UUID. |
+| `platform` | string | `"ANDROID"`. |
+
+## capture-event
+
+```
+POST /api/client/capture-event
+```
+
+Tracks a custom event. Events are stored for all users, including organic ones. Identify the user with `user_id` or `install_instance_id`.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `token` | string | **Required**. |
+| `event_name` | string | **Required**. |
+| `event_data` | object | Optional. Custom attributes. Add `amount` as a number to share revenue with ad networks. |
+| `install_instance_id` | string | The persisted UUID. |
+| `user_id` | string | Optional. |
+| `platform` | string | `"ANDROID"`. |
+
+```json
+{ "msg": "Event capture request received!", "status": 200, "data": { "message": "Event capture request received!" } }
+```
+
+## capture-payment
+
+```
+POST /api/client/capture-payment
+```
+
+Tracks revenue. Like events, the user must be attributed via `signup`.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `token` | string | **Required**. |
+| `amount` | number | Payment amount. Must be zero or greater. |
+| `user_id` | string | The paying user. |
+| `payment_id` | string | **Required**. Used to deduplicate. Sending the same `payment_id` twice is ignored. |
+| `type` | string | Optional. Defaults to `DEFAULT`. |
+| `status` | string | Optional. Defaults to `PAYMENT_COMPLETED`. |
+| `event_data` | object | Optional. Ecommerce attributes. |
+| `install_instance_id` | string | The persisted UUID. |
+| `platform` | string | `"ANDROID"`. |
+
+`type` values: `FIRST_PAYMENT`, `SECOND_PAYMENT`, `ONE_TIME`, `RECURRING`, `WALLET_TOPUP`, `FUNDS_WITHDRAWAL`, `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED`, `SUBSCRIPTION_REFUNDED`, `SUBSCRIPTION_BILLING_ISSUE`, `DEFAULT`.
+
+`status` values: `PAYMENT_INITIATED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, `PAYMENT_CANCELLED`.
+
+```json
+{ "msg": "Payment capture request received!", "status": 201, "data": { "message": "Payment capture request received!" } }
+```
+
+## remove-captured-payment
+
+```
+POST /api/client/remove-captured-payment
+```
+
+Removes a captured payment, for a refund. Provide `payment_id` or `user_id`.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `token` | string | **Required**. |
+| `payment_id` | string | The payment to remove. |
+| `user_id` | string | Remove payments for this user. |
+| `install_instance_id` | string | The persisted UUID. |
+| `platform` | string | `"ANDROID"`. |
+
+## update-push-token
+
+```
+POST /api/client/update-push-token
+```
+
+Stores the device push token, used for uninstall tracking.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `token` | string | **Required**. |
+| `push_token` | string | The FCM token. |
+| `install_instance_id` | string | The persisted UUID. |
+| `platform` | string | `"ANDROID"`. |
+
+## integrations
+
+```
+POST /api/client/integrations
+```
+
+Sends third-party IDs, such as a CleverTap ID.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `token` | string | **Required**. |
+| `integration_info` | object | For example `{ "clevertap_id": "..." }`. |
+| `install_instance_id` | string | The persisted UUID. |
+| `platform` | string | `"ANDROID"`. |
+
+## handle-deeplink
+
+```
+POST /api/client/handle-deeplink
+```
+
+Reports a deeplink open for remarketing and reattribution. Call when your app opens from a deeplink.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `token` | string | **Required**. |
+| `deeplink_url` | string | The deeplink the app opened with. |
+| `device_data` | object | Device signals. |
+| `meta_install_referrer` | object | Optional. The Meta referrer object if available. |
+| `install_instance_id` | string | The persisted UUID. |
+| `platform` | string | `"ANDROID"`. |
+
+```json
+{ "msg": "Deeplink processed", "status": 200, "data": { "deeplink": "https://app.example.com/x", "is_linkrunner": true, "processing": false } }
+```
+
+## Errors
+
+| Code | Meaning |
+| --- | --- |
+| `400` | Missing required field or invalid token. |
+| `401` | Invalid token (on `attribution-data`). |
+| `429` | Rate limit exceeded (25 req/s per token). |
+| `500` | Server error. Retry with backoff. |
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

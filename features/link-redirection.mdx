@@ -39,7 +39,7 @@ When someone clicks a Linkrunner campaign link, the system detects their device,
     ### Timeout behavior
 
     - **iOS**: 300ms timeout before falling back to the App Store.
-    - **Android**: 5-second timeout with a visible countdown before falling back to the Play Store.
+    - **Android**: 2-second timeout with a visible countdown before falling back to the Play Store.
 
     <Note>
       The intermediary page can be customized to match your brand. See [Social media intermediary page](/features/social-media-intermediary-page) for details.
@@ -74,6 +74,16 @@ When someone clicks a Linkrunner campaign link, the system detects their device,
     3. **Store link** — Falls back to the appropriate store page if no website is configured
   </Tab>
 </Tabs>
+
+## Open in app popup
+
+When **Open in app** is enabled on a campaign and Linkrunner detects that your app is already installed, the redirect page shows a **Continue to your app** prompt that opens the app directly, instead of auto-redirecting to the store.
+
+<img src="/images/link-redirection/continue-popup.png" alt="Continue to app popup shown on the Linkrunner redirect page" width="300" />
+
+On Android, detection uses Chrome's `navigator.getInstalledRelatedApps()`. This only works when your app declares an `asset_statements` link back to your Linkrunner subdomain. Linkrunner already hosts the matching `/.well-known/assetlinks.json` on your subdomain; you add the app→site half in your app. See [Enable install detection in Deep linking setup](/features/deep-linking-setup#enable-install-detection-continue-to-app-popup) for the `asset_statements` snippet.
+
+If the app is not installed, or detection is unavailable, the page falls back to the normal store redirect chain.
 
 ## Redirect priority
 

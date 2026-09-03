@@ -4,6 +4,16 @@ description: "Complete guide for integrating Linkrunner in Capacitor apps"
 icon: "/images/icons/capacitor.svg"
 ---
 
+<Note>
+  **Prefer to let your AI coding agent do this?** Install the Linkrunner skill and Claude Code, Cursor, GitHub Copilot, or Windsurf will wire up the SDK and deep links for you:
+
+  ```bash
+  npx @linkrunner/skills add capacitor
+  ```
+
+  Then ask your agent to "integrate Linkrunner". See [Linkrunner Agent Skills](https://github.com/linkrunner-labs/skills).
+</Note>
+
 ## Installation
 
 ### Step 1: Install the Package
@@ -52,6 +62,10 @@ To enable SKAdNetwork postback copies to be sent to Linkrunner, add the followin
 
 For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
 
+<Note>
+    **Google Integrated Conversion Measurement (ICM)** is not available in the Capacitor plugin yet. `capacitor-linkrunner` 2.1.1 pins LinkrunnerKit 4.0.x and `io.linkrunner:android-sdk:4.0.1`, and ICM needs 4.1.0 on both. If you run Google App Campaigns for your iOS app, contact [support@linkrunner.io](mailto:support@linkrunner.io). See [Google ICM](/features/google-icm) for what it does.
+</Note>
+
 ### Step 5: Android Backup Configuration
 
 For Android apps, the SDK provides backup rules to exclude Shared Preferences data from backup. This prevents the retention of the Linkrunner install ID during reinstallation, ensuring accurate detection of new installs and re-installs.
@@ -80,20 +94,10 @@ buildscript {
 }
 ```
 
-## Initialization
-
+## Initialization (Required)
 To initialize the Linkrunner SDK, add this code to your app's initialization:
 
 You can find your project token [here](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
-
-### SDK Signing Parameters (Optional)
-
-For enhanced security, the Linkrunner SDK accepts the following signing parameters during initialization:
-
--   **`secretKey`**: A unique secret key used for request signing and authentication
--   **`keyId`**: A unique identifier for the key pair used in the signing process
-
-You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
 
 Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
 
@@ -116,10 +120,46 @@ const init = async () => {
 init();
 ```
 
+## SDK Signing Parameters (Optional)
 
-## User Registration
+For enhanced security, the Linkrunner SDK accepts the following signing parameters during initialization:
 
-Call the `signup` method once after the user has completed your app's onboarding process:
+-   **`secretKey`**: A unique secret key used for request signing and authentication
+-   **`keyId`**: A unique identifier for the key pair used in the signing process
+
+You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
+
+## Setting the Customer User ID
+
+Use `setCustomerUserId` to attach your own user identifier to the device **right after `init`**. Once set, the identifier is stored securely on-device and automatically included in every event you track, so you never have to pass it on each `trackEvent` call.
+
+Call it as early as the user's ID is available. This guarantees every event carries a `user_id` from the very first event, and is especially useful for existing users who were already onboarded before this feature shipped.
+
+<Note>
+    Available from **Capacitor SDK v1.3.0**.
+</Note>
+
+<Note>
+    **Best practice:** set the Customer User ID as early as possible. The `user_id` is only attached to events tracked **after** it's set, and is not applied retroactively. Use a stable, unique identifier from your own system (for example your internal user ID or a UUID) rather than an email address or other PII.
+</Note>
+
+```typescript
+import linkrunner from "capacitor-linkrunner";
+
+try {
+    await linkrunner.setCustomerUserId("f47ac10b-58cc-4372-a567-0e02b2c3d479"); // Your unique customer user ID (e.g. a UUID)
+    console.log("Customer user id set");
+} catch (error) {
+    console.error("Error setting customer user id:", error);
+}
+```
+
+<Note>
+    The identifier is stored securely on-device and persists across app restarts. Calling `setCustomerUserId` again with a **different** identifier updates the stored value; passing the same identifier is a no-op. `signup()` / `setUserData()` also update it.
+</Note>
+
+## User Identification (Required)
+Call the `signup` method as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 
 It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
 
@@ -160,6 +200,37 @@ const onSignup = async () => {
 };
 ```
 
+## Handle Deeplink
+
+To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
+
+```typescript
+import { App } from '@capacitor/app';
+import linkrunner from 'capacitor-linkrunner';
+
+// Init SDK first
+await linkrunner.init('your_project_token');
+
+// Cold start — app was launched by a deeplink
+const launchUrl = await App.getLaunchUrl();
+if (launchUrl?.url) {
+  linkrunner.handleDeeplink(launchUrl.url);
+}
+
+// Warm start — app was in background, deeplink brought it to foreground
+App.addListener('appUrlOpen', ({ url }) => {
+  linkrunner.handleDeeplink(url);
+});
+```
+
+Linkrunner sends the updated deeplink back after processing. For Linkrunner campaign links, use the returned `deeplink` as the resolved destination instead of the original tracking URL.
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123"
+}
+```
+
 ## Getting Attribution Data
 
 To get attribution data and deeplink information for the current installation, use the `getAttributionData` function:
@@ -192,6 +263,35 @@ The `getAttributionData` function returns:
         groupName: string;
         assetName: string;
         assetGroupName: string;
+        adNetworkCampaignId?: string; // Ad network campaign ID
+        adSetId?: string; // Ad set ID
+        adSetName?: string; // Ad set name
+        adCreativeId?: string; // Ad creative ID
+        adCreativeName?: string; // Ad creative name
+    }
+}
+```
+
+**Example response:**
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123",
+    "campaignData": {
+        "id": "camp_123",
+        "name": "Summer Sale 2024",
+        "type": "INORGANIC",
+        "adNetwork": "META",
+        "installedAt": "2024-03-20T10:30:00Z",
+        "storeClickAt": "2024-03-20T10:29:45Z",
+        "groupName": "iOS Campaign",
+        "assetName": "Banner Ad 1",
+        "assetGroupName": "Product Catalog",
+        "adNetworkCampaignId": "120214682829390250",
+        "adSetId": "120214682829640250",
+        "adSetName": "Productivity",
+        "adCreativeId": "120214682926100250",
+        "adCreativeName": "Static_2"
     }
 }
 ```
@@ -199,6 +299,10 @@ The `getAttributionData` function returns:
 ## Setting User Data
 
 Call `setUserData` each time the app opens and the user is logged in:
+
+<Note>
+**`setUserData` is optional and is not a replacement for `signup`.** Always call `signup` first as soon as the user is identified (signup or login). Use `setUserData` afterwards only when additional user details become available later — for example, when the user adds a phone number, email, or completes their profile after identification.
+</Note>
 
 ```typescript
 import linkrunner from "capacitor-linkrunner";
@@ -239,7 +343,7 @@ This method allows you to connect user identities across different analytics and
 ## Revenue Tracking
 
 <Note>
-    Revenue data is only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before capturing payments. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
+    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 </Note>
 
 ### Capture Payment
@@ -253,7 +357,7 @@ const capturePayment = async () => {
     await linkrunner.capturePayment({
         amount: 100, // Payment amount
         userId: "user123", // User identifier
-        paymentId: "payment456", // Optional: Unique payment identifier
+        paymentId: "payment456", // Required: Unique payment identifier
         type: "FIRST_PAYMENT", // Optional: Payment type
         // type: "SECOND_PAYMENT", // Optional: Payment type
         status: "PAYMENT_COMPLETED", // Optional: Payment status
@@ -265,7 +369,7 @@ const capturePayment = async () => {
 
 -   `amount`: number (required) - The payment amount
 -   `userId`: string (required) - Identifier for the user making the payment
--   `paymentId`: string (optional) - Unique identifier for the payment
+-   `paymentId`: string (required) - Unique identifier for the payment, used to deduplicate transactions
 -   `type`: string (optional) - Type of payment. Available options:
     -   `FIRST_PAYMENT` - First payment made by the user
     -   `WALLET_TOPUP` - Adding funds to a wallet
@@ -306,7 +410,11 @@ Note: At least one of `paymentId` or `userId` must be provided when calling `rem
 ## Tracking Custom Events
 
 <Note>
-    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+    From **Capacitor SDK v1.3.0**, custom events automatically include the `user_id` you set during `signup()` / `setUserData()`. The SDK stores this identifier securely on-device and attaches it to every `trackEvent` call, so you no longer need to pass it manually. Events tracked before signup are sent without a `user_id`.
+</Note>
+
+<Note>
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
 </Note>
 
 Track custom events in your app:
@@ -317,10 +425,17 @@ import linkrunner from "capacitor-linkrunner";
 const trackEvent = async () => {
     await linkrunner.trackEvent(
         "purchase_initiated", // Event name
-        { product_id: "12345", category: "electronics", amount: 99.99 } // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
+        { product_id: "12345", category: "electronics", amount: 99.99 }, // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
+        "order_12345" // Optional: Your own unique event identifier (string or number)
     );
 };
 ```
+
+#### Parameters for `linkrunner.trackEvent`
+
+- `eventName`: string (required) - Name of the event to track
+- `eventData`: object (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventId`: string | number (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
 
 ### Revenue Sharing with Ad Networks
 
@@ -518,12 +633,13 @@ Connect APNs with Linkrunner
 | `linkrunner.init`               | App initialization             | Once when app starts                           |
 | `linkrunner.getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed        |
 | `linkrunner.setAdditionalData`  | Integration code               | When third-party integration IDs are available |
-| `linkrunner.signup`             | Onboarding flow                | Once after user completes onboarding           |
+| `linkrunner.signup`             | Identification flow (signup or login) | Once when the user is identified        |
 | `linkrunner.setUserData`        | Authentication logic           | Every time app opens with logged-in user       |
 | `linkrunner.trackEvent`         | Throughout app                 | When specific user actions occur               |
 | `linkrunner.capturePayment`     | Payment processing             | When user makes a payment                      |
 | `linkrunner.removePayment`      | Refund flow                    | When payment needs to be removed               |
 | `linkrunner.setPushToken`       | Push notification setup        | When push token is available                   |
+| `linkrunner.handleDeeplink`     | Deep link entry points         | When app is opened via a deep link             |
 
 ## Next Steps
 

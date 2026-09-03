@@ -1,0 +1,66 @@
+---
+title: "Affiliate Partner Integration"
+description: "Send Linkrunner your clicks and receive server-to-server postbacks on installs and in-app events"
+icon: "handshake"
+---
+
+## Overview
+
+Linkrunner is a Mobile Measurement Partner (MMP). When you run traffic to an advertiser who uses Linkrunner, the integration works in two directions:
+
+1. **You send us clicks.** You point your traffic at a Linkrunner tracking link and append your own identifiers (most importantly your click ID). Linkrunner records the click and uses it to attribute installs.
+2. **We send you postbacks.** When an install or a post-install event is attributed to your click, Linkrunner fires a server-to-server postback to your endpoint with the data filled into the macros you define.
+
+This is the same model used across the industry, so if you have integrated with other MMPs the flow will feel familiar.
+
+<Note>
+New affiliate partner? [Create your affiliate account](/affiliate-partners/create-account) and submit your workspace for approval first.
+</Note>
+
+```
+Your traffic
+   │  click  (you append tid + s2/s3/s4 params)
+   ▼
+Linkrunner tracking link  ──►  install attributed to your click
+   │
+   │  postback (we fill your macros: click_id, event_name, revenue, ...)
+   ▼
+Your endpoint
+```
+
+## How attribution works
+
+The link between a click and a conversion is your **click ID**. You generate a unique ID for every click and pass it to Linkrunner on the tracking link as `tid`. When a conversion is attributed back to that click, Linkrunner returns the same value in the `{click_id}` and `{tid}` macros on the postback. You match the postback to your original click using that value.
+
+<Note>
+Pass a unique `tid` on every click. Without it, Linkrunner cannot echo an identifier back to you on the postback, and you cannot reconcile conversions against your clicks.
+</Note>
+
+## What you can receive postbacks for
+
+| Conversion | When it fires |
+|---|---|
+| **Install** | A new app install is attributed to your click. |
+| **Signup** | The user completes registration, as defined by the advertiser. |
+| **In-app event** | A post-install event the advertiser tracks (for example a purchase or a custom event). Revenue and currency are included when the event carries them. |
+
+The advertiser controls which of their events map to a postback to you and whether revenue is shared. You provide one postback URL template per conversion you want to receive.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Create an affiliate account" icon="user-plus" href="/affiliate-partners/create-account">
+    Create your workspace and submit it for approval.
+  </Card>
+  <Card title="Create a campaign link" icon="link" href="/affiliate-partners/create-campaign-link">
+    Create a link from the affiliate dashboard with your template parameters included.
+  </Card>
+  <Card title="Tracking links" icon="link" href="/affiliate-partners/tracking-links">
+    The parameters included in your click tracking links.
+  </Card>
+  <Card title="Postbacks and macros" icon="satellite-dish" href="/affiliate-partners/postbacks">
+    The macros Linkrunner fills into your postback URLs, with examples.
+  </Card>
+</CardGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

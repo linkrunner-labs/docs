@@ -8,7 +8,23 @@ Linkrunner integrates with CleverTap to automatically send attribution data, hel
 
 ## How it works
 
-Every time a user is attributed by Linkrunner, we automatically send an organic or inorganic install event to CleverTap for the corresponding user profile.
+Every time a user is attributed by Linkrunner, we send an install event to CleverTap's attribution API for the corresponding user profile. The profile is matched using the CleverTap ID you pass to the Linkrunner SDK (see [Map User Identifiers](#steps-to-setup)).
+
+The event carries these attribution fields:
+
+| Field | Description |
+|---|---|
+| `event_type` | `organic_install` or `inorganic_install`, depending on whether the install was attributed to a campaign. |
+| `utm_source` | The acquisition source. For inorganic installs this is the ad network (for example `meta`, `google`, or `tiktok`). For organic installs this is `organic`. |
+| `utm_campaign` | The campaign name. Sent only for inorganic installs. |
+| `platform` | `android` or `ios`. |
+| `timestamp` | When the install occurred. |
+
+### Example
+
+- User came from a Meta campaign named `Summer_Sale`
+- In CleverTap, that user's profile receives an `inorganic_install` event with `utm_source` set to `meta` and `utm_campaign` set to `Summer_Sale`
+- An unattributed user instead receives an `organic_install` event with `utm_source` set to `organic`
 
 ## Prerequisites
 
@@ -58,7 +74,7 @@ Every time a user is attributed by Linkrunner, we automatically send an organic 
 
       <Tab title="iOS (Swift)">
         ```swift
-        import Linkrunner
+        import LinkrunnerKit
 
         let userData = UserData(
             id: "123", // Your user ID
@@ -121,7 +137,7 @@ After the integration is complete, you can view the attribution data in CleverTa
 
 1. Navigate to a user profile in the CleverTap dashboard
 2. Look for the install events section
-3. You'll see organic or inorganic install events with attribution data
+3. You'll see an `organic_install` or `inorganic_install` event with the `utm_source`, `utm_campaign`, and `platform` values described above
 
 This data can be used to:
 - Create segments based on acquisition source
