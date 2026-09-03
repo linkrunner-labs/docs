@@ -165,7 +165,8 @@
                             "affiliate-partners/create-account",
                             "affiliate-partners/create-campaign-link",
                             "affiliate-partners/tracking-links",
-                            "affiliate-partners/postbacks"
+                            "affiliate-partners/postbacks",
+                            "affiliate-partners/everflow"
                         ]
                     },
                     {
