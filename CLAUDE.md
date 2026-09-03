@@ -47,6 +47,7 @@ These are the rules to follow for every new page or edit. Some existing docs vio
 4. **Second person, present tense.** "You" and "your app", not "the user" or "the developer".
 5. **Bold for UI labels** (`**Save**`, `**Settings → Integrations**`), **backticks for code identifiers** (`init`, `getAttributionData`, `AndroidManifest.xml`).
 6. **Use absolute internal links.** `/features/deep-linking-setup`, not relative paths. Dashboard links use `https://dashboard.linkrunner.io/...`.
+7. **Do not repeat the frontmatter description.** Mintlify renders `description` directly below the page title. The opening body paragraph must add new information. Remove it when it only restates the description.
 
 ### Em-dash replacements
 
@@ -141,7 +142,7 @@ Drop platforms that do not apply. Do not invent new orderings.
 
 ### Capturing dashboard screenshots (retina + padding)
 
-In-product screenshots should match the rest of the page: 2x (retina) resolution with a little padding around the element, not a tight 1x crop. The full-width reference on the Google Web to App page is `final-url-suffix-account-settings.png` (2000px wide).
+In-product screenshots should match the rest of the page: 2x (retina) resolution with a little padding around the element, not a tight 1x crop. Use existing full-width dashboard screenshots as sizing references.
 
 The Playwright MCP `browser_take_screenshot` is locked to 1x (`scale: 'css'`) and crops exactly to the element (no padding). To get retina plus padding, capture via `browser_run_code_unsafe`:
 

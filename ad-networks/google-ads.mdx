@@ -12,6 +12,11 @@ Google Ads integration with Linkrunner enables you to track conversions and opti
 
 Setting up Google Ads integration involves four main steps: connecting your Google Ads account, creating a link ID for your mobile app, mapping events in Linkrunner, and importing events for conversion tracking.
 
+<Note>
+    Running iOS App Campaigns? Google measures iOS installs via SKAdNetwork. After completing this guide, follow the
+    [Google Ads SKAN Setup](/features/google-skan-setup) guide.
+</Note>
+
 ## 1. Connect Your Google Ads Account
 
 Start in the Linkrunner dashboard.
@@ -20,18 +25,11 @@ Start in the Linkrunner dashboard.
 
 ![All Integrations page with the Google Ads card](/images/google_ads/all-integrations-google-ads.png)
 
-2. On the **Account Integration** tab, click **Add Google Account** and select **Google App Ads**
-
-![Add Google Account dropdown with Google App Ads and Google Web to App Ads options](/images/google_ads/add-google-account-dropdown.png)
+2. On the **Account Integration** tab, click **Add Google Account**
 
 3. Sign in with a Google account that has access to your Google Ads account and approve the requested permissions
 
 Once connected, your account appears in the **Google Ad Accounts** table with **Auth Status** showing **Connected**.
-
-<Note>
-    Select **Google Web to App Ads** instead if you run Search, Display, or Performance Max campaigns that drive
-    installs through your website. See [Google Web to App](/ad-networks/google-web-to-app).
-</Note>
 
 ## 2. Create Link ID for Android/iOS App
 
@@ -53,17 +51,33 @@ To connect your mobile app with Google Ads, you'll need to create a link ID that
 4. Select the platform (iOS or Android) and search for your app
 5. Click on **"Create link ID"**
 
-![Google Ads Dashboard - Add Provider](/images/google_ads/google-ads-dashboard-2.webp)
+![Google Ads third-party app analytics form with Other provider selected](/images/google_ads/google-ads-dashboard-2.webp)
+
+Google Ads then shows the generated link ID. Copy it.
+
+![Google Ads confirmation dialog with the generated link ID and its copy button](/images/google_ads/google-ads-dashboard-3.webp)
+
+<Note>Link IDs are per platform. Repeat Step 2 for your other platform if you ship both Android and iOS.</Note>
 
 ### Step 3: Configure in Linkrunner Dashboard
 
-1. Copy the received link ID from Google Ads
-2. Navigate to your Linkrunner Dashboard
-3. Go to [Settings → Google Ads integration](https://dashboard.linkrunner.io/settings?s=google-ads-integration)
-4. Paste the link ID in the designated field
-5. Save your configuration
+Now paste that link ID into Linkrunner.
 
-![Google Ads Dashboard - Link ID Created](/images/google_ads/google-ads-dashboard-3.webp)
+1. Go to [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads) in your Linkrunner dashboard
+2. On the **Account Integration** tab, open the three-dot menu on your Google Ads account row
+
+![Linkrunner Google Ad Accounts table with the three-dot menu on the account row highlighted](/images/google_ads/link-ids/accounts-table-menu.png)
+
+3. Choose **Setup Link IDs**
+
+![Account row menu open showing the Setup Link IDs option](/images/google_ads/link-ids/setup-link-ids-menu.png)
+
+4. Paste the link ID into **Android Link ID** or **iOS Link ID**, matching the platform you selected in Google Ads
+5. Click **Save Link IDs**
+
+![Setup Link IDs dialog with the Android field, iOS field, and Save Link IDs button highlighted in order](/images/google_ads/link-ids/setup-link-ids-modal.png)
+
+<Note>You only need one link ID to save, but add both if you ship on Android and iOS.</Note>
 
 ## 3. Set Up Event Mapping
 
@@ -117,6 +131,88 @@ After creating the link ID and mapping events in Linkrunner, you can import app 
 3. Configure additional settings as needed for each conversion action
 4. Save your conversion actions
 
+## 5. Create Your First Campaign
+
+With steps 1 to 4 complete, launch an App campaign in Google Ads. App campaigns need no tracking links. Attribution flows through the link ID, and campaigns appear in Linkrunner automatically as installs come in.
+
+
+### Step 1: Start a New Campaign
+
+1. Open [Google Ads](https://ads.google.com) and go to **Campaigns**
+2. Click the **+** button and choose **New campaign**
+
+![Google Ads Campaigns page with the create button and New campaign menu item highlighted](/images/google_ads/first-campaign/new-campaign-button.png)
+
+3. Under **What's your campaign objective?**, select **App promotion** and click **Continue**
+
+![Campaign objective screen with the App promotion card highlighted](/images/google_ads/first-campaign/objective-app-promotion.png)
+
+### Step 2: Choose Subtype and Select Your App
+
+1. Under **Select a campaign subtype**, choose the subtype that matches your goal. **App installs** is the right choice for most first campaigns.
+2. Select your app's platform (**Android** or **iOS**)
+3. Under **Look up your app**, search by app name, package name, or store URL and select your app
+4. Enter a campaign name and click **Continue**
+
+![Campaign subtype screen with App installs and the Android platform highlighted](/images/google_ads/first-campaign/subtype-app-installs.png)
+
+<Note>
+    Pick a different subtype when your goal is not new installs:
+
+    - **App engagement**: re-engage users who already have your app with in-app actions. Google requires a minimum of
+      50K installs.
+    - **App pre-registration** (Android only): drive Play Store pre-registrations before your app launches.
+</Note>
+
+### Step 3: Set Locations and Languages
+
+1. Under **Locations**, select the countries to run in
+2. Under **Languages**, select the languages your customers speak
+3. Click **Next**
+
+![Campaign settings screen with the Locations and Languages sections highlighted](/images/google_ads/first-campaign/campaign-settings.png)
+
+### Step 4: Add Ad Assets
+
+App campaigns generate ads automatically from the assets you provide. Google mixes and matches them across Search, Play, YouTube, Display, and Discover.
+
+1. Add up to 5 **Headlines** and 5 **Descriptions**
+2. Upload images and videos if you have them
+3. Click **Next**
+
+![Ad group screen with the Headlines panel highlighted and the ad preview on the right](/images/google_ads/first-campaign/ad-assets.png)
+
+### Step 5: Set Bidding and Budget
+
+1. Under **What do you want to focus on?**, pick what Google should optimize for. You can choose either option; for your first campaign, choose **Install volume**.
+2. Under **What kind of users do you want to target?**, pick either option. For this guide, we select **All users**.
+3. Set your average daily **Budget**
+4. Click **Next**, review the campaign, and click **Publish campaign**
+
+![Bidding and budget screen with Install volume and All users highlighted](/images/google_ads/first-campaign/bidding-install-volume.png)
+
+<Note>
+    Bid on **In-app actions** only after your imported conversion actions have enough volume. Under **How do you want to
+    track install volume?**, Google lists the download conversion actions imported from Linkrunner.
+</Note>
+
+### Step 6: Verify the Campaign in Linkrunner
+
+Campaigns and spend sync automatically from your connected Google Ads account. Attribution rows appear after the campaign receives its first install.
+
+1. Open the [**Campaigns** section](https://dashboard.linkrunner.io/dashboard) in your Linkrunner dashboard
+2. Click **All Channels** and select **Google** to filter your campaigns
+3. Open the campaign to view installs, events, and revenue attributed to it
+
+![Linkrunner Campaigns section with the channel filter open and Google selected](/images/google_ads/first-campaign/linkrunner-campaigns-google-filter.png)
+
+<Note>
+    Campaigns appear after the first attributed install, not immediately at launch. New campaigns can also take a few
+    hours to exit Google's review and start serving.
+</Note>
+
+To open a specific screen after install, click **Edit** on the campaign row and set a **Deferred Deep Link**. Your app receives the URL from `getAttributionData()`. See [Deferred Deep Linking](/features/deferred-deep-linking).
+
 ## Important Notes
 
 <Note>
@@ -129,11 +225,24 @@ After creating the link ID and mapping events in Linkrunner, you can import app 
     events.
 </Tip>
 
+<Note>
+    Running App Campaigns for an iOS app? Set up [Google Integrated Conversion
+    Measurement](/features/google-icm) so Google can attribute installs from users who declined App Tracking
+    Transparency.
+</Note>
+
 ## FAQ and Discrepancies
 
 For answers to common questions and an explanation of why numbers in Google Ads may not exactly match Linkrunner, see [Google Ads FAQ and Discrepancies](/ad-networks/google-ads-discrepancies).
 
 ## Troubleshooting
+
+### Campaign Not Showing in Linkrunner
+
+-   Wait for the first install. Campaigns appear only after at least one install is attributed.
+-   Confirm the link ID is saved for the right platform under [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?p_id=89)
+-   Confirm the campaign is active and serving impressions in Google Ads
+-   Confirm your released app build includes the Linkrunner SDK at 100% rollout
 
 ### Events Not Showing Up
 

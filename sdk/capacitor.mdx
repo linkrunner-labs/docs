@@ -4,6 +4,16 @@ description: "Complete guide for integrating Linkrunner in Capacitor apps"
 icon: "/images/icons/capacitor.svg"
 ---
 
+<Note>
+  **Prefer to let your AI coding agent do this?** Install the Linkrunner skill and Claude Code, Cursor, GitHub Copilot, or Windsurf will wire up the SDK and deep links for you:
+
+  ```bash
+  npx @linkrunner/skills add capacitor
+  ```
+
+  Then ask your agent to "integrate Linkrunner". See [Linkrunner Agent Skills](https://github.com/linkrunner-labs/skills).
+</Note>
+
 ## Installation
 
 ### Step 1: Install the Package
@@ -51,6 +61,10 @@ To enable SKAdNetwork postback copies to be sent to Linkrunner, add the followin
 ```
 
 For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
+
+<Note>
+    **Google Integrated Conversion Measurement (ICM)** is not available in the Capacitor plugin yet. `capacitor-linkrunner` 2.1.1 pins LinkrunnerKit 4.0.x and `io.linkrunner:android-sdk:4.0.1`, and ICM needs 4.1.0 on both. If you run Google App Campaigns for your iOS app, contact [support@linkrunner.io](mailto:support@linkrunner.io). See [Google ICM](/features/google-icm) for what it does.
+</Note>
 
 ### Step 5: Android Backup Configuration
 
@@ -329,7 +343,7 @@ This method allows you to connect user identities across different analytics and
 ## Revenue Tracking
 
 <Note>
-    Revenue data is only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before capturing payments. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page.
+    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 </Note>
 
 ### Capture Payment
@@ -400,7 +414,7 @@ Note: At least one of `paymentId` or `userId` must be provided when calling `rem
 </Note>
 
 <Note>
-    Events are only stored and displayed for attributed users. Make sure you have implemented the [`.signup`](#user-registration) function before tracking events. To attribute a test user, follow the [Integration Testing](/testing/integration-testing) guide. You can verify your events are being captured on the [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
 </Note>
 
 Track custom events in your app:

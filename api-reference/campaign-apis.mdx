@@ -344,6 +344,8 @@ To remove the custom channel from a campaign, pass an empty array:
 | 400         | "Campaign name cannot be empty!"                              | If name is provided but is empty or only whitespace      |
 | 400         | "Active field must be a boolean!"                             | If active is provided but is not a boolean               |
 | 400         | "A campaign can have at most one custom channel"              | If more than one custom channel name is provided         |
+| 400         | "The system MAIN_DOMAIN campaign cannot be renamed."          | The MAIN_DOMAIN campaign is a system marker and cannot be renamed |
+| 400         | "A campaign cannot be renamed to the reserved name MAIN_DOMAIN." | MAIN_DOMAIN is reserved                              |
 | 404         | "Campaign not found!"                                         | If the campaign with the given display_id does not exist |
 | 500         | "Internal server error"                                       |                                                          |
 
@@ -378,6 +380,7 @@ DELETE /campaigns/:display_id
 | HTTP Status | Message                            | When/Why                                                 |
 | ----------- | ---------------------------------- | -------------------------------------------------------- |
 | 400         | "Campaign display ID is required!" | If the display_id param is missing                       |
+| 400         | "Only manually-created LinkRunner campaigns can be deleted. System (MAIN_DOMAIN) and ad-network campaigns cannot be deleted." | The campaign is the system MAIN_DOMAIN campaign or is owned by an ad-network sync |
 | 404         | "Campaign not found!"              | If the campaign with the given display_id does not exist |
 | 500         | "Internal server error"            |                                                          |
 
@@ -461,7 +464,7 @@ Specific error responses for each endpoint are detailed in their respective sect
 
 | Status Code | Error Message                                                          | Description                                                |
 | ----------- | ---------------------------------------------------------------------- | ---------------------------------------------------------- |
-| 400         | "Domain not found in project"                                          | The specified domain name doesn't exist or isn't in your project |
+| 400         | "Domain '{name}' not found for this project!"                          | The specified domain name doesn't exist or isn't in your project |
 | 400         | "store_listing_ids must be an array of non-empty strings!"             | store_listing_ids parameter is not an array or contains empty strings |
 | 400         | "Store listing(s) not found for this project: {ids}"                   | One or more store listing IDs don't exist in your project  |
 | 400         | "Cannot assign multiple store listings with the same platform to a campaign!" | Attempting to add more than one iOS or Android store listing |

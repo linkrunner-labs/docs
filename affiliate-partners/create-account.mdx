@@ -1,0 +1,81 @@
+---
+title: "Create an Affiliate Account"
+description: "Create your affiliate workspace, add your network details, and submit it for approval"
+icon: "user-plus"
+---
+
+Create an affiliate account before you receive Linkrunner tracking links or postbacks.
+
+<Info>
+  You need a work email, a network logo, a short description, and a valid post-install event URL. The install postback URL and website are optional.
+</Info>
+
+## 1. Start your registration
+
+Open [Affiliate Partner Sign Up](https://dashboard.linkrunner.io/affiliate/signup).
+
+Choose **Continue with Google** or enter your **Work Email**, accept the terms, then click **Continue**.
+
+![Affiliate partner signup form](/images/affiliate-partners/create-account-signup.webp)
+
+If you use a work email, open the sign-in link sent to your inbox. The link expires after 15 minutes.
+
+## 2. Add your network details
+
+<Steps>
+  <Step title="Upload your logo">
+    Upload a PNG, JPG, or WebP file up to 5 MB.
+  </Step>
+  <Step title="Describe your network">
+    Enter your affiliate network name and a short description of the traffic or services you provide.
+  </Step>
+  <Step title="Add your website">
+    Enter your website URL if you have one. This field is optional.
+  </Step>
+  <Step title="Continue">
+    Click **Continue** to add your callback URLs.
+  </Step>
+</Steps>
+
+![Completed affiliate network details](/images/affiliate-partners/create-account-network-details.webp)
+
+## 3. Add your postback URLs
+
+Enter the endpoints where Linkrunner should send attributed conversions:
+
+- **Install Postback URL:** Optional. Add it if you want a separate callback for installs.
+- **Post-Install Event URL:** Required. Add the endpoint that receives signup, purchase, and other in-app event postbacks.
+
+Use complete HTTPS URLs, including any credentials that Linkrunner should use. You can edit the URLs later from your affiliate settings.
+
+![Affiliate postback URL setup](/images/affiliate-partners/create-account-postbacks-filled.webp)
+
+Click **Complete setup**.
+
+<Note>
+  Linkrunner configures your postbacks after your application is approved. See [Postbacks and Macros](/affiliate-partners/postbacks) for supported macros and IP allowlisting.
+</Note>
+
+## 4. Wait for approval
+
+The **Pending verification** page confirms that Linkrunner received your application. You can close the page safely.
+
+![Affiliate application pending verification](/images/affiliate-partners/create-account-pending.webp)
+
+Linkrunner emails you when the workspace is approved. After approval, you can sign in and work with connected Linkrunner customers.
+
+## Troubleshooting
+
+**The email sign-in link expired.**
+Return to [Affiliate Partner Sign Up](https://dashboard.linkrunner.io/affiliate/signup) and request a new link.
+
+**Continue is disabled on the network details step.**
+Upload a supported logo, enter an affiliate name, and add a description.
+
+**Complete setup is disabled.**
+Enter a valid HTTPS post-install event URL. The install postback URL can remain blank.
+
+**Your workspace still shows Pending verification.**
+Your application is waiting for Linkrunner approval. You receive an email after the review is complete.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

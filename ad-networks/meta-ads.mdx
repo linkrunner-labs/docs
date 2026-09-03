@@ -29,6 +29,11 @@ Connect Meta Ads to send installs, registrations, purchases, and custom app even
 
 Setting up Meta Ads integration involves configuring your Meta app credentials, mapping events, and setting up conversion tracking in Meta Events Manager.
 
+<Note>
+    Running iOS App Promotion campaigns? Meta measures iOS installs via SKAdNetwork. After completing this guide, follow
+    the [Meta SKAN Setup](/features/meta-skan-setup) guide.
+</Note>
+
 ## 1. Configure Meta App Integration
 
 This process connects your app and Meta ad account with Linkrunner.
@@ -96,7 +101,7 @@ Map your app events to Meta events so Linkrunner can send postback conversions.
 4. Select the matching **Meta Ads Event**
 5. Turn on **Send Revenue** only for revenue events, then choose the **Currency**
 6. Click **Save**
-7. Click the paper plane **Send to ad network** icon to fire a test event
+7. Click the paper plane **Send event to ad network** icon to fire a test event
 
 <img src="/images/meta/event-mapping.png" alt="Meta Ads event mapping table in Linkrunner" />
 
@@ -106,7 +111,7 @@ Map your app events to Meta events so Linkrunner can send postback conversions.
 
 <Tip>
     If you cannot see **MobileAppInstall** or **CompleteRegistration** in Meta Events Manager, click the paper plane
-    **Send to ad network** icon for that event.
+    **Send event to ad network** icon for that event.
 </Tip>
 
 ## 3. Configure Events in Meta Events Manager
@@ -125,22 +130,74 @@ Use Meta Events Manager to verify that Meta receives events from Linkrunner.
     correct.
 </Note>
 
-## 4. Campaign Tracking
+## 4. Create Your First Campaign
 
-Once your integration is configured, Meta ad campaigns will automatically appear on the Linkrunner Dashboard as they go live.
+With the integration configured, launch an App Promotion campaign in Meta Ads Manager. No tracking links are needed. Linkrunner attributes installs through the Meta install referrer (Android) and SKAdNetwork (iOS), and campaigns appear in Linkrunner automatically as installs come in.
 
-### Automatic Campaign Detection
+<Note>
+    Your app must be registered in [Meta for Developers](https://developers.facebook.com/) with its store listing URL,
+    and linked to the ad account you run campaigns from. Running website campaigns that send users to your app through a
+    landing page? Follow [Meta Web to App](/ad-networks/meta-web-to-app) instead.
+</Note>
 
-- **No manual setup required** — Campaigns are detected automatically
-- **Real-time tracking** — See campaign performance as soon as ads start running
-- **Attribution data** — Track installs, events, and revenue back to specific campaigns
+### Step 1: Start a New Campaign
 
-### Viewing Campaign Data
+1. Open [Meta Ads Manager](https://business.facebook.com/adsmanager) and select the ad account you connected to Linkrunner
+2. Click **+ Create**
 
-1. Go to your [Linkrunner Dashboard](https://dashboard.linkrunner.io)
-2. Navigate to the **Campaigns** section
-3. Filter by **Meta** to see all your Meta ad campaigns
-4. View detailed attribution and conversion data for each campaign
+![Meta Ads Manager Campaigns tab with the Create button highlighted](/images/meta/first-campaign/create-button.png)
+
+3. Keep the buying type as **Auction**, select the **App promotion** objective, and click **Continue**
+
+![Create new campaign dialog with the App promotion objective selected](/images/meta/first-campaign/objective-app-promotion.png)
+
+4. Enter a campaign name and click **Next**
+
+<Note>
+    Meta enables **Advantage+** by default, which automates audience and placements. You can switch to a manual setup
+    during configuration. Linkrunner attributes both the same way.
+</Note>
+
+### Step 2: Configure the Ad Set
+
+1. Under **App promotion**, select your **Mobile app store** (**Google Play Store** or **App Store**) and search for your app under **App name**
+
+![Ad set editor with the Mobile app store dropdown and App name field highlighted](/images/meta/first-campaign/ad-set-app-store.png)
+
+2. Set your **Budget & schedule**. Keep the budget low for the first campaign.
+3. Define your **Audience** (locations, age, interests)
+4. Leave **Advantage+ placements** on unless you have a reason not to
+5. Click **Next**
+
+<Note>
+    If your app is not listed under **App name**, it is not registered with Meta or not linked to this ad account.
+</Note>
+
+### Step 3: Create the Ad
+
+1. Choose the Facebook Page and Instagram account for the ad's **Identity**
+2. Upload your creative and write the primary text and headline
+3. In **Destination**, keep **Main destination** as **App**
+4. To open a specific screen after install, add your link in **Deferred deep link**. See [Deferred Deep Linking](#5-deferred-deep-linking) below.
+
+![Ad editor Destination section with the Deferred deep link field highlighted](/images/meta/first-campaign/ad-destination-deferred-deep-link.png)
+
+5. Click **Publish**
+
+### Step 4: Verify the Campaign in Linkrunner
+
+Campaigns and spend sync automatically from your connected ad account. Attribution rows appear after the campaign receives its first install.
+
+1. Open the [**Campaigns** section](https://dashboard.linkrunner.io/dashboard) in your Linkrunner dashboard
+2. Click **All Channels** and select **Meta** to filter your campaigns
+3. Open the campaign to view installs, events, and revenue attributed to it, broken down by ad set and ad creative
+
+![Linkrunner Campaigns section with the channel filter open and Meta selected](/images/meta/first-campaign/linkrunner-campaigns-meta-filter.png)
+
+<Note>
+    Campaign, ad set, and ad creative rows appear after they receive at least one install, not immediately at launch.
+    New campaigns can also take a few hours to exit Meta's review and start delivering.
+</Note>
 
 ## 5. Deferred Deep Linking
 
@@ -276,6 +333,8 @@ To enable this, you need to make your Facebook App ID available to the Linkrunne
 
 For more details, see the [Meta Install Referrer](/features/meta-install-referrer) documentation.
 
+Test the complete preview, install, and first attribution response with [Meta Android attribution testing](/testing/meta-android-attribution-testing).
+
 ## FAQ and Discrepancies
 
 For answers to common questions and an explanation of why numbers in Meta Ads Manager may not exactly match Linkrunner, see [Meta Ads FAQ and Discrepancies](/ad-networks/meta-ads-discrepancies).
@@ -287,7 +346,7 @@ For answers to common questions and an explanation of why numbers in Meta Ads Ma
 - Verify your Referrer Decryption Key is correct
 - Check that your dataset is configured to receive Conversions API events
 - Wait up to 1 hour for events to appear in Meta Events Manager
-- Test your event mappings using the paper plane **Send to ad network** icon in Linkrunner
+- Test your event mappings using the paper plane **Send event to ad network** icon in Linkrunner
 
 ### Campaigns Not Appearing in Dashboard
 

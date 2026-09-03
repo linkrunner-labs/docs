@@ -111,12 +111,10 @@ HTTP/HTTPS deep links (including App Links on Android and Universal Links on iOS
 
 Linkrunner hosts your verification files automatically so you don't have to manage server configuration yourself.
 
-1. Log in to your [Linkrunner dashboard](https://dashboard.linkrunner.io/settings?sort_by=activity-1&s=store-verification)
-2. Go to **Project Settings** from the navigation menu
-3. In the **Domain Verification** section:
-    - Paste your `apple-app-site-association` JSON in the **iOS (Only JSON allowed)** text area
-    - Paste your `assetlinks.json` content in the **Android (Only JSON allowed)** text area
-4. Click **Save**
+1. Open [Settings → Deeplinks](https://dashboard.linkrunner.io/dashboard/settings/deeplinks) in your Linkrunner dashboard
+2. Paste your `apple-app-site-association` JSON into **iOS Verification Object**
+3. Paste your `assetlinks.json` content into **Android Verification Object**
+4. Click **Save Changes**
 
 Linkrunner will automatically host these files at:
 - iOS: `https://your-domain.io/.well-known/apple-app-site-association`
@@ -191,7 +189,7 @@ These changes are the same whether you're using React Native or Flutter.
     // App.js or your navigation configuration file
     import { NavigationContainer } from "@react-navigation/native";
     import { createStackNavigator } from "@react-navigation/stack";
-    import LinkRunner from "@linkrunner/react-native";
+    import linkrunner from "rn-linkrunner";
 
     const Stack = createStackNavigator();
 
@@ -394,6 +392,16 @@ Custom URI schemes use a custom protocol like `myapp://` and don't require domai
 ## Debugging Domain Verification
 
 If an HTTPS link opens the browser instead of your app, domain verification is the usual cause. Work through these checks to find where it's failing.
+
+<Note>
+  **Prefer to let your AI coding agent diagnose it?** Run:
+
+  ```bash
+  npx @linkrunner/skills add deep-links
+  ```
+
+  The skill runs the full gauntlet below automatically (hosted files, Apple CDN freshness, Android fingerprint + verification state, native wiring) and tells you exactly what is broken. See [Linkrunner Agent Skills](/ai-agent-skills).
+</Note>
 
 <Tabs>
   <Tab title="Android">

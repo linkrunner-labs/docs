@@ -15,16 +15,31 @@ dashboard, add it as a Custom Connector in Claude.ai, and ask things like:
 - "Compare my Meta vs Google performance for the last 7 days."
 - "Which campaigns should I cut based on ROAS?"
 - "Why did installs drop yesterday?"
+- "How much of my growth is organic?"
+- "Where do users drop off between install and checkout?"
 
-The connector is read-only. Claude can query the same metrics surfaced in your
-dashboard (campaigns, installs, revenue, attribution, events) but cannot make
-changes to campaigns, projects, or settings.
+Claude can also make a defined set of changes for you:
+
+- "Create a Meta campaign for the Diwali sale pointing at our sneakers page."
+- "Pause every campaign with no installs in the last 30 days."
+- "Save a funnel for install, sign up, then purchase."
+
+<Warning>
+Editing tools act on your live project, not a sandbox. Claude can create and
+edit campaigns, funnels, domains, store listings, webhooks, and postback event
+mappings. A few of these send real traffic to third parties or cannot be undone.
+Read [What Claude can change](#what-claude-can-change) before you share the
+connector with a team.
+</Warning>
 
 ## Prerequisites
 
 - A project on Linkrunner that you have access to.
 - The **Admin** or **Member** role on that project. **Influencers** cannot mint
   MCP tokens.
+- Editing tools run as the person who created the token, using that person's
+  project permissions. A role that cannot edit in the dashboard cannot edit
+  through Claude either.
 - A Claude.ai account on a plan that supports Custom Connectors (Pro, Team, or
   Enterprise).
 
@@ -48,13 +63,15 @@ from the dashboard if it leaks, and generate a new one.
 
 ### 2. Add the connector in Claude
 
-1. Click **Add to Claude** in the dashboard. This copies the URL and opens
-   Claude's "Add custom connector" dialog in a new tab.
-2. Paste the URL into the **URL** field.
-3. Give the connector a name (e.g. "Linkrunner — MyApp").
-4. Leave authentication as **No authentication**. The token is already part of
-   the URL.
-5. Click **Connect**.
+Under **Register the Linkrunner MCP server**, the dashboard shows a ready-made
+command with your server URL already filled in. Copy it and run it in a
+terminal:
+
+```bash
+claude mcp add linkrunner --scope user --transport http "<YOUR_SERVER_URL>"
+```
+
+The token is part of the URL, so no separate authentication step is needed.
 
 <Note>
 You only need one connector per project. If you manage several Linkrunner
@@ -77,14 +94,131 @@ based on your question.
 | Tool | Use it for |
 |------|------------|
 | `get_project_info` | Project name, timezone, display currency. |
-| `get_project_stats` | Headline KPIs (clicks, installs, onboards, revenue) and trend graph. |
-| `list_campaigns` | Campaign-level metrics with filters (date range, network, platform, search). |
-| `list_events` | Custom and revenue event names you've defined. |
+| `get_project_stats` | Headline KPIs (clicks, installs, sign-ups, revenue) as lifetime and current-month totals. |
+| `get_metrics_trend` | Day-by-day trend for clicks, organic installs, sign-ups, and revenue. Current calendar month only. |
+| `list_campaigns` | One row per campaign, with filters (date range, network, platform, search) and selectable metrics. |
+| `find_campaign` | Resolve a campaign name to its `display_id`, with no metrics computed. |
+| `get_campaign_details` | One named campaign day by day, over any date range. |
+| `get_channel_performance` | One row per acquisition channel (Meta, Google, TikTok, Snapchat, Apple Search Ads, Linkrunner Links, Organic). |
+| `get_organic_performance` | Installs, sign-ups, and revenue carrying no campaign, as a single organic total. |
+| `list_event_names` | Custom and revenue event names you've defined. |
+| `search_event_log` | Individual event rows with timestamp, user, campaign, platform, and device. |
+| `list_funnels` | Names and step definitions of the funnels saved in your dashboard. |
+| `run_funnel` | Step-to-step conversion and drop-off, for a saved funnel or an ad-hoc one you describe in chat. |
 | `lookup_attribution` | Attribution result for a single user or device: campaign, ad network, ad set, creative, keyword (Apple Search Ads), organic vs inorganic flag, device IDs (gaid/idfa), and click/install timestamps. |
 | `get_billing_usage` | Free-install allowance and current-month usage. Only fetched when you explicitly ask about billing. |
+| `list_domains` | Tracking domains on the project, and which one is primary. |
+| `list_store_listings` | Custom App Store and Play Store listings you can attach to a campaign. |
+| `list_ad_accounts` | Ad-network accounts connected to the project. |
+| `list_postback_event_maps` | Event mappings sent to each ad network, and which are network defaults. |
+| `get_webhook` | Whether a webhook is configured, its host, and its organic setting. |
 
 Claude reads these tools' descriptions and decides which to call. You don't
 need to invoke them manually.
+
+<Note>
+`list_campaigns`, `get_channel_performance`, and `get_organic_performance`
+return only the metric groups Claude asks for (installs, spend, retention,
+custom events, and so on). A group that wasn't requested is absent from the
+response rather than reported as zero, so Claude never mistakes "not fetched"
+for "measured zero". Ask for a metric by name and Claude will fetch it.
+</Note>
+
+## What Claude can change
+
+Ask in plain language ("create a campaign for the Diwali sale") and Claude picks
+the right tool. Describe what you want changed, and confirm the summary it gives
+you before it writes.
+
+<Warning>
+Every tool below writes to your live project. Claude asks before making an
+ambiguous change, but it is worth being specific about what you want, especially
+for the tools marked as sending live traffic or being irreversible.
+</Warning>
+
+### Campaigns
+
+| Tool | Use it for |
+|------|------------|
+| `create_campaign` | A new tracking link for an ad creative, an influencer, an organic channel, or a web-to-app flow. |
+| `edit_campaign` | Rename, pause or resume, change the deep link, swap the store listing, or reassign the ad account. |
+| `create_deeplink` | A per-ad-set or per-creative deep link under a Meta or Google campaign. |
+
+A deep link has to be a full URL on one of your own tracking domains, for
+example `https://links.yourbrand.com/product/sneakers`. An external URL is
+rejected. Ask Claude to list your domains if you are not sure which to use.
+
+<Note>
+Campaigns cannot be deleted through the connector. Pause them with
+`edit_campaign` instead.
+</Note>
+
+### Funnels
+
+| Tool | Use it for |
+|------|------------|
+| `create_funnel` | Save a funnel so it appears in your dashboard and in `list_funnels`. |
+| `update_funnel` | Rename a saved funnel or change its steps. |
+
+### Domains and store listings
+
+| Tool | Use it for |
+|------|------------|
+| `create_domain` | Register a tracking domain or subdomain. |
+| `create_store_listing` | Add a custom Play Store or App Store listing. |
+| `update_store_listing` | Change a listing's name or its platform listing id. |
+| `delete_store_listing` | Remove a listing no campaign is using. |
+
+<Warning>
+`create_domain` does not check DNS, so it will save a domain that is not pointed
+at Linkrunner yet, and there is no way to delete a domain through the connector.
+Check the spelling before you confirm. Adding a domain also creates a permanent
+`MAIN_DOMAIN` campaign that backs root-domain links and counts toward your
+campaign limit, and making the new domain primary changes which domain later
+campaigns use by default.
+</Warning>
+
+`delete_store_listing` is refused while any campaign still points at the
+listing, and the error names the campaigns. Remove it from those campaigns
+first.
+
+### Webhooks
+
+| Tool | Use it for |
+|------|------------|
+| `update_webhook` | Set the endpoint that receives install and event payloads, or change the organic setting. |
+| `test_webhook` | Send a sample payload to the configured endpoint. |
+
+<Warning>
+Both tools deliver a real payload to your endpoint. Saving a webhook sends one
+by itself, because Linkrunner only stores an endpoint that answers `200` or
+`201`, so configuring a Slack webhook posts a real message to that channel. Ask
+Claude to test afterwards only if you want a second message.
+
+Replacing the URL cannot be undone. A project has one webhook, the new URL
+overwrites the old one, and Claude cannot read the old value back to restore it
+(`get_webhook` hides the path, because a Slack webhook path is itself a
+credential). Keep a copy of the current URL before you replace it.
+</Warning>
+
+### Postback event mappings
+
+| Tool | Use it for |
+|------|------------|
+| `create_postback_event_map` | Map one of your events to the name an ad network expects. |
+| `update_postback_event_map` | Change an existing mapping. |
+| `delete_postback_event_map` | Remove a mapping you added. |
+
+<Warning>
+Creating or updating a mapping immediately sends a test postback to every
+connected account on that network (Meta, Google, TikTok, Snapchat, LinkedIn,
+Reddit). That puts a synthetic conversion in your real ad account, so avoid
+repeated edits.
+</Warning>
+
+An ad network's built-in defaults also appear in `list_postback_event_maps`.
+They are always active and cannot be changed or removed. To override one, add
+your own mapping for the same event.
 
 ## Built-in prompts
 
@@ -116,14 +250,27 @@ revoke an unused token before creating a new one.
 
 ## Security
 
-- Tokens are scoped to a single project's data. They cannot read other
-  projects you might be a member of.
-- Tokens are read-only. Claude cannot create, edit, or delete campaigns,
-  projects, members, or any other resource through the connector.
+- Tokens are scoped to a single project. They cannot read or change other
+  projects you are a member of, even when the same person created the token.
+- Editing tools run as the person who created the token and apply that person's
+  project role, so the connector cannot do anything that person could not do in
+  the dashboard.
+- Every change made through the connector is recorded with the action, the
+  token, the person who created it, and what was changed.
+- Claude cannot delete campaigns, funnels, domains, or projects, cannot manage
+  members, and cannot disconnect an ad-network account. Those stay in the
+  dashboard.
+- The webhook URL is never fully readable. `get_webhook` returns the host but
+  hides the path, because a Slack webhook path is a credential in itself.
+- SDK private keys, billing settings, and admin actions are not exposed.
 - Tokens are revocable from the dashboard at any time.
-- The connector does not expose webhooks, SDK private keys, billing settings,
-  or admin actions.
 - Per-project token cap of 10 limits the blast radius if one leaks.
+
+<Note>
+A token that can read your data can also change it. If you only want someone to
+read, give them a token created by a project member whose role cannot edit, or
+revoke the token when the work is done.
+</Note>
 
 ## Troubleshooting
 
@@ -146,11 +293,38 @@ real-time, so there's no lag to account for.
 You're at the per-project cap. Revoke an unused token from the same settings
 page before creating a new one.
 
+**Claude says your deep link was rejected.**
+A deep link has to be a full URL on one of your own tracking domains. An
+external address such as `https://example.com/promo` is refused, and so is a
+bare path such as `/promo`. Ask Claude to list your domains and rebuild the URL
+on one of them.
+
+**Saving a webhook fails with "Endpoint needs to return a status code of 200".**
+Linkrunner only stores an endpoint that answers `200` or `201` to the sample
+payload, and it must answer directly rather than redirecting. An endpoint that
+returns `202` or `204` cannot be saved.
+
+**Claude cannot rename a custom channel.**
+Renaming needs the channel's internal id, which Claude only sees right after it
+creates or edits a campaign. In a later chat it has no way to look the id up.
+Rename the channel in the dashboard instead.
+
+<Warning>
+Asking Claude to rename a channel by editing the campaign does something
+different. It points the campaign at a new channel and leaves the old one
+behind, which changes the channel's reporting name and splits its history.
+</Warning>
+
 ## What this is not
 
-- Not a write API. Use the [Linkrunner data
-  API](/api-reference/introduction) for programmatic writes.
+- Not a full write API. Claude can make the changes listed above, and nothing
+  else. Use the [Linkrunner data API](/api-reference/data-apis) for
+  programmatic writes.
+- Not a way to delete things. Campaigns, funnels, domains, and projects can only
+  be deleted from the dashboard.
 - Not a generic SQL/Postgres bridge. It calls the same endpoints the
   dashboard uses, with the same access controls.
 - Not a substitute for webhooks. Use [webhooks](/features/webhooks) for
   real-time install and signup notifications.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

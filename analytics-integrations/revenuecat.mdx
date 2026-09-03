@@ -79,19 +79,26 @@ Unlike other analytics integrations that push data from Linkrunner, RevenueCat u
 
 ## Event Type Mapping
 
-RevenueCat events are automatically mapped to Linkrunner revenue types:
+RevenueCat events are automatically mapped to Linkrunner revenue types. For subscription events, Linkrunner reads `period_type` and `is_trial_conversion` from the webhook payload to keep trial activity separate from real payments:
 
-| RevenueCat Event | Linkrunner Revenue Type | Description |
-|---|---|---|
-| INITIAL_PURCHASE | FIRST_PAYMENT | First subscription purchase |
-| RENEWAL | SUBSCRIPTION_RENEWED | Subscription renewal payment |
-| NON_RENEWING_PURCHASE | ONE_TIME | One-time purchase |
-| CANCELLATION | SUBSCRIPTION_CANCELLED | User cancelled subscription |
-| UNCANCELLATION | SUBSCRIPTION_RENEWED | User reactivated subscription |
-| REFUND | SUBSCRIPTION_REFUNDED | Payment refunded to user |
-| BILLING_ISSUE | SUBSCRIPTION_BILLING_ISSUE | Payment failed or billing problem |
-| PRODUCT_CHANGE | SUBSCRIPTION_RENEWED | User changed subscription tier |
-| EXPIRATION | DEFAULT | Subscription expired naturally |
+| RevenueCat Event | Condition | Linkrunner Revenue Type | Description |
+|---|---|---|---|
+| INITIAL_PURCHASE | `period_type` = TRIAL | TRIAL_STARTED | Free trial started (no revenue) |
+| INITIAL_PURCHASE | `period_type` = NORMAL | FIRST_PAYMENT | First paid purchase |
+| RENEWAL | `is_trial_conversion` = true | FIRST_PAYMENT | Trial converted to paid (first real payment) |
+| RENEWAL | `is_trial_conversion` = false | SUBSCRIPTION_RENEWED | Subscription renewal payment |
+| NON_RENEWING_PURCHASE | | ONE_TIME | One-time purchase |
+| CANCELLATION | `period_type` = TRIAL | TRIAL_CANCELLED | User cancelled during trial |
+| CANCELLATION | `period_type` = NORMAL | SUBSCRIPTION_CANCELLED | User cancelled a paid subscription |
+| UNCANCELLATION | | SUBSCRIPTION_RENEWED | User reactivated subscription |
+| REFUND | | SUBSCRIPTION_REFUNDED | Payment refunded to user |
+| BILLING_ISSUE | | SUBSCRIPTION_BILLING_ISSUE | Payment failed or billing problem |
+| PRODUCT_CHANGE | | SUBSCRIPTION_RENEWED | User changed subscription tier |
+| EXPIRATION | | DEFAULT | Subscription expired naturally |
+
+<Note>
+FIRST_PAYMENT always means a real paid transaction. If your app offers a free trial, the trial start arrives as TRIAL_STARTED and the trial-to-paid conversion arrives as FIRST_PAYMENT. Use TRIAL_STARTED for trial-optimization events (for example, mapping to Meta's StartTrial) and FIRST_PAYMENT for purchase events.
+</Note>
 
 ## Event Status Mapping
 
