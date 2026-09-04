@@ -156,6 +156,7 @@
                             "ad-networks/tiktok",
                             "ad-networks/snapchat",
                             "ad-networks/reddit-ads",
+                            "ad-networks/chatgpt-ads",
                             "ad-networks/linkedin-ads",
                             "ad-networks/meta-web-to-app"
                         ]

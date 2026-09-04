@@ -1,0 +1,340 @@
+---
+title: "ChatGPT Ads"
+description: "Run ChatGPT Ads (OpenAI) with Linkrunner attribution, oppref click IDs, and OpenAI Conversions API postbacks"
+icon: "/images/logos/chatgpt.webp"
+---
+
+## Overview
+
+Use ChatGPT Ads with Linkrunner when you want to send ChatGPT ad traffic through one Linkrunner campaign link, attribute installs and in-app events, and send server-side conversions back to OpenAI through the OpenAI Conversions API.
+
+The recommended flow is:
+
+1. Create or prepare your ChatGPT Ads account in [ChatGPT Ads Manager](https://ads.openai.com).
+2. Create a Pixel and a Conversions API key under **Tools → Conversions**.
+3. Add the Pixel ID and Conversions API key in Linkrunner and validate them.
+4. Create a Linkrunner campaign link for each ChatGPT ad you want to measure.
+5. Use that link as the ad's destination URL, and set the landing page query parameters.
+6. Test the full click, install, first open, and event flow before scaling spend.
+
+<Note>
+  Linkrunner captures OpenAI's `oppref` click ID when a user clicks your ChatGPT ad. ChatGPT appends this value to the destination URL, so keep the Linkrunner campaign link intact and do not remove query parameters.
+</Note>
+
+<Warning>
+  ChatGPT app attribution is **click-through only**. There is no view-through attribution for app events, so an install with no `oppref` cannot be matched back to a ChatGPT ad.
+</Warning>
+
+## What you need
+
+- A Linkrunner project with the Linkrunner SDK installed in your app
+- Android and iOS store URLs configured in Linkrunner
+- Deep linking configured if the ad should open a specific in-app screen
+- Access to a ChatGPT Ads account
+- A **Pixel ID**
+- A **Conversions API key**
+
+<Warning>
+  Use the **Conversions API key**, not the Ads management API key. They are different credentials and only the Conversions API key authorizes event ingestion.
+</Warning>
+
+<Note>
+  You do not need a partnership with OpenAI to send Conversions API events. Any advertiser can create a Pixel ID and Conversions API key in Ads Manager and paste them into Linkrunner.
+</Note>
+
+## How ChatGPT Ads Manager is organized
+
+Everything in [ChatGPT Ads Manager](https://ads.openai.com) hangs off four levels:
+
+| Level | What it holds |
+| --- | --- |
+| **Ad account** | Billing, users, API keys, and your Pixels |
+| **Campaign** | Objective, budget, schedule, and the conversion event a conversions campaign optimizes toward |
+| **Ad group** | Targeting and bidding |
+| **Ad** | Title, description, images, and the **destination URL** |
+
+Two places in the left nav matter for this integration:
+
+- **Tools → Conversions** holds your **Pixel ID** and your **Conversions API key**. Both go into Linkrunner.
+- **Settings** holds the **Ads API key**, which manages campaigns. Linkrunner does not use it.
+
+<Warning>
+  These are two different credentials. Linkrunner needs the **Conversions API key** from **Tools → Conversions**. The Ads API key from **Settings** will not authorize conversion events.
+</Warning>
+
+The destination URL lives on the **ad** (and can be defaulted from the ad group), and landing page query parameters can be set at campaign, ad group, or ad level. That is the whole surface Linkrunner touches.
+
+## 1. Create a Pixel and Conversions API key
+
+Go to [ChatGPT Ads Manager](https://ads.openai.com) and sign in to the advertiser account that will run the campaign. If this is your first ChatGPT campaign, complete the business, billing, and advertiser setup first.
+
+Open **Tools → Conversions**. It has three tabs: **Data Source**, **Conversion Events**, and **Event Stream**.
+
+On **Data Source**, the string under each data source name is its **Pixel ID**. Copy it.
+
+![The Pixel ID on the Data Source tab in ChatGPT Ads Manager](/images/chatgpt-ads/chatgpt-ads-manager-conversions-pixel-id.webp)
+
+Then click the key icon in the top right to open **Conversion keys**, and click **Create new key**. Copy the key when it is shown, because it is only displayed once.
+
+![Creating a Conversions API key in ChatGPT Ads Manager](/images/chatgpt-ads/chatgpt-ads-manager-conversion-keys.webp)
+
+Keep both values ready:
+
+- **Pixel ID** - identifies the data source that should receive conversions.
+- **Conversions API key** - authorizes Linkrunner to send events.
+
+<Note>
+  App events (`app_installed`, `app_opened`) are Conversions API only. OpenAI does not currently support native mobile SDK setup or mobile data sources, so use a Pixel ID from an existing **web** data source.
+</Note>
+
+On the **Conversion Events** tab, confirm you have a conversion event whose base event is the one Linkrunner will send, usually `app_installed`. This is the event a conversions campaign optimizes toward, so it has to exist here before you create the campaign.
+
+![The Conversion Events tab in ChatGPT Ads Manager](/images/chatgpt-ads/chatgpt-ads-manager-conversion-events.webp)
+
+## 2. Add ChatGPT Ads credentials in Linkrunner
+
+Open your Linkrunner project and go to **Dashboard > Integrations > ChatGPT Ads**.
+
+1. Open **Pixel Management**.
+2. Click **Add ChatGPT Ads Pixel**.
+
+![Pixel Management on the ChatGPT Ads integration page in Linkrunner](/images/chatgpt-ads/linkrunner-chatgpt-pixel-management.webp)
+
+3. Paste the Pixel ID and Conversions API key.
+4. Click **Validate** to check them, then **Save Configuration**.
+
+![Add ChatGPT Ads CAPI credentials in Linkrunner](/images/chatgpt-ads/linkrunner-add-chatgpt-capi-credentials.webp)
+
+Validation sends a synthetic `app_opened` event with OpenAI's `validate_only` flag, so it confirms the credentials without recording a conversion in your Ads Manager reporting.
+
+<Warning>
+  Use the Pixel ID and Conversions API key from the same ChatGPT advertiser account. A mismatched Pixel or key prevents OpenAI from accepting or matching events.
+</Warning>
+
+## 3. Map events for ChatGPT Ads
+
+Open the **Event Mapping** tab inside the ChatGPT Ads integration page. This tab becomes available after the Pixel ID and Conversions API key are saved.
+
+![ChatGPT Ads event mapping in Linkrunner](/images/chatgpt-ads/linkrunner-chatgpt-event-mapping.webp)
+
+Linkrunner creates the default mappings for you when you connect. Click **Add Mapping** for any additional app event you want ChatGPT to optimize or report on.
+
+These defaults are created automatically on connect:
+
+| Linkrunner event | ChatGPT Ads event |
+| --- | --- |
+| Install or first open | `app_installed` |
+| App open | `app_opened` |
+| Registration or signup | `registration_completed` |
+| Purchase | `order_created` |
+
+Other standard events you can map:
+
+| Linkrunner event | ChatGPT Ads event |
+| --- | --- |
+| Lead form or qualified lead | `lead_created` |
+| Appointment booked | `appointment_scheduled` |
+| Checkout started | `checkout_started` |
+| Add to cart | `items_added` |
+| Product or content view | `contents_viewed` |
+| Screen or page view | `page_viewed` |
+| Subscription started | `subscription_created` |
+| Free trial started | `trial_started` |
+| Anything else | `custom` |
+
+### Custom events
+
+Pick **Custom Event (custom)** when your app event has no standard equivalent, then type the event name ChatGPT should record it as.
+
+![Typing a custom event name in the ChatGPT Ads event mapping](/images/chatgpt-ads/linkrunner-chatgpt-custom-event-name.webp)
+
+<Warning>
+  OpenAI matches a custom conversion on its name, so type the **same name you already use in ChatGPT Ads Manager**. If your web pixel fires `add_to_wishlist` and you type something else here, OpenAI treats them as two different events: they will not deduplicate, and they will not roll up against the conversion event on the **Conversion Events** tab. Names are lowercase and up to 64 characters.
+</Warning>
+
+<Warning>
+  Conversion-optimized (oCPC) campaigns optimize toward exactly one **standard** event. A custom event cannot be used as an optimization goal, which is why Linkrunner maps installs to `app_installed` rather than to a custom event.
+</Warning>
+
+<Tip>
+  Start with the default install and signup behavior plus a purchase mapping. Add the rest after your first campaign is sending clean traffic and Ads Manager shows successful event delivery.
+</Tip>
+
+For purchase or revenue events, enable **Send Revenue** and choose the currency. Linkrunner converts the amount into the integer minor unit OpenAI expects (for example, USD 42.00 is sent as `4200`), including zero-decimal currencies such as JPY.
+
+## 4. Create a Linkrunner campaign link
+
+Before you create the ChatGPT ad, create the Linkrunner campaign link that ChatGPT will send users to.
+
+1. Go to **All Campaigns** in Linkrunner.
+2. Click **Create Link**.
+3. Enter a campaign name. The **Display ID** fills in automatically and becomes the `?c=` value on your link.
+4. Turn on **Enable Deferred deeplinking** if the ad should open a specific in-app screen after install.
+5. Open **Advanced Options**.
+6. Under **Ad Channel**, select **ChatGPT Ads**.
+7. Click **Create Campaign**, then copy the campaign link.
+
+![Select ChatGPT Ads as the ad channel when creating a Linkrunner campaign](/images/chatgpt-ads/linkrunner-create-chatgpt-campaign.webp)
+
+Selecting **ChatGPT Ads** is what tells Linkrunner to send this campaign's conversions to the OpenAI Conversions API. A campaign left on **None** still records clicks, but sends no postbacks.
+
+<Note>
+  Create a new Linkrunner campaign for every ChatGPT destination link you want measured independently: different creatives, landing destinations, audiences, or experiments.
+</Note>
+
+<Warning>
+  Do not paste the App Store or Play Store URL directly into ChatGPT Ads if you want Linkrunner attribution, deferred deep linking, or OpenAI CAPI postbacks. ChatGPT must send the user to the Linkrunner campaign link first.
+</Warning>
+
+## 5. Create the ChatGPT campaign
+
+After the Linkrunner campaign link is created, go to [ChatGPT Ads Manager](https://ads.openai.com) and create the campaign that will use it.
+
+The **New campaign** wizard has three steps: **Create Campaign**, **Create Ad Group & Ads**, and **Review**.
+
+### Step 1: Create Campaign
+
+Name the campaign, then set:
+
+- **Objective** to **Conversions**, so OpenAI optimizes delivery toward your app event.
+- **Conversion event** to the event you want to buy, usually **App Installed**. This list comes from the **Conversion Events** tab you checked earlier.
+- **Locations**, **Eligible platforms**, **Budget**, and the schedule.
+
+![Setting the objective and conversion event on a ChatGPT campaign](/images/chatgpt-ads/chatgpt-ads-manager-campaign-objective.webp)
+
+<Warning>
+  A conversions campaign optimizes toward exactly **one standard** event, and the objective cannot be changed after the campaign is created. Pick the event you actually want to buy, usually `app_installed`. A `custom` event cannot be an optimization goal.
+</Warning>
+
+<Tip>
+  Start with a deliberately low daily budget so you can verify the full click, install, and event flow before any meaningful spend.
+</Tip>
+
+### Step 2: Create Ad Group & Ads
+
+Name the ad group and set the bid strategy, then fill the two fields Linkrunner depends on.
+
+![Setting the Linkrunner campaign link and tracking macros on a ChatGPT ad group](/images/chatgpt-ads/chatgpt-ads-manager-ad-group-link-and-macros.webp)
+
+**Default Ad Destination URL** takes your **Linkrunner campaign link**, and every new ad in the ad group inherits it:
+
+```
+https://yourapp.linkrunner.io/?c=YOUR_DISPLAY_ID
+```
+
+Nothing else goes in that field. ChatGPT appends `oppref` to it on every click.
+
+<Warning>
+  Do not replace the Linkrunner campaign link with a store URL or your website URL. ChatGPT must send the click to Linkrunner first so Linkrunner can capture `oppref`, redirect the user, attribute the install, and send the CAPI postbacks.
+</Warning>
+
+**Landing page query parameters** takes the tracking macros:
+
+```
+campaign_id={campaign_id}&ad_group_id={ad_group_id}&ad_id={ad_id}
+```
+
+This field exists at campaign, ad group, and ad level, and the most specific level wins. Setting it once on the campaign covers everything beneath it. The supported macros are `{campaign_id}`, `{ad_group_id}`, `{ad_id}`, `{ad_account_id}`, and `{oppref}`.
+
+<Warning>
+  Do not add `oppref` as a parameter name. ChatGPT reserves it and rejects the field with "Reserved query parameters are not supported: olref, oppref." It appends `oppref` to the landing URL itself on every click, so all you have to do is make sure nothing in your setup strips query parameters.
+</Warning>
+
+ChatGPT substitutes each macro at click time, so a real click arrives at your Linkrunner link as:
+
+```
+https://yourapp.linkrunner.io/?c=YOUR_DISPLAY_ID&campaign_id=cmp_123&ad_group_id=grp_456&ad_id=ad_789&oppref=gAAAA...
+```
+
+Linkrunner records these macro values against every click, so a single Linkrunner campaign link gives you a per campaign, ad group, and ad breakdown. You only need separate links when you want the campaigns themselves kept apart in Linkrunner.
+
+<Tip>
+  If an ad points at a link with no Linkrunner campaign on it, Linkrunner creates one from the `{campaign_id}` macro (named `ChatGPT Ads - <id>`) so the installs still land on a campaign instead of showing as organic.
+</Tip>
+
+### Step 3: Create the ad
+
+Add the headline, description, and images. **Destination URL** is pre-filled from the ad group's default, so leave it as the Linkrunner campaign link.
+
+![The Destination URL on a ChatGPT ad](/images/chatgpt-ads/chatgpt-ads-manager-ad-destination-url.webp)
+
+### Step 4: Review and publish
+
+1. Confirm the ad account owns the same Pixel configured in Linkrunner.
+2. Confirm the destination URL is the Linkrunner campaign link.
+3. Confirm the landing page query parameters are set.
+4. Confirm the budget is intentionally low for the first test.
+5. Unpause the campaign when everything is correct.
+
+## How attribution and CAPI work
+
+When a ChatGPT user clicks your ad, OpenAI appends `oppref` to the destination URL. It is an opaque token, and Linkrunner captures it on the campaign link click and carries it through install attribution unchanged.
+
+For attributed installs and mapped in-app events, Linkrunner sends an OpenAI Conversions API event to `https://bzr.openai.com/v1/events?pid=<PIXEL-ID>` containing:
+
+- The OpenAI click ID (`oppref`)
+- The mapped event name and its data type
+- Event time in milliseconds
+- A deterministic deduplication ID, so a retry never double-counts
+- Hashed user identifiers when available (email, phone, external ID, name)
+- Google Advertising ID, IP address, user agent, and coarse location when available
+- Amount in integer minor units plus currency, for revenue events
+
+Every request is tagged with `integration_source: linkrunner`.
+
+<Note>
+  Conversions typically appear in the Ads Manager **Conversions** metric 24 to 48 hours after the event is sent.
+</Note>
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Why are my ChatGPT campaigns not showing up on Linkrunner?">
+    ChatGPT campaigns do not appear automatically on the Linkrunner dashboard. They show up after users click the Linkrunner campaign links you set as destination URLs in your ChatGPT ads.
+
+    Confirm each ad uses a Linkrunner campaign link, the ad is active and receiving traffic, and your app is live with the Linkrunner SDK installed.
+  </Accordion>
+
+  <Accordion title="What is oppref and why is it important?">
+    `oppref` is OpenAI's click ID. ChatGPT appends it to the destination URL when a user clicks an ad, and Linkrunner captures it from the campaign link click.
+
+    It is the only key OpenAI matches app conversions on. Keep the Linkrunner campaign link intact and do not strip URL parameters, or Linkrunner cannot match the install or event back to the ad click.
+  </Accordion>
+
+  <Accordion title="Why are iOS devices not matched by device ID?">
+    OpenAI's Conversions API accepts `android_advertising_id` (GAID) but does not support IDFA. On iOS, matching relies on `oppref` plus any hashed user identifiers your app provides, so iOS attribution depends on the click ID being preserved.
+  </Accordion>
+
+  <Accordion title="Why were some of my events not sent?">
+    OpenAI rejects any event whose timestamp is more than 7 days old, and a single rejected event fails the entire batch it was sent in. Linkrunner drops events older than 7 days before sending and logs them as skipped, so one stale event can never block your other conversions.
+  </Accordion>
+
+  <Accordion title="Is view-through attribution supported?">
+    Not for app events. ChatGPT app attribution is click-through only. A 1-day view-through window exists for web events, but it is reporting-only and does not apply to installs or in-app events.
+  </Accordion>
+
+  <Accordion title="Which countries can run ChatGPT Ads?">
+    OpenAI opened self-serve Ads Manager to India, 31 European markets, and 11 MENA markets on 31 August 2026, in addition to the earlier US, CA, AU, NZ, UK, JP, and KR markets. Check Ads Manager for the current list for your account.
+  </Accordion>
+
+  <Accordion title="Can I track revenue and purchase events?">
+    Yes. Map your purchase event to `order_created` and enable **Send Revenue** with the correct currency. Linkrunner converts the amount to the integer minor unit OpenAI requires.
+  </Accordion>
+
+  <Accordion title="How do I verify Linkrunner is sending events to OpenAI?">
+    Use the **Validate** action on the Pixel Management tab to confirm credentials, then use Linkrunner's test-event action for a mapped event. Verify installs and events through the Linkrunner SDK testing flow first, then confirm delivery in the Ads Manager Conversions tab after 24 to 48 hours.
+  </Accordion>
+</AccordionGroup>
+
+## Related setup
+
+<CardGroup cols={2}>
+  <Card title="Deep Linking Setup" icon="link" href="/features/deep-linking-setup">
+    Configure Android App Links and iOS Universal Links.
+  </Card>
+  <Card title="Deferred Deep Linking" icon="route" href="/features/deferred-deep-linking">
+    Read deferred deep link data after first app open.
+  </Card>
+</CardGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
