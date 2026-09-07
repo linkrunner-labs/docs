@@ -281,6 +281,9 @@ PATCH /campaigns/:display_id
 {
     "name": "campaign name",
     "active": false,
+    "website": "https://www.your-website.com",
+    "android_web_redirect": "https://www.your-website.com/android",
+    "ios_web_redirect": "https://www.your-website.com/ios",
     "custom_channel_names": ["WhatsApp"]
 }
 ```
@@ -293,11 +296,27 @@ To remove the custom channel from a campaign, pass an empty array:
 }
 ```
 
+To clear a web field, pass an empty string or `null`. Omitting a field leaves its stored value unchanged:
+
+```json
+{
+    "android_web_redirect": "",
+    "ios_web_redirect": null
+}
+```
+
 | Parameter                | Type     | Description |
 | ------------------------ | -------- | ----------- |
 | name                     | string   | **Optional**. Name of the campaign |
 | active                   | boolean  | **Optional**. Campaign status |
+| website                  | string\|null | **Optional**. The desktop fallback URL. This is the same field the Create Campaign endpoint accepts as `link_for_desktop_users`; either name is accepted here, but sending both with different values is rejected. Pass an empty string or `null` to clear it. |
+| android_web_redirect     | string\|null | **Optional**. Web URL that Android users are redirected to, overriding the campaign's store listing link for that platform. Must be an absolute `http(s)` URL. Pass an empty string or `null` to clear it. |
+| ios_web_redirect         | string\|null | **Optional**. Web URL that iOS users are redirected to, overriding the campaign's store listing link for that platform. Must be an absolute `http(s)` URL. Pass an empty string or `null` to clear it. |
 | custom_channel_names     | string[] | **Optional**. Omit to leave unchanged, pass one name to set or replace the campaign custom channel, or pass an empty array to clear it. Linkrunner currently supports only one custom channel per campaign. |
+
+<Note>
+    Changes to `website`, `android_web_redirect` and `ios_web_redirect` are applied to live campaign links immediately — the cached copy the click path serves is cleared as part of the update.
+</Note>
 
 #### Responses
 
@@ -323,6 +342,9 @@ To remove the custom channel from a campaign, pass an empty array:
         "meta_web_to_app": false,
         "active": false,
         "default_link": true,
+        "website": "https://www.your-website.com",
+        "android_web_redirect": "https://www.your-website.com/android",
+        "ios_web_redirect": "https://www.your-website.com/ios",
         "attributed_users": 0,
         "custom_channels": [
             {
@@ -340,7 +362,9 @@ To remove the custom channel from a campaign, pass an empty array:
 | HTTP Status | Message                                                       | When/Why                                                 |
 | ----------- | ------------------------------------------------------------- | -------------------------------------------------------- |
 | 400         | "Campaign display ID is required!"                            | If the display_id param is missing                       |
-| 400         | "At least one field (name, active, website, deeplink, store listing, linkedin, network_account_id, ad_network_id, or custom channel) is required" | If no supported update field is provided |
+| 400         | "At least one field (name, active, website, android_web_redirect or ios_web_redirect) is required for update!" | If no supported update field is provided |
+| 400         | "Please enter a valid URL (e.g., https://example.com/android)" | If a web redirect is not an absolute http(s) URL |
+| 400         | "website and link_for_desktop_users refer to the same field and cannot be sent with different values!" | If both spellings of the website field are sent with different values |
 | 400         | "Campaign name cannot be empty!"                              | If name is provided but is empty or only whitespace      |
 | 400         | "Active field must be a boolean!"                             | If active is provided but is not a boolean               |
 | 400         | "A campaign can have at most one custom channel"              | If more than one custom channel name is provided         |
@@ -427,6 +451,10 @@ fetch("https://api.linkrunner.io/api/v1/campaigns/TOhmGM", {
     body: JSON.stringify({
         name: "Updated Campaign Name",
         active: true,
+        website: "https://www.your-website.com",
+        android_web_redirect: "https://www.your-website.com/android",
+        // Pass an empty string or null to clear a field; omit it to leave it unchanged.
+        ios_web_redirect: "",
     }),
 })
     .then((response) => response.json())
