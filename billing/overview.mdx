@@ -77,14 +77,46 @@ This means you can scale up during a big launch and scale back down the next mon
 
 ## Invoices & Payments
 
-You can view and pay invoices from your [dashboard billing page](https://dashboard.linkrunner.io/dashboard/billing).
+View and pay invoices from your [dashboard billing page](https://dashboard.linkrunner.io/dashboard/billing). Click **Pay Now** on a pending invoice to see every option available to you.
 
 **Supported payment methods:**
+
+- Bank transfer (INR invoices)
+- [Linkrunner Wallet](/billing/wallet)
 - Razorpay (cards, UPI, netbanking)
+- Cashfree (cards, UPI, netbanking, for INR invoices)
 - Stripe (cards, for USD invoices)
 - PayPal
 
-Each invoice includes a payment link. You'll receive an email notification when a new invoice is ready.
+You'll receive an email notification when a new invoice is ready.
+
+### Pay by bank transfer
+
+Available for **INR invoices**. The **Pay Now** dialog shows the account name, account number, IFSC, and the exact amount due.
+
+<Steps>
+  <Step title="Transfer the amount due">
+    Transfer the **full amount shown** from your bank. An invoice is settled in full or not at all, so a partial transfer cannot clear it.
+  </Step>
+  <Step title="Submit your reference">
+    Paste the UTR (transaction reference) from your bank into **Transfer reference (UTR)** and click **Submit reference**. Do this straight after transferring. You do not need to wait for the money to arrive.
+  </Step>
+  <Step title="We match it and mark the invoice paid">
+    We check the reference against our bank statement and mark the invoice paid. It stays **Pending** until then, and you get a confirmation email with a receipt once it clears.
+  </Step>
+</Steps>
+
+<Note>
+Each reference can be used only once, and one transfer clears one invoice. If you mistype it, submit the correct one after the first is rejected.
+</Note>
+
+### Pay by card, UPI, or netbanking
+
+Click the payment link in the **Pay Now** dialog. It opens a hosted payment page, and the invoice is marked paid as soon as the payment succeeds. There is no approval step.
+
+### Pay from your wallet
+
+If your account has the wallet enabled, a pending invoice is settled from your balance automatically. See [Linkrunner Wallet](/billing/wallet).
 
 ## What happens when an invoice is overdue?
 
