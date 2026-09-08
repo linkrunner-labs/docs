@@ -94,6 +94,35 @@ Linkrunner drops any signal left `unknown` instead of sending it as a denial, so
 
 A **Consent Management Platform (CMP)** shows the consent screen at first launch and stores the answers, or you can build the screen yourself. Either way, you read the answers and report them with `setConsent`.
 
+### Reading consent from a TCF CMP
+
+If your CMP is IAB TCF v2.2/v2.3 compliant, you can skip the mapping below entirely. Call `enableTCFConsentCollection(true)` before `init` and the SDK derives all three signals from the CMP's standard `IABTCF_*` keys, using Google's published purpose mapping — `hasConsentForDataUsage` from purposes 1 and 7, `hasConsentForAdsPersonalization` from purposes 3 and 4, both gated on vendor consent for Google (TCF vendor 755).
+
+<Tabs>
+  <Tab title="Android">
+    ```kotlin
+    LinkRunner.getInstance().enableTCFConsentCollection(true)
+    ```
+  </Tab>
+  <Tab title="iOS">
+    ```swift
+    LinkrunnerSDK.shared.enableTCFConsentCollection(true)
+    ```
+  </Tab>
+  <Tab title="React Native">
+    ```javascript
+    linkrunner.enableTCFConsentCollection(true);
+    ```
+  </Tab>
+  <Tab title="Flutter">
+    ```dart
+    await LinkRunner().enableTCFConsentCollection(true);
+    ```
+  </Tab>
+</Tabs>
+
+Anything you set explicitly with `setConsent` still wins, per signal, so you can combine both — let the CMP answer what it knows and override the rest yourself. It is opt-in rather than automatic because interpreting a TC string on your behalf is a legal judgement: only enable it with a TCF-compliant CMP. Custom consent screens and Firebase Consent Mode do not write these keys. The flag is not persisted, so call it on every launch before `init`. If your CMP is not TCF-compliant, follow the steps below instead.
+
 <Steps>
   <Step title="Ask the user">
     Show your consent screen at first launch, before you initialize the SDK. Ask whether they agree to their data being sent to Google for advertising, and whether they agree to it being used to personalize ads.
