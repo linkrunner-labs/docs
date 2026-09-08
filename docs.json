@@ -106,7 +106,7 @@
                     },
                     {
                         "group": "Billing",
-                        "pages": ["billing/overview"]
+                        "pages": ["billing/overview", "billing/wallet"]
                     },
                     {
                         "group": "Troubleshooting",
