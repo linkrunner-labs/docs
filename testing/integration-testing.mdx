@@ -120,14 +120,18 @@ Expected result:
 1. After clicking the link, install the app **locally from your computer** (the build that contains the Linkrunner SDK).
 2. Open the app on the device.
 
-Important timing rule:
+Important ordering rule:
 
--   Open the app **within 3 minutes** of clicking the link.
+-   **Click the link before the app opens for the first time.** A click that lands after the install is never matched
+    to it.
+-   There is no few-minute deadline. The click stays eligible for the campaign's full attribution window — **7 days by
+    default**, and 30 days for Google and Meta campaigns.
 
 <Note>
-    **Alternative flow for slow builds:** If building and installing the app locally takes more than 3 minutes, use this
-    approach instead: 1. First install the app on your device 2. Then open the campaign link in a browser
-    (Chrome/Safari) on the same device 3. Immediately open the app after clicking the link
+    **Alternative flow for slow builds:** If building and installing the app locally takes a while, use this approach
+    instead: 1. First install the app on your device 2. Then open the campaign link in a browser (Chrome/Safari) on the
+    same device 3. Open the app after clicking the link. This works because a locally installed build has no Play Store
+    install timestamp, so the click still lands before the first app open.
 </Note>
 
 Expected result:
@@ -218,7 +222,9 @@ This test verifies that a user who uninstalls and reinstalls the app is attribut
 ### Install count not increasing
 
 -   Confirm the app was **uninstalled before the test**.
--   Confirm you **opened the app within 3 minutes** of clicking the link.
+-   Confirm you **clicked the link before opening the app**. A click that lands after the install is never matched to
+    it. There is no few-minute deadline — the click stays eligible for the campaign's full attribution window (7 days
+    by default, 30 for Google and Meta).
 -   If you are using SDK Console, confirm the device is registered as a test device.
 -   If GAID collection is disabled on Android or the ATT prompt is disabled on iOS, set `debug = true` in SDK init and reopen the app.
 

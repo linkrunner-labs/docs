@@ -60,7 +60,7 @@ LinkRunner.getInstance().init(
 ### 3. Run the test flow
 
 1. **Click** your new campaign link on the test device
-2. **Install** and **open** the app within 3 minutes of clicking
+2. **Install** and **open** the app — the click must land before the first app open, but there is no few-minute deadline
 3. **Signup** (if testing signup attribution)
 
 <Tip>
@@ -70,7 +70,7 @@ LinkRunner.getInstance().init(
 ## Still seeing issues?
 
 - Confirm you clicked the link **on the same device** where the app is installed
-- Confirm you opened the app **within 3 minutes** of clicking
+- Confirm you **clicked the link before opening the app** — a click that lands after the install is never matched to it
 - See the full [Integration Testing guide](/testing/integration-testing) for a detailed walkthrough
 
 Need help? Reach out at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).
