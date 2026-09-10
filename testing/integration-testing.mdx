@@ -124,8 +124,8 @@ Important ordering rule:
 
 -   **Click the link before the app opens for the first time.** A click that lands after the install is never matched
     to it.
--   There is no few-minute deadline. The click stays eligible for the campaign's full attribution window — **7 days by
-    default**, and 30 days for Google and Meta campaigns.
+-   The click stays eligible for the campaign's full attribution window — **7 days by default**, and 30 days for
+    Google and Meta campaigns.
 
 <Note>
     **Alternative flow for slow builds:** If building and installing the app locally takes a while, use this approach
@@ -223,8 +223,8 @@ This test verifies that a user who uninstalls and reinstalls the app is attribut
 
 -   Confirm the app was **uninstalled before the test**.
 -   Confirm you **clicked the link before opening the app**. A click that lands after the install is never matched to
-    it. There is no few-minute deadline — the click stays eligible for the campaign's full attribution window (7 days
-    by default, 30 for Google and Meta).
+    it. The click stays eligible for the campaign's full attribution window (7 days by default, 30 for Google and
+    Meta).
 -   If you are using SDK Console, confirm the device is registered as a test device.
 -   If GAID collection is disabled on Android or the ATT prompt is disabled on iOS, set `debug = true` in SDK init and reopen the app.
 
