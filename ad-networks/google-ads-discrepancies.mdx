@@ -4,7 +4,7 @@ description: "Troubleshoot common issues and understand expected discrepancies b
 icon: "circle-question"
 ---
 
-Google Ads and Linkrunner will rarely show identical numbers. Most of the gap is expected — this page explains what's normal, what's fixable, and how to compare the two dashboards correctly.
+Google Ads and Linkrunner rarely show identical numbers. Check your integration first, then compare the same date range, time zone, and conversion actions.
 
 For setup instructions, see the [Google Ads integration guide](/ad-networks/google-ads).
 
@@ -24,7 +24,9 @@ Walk through this checklist.
 Open [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads), open the three-dot menu on the Google Ads row, choose **Setup Link IDs**, and verify the link ID is saved for the correct platform (Android or iOS).
 </Step>
 <Step title="Import first_open in Google Ads">
-On the Google Ads [Conversions summary](https://ads.google.com/aw/conversions) page, confirm the `first_open` conversion event is imported. If it was previously deleted, follow [Re-enabling Previously Deleted Events](/ad-networks/google-ads#re-enabling-previously-deleted-events). Full setup: [Importing Events for Conversion Actions Setup](/ad-networks/google-ads#4-importing-events-for-conversion-actions-setup).
+In Linkrunner, open [Google Ads → Event Mapping → App Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping). Under **Google app conversion goals**, select the account and platform and check the `first_open` action. If it is hidden, follow [Manage Google conversion actions](/ad-networks/google-ads#4-importing-events-for-conversion-actions-setup) to import it. **Import** opens the editor and does not save the change until you confirm. An already enabled action does not need importing again.
+
+If it was previously deleted, follow [Re-enabling Previously Deleted Events](/ad-networks/google-ads#re-enabling-previously-deleted-events).
 </Step>
 <Step title="Check MCC vs. sub-account responsibility">
 If you run from an MCC (manager account) with sub-accounts, either:
@@ -33,13 +35,13 @@ If you run from an MCC (manager account) with sub-accounts, either:
 - The MCC shares the Link ID with the sub-account, and the sub-account imports `first_open` itself.
 </Step>
 <Step title="Wait for activation">
-After creating or updating a Link ID, allow up to **12 hours** for Google to start attributing events.
+Google processing time varies after you create or update a Link ID. There is no fixed activation-time guarantee. Confirm the account and platform, then use **Refresh goals** to check conversion-action discovery. Discovery does not confirm receipt or attribution of an individual event.
 </Step>
 </Steps>
 </Accordion>
 
 <Accordion title="first_open conversions are missing in Google Ads">
-You most likely haven't imported `first_open` as a conversion action. Follow [Importing Events for Conversion Actions Setup](/ad-networks/google-ads#4-importing-events-for-conversion-actions-setup).
+Check whether `first_open` is pending discovery, hidden, or already enabled in **Google app conversion goals**. Follow [Manage Google conversion actions](/ad-networks/google-ads#4-importing-events-for-conversion-actions-setup) to refresh discovery or import a hidden action. Google may automatically enable an action as **Secondary**. An enabled action alone does not confirm individual event receipt or campaign bidding eligibility. Review **Action optimization** and **Account default goal** through **Edit goal**, and check campaign-specific goal selection in Google Ads.
 </Accordion>
 
 <Accordion title="In-app events aren't appearing in the Google Ads dashboard">
@@ -51,12 +53,14 @@ Trigger the event in your app (on iOS, allow tracking so the IDFA is available) 
 In the Linkrunner Google Ads integration tab, confirm the event is mapped and postbacks are enabled.
 </Step>
 <Step title="Import the event in Google Ads">
-From Google Ads, go to **Tools → Conversions** and import the event. See [Importing Events for Conversion Actions Setup](/ad-networks/google-ads#4-importing-events-for-conversion-actions-setup).
+In Linkrunner's **App Event Mapping**, find **Google app conversion goals**, select the account and platform, and click **Refresh goals**. Check the exact mapped event name. If the action is hidden, click **Import**, review the goal settings, and set **Import conversion action** to **Import and enable**. Click **Save changes**, review the **Confirm Google Ads account changes** dialog, then click **Confirm and save**. The action is imported only after the save succeeds. Choose **Keep hidden** if you do not want to import it.
+
+For an enabled action, use **Edit goal** instead. See [Manage Google conversion actions](/ad-networks/google-ads#4-importing-events-for-conversion-actions-setup) for the settings and their account-level scope. Campaign-specific selection remains in Google Ads.
 </Step>
 </Steps>
 
 <Note>
-    Conversions can take up to **6 hours** to appear in Google Ads after the event is performed.
+    Event receipt, conversion-action discovery, import, and reporting are separate. Google processing time varies, with no fixed guarantee. A discovered or enabled action does not prove that Google received or attributed a particular event.
 </Note>
 </Accordion>
 
@@ -115,7 +119,7 @@ On iOS, Linkrunner counts only SKAN postbacks with `did_win=TRUE`. Google Ads tr
 | Assisted installs        | Every install following any engagement within the window is credited         | Last-click attribution; earlier engagements are assists               |
 | Reinstalls               | Reported as `session_start` conversions                                      | Surfaced as re-attributions in the remarketing view                   |
 | Count setting            | "Every" conversion counted                                                   | One install per user; multiple occurrences of the same in-app event   |
-| Processing delay         | Up to 24 hours                                                               | Near real time                                                        |
+| Processing delay         | Varies by processing stage; no fixed guarantee                                | Near real time                                                        |
 | Deduplication            | Reports all claims, including overlap with other networks                    | Credits a single source per user                                      |
 | SKAN installs (iOS)      | Counts postbacks with `did_win=TRUE` and `did_win=NULL` together             | Counts only `did_win=TRUE`                                            |
 
@@ -127,7 +131,7 @@ On iOS, Linkrunner counts only SKAN postbacks with `did_win=TRUE`. Google Ads tr
 
 If the gap is much bigger than expected:
 
-- Event is **imported** in the correct Google Ads account.
+- Conversion action is **enabled** in the correct Google Ads account, either through import or automatic enablement. For bidding, also check **Action optimization**, **Account default goal**, and campaign-specific selection in Google Ads.
 - Event is **mapped and enabled** in the Linkrunner → Google Ads integration.
 - The correct **Link ID** is saved in Linkrunner and shared with the right MCC sub-account.
 - iOS: SKAdNetwork is configured and you're running App Campaigns. See [SKAdNetwork integration](/features/skadnetwork-integration).
@@ -135,4 +139,4 @@ If the gap is much bigger than expected:
 
 ---
 
-For any questions or assistance, please contact us at [support@linkrunner.io](mailto:support@linkrunner.io).
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

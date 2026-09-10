@@ -1,12 +1,12 @@
 ---
 title: "Google Ads"
-description: "Connect your app with Google Ads for enhanced campaign tracking and optimization"
+description: "Connect Google Ads, map app events, and manage native app conversion actions in Linkrunner."
 icon: "/images/logos/google.webp"
 ---
 
 ## Overview
 
-Google Ads integration with Linkrunner enables you to track conversions and optimize your app campaigns directly within the Google Ads platform. This integration allows you to import events from your app into Google Ads as conversion actions, providing better insights into your campaign performance and user behavior.
+Use this guide for native Android and iOS App campaigns. Receiving an event, importing a conversion action, and using it for campaign bidding are separate steps.
 
 ## Setup Process
 
@@ -88,48 +88,70 @@ Map your app events to Google Ads events so Linkrunner can send postback convers
     for these events.
 </Note>
 
-1. Go to [Google Ads Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping)
-2. Click **Add Mapping**
-3. Select your event under **Your Events**
-4. Select the matching **Google Ads Event**
-5. Turn on **Send Revenue** only for revenue events, then choose the **Currency**
-6. Click **Save**
-7. Click the paper plane **Send event to ad network** icon to fire a test event
+<Steps>
+  <Step title="Open app event mapping">
+    Go to [Integrations → Google Ads → Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping) and open **App Event Mapping**.
+  </Step>
+  <Step title="Map your event">
+    Click **Add Mapping**, select **Your Events**, and choose the matching **Google Ads Event**. Turn on **Send Revenue** only for revenue events, choose the **Currency**, then click **Save**.
 
-<img src="/images/google_ads/event-mapping.png" alt="Google Ads event mapping table in Linkrunner" />
+    Match the Google event name exactly. `Signup` and `sign_up` are different events. A custom mapping to `Signup` does not use the default `sign_up` action.
+  </Step>
+  <Step title="Check event delivery">
+    Saving a new or updated mapping automatically attempts to send a test event. You do not need to click the paper plane **Send event to ad network** action after every save. Use it for a manual retry if needed, or trigger the event in your app.
+
+    A success message does not prove that Google received the event, discovered a conversion action, or imported it. Google processing time varies. Refresh the conversion actions after processing rather than adding duplicate mappings.
+  </Step>
+</Steps>
+
+<span id="4-importing-events-for-conversion-actions-setup" />
+<span id="step-1-access-conversions-dashboard" />
+<span id="step-2-create-conversion-action" />
+<span id="step-3-import-events" />
+
+## 4. Manage Google conversion actions
+
+Stay in **App Event Mapping** on [Google Ads → Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping) and find **Google app conversion goals**. Linkrunner matches mapped events to native app conversion actions discovered by Google. Discovery identifies an action, not receipt of an individual event. You cannot create an arbitrary new native action here.
+
+<Steps>
+  <Step title="Select the account and platform">
+    Choose your Google Ads account, then **Android** or **iOS**. Confirm that the account has a link ID for that platform.
+  </Step>
+  <Step title="Check the discovered action">
+    ![Google app conversion goals showing the account, platform, and an enabled action using illustrative demo data](/images/google_ads/app-conversion-goals-overview.png)
+
+    Find your mapped event and check its matching Google conversion action. If discovery is pending, confirm the exact mapped name, send an event using the existing test action if needed, then click **Refresh goals** after Google processes it.
+  </Step>
+  <Step title="Open the goal editor">
+    For a discovered action with status **HIDDEN**, click **Import** to open the editor. This does not save or enable the action yet. For an enabled action, click **Edit goal**.
+  </Step>
+  <Step title="Review the action and goal settings">
+    ![Goal editor with category, Primary optimization, account-default settings, and Save changes for a demo action](/images/google_ads/app-conversion-goals-editor.png)
+
+    Review **Goal category**, choose **Primary** or **Secondary** under **Action optimization**, and review **Account default goal**.
+
+    For a hidden action, set **Import conversion action** to **Import and enable** if you want to import it, or **Keep hidden** to leave it unimported.
+
+    The category and Primary or Secondary setting apply to the conversion action. Account-default changes apply to the account-level goal and can affect other actions and campaigns that use it, not just this event row.
+  </Step>
+  <Step title="Confirm and save">
+    ![Confirmation dialog explaining the account-wide impact before saving a demo conversion action](/images/google_ads/app-conversion-goals-confirm.png)
+
+    Click **Save changes** to open the **Confirm Google Ads account changes** dialog. Review the affected account, action, and goal, then click **Confirm and save** only if the changes are correct.
+
+    Importing enables the existing Google Ads action only after you confirm and the save succeeds. It does not create a new native action or select it for campaign bidding.
+  </Step>
+</Steps>
 
 <Note>
-    After Linkrunner sends an event, it can take up to **6 hours** to appear in Google Ads.
+  Google can automatically enable app conversion actions as **Secondary**. These are for observation, not ordinary bidding optimization. If Google creates a new goal for an automatically enabled action, it does not make that goal an account default. See [Google's automatically enabled app conversion actions](https://support.google.com/google-ads/answer/17086025?hl=en).
 </Note>
 
-<Tip>
-    If an event is not available as a conversion action in Google Ads, fire a test event from Linkrunner, then import it
-    from **Goals** → **Conversions** → **Summary** after Google finishes processing it.
-</Tip>
+<Warning>
+  **Primary** alone does not select an action for every campaign. Bidding also depends on the campaign's goal configuration. Review campaign-specific goal and action selection in Google Ads. Linkrunner does not manage campaign-specific selection here.
+</Warning>
 
-## 4. Importing Events for Conversion Actions Setup
-
-After creating the link ID and mapping events in Linkrunner, you can import app events into Google Ads to set up conversion tracking.
-
-### Step 1: Access Conversions Dashboard
-
-1. On Google Ads Dashboard, navigate to **Goals** [sidebar] → **Conversions** → **Summary**
-2. Or visit directly: [https://ads.google.com/aw/conversions](https://ads.google.com/aw/conversions)
-
-### Step 2: Create Conversion Action
-
-1. Click on **"+ Create conversion action"**
-2. On the "Start tracking conversions" popup:
-    - Select **"App"**
-    - Then select **"Third-party app analytics"**
-    - Press **Continue**
-
-### Step 3: Import Events
-
-1. Select all the events you want to import from the available list
-2. To get started, we recommend selecting the `first_open` event
-3. Configure additional settings as needed for each conversion action
-4. Save your conversion actions
+For the import behavior, see [Google's native app conversion action API guidance](https://developers.google.com/google-ads/api/docs/conversions/categories#firebase_and_third-party_app_analytics).
 
 ## 5. Create Your First Campaign
 
@@ -216,8 +238,7 @@ To open a specific screen after install, click **Edit** on the campaign row and 
 ## Important Notes
 
 <Note>
-    After generating the link ID, it might take up to **12 hours** for the events to show up in Google Ads. This is a
-    normal processing delay from Google's side.
+    Google processes event receipt and conversion-action discovery separately. There is no fixed processing-time guarantee. Refresh the action list after processing and check the selected account, platform, and mapped event name if it remains pending.
 </Note>
 
 <Tip>
@@ -237,54 +258,33 @@ For answers to common questions and an explanation of why numbers in Google Ads 
 
 ## Troubleshooting
 
-### Campaign Not Showing in Linkrunner
+<AccordionGroup>
+  <Accordion title="Campaign Not Showing in Linkrunner" description="Check attribution, the platform link ID, and your released SDK.">
+    - Wait for the first attributed install before expecting attribution rows.
+    - Confirm the platform link ID under [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=integration).
+    - Check that the campaign is active and serving impressions in Google Ads.
+    - Confirm your released app includes the Linkrunner SDK at 100% rollout.
+  </Accordion>
+  <Accordion title="Events Not Showing Up" description="Check the exact mapped name and refresh after Google processes the event.">
+    Confirm your app sends the event to Linkrunner and the correct platform link ID is saved. In [App Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping), check the selected account, platform, and Google event name. `Signup` does not match `sign_up`.
 
--   Wait for the first install. Campaigns appear only after at least one install is attributed.
--   Confirm the link ID is saved for the right platform under [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?p_id=89)
--   Confirm the campaign is active and serving impressions in Google Ads
--   Confirm your released app build includes the Linkrunner SDK at 100% rollout
+    Use the existing test-event action if you have not sent the mapped event. A successful send is not proof of discovery or import. Allow Google to process it, then click **Refresh goals**. Do not create a duplicate action to bypass pending discovery. Contact support if it remains pending after these checks.
+  </Accordion>
+  <Accordion title="Action is enabled but not used for bidding" description="Review Primary or Secondary, the account-default goal, and campaign settings.">
+    Google may have automatically enabled the action as **Secondary**, with a new goal that is not an account default. Click **Edit goal** in Linkrunner and review **Action optimization** and **Account default goal**. Click **Save changes**, review the **Confirm Google Ads account changes** dialog, then click **Confirm and save**. Check campaign-specific goal selection in Google Ads. Importing an action does not select it for bidding.
+  </Accordion>
+  <Accordion title="Re-enabling Previously Deleted Events" description="Find the removed action in Google Ads instead of creating a duplicate.">
+    <span id="step-1-navigate-to-all-conversion-actions" />
+    <span id="step-2-set-filter-to-show-all-conversions" />
+    <span id="step-3-re-enable-the-deleted-event" />
 
-### Events Not Showing Up
+    A removed action is different from a discovered **HIDDEN** action awaiting import. In [Google Ads conversions](https://ads.google.com/aw/conversions), open **View all conversion actions**, set the **Status** filter to **All**, find the removed action, and change its status to **Enabled**.
 
--   Ensure the link ID was copied correctly
--   Verify the event is mapped in [Google Ads Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping)
--   Wait the full 12 hours for Google's processing
--   Verify that your app is sending events to Linkrunner
+    Refresh App Event Mapping afterward. Re-enabling the action does not establish campaign bidding eligibility.
+  </Accordion>
+  <Accordion title="Link ID Creation Issues" description="Check your app's platform, store listing, and provider ID.">
+    Select the correct platform, **Android** or **iOS**, and verify your app is published and searchable in its app store. Use provider ID `9936233049`.
+  </Accordion>
+</AccordionGroup>
 
-### Re-enabling Previously Deleted Events
-
-If you previously added an event as a conversion action and then deleted it, the event won't appear in the "Create conversion action" flow when you try to add it again. Instead of creating a new conversion action, you need to re-enable the existing (deleted) one.
-
-#### Step 1: Navigate to All Conversion Actions
-
-1. Go to **Goals** → **Conversions** → **Summary** in the sidebar
-2. Click on **"View all conversion actions"** link
-
-![Google Ads - View All Conversion Actions](/images/google_ads/google-ads-nav.png)
-
-#### Step 2: Set Filter to Show All Conversions
-
-1. Click on the **Status** filter
-2. Select **"All"** from the dropdown to show both enabled and removed conversion actions
-
-![Google Ads - Status Filter](/images/google_ads/google-ads-filter.png)
-
-#### Step 3: Re-enable the Deleted Event
-
-1. Find your previously deleted event in the list
-2. Click on the status indicator (red "Removed" icon) next to the event
-3. Select **"Enabled"** from the dropdown menu
-
-![Google Ads - Enable Removed Conversion](/images/google_ads/google-ads-enable.png)
-
-Your event will now be active again and will start tracking conversions.
-
-### Link ID Creation Issues
-
--   Make sure you've selected the correct platform (iOS/Android)
--   Verify your app is published and searchable in the respective app store
--   Double-check the provider ID: `9936233049`
-
----
-
-For any questions or assistance with Google Ads integration, please contact us at [support@linkrunner.io](mailto:support@linkrunner.io).
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
