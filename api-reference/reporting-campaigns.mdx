@@ -115,7 +115,14 @@ By default the response includes:
 
 - **All custom events** your project tracks (under `custom_events`), each as a total occurrence count.
 - **All payment events** (under `payment_events`), each as a total count and total amount.
+- **A cost-per column for every one of those events**, under `cost_per_custom_events` / `cost_per_payment_events`.
 - **`active_users`** with a 7-day window.
+
+<Note>
+    Projects emitting more than 100 distinct event names get the first 100, ordered
+    the same way [Dashboard → Events](https://dashboard.linkrunner.io/dashboard/events)
+    lists them. Request anything beyond that explicitly with `events=`.
+</Note>
 
 These query params let you narrow or change that:
 
@@ -124,10 +131,18 @@ These query params let you narrow or change that:
 | `events`              | Whitelist `custom_events` to only these names. Smaller payload, faster query.                                                      | `events=Purchase,AddToCart`          |
 | `payment_events`      | Whitelist `payment_events` to only these types.                                                                                    | `payment_events=PURCHASE`            |
 | `unique_user_events`  | Count distinct users (`unique_count`) for these events instead of total occurrences. Works for both custom and payment events.    | `unique_user_events=Purchase`        |
-| `cost_per_event`      | Include `cost_per_custom_events` / `cost_per_payment_events` for these event names. Off by default.                              | `cost_per_event=Purchase,PURCHASE`   |
+| `cost_per_event`      | Narrow `cost_per_custom_events` / `cost_per_payment_events` to only these event names.                                             | `cost_per_event=Purchase,PURCHASE`   |
 | `active_users`        | Override the active-users window (in days).                                                                                        | `active_users=14`                    |
 
 All five accept a comma-separated list. Unknown event names are silently dropped (they map to no rows in our analytics store).
+
+<Warning>
+    `events`, `payment_events` and `cost_per_event` work as a group: send **any** of
+    them and you take over the whole event column spec, so the other two narrow to
+    exactly what you passed rather than defaulting to everything. Sending
+    `events=Purchase` alone therefore returns no cost-per columns, so pass
+    `cost_per_event=Purchase` alongside it if you want them.
+</Warning>
 
 Find your project's event names under [Dashboard → Events](https://dashboard.linkrunner.io/dashboard/events).
 
