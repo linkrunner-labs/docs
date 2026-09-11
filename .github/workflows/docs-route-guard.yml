@@ -7,6 +7,10 @@ on:
       - "**/*.mdx"
       - "docs.json"
       - "scripts/check-doc-routes.mjs"
+      - "scripts/check-doc-agent-files.test.mjs"
+      - ".agents/skills/**"
+      - ".claude/skills/**"
+      - "package.json"
       - ".github/workflows/docs-route-guard.yml"
 
 permissions:
@@ -21,5 +25,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Check published documentation routes
         run: node scripts/check-doc-routes.mjs "${{ github.event.pull_request.base.sha }}"
+
+      - name: Check shared documentation instructions and skills
+        run: npm run check:agents
