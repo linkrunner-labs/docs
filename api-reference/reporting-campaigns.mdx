@@ -118,7 +118,7 @@ Event columns are opt-in. Name the events you want and the response carries thos
 | `events`             | Return `custom_events` for these event names.                                                                          | `events=Purchase,AddToCart`        |
 | `payment_events`     | Return `payment_events` for these revenue types.                                                                       | `payment_events=PURCHASE`          |
 | `cost_per_event`     | Add `cost_per_custom_events` / `cost_per_payment_events` for these names (spend divided by that event's count).          | `cost_per_event=Purchase,PURCHASE` |
-| `unique_user_events` | Count distinct users for these events instead of occurrences, replacing that event's `count` with `unique_count`.       | `unique_user_events=Purchase`      |
+| `unique_user_events` | Make these events' `count` distinct users instead of total occurrences. The field name stays `count`.                    | `unique_user_events=Purchase`      |
 | `active_users`       | Override the active-users window, in days. Defaults to 7.                                                              | `active_users=14`                  |
 
 All five take a comma-separated list. Unknown event names are dropped silently, since they match no rows.
@@ -127,7 +127,7 @@ Naming an event in **any** of `events`, `payment_events`, `cost_per_event` or `u
 
 - `events=Purchase` returns `custom_events.Purchase` and nothing else.
 - `cost_per_event=Purchase` returns `cost_per_custom_events.Purchase` **and** `custom_events.Purchase`.
-- `unique_user_events=Purchase` returns `custom_events.Purchase` with `unique_count` in place of `count`.
+- `unique_user_events=Purchase` returns `custom_events.Purchase` whose `count` is distinct users rather than occurrences.
 
 Send none of them and the response contains no event columns at all: `custom_events`, `payment_events`, `cost_per_custom_events` and `cost_per_payment_events` all come back as `{}`. Every other metric (clicks, installs, signups, spend, revenue, ROAS, retention) is unaffected.
 
@@ -163,7 +163,7 @@ Each campaign, ad set and ad creative in the response then carries:
 ```json
 {
     "custom_events": {
-        "Purchase": { "unique_count": "412", "amount": "0.00" },
+        "Purchase": { "count": "412", "amount": "0.00" },
         "AddToCart": { "count": "1,905", "amount": "0.00" }
     },
     "cost_per_custom_events": { "Purchase": "258.20" },
@@ -172,7 +172,7 @@ Each campaign, ad set and ad creative in the response then carries:
 }
 ```
 
-`Purchase` reports distinct users because it was named in `unique_user_events`; `AddToCart` reports total occurrences. `payment_events` is empty because no revenue types were requested.
+`Purchase` reports distinct users because it was named in `unique_user_events`; `AddToCart` reports total occurrences. Both use the `count` field, so the parameter you sent is the only thing that tells them apart. `payment_events` is empty because no revenue types were requested.
 
 ### Errors
 
@@ -263,7 +263,7 @@ export interface Campaign {
     active_users?: number | string;
 
     // Custom & payment events: map of event name → count/amount
-    custom_events?: { [name: string]: { count: string; amount?: string; unique_count?: string } | string };
+    custom_events?: { [name: string]: { count: string; amount?: string } | string };
     payment_events?: { [type: string]: { count: string; total: string } };
     cost_per_custom_events?: { [name: string]: string };
     cost_per_payment_events?: { [type: string]: string };
