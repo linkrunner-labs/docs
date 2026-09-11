@@ -117,13 +117,17 @@ Event columns are opt-in. Name the events you want and the response carries thos
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
 | `events`             | Return `custom_events` for these event names.                                                                          | `events=Purchase,AddToCart`        |
 | `payment_events`     | Return `payment_events` for these revenue types.                                                                       | `payment_events=PURCHASE`          |
-| `cost_per_event`     | Return `cost_per_custom_events` / `cost_per_payment_events` for these names (spend divided by that event's count).      | `cost_per_event=Purchase,PURCHASE` |
+| `cost_per_event`     | Add `cost_per_custom_events` / `cost_per_payment_events` for these names (spend divided by that event's count).          | `cost_per_event=Purchase,PURCHASE` |
 | `unique_user_events` | Count distinct users for these events instead of occurrences, replacing that event's `count` with `unique_count`.       | `unique_user_events=Purchase`      |
 | `active_users`       | Override the active-users window, in days. Defaults to 7.                                                              | `active_users=14`                  |
 
 All five take a comma-separated list. Unknown event names are dropped silently, since they match no rows.
 
-Each parameter controls its own column family, so ask for each one you want. `events=Purchase` returns the Purchase count but no cost-per column; add `cost_per_event=Purchase` for that.
+Naming an event in **any** of `events`, `payment_events`, `cost_per_event` or `unique_user_events` puts its count in the response, because a cost-per value is spend divided by that count and a distinct-user count replaces it. The extra columns are what you add on top:
+
+- `events=Purchase` returns `custom_events.Purchase` and nothing else.
+- `cost_per_event=Purchase` returns `cost_per_custom_events.Purchase` **and** `custom_events.Purchase`.
+- `unique_user_events=Purchase` returns `custom_events.Purchase` with `unique_count` in place of `count`.
 
 Send none of them and the response contains no event columns at all: `custom_events`, `payment_events`, `cost_per_custom_events` and `cost_per_payment_events` all come back as `{}`. Every other metric (clicks, installs, signups, spend, revenue, ROAS, retention) is unaffected.
 
