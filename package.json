@@ -7,6 +7,7 @@
         "dev": "mintlify dev --port 3001",
         "build": "mintlify build",
         "check:routes": "node scripts/check-doc-routes.mjs",
+        "check:agents": "node --test scripts/check-doc-agent-files.test.mjs",
         "preview": "mintlify preview",
         "install-mintlify": "npm install -g mintlify",
         "export": "next build && next export"
