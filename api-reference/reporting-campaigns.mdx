@@ -144,6 +144,21 @@ All five accept a comma-separated list. Unknown event names are silently dropped
     `cost_per_event=Purchase` alongside it if you want them.
 </Warning>
 
+<Note>
+    **Counts are occurrences unless you ask otherwise.** `custom_events` and
+    `payment_events` report total occurrence counts. To get distinct users for an
+    event, name it in `unique_user_events`, which replaces that event's `count`
+    with `unique_count`.
+
+    This is a change if you called the API before 2026-09-11. Event counts used to
+    follow whichever events a dashboard user had marked as unique-user in their
+    saved column settings, so the same field could carry distinct users for one
+    project and occurrences for another, with nothing in the response to tell you
+    which. The API no longer reads those settings. If your numbers dropped for an
+    event, it was previously being counted per user: add it to
+    `unique_user_events` to get the old value back.
+</Note>
+
 Find your project's event names under [Dashboard → Events](https://dashboard.linkrunner.io/dashboard/events).
 
 #### Example: revenue events with cost-per and 14-day active users
