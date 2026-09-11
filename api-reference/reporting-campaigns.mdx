@@ -107,50 +107,72 @@ Numeric fields are returned as **formatted strings** (`"3,201"`, `"$12,540.50"`)
 `from` and `to` choose the window over which metrics (clicks, installs, revenue, spend) are computed. They do not filter which campaigns are returned: a campaign created after `to` still appears, with zeros for the window. This matches the dashboard campaign table, where the date picker changes the numbers, not the list. To fetch only campaigns created in a range, see [Troubleshooting](#troubleshooting).
 </Note>
 
-See [Configurable columns](#configurable-columns) below for `events`, `payment_events`, `unique_user_events`, `cost_per_event`, and `active_users`.
+See [Event columns](#event-columns) below for `events`, `payment_events`, `unique_user_events`, `cost_per_event`, and `active_users`.
 
-### Configurable columns
+### Event columns
 
-By default the response includes:
+Event columns are opt-in. Name the events you want and the response carries those and no others, which keeps the payload small and the query fast.
 
-- **All custom events** your project tracks (under `custom_events`), each as a total occurrence count.
-- **All payment events** (under `payment_events`), each as a total count and total amount.
-- **`active_users`** with a 7-day window.
+| Parameter            | Effect                                                                                                                 | Example                            |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `events`             | Return `custom_events` for these event names.                                                                          | `events=Purchase,AddToCart`        |
+| `payment_events`     | Return `payment_events` for these revenue types.                                                                       | `payment_events=PURCHASE`          |
+| `cost_per_event`     | Add `cost_per_custom_events` / `cost_per_payment_events` for these names (spend divided by that event's count).          | `cost_per_event=Purchase,PURCHASE` |
+| `unique_user_events` | Count distinct users for these events instead of occurrences, replacing that event's `count` with `unique_count`.       | `unique_user_events=Purchase`      |
+| `active_users`       | Override the active-users window, in days. Defaults to 7.                                                              | `active_users=14`                  |
 
-These query params let you narrow or change that:
+All five take a comma-separated list. Unknown event names are dropped silently, since they match no rows.
 
-| Parameter             | Effect                                                                                                                             | Example                              |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| `events`              | Whitelist `custom_events` to only these names. Smaller payload, faster query.                                                      | `events=Purchase,AddToCart`          |
-| `payment_events`      | Whitelist `payment_events` to only these types.                                                                                    | `payment_events=PURCHASE`            |
-| `unique_user_events`  | Count distinct users (`unique_count`) for these events instead of total occurrences. Works for both custom and payment events.    | `unique_user_events=Purchase`        |
-| `cost_per_event`      | Include `cost_per_custom_events` / `cost_per_payment_events` for these event names. Off by default.                              | `cost_per_event=Purchase,PURCHASE`   |
-| `active_users`        | Override the active-users window (in days).                                                                                        | `active_users=14`                    |
+Naming an event in **any** of `events`, `payment_events`, `cost_per_event` or `unique_user_events` puts its count in the response, because a cost-per value is spend divided by that count and a distinct-user count replaces it. The extra columns are what you add on top:
 
-All five accept a comma-separated list. Unknown event names are silently dropped (they map to no rows in our analytics store).
+- `events=Purchase` returns `custom_events.Purchase` and nothing else.
+- `cost_per_event=Purchase` returns `cost_per_custom_events.Purchase` **and** `custom_events.Purchase`.
+- `unique_user_events=Purchase` returns `custom_events.Purchase` with `unique_count` in place of `count`.
+
+Send none of them and the response contains no event columns at all: `custom_events`, `payment_events`, `cost_per_custom_events` and `cost_per_payment_events` all come back as `{}`. Every other metric (clicks, installs, signups, spend, revenue, ROAS, retention) is unaffected.
 
 Find your project's event names under [Dashboard → Events](https://dashboard.linkrunner.io/dashboard/events).
 
-#### Example: revenue events with cost-per and 14-day active users
+<Note>
+    **This changed on 2026-09-11.** Previously the endpoint tried to infer which
+    events you wanted from the saved dashboard column settings of one of your
+    project admins, so the same request returned different events for different
+    projects, changed whenever that person edited their dashboard, and gave no
+    way to tell which events you were looking at. Those settings are no longer
+    read.
+
+    If you were relying on events appearing without asking for them, add an
+    `events=` list naming them. If a count dropped, that event was previously
+    being counted per distinct user: add it to `unique_user_events` as well.
+</Note>
+
+#### Example: two events, with cost-per and distinct users
 
 ```bash
 curl -G 'https://api.linkrunner.io/api/v1/reporting/campaigns' \
   -H 'linkrunner-key: YOUR_API_KEY' \
-  --data-urlencode 'events=Purchase,AddToCart' \
-  --data-urlencode 'unique_user_events=Purchase' \
-  --data-urlencode 'cost_per_event=Purchase' \
-  --data-urlencode 'active_users=14' \
   --data-urlencode 'from=2026-04-01' \
   --data-urlencode 'to=2026-04-30' \
-  --data-urlencode 'limit=20'
+  --data-urlencode 'events=Purchase,AddToCart' \
+  --data-urlencode 'cost_per_event=Purchase' \
+  --data-urlencode 'unique_user_events=Purchase'
 ```
 
-Returns each campaign with:
+Each campaign, ad set and ad creative in the response then carries:
 
-- `custom_events.Purchase` containing a `unique_count` (distinct paying users) instead of `count`.
-- `custom_events.AddToCart` with the standard total `count`.
-- `cost_per_custom_events.Purchase` (spend ÷ Purchase count).
-- `active_users` computed over a 14-day window.
+```json
+{
+    "custom_events": {
+        "Purchase": { "unique_count": "412", "amount": "0.00" },
+        "AddToCart": { "count": "1,905", "amount": "0.00" }
+    },
+    "cost_per_custom_events": { "Purchase": "258.20" },
+    "payment_events": {},
+    "cost_per_payment_events": {}
+}
+```
+
+`Purchase` reports distinct users because it was named in `unique_user_events`; `AddToCart` reports total occurrences. `payment_events` is empty because no revenue types were requested.
 
 ### Errors
 

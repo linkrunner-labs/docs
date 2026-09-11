@@ -127,7 +127,7 @@
       }
     },
     {
-      "name": "Configurable columns: events + cost-per + active users",
+      "name": "Event columns: events + cost-per + distinct users",
       "request": {
         "method": "GET",
         "header": [],
@@ -136,9 +136,9 @@
           "host": ["{{base_url}}"],
           "path": ["reporting", "campaigns"],
           "query": [
-            { "key": "events", "value": "Purchase,AddToCart", "description": "Whitelist custom_events to these names." },
-            { "key": "unique_user_events", "value": "Purchase", "description": "Count distinct users (unique_count) instead of total occurrences." },
-            { "key": "cost_per_event", "value": "Purchase", "description": "Include cost_per_custom_events / cost_per_payment_events for these names." },
+            { "key": "events", "value": "Purchase,AddToCart", "description": "Return custom_events for these event names. Omit to get no event columns." },
+            { "key": "unique_user_events", "value": "Purchase", "description": "Count distinct users (unique_count) for these events instead of occurrences." },
+            { "key": "cost_per_event", "value": "Purchase", "description": "Return cost_per_custom_events / cost_per_payment_events for these names." },
             { "key": "active_users", "value": "14", "description": "Active users window in days. Default 7." },
             { "key": "limit", "value": "20" }
           ]
