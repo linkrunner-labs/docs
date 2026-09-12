@@ -128,6 +128,8 @@ All webhooks are sent as POST requests with a JSON body.
 | `google_campaign_details` | `object` \| `null` | Google Ads campaign details (see below) |
 | `apple_search_ads_details` | `object` \| `null` | Apple Search Ads campaign details (see below) |
 | `campaign_details` | `object` \| `null` | Generic ad network campaign details (see below) |
+| `device_data` | `object` | Device details captured at install (see below) |
+| `location_data` | `object` | Location resolved from the install's IP address (see below) |
 
 <Note>
   The `name`, `phone`, and `email` fields are populated from `user_data` passed to the SDK's `.signup()` or `.trigger()` methods.  
@@ -201,6 +203,34 @@ For supported non-Meta and non-Google ad networks, `campaign_details` contains:
 | `adset_id` | `string` \| `null` | Network ad set ID, when available |
 | `ad_creative_id` | `string` \| `null` | Network ad creative ID, when available |
 
+### Device Data
+
+`device_data` describes the device at the time of install. It is present on every install and signup webhook. The signup webhook reports the device of the install it belongs to, so both webhooks for the same `lr_install_id` carry the same values.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ip_address` | `string` \| `null` | IP address the install request came from, as seen by Linkrunner's servers |
+| `user_agent` | `string` \| `null` | `User-Agent` header of the install request. This is usually your app's HTTP client, such as `okhttp/4.12.0`, not a browser |
+| `manufacturer` | `string` \| `null` | Device manufacturer, such as `samsung` |
+| `brand` | `string` \| `null` | Device brand |
+| `device_name` | `string` \| `null` | Device model name reported by the SDK, such as `SM-S936B` |
+| `os_version` | `string` \| `null` | Operating system version |
+| `connectivity` | `string` \| `null` | Network connection at install: `wifi`, `cellular`, `ethernet`, `offline`, or `unknown` |
+
+### Location Data
+
+`location_data` is resolved from `device_data.ip_address`, so it shows where the device connected from, not its GPS position. Like `device_data`, it is present on every webhook and describes the install.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `country` | `string` \| `null` | Country name, such as `India` |
+| `state` | `string` \| `null` | State or region name |
+| `city` | `string` \| `null` | City name |
+
+<Note>
+  Both objects always contain every key. A key is `null` when Linkrunner did not receive that value or could not resolve the IP address. The values match the device and location columns in the user files from [Data Export](/features/data-export).
+</Note>
+
 ### Additional Data
 
 The `additional_data` object contains custom parameters and device data passed through the SDK. This is useful for forwarding arbitrary key-value pairs like referral codes or custom identifiers through the attribution flow.
@@ -217,6 +247,8 @@ Example:
   "custom_param_name": "custom_value"
 }
 ```
+
+`additional_data.device_data` is whatever your app passes in the SDK `data` object. It is separate from the top-level `device_data` object, which Linkrunner fills in.
 
 ## Example Payloads
 
@@ -252,7 +284,21 @@ Example:
   "apple_search_ads_details": null,
   "campaign_details": null,
   "gaid": "bk9384xs-p449-96ds-r132",
-  "idfa": null
+  "idfa": null,
+  "device_data": {
+    "ip_address": "203.0.113.24",
+    "user_agent": "okhttp/4.12.0",
+    "manufacturer": "samsung",
+    "brand": "samsung",
+    "device_name": "SM-S936B",
+    "os_version": "14",
+    "connectivity": "wifi"
+  },
+  "location_data": {
+    "country": "India",
+    "state": "Karnataka",
+    "city": "Bengaluru"
+  }
 }
 ```
 
@@ -278,7 +324,21 @@ Sent only when **Send webhooks for organic users** is enabled:
   "apple_search_ads_details": null,
   "campaign_details": null,
   "gaid": "bk9384xs-p449-96ds-r132",
-  "idfa": null
+  "idfa": null,
+  "device_data": {
+    "ip_address": "198.51.100.7",
+    "user_agent": "okhttp/4.12.0",
+    "manufacturer": "Xiaomi",
+    "brand": "Redmi",
+    "device_name": "23129RN51X",
+    "os_version": "13",
+    "connectivity": "cellular"
+  },
+  "location_data": {
+    "country": "India",
+    "state": "Maharashtra",
+    "city": "Pune"
+  }
 }
 ```
 
@@ -315,6 +375,20 @@ Sent only when **Send webhooks for organic users** is enabled:
     "device_data": {},
     "referral_code": "ABC123",
     "custom_param_name": "custom_value"
+  },
+  "device_data": {
+    "ip_address": "203.0.113.58",
+    "user_agent": "Dart/3.4 (dart:io)",
+    "manufacturer": "Google",
+    "brand": "google",
+    "device_name": "Pixel 8",
+    "os_version": "15",
+    "connectivity": "wifi"
+  },
+  "location_data": {
+    "country": "India",
+    "state": "Delhi",
+    "city": "New Delhi"
   }
 }
 ```
