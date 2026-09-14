@@ -104,9 +104,17 @@ Meta substitutes the `{{...}}` macros with real campaign, ad set, ad, and placem
 
     ![Ad Set Configuration](/images/meta/sales_ad_set.png)
 
-4. Select an ad set. Under **Placements**, open **Devices and operating systems** and select **Mobile** only. **Desktop** should not be selected.
+4. Select an ad set and go to **Placements → Show more settings → Devices and operating systems**. Select **Mobile** only and leave **Desktop** unselected.
 
     ![Meta placements device targeting with Mobile selected and Desktop not selected](/images/meta/web-to-app-mobile-devices.png)
+
+    For an iOS campaign, select **iOS devices only** in the operating-system dropdown. Selecting **Mobile** alone still includes Android devices.
+
+    Under **Included devices**, keep only the devices your app supports. For an iPhone-only app, keep **iPhones (all)** and remove **iPads (all)** and **iPods (all)**. Set **OS versions → Min.** to your app's minimum supported iOS version, rather than copying the value in the screenshot.
+
+    ![Meta device settings with iOS devices only selected, included devices, and minimum OS version controls](/images/meta/web-to-app-ios-devices.webp)
+
+    Check that each ad set targets only devices and operating systems your app supports before publishing. Keep **Conversion location** set to **Website**; iOS is the device-targeting choice, not the conversion location.
 
 5. In the ad, paste the destination URL above as the **Website URL**
 6. Add your creative assets and publish
