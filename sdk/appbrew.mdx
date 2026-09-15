@@ -1,0 +1,201 @@
+---
+title: "Appbrew SDK"
+description: "Add Linkrunner attribution to an Appbrew Shopify app with the @linkrunner/appbrew tracker"
+icon: "store"
+---
+
+[Appbrew](https://appbrew.tech) builds Shopify mobile apps from config. `@linkrunner/appbrew` plugs Linkrunner into that system as an analytics tracker, so installs, events, revenue, identity, deep links and uninstalls are attributed without per-event code.
+
+The package is an adapter over the [React Native SDK](/sdk/react-native). `rn-linkrunner` does the work; `@linkrunner/appbrew` translates Appbrew's events and lifecycle into SDK calls.
+
+| Package | Role |
+| --- | --- |
+| [`@linkrunner/appbrew`](https://www.npmjs.com/package/@linkrunner/appbrew) | Appbrew tracker. `LinkrunnerTrackerV2 extends AnalyticsTrackerV2`. |
+| [`rn-linkrunner`](https://www.npmjs.com/package/rn-linkrunner) | Linkrunner React Native SDK. Native module. |
+
+## Requirements
+
+- An Appbrew app built on the `@gauntlet/*` packages
+- `@linkrunner/appbrew` 0.2.0 or higher and `rn-linkrunner` 3.1.0 or higher
+- iOS 15.0 or higher, Android minSdk 24
+- A Linkrunner project token from [Project Settings](https://dashboard.linkrunner.io/dashboard/settings/project-details)
+
+## 1. Install
+
+```bash
+pnpm add @linkrunner/appbrew rn-linkrunner
+cd ios && pod install
+```
+
+<Warning>
+  The package declares `requiresNativeBuild: true`. Adding or updating it needs a new binary build and a store release.
+</Warning>
+
+## 2. Register the tracker
+
+In `src/app/App.tsx`, alongside Appbrew's own trackers:
+
+```typescript
+import { AnalyticsProvider } from '@gauntlet/analytics'
+import { LinkrunnerTrackerV2 } from '@linkrunner/appbrew'
+
+AnalyticsProvider.getInstance().addTracker(new LinkrunnerTrackerV2())
+```
+
+Do not put the token in code. It arrives at runtime from the Appbrew dashboard.
+
+<Tip>
+  Sample apps register trackers inside `if (!__DEV__)`. Move this line outside that guard to test in a debug build, or pass `{ token, debug: true }` to the constructor for local runs only.
+</Tip>
+
+## 3. Configure in the Appbrew dashboard
+
+The Appbrew team enters the settings per store. They reach the app as `config.integrations.linkrunner`, and the tracker reads them on every launch. Only `token` is required.
+
+| Setting | Default | Purpose |
+| --- | --- | --- |
+| `token` | required | Linkrunner project token. Without it the tracker stays disabled. |
+| `secretKey`, `keyId` | unset | [SDK signing](https://dashboard.linkrunner.io/settings?s=sdk-signing). |
+| `debug` | `false` | Verbose SDK logs. |
+| `disableIdfa` | `false` | Skip IDFA on iOS even when ATT is granted. |
+| `enablePIIHashing` | `false` | Hash email and phone on device before sending. |
+| `trackScreenViews` | `false` | Forward `screen_view` and `page_view`. Off because they are the highest-volume events. |
+| `deeplinkRouting` | `true` | Route the resolved deferred deep link into Appbrew's router. |
+| `uninstallTracking` | `true` | Register the push token for [uninstall tracking](/sdk/react-native#uninstall-tracking). |
+| `enableRefunds` | `false` | Forward `refund` as `removePayment`. Verify order id mapping for your store first. |
+| `consentIsEEA`, `consentAdUserData`, `consentAdPersonalization` | unset | Google Ads consent, each `granted`, `denied` or `unknown`. Sent before `init`. See [Consent](#consent). |
+| `enableTCFConsentCollection` | `false` | Let the SDK read TCF consent from the device CMP on Android. |
+| `clevertapIntegration` | `true` | Send the CleverTap ID to Linkrunner when `clevertap-react-native` is installed. |
+| `analyticsIdentifiers` | `true` | Attach Firebase Analytics ids to `signup` and `setUserData`. |
+| `eventsMapper`, `paramsMapper`, `eventsWhitelist`, `paramsWhitelist` | unset | Rename or restrict events and params (JSON). |
+
+## 4. Native setup
+
+<Tabs>
+  <Tab title="Android">
+
+Exclude the SDK's preferences from auto-backup in `AndroidManifest.xml`, or a reinstall reads as an existing install:
+
+```xml
+<application
+  android:dataExtractionRules="@xml/linkrunner_backup_rules"
+  android:fullBackupContent="@xml/linkrunner_backup_descriptor">
+```
+
+Both resource files ship inside `rn-linkrunner`. Permissions and the Play Install Referrer dependency are merged automatically.
+
+  </Tab>
+  <Tab title="iOS">
+
+`pod install` only. Appbrew already presents the ATT prompt before trackers start, so no ATT handling is needed. Confirm `NSUserTrackingUsageDescription` is in `Info.plist`.
+
+For Google Ads on iOS, add `pod 'GoogleAdsOnDeviceConversion'` as described in [Google Integrated Conversion Measurement](/features/google-icm).
+
+  </Tab>
+</Tabs>
+
+Deep links need your Linkrunner domain in the iOS Associated Domains entitlement and an Android intent filter with `autoVerify`. Follow [Deep Linking Setup](/features/deep-linking-setup).
+
+## What the tracker does on its own
+
+| Appbrew | Linkrunner |
+| --- | --- |
+| App open | `init`, then `setCustomerUserId` with the device id so guests are attributed |
+| `purchase` | `capturePayment` with `transaction_id` as the payment id |
+| `refund` | `removePayment`, only when `enableRefunds` is on |
+| `signup`, `login`, customer details | `signup` once per install and customer, `setUserData` after |
+| `logout` | Identity reset to the device id |
+| Every other event | `trackEvent` with the Appbrew name unchanged and Meta catalog fields added from `items[]` |
+| Link opened with the app installed | `handleDeeplink`. Appbrew routes it |
+| First open after install | `getAttributionData`, and the deferred link is routed once per install |
+| Push token | `setPushToken` for uninstall tracking |
+| CleverTap installed | `setAdditionalData` with the CleverTap ID |
+| Firebase Analytics installed | `ga_app_instance_id` and `ga_session_id` on user data |
+
+<Warning>
+  Map your events to standard commerce events in **Dashboard → Meta Ads → Event Mapping** (`add_to_cart` → `AddToCart`, `view_item` → `ViewContent`, payment type `DEFAULT` → `Purchase`). Without the mapping, events are stored but never sync to Meta.
+</Warning>
+
+## Using the attribution API
+
+Everything above is automatic. Use these calls when your app needs the campaign context itself. Each is exported from `@linkrunner/appbrew` and waits for the tracker to initialise.
+
+### Getting attribution data
+
+Read the campaign that drove the install and the deferred deep link. Use it for [referral codes](/features/referral-codes) or campaign-specific onboarding.
+
+```typescript
+import { getAttributionData } from '@linkrunner/appbrew'
+
+const attribution = await getAttributionData()
+// { deeplink?: string, campaignData?: { id, name, type, adNetwork, ... } }
+```
+
+Returns `undefined` when no token is configured or the install has no attribution. One native call per launch, shared with deferred routing.
+
+### Consent
+
+Google Ads attribution needs consent before `init`. Without a consent management platform, set the three consent settings in the Appbrew dashboard. With one, call `setConsent` from its callback and again whenever the choice changes:
+
+```typescript
+import { setConsent } from '@linkrunner/appbrew'
+
+setConsent({
+  isEEA: 'granted',
+  hasConsentForDataUsage: 'granted',
+  hasConsentForAdsPersonalization: 'denied',
+})
+```
+
+Leave a signal out rather than sending `unknown` as a denial. See [Google Integrated Conversion Measurement](/features/google-icm).
+
+### Handling deep links yourself
+
+The tracker reports every link that arrives through React Native's `Linking`. Push taps do not: Appbrew's push module navigates from the notification payload directly. Report those so a push campaign shows as a re-engagement:
+
+```typescript
+import { handleDeeplink } from '@linkrunner/appbrew'
+
+messaging().onNotificationOpenedApp(async (message) => {
+  const link = message.data?.link
+  if (typeof link === 'string' && link.startsWith('http')) {
+    await handleDeeplink(link)
+  }
+})
+```
+
+### Extra user fields
+
+`id` defaults to the current customer, or the device id for guests:
+
+```typescript
+import { setAdditionalData, setUserData } from '@linkrunner/appbrew'
+
+await setUserData({ mixpanel_distinct_id: distinctId })
+await setAdditionalData({ clevertapId })
+```
+
+The same five calls exist as methods on the `LinkrunnerTrackerV2` instance.
+
+## Testing
+
+1. Build with `debug: true` and look for `Linkrunner initialised successfully` in the console.
+2. Open [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events). The install and events appear as you use the app.
+3. Place an order and confirm one payment appears. Relaunch and confirm it is not duplicated.
+4. Install through a campaign link on a fresh device and confirm `getAttributionData()` returns the `deeplink`.
+
+See [Integration Testing](/testing/integration-testing) for the full checklist.
+
+## Troubleshooting
+
+| Symptom | Cause |
+| --- | --- |
+| `no token in config.integrations.linkrunner` in the console | The token is not set for this store in the Appbrew dashboard |
+| No events at all | The tracker is registered inside `if (!__DEV__)`, or the whitelist excludes them |
+| Events in Linkrunner but not in Meta | Event mapping missing under **Meta Ads → Event Mapping** |
+| Reinstalls counted as existing installs | Android backup rules missing from `AndroidManifest.xml` |
+| Deep link opens the app but does not navigate | Domain verification incomplete. See [Deep Linking Setup](/features/deep-linking-setup) |
+| Duplicate payments | `capturePayment` also called from a Shopify webhook with a different payment id |
+| `getAttributionData()` returns `undefined` | No token, or the app was installed directly from the store |
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
