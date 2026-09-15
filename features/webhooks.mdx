@@ -213,7 +213,7 @@ For supported non-Meta and non-Google ad networks, `campaign_details` contains:
 | `user_agent` | `string` \| `null` | `User-Agent` header of the install request. This is usually your app's HTTP client, such as `okhttp/4.12.0`, not a browser |
 | `manufacturer` | `string` \| `null` | Device manufacturer, such as `samsung` |
 | `brand` | `string` \| `null` | Device brand |
-| `device_name` | `string` \| `null` | Device model name reported by the SDK, such as `SM-S936B` |
+| `device_name` | `string` \| `null` | Device model, such as `SM-S936B` on Android or `iPhone` and `iPhone 17 Pro` on iOS. The user-assigned iOS device name (for example `Becca's iPhone`) is never sent; when that is all the SDK reported, this is `null` |
 | `os_version` | `string` \| `null` | Operating system version |
 | `connectivity` | `string` \| `null` | Network connection at install: `wifi`, `cellular`, `ethernet`, `offline`, or `unknown` |
 
