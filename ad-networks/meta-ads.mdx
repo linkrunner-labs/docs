@@ -80,9 +80,11 @@ This process connects your app and Meta ad account with Linkrunner.
 ### Step 5: Configure CAPI
 
 1. Click **Configure CAPI** for the connected ad account
-2. Enter the **Dataset ID** from Meta Events Manager
-3. Enter the **CAPI Access Token** from Meta Events Manager → **Settings** → **Conversions API**
-4. Click **Save**
+2. Select the dataset in Meta Events Manager and copy its **Dataset ID** into Linkrunner
+3. In that same dataset, open **Settings → Conversions API**, generate an access token, and paste it into **CAPI access token** in Linkrunner
+4. Click **Check access & save**
+
+Linkrunner checks whether the token can access the dataset before saving. If the check fails, see [CAPI dataset access errors](#capi-dataset-access-errors).
 
 <img src="/images/meta/configure-capi.png" alt="Configure CAPI modal in Linkrunner" />
 
@@ -341,6 +343,28 @@ For answers to common questions and an explanation of why numbers in Meta Ads Ma
 
 ## Troubleshooting
 
+### CAPI dataset access errors
+
+A missing CAPI configuration means the ad account needs a dataset ID and token saved in Linkrunner. An error after **Check access & save** means the save attempt failed or could not be confirmed. Follow the message shown in the modal.
+
+If the modal says it could not verify dataset access or asks you to check dataset permissions, Linkrunner rejected the new configuration before saving. The dataset ID and token may not match, or the token may lack access. A valid Events Manager token can also be rejected because of a Linkrunner validation limitation. The error alone does not prove that you need a new token or broader permissions.
+
+1. Open [Meta Events Manager](https://business.facebook.com/events_manager2/list) and select the dataset that should receive your events. Check that its ID matches **Dataset ID** in Linkrunner, not your App ID or ad account ID.
+2. For an Events Manager token, confirm that it was generated under **Settings → Conversions API** for that same dataset and was pasted completely. If it belongs to another dataset, use a token for the intended dataset. If you see **Saved token**, click **Replace token** only when you need to replace it.
+3. If you cannot access the dataset or need help generating a replacement, ask the dataset owner or business admin. For a token generated through your own Meta app, have the admin check that the dataset/pixel is assigned to the system user that generated it. See [Meta's access token setup guide](https://developers.facebook.com/docs/marketing-api/conversions-api/get-started/#access-token). Do not grant broad permissions to unrelated assets as a workaround.
+4. After correcting a mismatch or access assignment, click **Check access & save** again. If an Events Manager token for the correct dataset is still rejected, contact Linkrunner support using the details below instead of repeatedly generating tokens or expanding permissions. Linkrunner must investigate validation failures on its side; do not change your credentials solely to work around them.
+
+For other messages:
+
+- **Invalid or expired token:** Generate a new token for the same dataset, replace the token in Linkrunner, and retry.
+- **Meta unavailable, rate limited, or unexpected response:** These validation errors leave your saved configuration unchanged. Wait and retry rather than changing permissions.
+- **Save could not be confirmed:** Click **Reload configuration** and review the saved values before retrying. Your changes may already have been saved.
+- **Configuration changed during the check:** Reopen the configuration before trying again.
+
+**Configuration saved** with **Dataset access checked** confirms access to the dataset, not event delivery. Continue with [event mapping](#2-set-up-event-mapping) and verify receipt in Meta Events Manager separately.
+
+If the error persists, contact [support@linkrunner.io](mailto:support@linkrunner.io) with the dataset ID, ad account ID, exact error, and a screenshot with the token masked. Never send access tokens, app secrets, or referrer decryption keys in WhatsApp, email, or screenshots.
+
 ### Events Not Showing Up in Meta
 
 - Verify your Referrer Decryption Key is correct
@@ -372,4 +396,4 @@ Campaigns will only appear in the Linkrunner dashboard after the first install c
 
 ---
 
-For any questions or assistance with Meta Ads integration, please contact us at [support@linkrunner.io](mailto:support@linkrunner.io).
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).
