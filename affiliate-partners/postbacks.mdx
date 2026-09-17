@@ -46,11 +46,10 @@ https://track.example.com/?c=OgWmhiSXhG&tid=a1b2c3d4e5&s2=camp_88&s3=pub_4471&ga
 | `c`              | Linkrunner campaign identifier. Keep the value from the dashboard.                               |
 | `tid`            | Your click ID. Linkrunner returns this in postbacks as `{click_id}` and `{tid}`.                 |
 | `s2`, `s3`, `s4` | Optional passthrough values. Linkrunner returns them in postbacks as `{s2}`, `{s3}`, and `{s4}`. |
-| `cc`             | Optional. Your own campaign ID. Linkrunner returns it in postbacks as `{campaign_id}` and `{cc}`. |
 | `gaid`           | Android Google Advertising ID, when available.                                                   |
 | `idfa`           | iOS advertising ID, when available.                                                              |
 
-Use these parameter names in the URL. For example, use `tid={click_id}` instead of `utm_id={click_id}`.
+Use these parameter names in the URL. For example, use `tid={click_id}` instead of `utm_id={click_id}`, and use `s2={campaign_id}` instead of `cc={campaign_id}`.
 
 Do not add postback-only values such as `postbackKey`, `event`, `event_name`, or `crc` to the click tracking link. If your postback endpoint requires a secret key, configure it privately with Linkrunner.
 
@@ -87,7 +86,7 @@ Any macro on this page can arrive empty when the value is not known for that con
 | `{click_id}`   | The `tid` value you sent on the tracking link. Use this to match the postback to your click. |
 | `{tid}`        | Same value as `{click_id}`.                                                                  |
 | `{install_id}` | Linkrunner's unique identifier for the install.                                              |
-| `{campaign_id}` | Your campaign ID from the click URL, if you sent one. Otherwise Linkrunner's numeric campaign ID (for example `4471`). |
+| `{campaign_id}` | Your campaign ID from the click link when you sent one. Otherwise Linkrunner's numeric campaign ID (for example `4471`). |
 | `{cc}`         | Same value as `{campaign_id}`.                                                               |
 
 ### Event
