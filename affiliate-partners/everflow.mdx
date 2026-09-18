@@ -1,0 +1,123 @@
+---
+title: "Everflow Integration"
+description: "Run affiliate traffic from an Everflow-based network and receive conversions in both platforms"
+icon: "diagram-project"
+---
+
+## Overview
+
+Everflow is a partner marketing platform used by many affiliate networks. Each network on Everflow has its own tracking domain and Network ID (`nid`), so the values in this guide come from the network you work with.
+
+The integration works in two directions:
+
+1. **Clicks.** Your network places your Linkrunner tracking link as the offer's Default Landing Page in Everflow. Everflow fills in its click macros (most importantly `{transaction_id}`) before the user reaches Linkrunner.
+2. **Postbacks.** When Linkrunner attributes an install or an in-app event to an Everflow click, it fires a server-to-server postback to the network's Everflow domain with the same `transaction_id`. Everflow uses it to credit the right partner.
+
+You can find Everflow under **Integrations → Affiliate Partners** in the dashboard.
+
+<img src="/images/affiliate-partners/everflow-affiliate-card.png" alt="Everflow card on the Integrations page under Affiliate Partners" />
+
+### What you need from your network
+
+| Value | Where the network finds it |
+| --- | --- |
+| Tracking (conversion) domain | **Control Center → Platform Configurations → Domains** |
+| Network ID (`nid`) | **Control Center → Platform Configurations** |
+| Your Advertiser ID (`aid`) | Next to the advertiser name on the offer |
+| Event IDs (`adv_event_id`) for each post-install event | **Advertisers → [Advertiser] → Events** tab |
+| Verification token, if the network enforces one | **Advertisers → [Advertiser] → Edit → Advanced Options** |
+
+## 1. Create an Everflow campaign
+
+1. Go to [https://dashboard.linkrunner.io/campaigns](https://dashboard.linkrunner.io/campaigns) and click **Create Link**.
+2. Under **Advanced Options → Ad Channel**, search for and select **Everflow**.
+
+<img src="/images/affiliate-partners/everflow-channel-select.png" alt="Create Campaign modal with Everflow selected in the Ad Channel dropdown" />
+
+3. Click **Create Campaign** and copy the **Template URL** from the success screen.
+
+<img src="/images/affiliate-partners/everflow-template-url.png" alt="Campaign success screen showing the Everflow Template URL" />
+
+The Template URL looks like this:
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid={transaction_id}&s2={offer_id}&s3={affiliate_id}&gaid={google_aid}&idfa={idfa}
+```
+
+The placeholders in curly braces are Everflow macros. Do not fill them in. Everflow replaces them at click time.
+
+| Parameter | Everflow macro | Purpose |
+| --- | --- | --- |
+| `tid` | `{transaction_id}` | The Everflow click ID. Required. This is the value Linkrunner echoes back on every postback. |
+| `s2` | `{offer_id}` | The Everflow offer ID. Recommended. |
+| `s3` | `{affiliate_id}` | The partner running the traffic. Recommended. |
+| `gaid` | `{google_aid}` | Google Advertising ID. Upgrades attribution to deterministic device matching. |
+| `idfa` | `{idfa}` | iOS advertising ID. Same benefit on iOS. |
+
+## 2. Add the link to the Everflow offer
+
+Send the Template URL to your network. They paste it as the offer's **Default Landing Page** (**Offers → [Offer] → Destination**).
+
+<Warning>
+The click ID must arrive as `tid={transaction_id}`, with curly braces. Everflow does not resolve square brackets. If the parameter name or format is wrong, Everflow never stores the transaction ID and every postback later fails with Everflow's Error 12 (Invalid Transaction ID).
+</Warning>
+
+## 3. Configure postbacks
+
+Share the values from the table in the [Overview](#what-you-need-from-your-network) with your Linkrunner account manager or [support@linkrunner.io](mailto:support@linkrunner.io). Linkrunner configures the postbacks for your project.
+
+Linkrunner then sends:
+
+**Install** (the Everflow base conversion):
+
+```
+https://www.NETWORK_DOMAIN.com/?nid=NID&aid=AID&transaction_id=<click's transaction_id>
+```
+
+**Post-install event** (one Everflow event ID per event you map):
+
+```
+https://www.NETWORK_DOMAIN.com/?nid=NID&aid=AID&adv_event_id=EVENT_ID&transaction_id=<click's transaction_id>
+```
+
+**Purchase with revenue**, if your offer pays on sale value (RPS/CPS):
+
+```
+https://www.NETWORK_DOMAIN.com/?nid=NID&aid=AID&adv_event_id=EVENT_ID&transaction_id=<click's transaction_id>&amount=9.99&currency=USD
+```
+
+<Note>
+Linkrunner only sends events you explicitly map to an Everflow event ID. Everflow records a postback without an event ID as a base conversion instead of rejecting it, which silently misreports data. Mapping every event up front avoids this.
+</Note>
+
+## 4. Test the integration
+
+1. Ask your network for a test tracking link from the offer (**Offers → [Offer] → Tracking Links**).
+2. On a device that has never had your app, click the link, install, and open the app.
+3. Check the install in Everflow under **Reporting → Conversions**. It usually appears within 2 to 5 minutes.
+4. Check the install on your Linkrunner campaign at [https://dashboard.linkrunner.io/campaigns](https://dashboard.linkrunner.io/campaigns).
+5. Fire a test in-app event (for example a purchase) and confirm it appears in Everflow with the right event ID and amount.
+
+<Tip>
+Ask your network to turn off **Allow Duplicate Conversions** on the offer. Linkrunner postbacks are at-least-once, so Everflow-side deduplication keeps reporting clean.
+</Tip>
+
+## Attribution windows
+
+Everflow purges click data after 90 days if no conversion arrived for it. The install postback normally anchors the transaction ID well within that window, so later events keep attributing. Keep your Linkrunner campaign's click-through window at or below the offer's session duration in Everflow.
+
+## Troubleshooting
+
+**Conversions appear in Linkrunner but not in Everflow.**
+Check the postback in Everflow's Investigator tool using the transaction ID. Error 12 means the transaction ID was never captured (see the warning in step 2) or the click is older than 90 days. Error 21 means the advertiser enforces a verification token and the postback is missing it.
+
+**Everything shows up as a base conversion in Everflow.**
+The event postbacks are missing `adv_event_id`. Confirm every event you expect is mapped to an Everflow event ID with your Linkrunner contact.
+
+**The same conversion appears twice in Everflow.**
+Turn off **Allow Duplicate Conversions** on the offer.
+
+**Installs are not attributed to the network's clicks.**
+Confirm the offer's Default Landing Page is exactly the Template URL from your Linkrunner campaign, and that the final clicked URL contains a real `tid` value, not the literal text `{transaction_id}`.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
