@@ -50,6 +50,19 @@ Webhooks allow you to receive real-time HTTP notifications when attribution even
 Your endpoint must be publicly accessible. Linkrunner retries failed requests up to three times, but does not follow redirects.
 </Note>
 
+### Allowlisting Linkrunner IPs
+
+If your endpoint sits behind a firewall or IP allowlist, allow inbound requests from these addresses. All Linkrunner webhooks are sent from one of them:
+
+| IP Address |
+|------------|
+| `8.234.94.188` |
+| `8.234.80.204` |
+
+<Note>
+These are static and will not change without advance notice. Allowlist both — webhooks may be sent from either one.
+</Note>
+
 ## Webhook Events
 
 Linkrunner sends webhooks for the following events:
