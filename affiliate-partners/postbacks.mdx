@@ -67,6 +67,9 @@ Rules:
 - Values are URL-encoded automatically. Do not encode the macros yourself.
 - A macro with no value for a given conversion is replaced with an empty string. For example, `{idfa}` is empty on an Android install.
 - Text that is not a recognized macro is left untouched, so static query parameters are safe.
+- All timestamps are Unix seconds in UTC.
+
+Any macro on this page can arrive empty when the value is not known for that conversion. Build your endpoint to accept empty values rather than reject the request.
 
 <Warning>
   Only use the postback macros listed below in your postback URL template.
@@ -83,6 +86,8 @@ Rules:
 | `{click_id}`   | The `tid` value you sent on the tracking link. Use this to match the postback to your click. |
 | `{tid}`        | Same value as `{click_id}`.                                                                  |
 | `{install_id}` | Linkrunner's unique identifier for the install.                                              |
+| `{campaign_id}` | Your campaign ID from the click link when you sent one. Otherwise Linkrunner's numeric campaign ID (for example `4471`). |
+| `{cc}`         | Same value as `{campaign_id}`.                                                               |
 
 ### Event
 
@@ -91,6 +96,34 @@ Rules:
 | `{event_name}` | The conversion name: `install`, `signup`, or the in-app event name (for example `purchase`). |
 | `{event}`      | Same value as `{event_name}`.                                                                |
 | `{timestamp}`  | Time when Linkrunner builds the postback, as a Unix timestamp in seconds.                    |
+
+<Note>
+  `{timestamp}` is when the postback was sent, not when the conversion happened.
+  Use `{event_time}` for the time of the event itself.
+</Note>
+
+### Time
+
+All three are Unix timestamps in seconds, UTC.
+
+| Macro            | Description                                                                                   | Example      |
+| ---------------- | --------------------------------------------------------------------------------------------- | ------------ |
+| `{click_time}`   | Time of the click that the conversion was attributed to.                                      | `1789653202` |
+| `{install_time}` | Time of the install, measured as the first app open received by Linkrunner's servers.         | `1789653349` |
+| `{event_time}`   | Time the event happened. On an install postback this is the same value as `{install_time}`.   | `1789667620` |
+
+<Note>
+  `{install_time}` is the first app open as received by Linkrunner's servers,
+  the same definition other MMPs use. It is not the Play Store download or
+  install-begin time.
+</Note>
+
+### App
+
+| Macro           | Description                                        | Example           |
+| --------------- | -------------------------------------------------- | ----------------- |
+| `{bundle_id}`   | App bundle ID (iOS) or package name (Android).     | `com.example.app` |
+| `{app_version}` | Version of the app the user is running.            | `15.2.209`        |
 
 ### Revenue
 
@@ -108,10 +141,35 @@ Rules:
 
 ### Device
 
-| Macro    | Description                      |
-| -------- | -------------------------------- |
-| `{gaid}` | Google Advertising ID (Android). |
-| `{idfa}` | iOS Advertising ID (Apple).      |
+| Macro            | Description                                                          | Example                |
+| ---------------- | -------------------------------------------------------------------- | ---------------------- |
+| `{gaid}`         | Google Advertising ID (Android).                                     | `38400000-8cf0-11bd-b23e-10b96e40000d` |
+| `{idfa}`         | iOS Advertising ID (Apple).                                          | `6D92078A-8246-4BA4-AE5B-76104861E7DC` |
+| `{device_brand}` | Device brand.                                                        | `POCO`                 |
+| `{device_model}` | Device model. Android sends a readable name, iOS sends the hardware identifier. | `Xiaomi 2302EPCC4I` (Android), `iPhone15,2` (iOS) |
+| `{os_version}`   | Operating system version.                                            | `13`                   |
+| `{platform}`     | `android` or `ios`, always lowercase.                                | `android`              |
+
+### Network
+
+| Macro          | Description                                                                 | Example                |
+| -------------- | --------------------------------------------------------------------------- | ---------------------- |
+| `{ip}`         | The device's public IP address at install.                                  | `203.0.113.24`         |
+| `{user_agent}` | The user agent of the matched click, not of the app's install request.      | `Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36` |
+
+`{user_agent}` and `{click_time}` come from the click the conversion was matched to. `{ip}` is the device's public IP at install time.
+
+### Attribution
+
+| Macro           | Description                                                                          | Example |
+| --------------- | ------------------------------------------------------------------------------------ | ------- |
+| `{is_reinstall}` | `1` if the user had installed the app before, `0` if this is a first install.        | `0`     |
+| `{touch_type}`  | The type of touch the conversion was attributed to.                                  | `click` |
+
+<Note>
+  `{touch_type}` is always `click` today. Linkrunner does not run impression
+  tracking for affiliate partners.
+</Note>
 
 ### Click passthrough
 
@@ -131,6 +189,13 @@ https://partner.example.com/postback?tid={click_id}&source=linkrunner
 
 Do not use `{secret.postbackKey}`. If your endpoint requires a secret key, configure it privately with Linkrunner so it is not shown in dashboard tracking links or public examples.
 
+## Not available
+
+- **Country code.** There is no country macro. Derive it from `{ip}` if you need one.
+- **App store ID.** Use `{bundle_id}`. On Android it is the same value as the Play Store listing ID.
+- **Retargeting and re-engagement conversions.** Linkrunner does not send affiliate postbacks for these.
+- **Rejected and fraud postbacks.** Linkrunner does not send these.
+
 ## Examples
 
 ### Install postback
@@ -138,19 +203,19 @@ Do not use `{secret.postbackKey}`. If your endpoint requires a secret key, confi
 Your template:
 
 ```
-https://partner.example.com/postback?tid={click_id}&event={event_name}&gaid={gaid}&s2={s2}&ts={timestamp}
+https://partner.example.com/postback?tid={click_id}&event={event_name}&gaid={gaid}&s2={s2}&click_time={click_time}&install_time={install_time}&bundle_id={bundle_id}&platform={platform}
 ```
 
 What Linkrunner sends:
 
 ```
-https://partner.example.com/postback?tid=a1b2c3d4e5&event=install&gaid=38400000-8cf0-11bd-b23e-10b96e40000d&s2=camp_88&ts=1751021400
+https://partner.example.com/postback?tid=a1b2c3d4e5&event=install&gaid=38400000-8cf0-11bd-b23e-10b96e40000d&s2=camp_88&click_time=1789653202&install_time=1789653349&bundle_id=com.example.app&platform=android
 ```
 
 ### Signup postback
 
 ```
-https://partner.example.com/postback?tid={click_id}&event={event_name}&s2={s2}&ts={timestamp}
+https://partner.example.com/postback?tid={click_id}&event={event_name}&s2={s2}&event_time={event_time}
 ```
 
 ### Purchase postback with revenue
@@ -158,13 +223,27 @@ https://partner.example.com/postback?tid={click_id}&event={event_name}&s2={s2}&t
 Your template:
 
 ```
-https://partner.example.com/postback?tid={click_id}&event={event_name}&amount={revenue}&currency={currency}&ts={timestamp}
+https://partner.example.com/postback?tid={click_id}&event={event_name}&amount={revenue}&currency={currency}&event_time={event_time}&ts={timestamp}
 ```
 
 What Linkrunner sends:
 
 ```
-https://partner.example.com/postback?tid=a1b2c3d4e5&event=purchase&amount=9.99&currency=USD&ts=1751025000
+https://partner.example.com/postback?tid=a1b2c3d4e5&event=purchase&amount=9.99&currency=USD&event_time=1789667620&ts=1789667623
+```
+
+### Device and attribution detail
+
+Your template:
+
+```
+https://partner.example.com/postback?tid={click_id}&event={event_name}&brand={device_brand}&model={device_model}&os={os_version}&app_version={app_version}&ip={ip}&reinstall={is_reinstall}&touch={touch_type}
+```
+
+What Linkrunner sends:
+
+```
+https://partner.example.com/postback?tid=a1b2c3d4e5&event=install&brand=POCO&model=Xiaomi+2302EPCC4I&os=13&app_version=15.2.209&ip=203.0.113.24&reinstall=0&touch=click
 ```
 
 ## Deduplication
@@ -173,12 +252,14 @@ Linkrunner retries a postback if your endpoint does not respond with a success s
 
 ## Formatting reference
 
-| Value                      | Format                                     |
-| -------------------------- | ------------------------------------------ |
-| Timestamps (`{timestamp}`) | Unix seconds.                              |
-| Revenue (`{revenue}`)      | Decimal, two places, major currency units. |
-| Currency (`{currency}`)    | ISO 4217 three-letter code.                |
-| All values                 | URL-encoded.                               |
+| Value                                                                      | Format                                     |
+| -------------------------------------------------------------------------- | ------------------------------------------ |
+| Timestamps (`{timestamp}`, `{click_time}`, `{install_time}`, `{event_time}`) | Unix seconds, UTC.                         |
+| Revenue (`{revenue}`)                                                      | Decimal, two places, major currency units. |
+| Currency (`{currency}`)                                                    | ISO 4217 three-letter code.                |
+| Platform (`{platform}`)                                                    | Lowercase `android` or `ios`.              |
+| Reinstall flag (`{is_reinstall}`)                                          | `1` or `0`.                                |
+| All values                                                                 | URL-encoded.                               |
 
 ## Troubleshooting
 
