@@ -37,10 +37,17 @@ In Everflow, go to **Control Center → Platform Configurations**.
 
 | Value | Where to find it | Example |
 |---|---|---|
-| Postback domain | The domain in the **Global Postback** URL | `www.your-network.com` |
-| Network ID (`nid`) | **NID** on the same page | `4104` |
+| Postback domain | The domain in the **Global Postback** URL, at the bottom of the **General** tab | `www.your-network.com` |
+| Network ID (`nid`) | **NID**, under **General** near the top | `4104` |
 | Advertiser ID (`aid`) | Next to the advertiser name. Optional, used with advertiser events | `1` |
 | Event IDs | Your offer's **Revenue & Payout (Events)** table, or **Advertisers → Events** | `70931` |
+
+<Note>
+Every Everflow network has its own postback domain and NID, so copy these from your own
+network rather than from another guide. If your network runs several conversion domains,
+the Global Postback URL shows the default one, and you can see the full list under
+**Platform Configurations → Domains → Conversion Domains**.
+</Note>
 
 ### 1. Connect Everflow in Linkrunner
 
@@ -52,15 +59,25 @@ The Everflow page has three tabs: **Connection**, **Event Mapping** and **Tracki
 
 On the **Connection** tab:
 
-1. Enter the **Postback domain**, **Network ID** and, if your events are advertiser events, the **Advertiser ID**.
+1. Enter the **Postback domain**, **Network ID** and, if your events are advertiser events, the **Advertiser ID**. These are the values you copied from Everflow in [What you need from Everflow](#what-you-need-from-everflow).
 2. Choose where your events are defined in Everflow:
    - **Offer events**: IDs from the offer's Revenue & Payout tab. Sent as `event_id`.
    - **Advertiser events**: IDs from **Advertisers → Events**. Sent as `adv_event_id`.
-3. Turn on **Send postbacks to Everflow** and click **Save connection**.
+3. Pick **Your Everflow base conversion**. Leave it on **Install** unless your offer converts before the install.
+4. Turn on **Send postbacks to Everflow** and click **Save connection**.
 
-<img src="/images/integrations/everflow/lr-everflow-connection.png" alt="Everflow Connection tab in Linkrunner: postback domain, network ID, advertiser ID, event type and the send postbacks switch" />
+<img src="/images/integrations/everflow/lr-everflow-connection.png" alt="Everflow Connection tab in Linkrunner: postback domain, network ID, advertiser ID, event type, base conversion and the send postbacks switch" />
 
-The install is always sent as Everflow's base conversion, with no event ID.
+### Which conversion is your base conversion
+
+Everflow books the one postback that carries **no event ID** as the offer's base conversion. Everything else needs an event ID. Which of your conversions that should be depends on the offer:
+
+| Your offer | Base conversion | The install |
+|---|---|---|
+| App install offer. The partner is paid for the install | **Install** (the default) | Sent with no event ID |
+| Web to app funnel. The partner is paid for a signup or purchase that happens before the install | The event you pick, such as `signup` | Sent with its own **Install event ID** |
+
+Pick the event on the Connection tab and Linkrunner moves the base conversion for you: that event's postback drops its event ID, and the install gains the one you enter. Exactly one conversion is ever the base conversion, so Everflow never sees two on the same click.
 
 ### 2. Map your events
 
@@ -77,6 +94,8 @@ Click **Save Mapping**.
 <Warning>
 Only mapped events are sent. Everflow books a postback without an event ID as a base conversion, so Linkrunner never forwards an event you have not mapped.
 </Warning>
+
+The **Install** row at the top of the table is read only. It shows whether the install is your base conversion or carries its own event ID, both of which are set on the Connection tab.
 
 ### 3. Create an Everflow campaign and copy the link
 
@@ -111,12 +130,12 @@ If your Everflow network restricts postbacks by IP, allowlist `8.234.94.188` and
 ### Postbacks Linkrunner sends
 
 ```
-Install:   https://<domain>/?nid=<nid>[&aid=<aid>]&transaction_id=<transaction_id>
-Event:     https://<domain>/?nid=<nid>[&aid=<aid>]&event_id=<event id>&transaction_id=<transaction_id>
-Purchase:  ...&amount=<amount>
+Base conversion:  https://<domain>/?nid=<nid>[&aid=<aid>]&transaction_id=<transaction_id>
+Event:            https://<domain>/?nid=<nid>[&aid=<aid>]&event_id=<event id>&transaction_id=<transaction_id>
+Purchase:         ...&amount=<amount>
 ```
 
-With advertiser events, `event_id` is `adv_event_id`.
+The base conversion is the install by default, or the event you picked on the Connection tab. With advertiser events, `event_id` is `adv_event_id`.
 
 ---
 
