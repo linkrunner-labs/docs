@@ -40,7 +40,7 @@ In Everflow, go to **Control Center → Platform Configurations**.
 | Postback domain | The domain in the **Global Postback** URL, at the bottom of the **General** tab | `www.your-network.com` |
 | Network ID (`nid`) | **NID**, under **General** near the top | `4104` |
 | Advertiser ID (`aid`) | Next to the advertiser name. Optional, used with advertiser events | `1` |
-| Event IDs | Your offer's **Revenue & Payout (Events)** table, or **Advertisers → Events** | `70931` |
+| Event IDs | Your offer's **Revenue & Payout (Events)** table, or **Advertisers → Events**. You create these yourself, see [Create your events in Everflow](#2-create-your-events-in-everflow) | `70931` |
 
 <Note>
 Every Everflow network has its own postback domain and NID, so copy these from your own
@@ -79,12 +79,43 @@ Everflow books the one postback that carries **no event ID** as the offer's base
 
 Pick the event on the Connection tab and Linkrunner moves the base conversion for you: that event's postback drops its event ID, and the install gains the one you enter. Exactly one conversion is ever the base conversion, so Everflow never sees two on the same click.
 
-### 2. Map your events
+### 2. Create your events in Everflow
+
+Everflow event IDs are created by you on the offer, and each one is a number Everflow assigns. Create one for every Linkrunner event you want the network to see, before mapping them.
+
+In Everflow, open your offer, click **Edit**, and go to the **Revenue & Payout (Events)** tab.
+
+The **Base Conversion Event** at the top is the conversion with no event ID. On this offer it is named `Install`, which matches leaving the base conversion on **Install** in Linkrunner. If your offer converts before the install, name it after that step instead, such as `Signup`.
+
+Under **Additional Conversion Event(s)**, click **Add Additional Event** for each further event:
+
+<img src="/images/integrations/everflow/everflow-add-event.png" alt="Everflow's Add Additional Event dialog, with the event name and visibility fields" />
+
+1. **Additional Event Name**: name it after the Linkrunner event it represents, such as `Add to Cart` or `Purchase`, so the mapping is obvious later.
+2. **Event Visibility**: **Public** lets your partners see the event in their portal. Private hides it.
+3. Set the **Revenue** and **Payout** for the event. A $0 payout still records the event, so use it for steps you want visible but do not pay for.
+4. Click **Add & Continue**, then **Save** the offer.
+
+Everflow assigns each saved event an **ID**. That number is what you paste into Linkrunner:
+
+<img src="/images/integrations/everflow/everflow-offer-events.png" alt="The Additional Conversion Events table on an Everflow offer, showing each event's ID" />
+
+| Everflow event | ID | Maps to your Linkrunner event |
+|---|---|---|
+| Install (Base) | none | the base conversion, no ID to copy |
+| Add to Cart | `70932` | `add_to_cart` |
+| Purchase | `70931` | `FIRST_PAYMENT` |
+
+<Note>
+Using **advertiser events** instead? Create them under **Advertisers → your advertiser → Events**. Those IDs are sent as `adv_event_id` and are shared across every offer for that advertiser, so pick **Advertiser events** on Linkrunner's Connection tab.
+</Note>
+
+### 3. Map your events in Linkrunner
 
 Open the **Event Mapping** tab and click **Add Mapping** for each event you want Everflow to receive:
 
 - **Your Events**: an event your app sends, such as `signup`, `add_to_cart` or a payment type like `FIRST_PAYMENT`.
-- **Everflow Event ID**: the matching ID from your offer.
+- **Everflow Event ID**: the ID Everflow assigned when you created the event above.
 - **Send Revenue**: turn it on to send the purchase amount, for revenue-based payouts.
 
 Click **Save Mapping**.
@@ -97,7 +128,7 @@ Only mapped events are sent. Everflow books a postback without an event ID as a 
 
 The **Install** row at the top of the table is read only. It shows whether the install is your base conversion or carries its own event ID, both of which are set on the Connection tab.
 
-### 3. Create an Everflow campaign and copy the link
+### 4. Create an Everflow campaign and copy the link
 
 1. Go to **Campaigns → Create Link**.
 2. Under **Advanced Options → Ad Channel**, choose **Everflow** and create the campaign.
@@ -111,13 +142,13 @@ https://yourdomain.com/?c=CAMPAIGN_ID&tid={transaction_id}&s2={affiliate_id}&s3=
 
 Keep the curly braces. Everflow fills them in on every click.
 
-### 4. Add the link to your Everflow offer
+### 5. Add the link to your Everflow offer
 
 In Everflow, open your offer, edit **Tracking**, and paste the link as the **Default Landing Page URL**.
 
 <img src="/images/integrations/everflow/everflow-offer-setup.png" alt="Everflow offer showing the Default Landing Page URL, the event IDs and the Advertiser Test Link button" />
 
-### 5. Test
+### 6. Test
 
 1. On a phone, open your offer's **Advertiser Test Link**.
 2. Install and open your app, then trigger a mapped event.
