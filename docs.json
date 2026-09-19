@@ -172,6 +172,12 @@
                         ]
                     },
                     {
+                        "group": "Affiliate Platforms",
+                        "pages": [
+                            "integrations/everflow"
+                        ]
+                    },
+                    {
                         "group": "Agency Partners",
                         "pages": [
                             "agency-partners/overview",

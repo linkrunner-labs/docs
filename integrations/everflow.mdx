@@ -1,0 +1,168 @@
+---
+title: "Everflow"
+description: "Send installs and in-app events to your Everflow network, or bring Linkrunner reporting into Everflow"
+icon: "/images/logos/everflow.png"
+---
+
+## Overview
+
+Everflow is a partner marketing platform. Many affiliate networks run on it, and each one has its own tracking domain and Network ID (`nid`).
+
+You can connect Linkrunner and Everflow in two ways:
+
+| | Option 1: Postbacks | Option 2: Linkrunner card in Everflow |
+|---|---|---|
+| What it does | Linkrunner sends each install and in-app event to Everflow as it happens | Everflow imports Linkrunner campaigns, events and daily stats |
+| Use it when | Your affiliates run on Everflow tracking links and Everflow pays them | You want Linkrunner numbers in Everflow reports |
+| Where you set it up | Linkrunner (**Integrations → Everflow**) and your Everflow offer | Everflow (**Integrations → MMP → Linkrunner**) |
+
+Use one option for the same traffic, not both. With both on, a click is counted twice.
+
+---
+
+## Option 1: Send postbacks to Everflow
+
+When a user clicks an Everflow tracking link, Everflow redirects them to your Linkrunner link with its click ID (`transaction_id`). Linkrunner attributes the install and events, then sends each one back to your Everflow network with that same `transaction_id`, so Everflow can credit and pay the right partner.
+
+```
+Partner traffic → Everflow tracking link → Linkrunner link (tid={transaction_id})
+      → app install and events → Linkrunner postback → Everflow conversion
+```
+
+### What you need from Everflow
+
+In Everflow, go to **Control Center → Platform Configurations**.
+
+<img src="/images/integrations/everflow/everflow-platform-config.png" alt="Everflow Platform Configurations showing the Network ID and the Global Postback URL" />
+
+| Value | Where to find it | Example |
+|---|---|---|
+| Postback domain | The domain in the **Global Postback** URL | `www.your-network.com` |
+| Network ID (`nid`) | **NID** on the same page | `4104` |
+| Advertiser ID (`aid`) | Next to the advertiser name. Optional, used with advertiser events | `1` |
+| Event IDs | Your offer's **Revenue & Payout (Events)** table, or **Advertisers → Events** | `70931` |
+
+### 1. Connect Everflow in Linkrunner
+
+Go to **Integrations → Affiliate Partners → Everflow** and click **Configure**.
+
+<img src="/images/integrations/everflow/lr-integrations-card.png" alt="The Everflow card on the Linkrunner Integrations page with its Configure button" />
+
+The Everflow page has three tabs: **Connection**, **Event Mapping** and **Tracking Link**.
+
+On the **Connection** tab:
+
+1. Enter the **Postback domain**, **Network ID** and, if your events are advertiser events, the **Advertiser ID**.
+2. Choose where your events are defined in Everflow:
+   - **Offer events**: IDs from the offer's Revenue & Payout tab. Sent as `event_id`.
+   - **Advertiser events**: IDs from **Advertisers → Events**. Sent as `adv_event_id`.
+3. Turn on **Send postbacks to Everflow** and click **Save connection**.
+
+<img src="/images/integrations/everflow/lr-everflow-connection.png" alt="Everflow Connection tab in Linkrunner: postback domain, network ID, advertiser ID, event type and the send postbacks switch" />
+
+The install is always sent as Everflow's base conversion, with no event ID.
+
+### 2. Map your events
+
+Open the **Event Mapping** tab and click **Add Mapping** for each event you want Everflow to receive:
+
+- **Your Events**: an event your app sends, such as `signup`, `add_to_cart` or a payment type like `FIRST_PAYMENT`.
+- **Everflow Event ID**: the matching ID from your offer.
+- **Send Revenue**: turn it on to send the purchase amount, for revenue-based payouts.
+
+Click **Save Mapping**.
+
+<img src="/images/integrations/everflow/lr-everflow-mapping.png" alt="Everflow Event Mapping tab in Linkrunner: your event, the Everflow event ID and the Send Revenue switch" />
+
+<Warning>
+Only mapped events are sent. Everflow books a postback without an event ID as a base conversion, so Linkrunner never forwards an event you have not mapped.
+</Warning>
+
+### 3. Create an Everflow campaign and copy the link
+
+1. Go to **Campaigns → Create Link**.
+2. Under **Advanced Options → Ad Channel**, choose **Everflow** and create the campaign.
+3. Copy the link. It is also listed on the Everflow page under the **Tracking Link** tab.
+
+The link looks like this:
+
+```
+https://yourdomain.com/?c=CAMPAIGN_ID&tid={transaction_id}&s2={affiliate_id}&s3={affiliate_source_id}&s4={offer_id}&gaid={google_aid}&idfa={idfa}
+```
+
+Keep the curly braces. Everflow fills them in on every click.
+
+### 4. Add the link to your Everflow offer
+
+In Everflow, open your offer, edit **Tracking**, and paste the link as the **Default Landing Page URL**.
+
+<img src="/images/integrations/everflow/everflow-offer-setup.png" alt="Everflow offer showing the Default Landing Page URL, the event IDs and the Advertiser Test Link button" />
+
+### 5. Test
+
+1. On a phone, open your offer's **Advertiser Test Link**.
+2. Install and open your app, then trigger a mapped event.
+3. In Everflow, open **Reporting → Conversions** and filter by your offer. The install and events appear within a few minutes, sent from Linkrunner's postback IP.
+
+<img src="/images/integrations/everflow/everflow-conversions.png" alt="Everflow Conversion Report with install and event conversions sent by Linkrunner" />
+
+If your Everflow network restricts postbacks by IP, allowlist `8.234.94.188` and `8.234.80.204`.
+
+### Postbacks Linkrunner sends
+
+```
+Install:   https://<domain>/?nid=<nid>[&aid=<aid>]&transaction_id=<transaction_id>
+Event:     https://<domain>/?nid=<nid>[&aid=<aid>]&event_id=<event id>&transaction_id=<transaction_id>
+Purchase:  ...&amount=<amount>
+```
+
+With advertiser events, `event_id` is `adv_event_id`.
+
+---
+
+## Option 2: Linkrunner card in Everflow
+
+<Note>
+The Linkrunner card is being added to Everflow's Integrations page. Until it is live, use Option 1.
+</Note>
+
+The card works like Everflow's AppsFlyer and Adjust integrations: Everflow uses your Linkrunner server key to import your app, campaigns, sources, events and daily stats.
+
+### 1. Copy your server key
+
+In Linkrunner, go to **Settings → Data Export → Data APIs** and copy the server key shown under **Authentication (linkrunner-key)**. The key belongs to one project, so connect each app separately.
+
+<img src="/images/integrations/everflow/lr-data-apis-key.png" alt="Linkrunner Settings, Data Export page with the masked linkrunner-key and its copy button" />
+
+### 2. Connect in Everflow
+
+1. In Everflow, go to **Integrations → MMP**.
+2. On the **Linkrunner** card, click **Configure**.
+3. Paste your server key, give the integration a name, and click **Connect**.
+
+<img src="/images/integrations/everflow/everflow-mmp-tab.png" alt="Everflow Integrations, MMP tab where the Linkrunner card appears" />
+
+### 3. Add your app and map
+
+1. Click **Add App** and pick your Linkrunner app and a sync start date.
+2. Click **Sync Now**, then map:
+   - Linkrunner campaigns to Everflow offers
+   - Linkrunner sources to Everflow partners, with a payout percentage
+   - Linkrunner events to Everflow events
+3. Save. Everflow imports daily data and shows it under the integration's **Report** tab.
+
+With the card connected, partners should use your **Linkrunner links** for that traffic, not Everflow tracking links.
+
+To disconnect Everflow, deactivate the server key in Linkrunner. Everflow can no longer read your data.
+
+---
+
+## Troubleshooting
+
+**No conversions in Everflow.** Check that **Send postbacks to Everflow** is on, the domain and Network ID match your Global Postback URL, and the offer's Default Landing Page URL is your Linkrunner link with `tid={transaction_id}`.
+
+**Events show up as base conversions.** The event is being sent with the wrong ID type. Switch between **Offer events** and **Advertiser events** to match where the ID comes from.
+
+**Everflow rejects the postback as an invalid transaction ID.** The click did not carry Everflow's `transaction_id`. Make sure the link uses curly braces, `{transaction_id}`, not square brackets.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).
