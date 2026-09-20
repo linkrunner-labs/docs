@@ -31,6 +31,10 @@ Partner traffic → Everflow tracking link → Linkrunner link (tid={transaction
 
 ### What you need from Everflow
 
+Everflow is white label. **Every network runs on its own postback domain and its own Network ID**, so there is no single Everflow address to send to. `www.serve-eflow-test.com` and `www.jb8np9ux.com` are both Everflow, they are just different networks. You have to copy these two values from the network you actually work with, and each Linkrunner project connects to one network.
+
+This is the same thing AppsFlyer asks for. Their Everflow setup takes a "Custom Everflow Domain" and the Network ID, and builds `https://www.YOUR_DOMAIN.com/?nid=[EVERFLOW_NETWORK_ID]&...`. If you have set Everflow up with another MMP before, these are the same two values.
+
 In Everflow, go to **Control Center → Platform Configurations**.
 
 <img src="/images/integrations/everflow/everflow-platform-config.png" alt="Everflow Platform Configurations showing the Network ID and the Global Postback URL" />
@@ -43,11 +47,17 @@ In Everflow, go to **Control Center → Platform Configurations**.
 | Event IDs | Your offer's **Revenue & Payout (Events)** table, or **Advertisers → Events**. You create these yourself, see [Create your events in Everflow](#2-create-your-events-in-everflow) | `70931` |
 
 <Note>
-Every Everflow network has its own postback domain and NID, so copy these from your own
-network rather than from another guide. If your network runs several conversion domains,
-the Global Postback URL shows the default one, and you can see the full list under
-**Platform Configurations → Domains → Conversion Domains**.
+**Do not copy the example values above.** They are from our test network and will send your
+conversions nowhere. Use the NID and domain from your own Everflow account.
 </Note>
+
+If your network runs more than one conversion domain, the Global Postback URL shows the default
+one, which is the one to use. The full list is under **Platform Configurations → Domains →
+Conversion Domains**, a separate list from Tracking Domains with its own default.
+
+If your affiliate network manages Everflow for you rather than you owning the account, ask them
+for the postback domain and NID. Partners can also read the domain from
+**Offers → Manage → your offer → Conversion Method**.
 
 ### 1. Connect Everflow in Linkrunner
 
