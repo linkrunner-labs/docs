@@ -40,11 +40,13 @@ Pass a unique `tid` on every click. Without it, Linkrunner cannot echo an identi
 
 | Conversion | When it fires |
 |---|---|
-| **Install** | A new app install is attributed to your click. |
-| **Signup** | The user completes registration, as defined by the advertiser. |
-| **In-app event** | A post-install event the advertiser tracks (for example a purchase or a custom event). Revenue and currency are included when the event carries them. |
+| **Install** | A new app install is attributed to your click. Sent automatically. |
+| **Signup** | The user completes registration, as defined by the advertiser. Sent automatically once a signup postback is set up. |
+| **In-app event** | A post-install event the advertiser tracks (for example a purchase). Sent only for events that have an event mapping. |
 
-The advertiser controls which of their events map to a postback to you and whether revenue is shared. You provide one postback URL template per conversion you want to receive.
+In-app events are not sent by default. Linkrunner sends an in-app event only after it is mapped, either by the advertiser (**Integrations →** your network **→ Event Mapping**) or by you (**Event Mapping** in your affiliate dashboard). A mapping can rename the event to your goal name and can include revenue.
+
+You provide one postback URL template per conversion you want to receive. See [Event mapping](/affiliate-partners/postbacks#event-mapping) for details.
 
 ## Next steps
 

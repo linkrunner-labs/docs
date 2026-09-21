@@ -10,6 +10,26 @@ When a conversion is attributed to your click, Linkrunner sends a server-to-serv
 
 You provide one URL template per conversion you want to receive (install, signup, in-app event). Linkrunner sends the request as an HTTP `GET`.
 
+## Event mapping
+
+Linkrunner sends these postbacks automatically:
+
+- **Install**, for every install attributed to your click.
+- **Signup**, once a signup postback is set up for you.
+
+In-app events (for example a purchase) are sent only after they are mapped. Events without a mapping are not sent to you.
+
+Either side can add a mapping:
+
+- **The advertiser**, from **Integrations →** your network **→ Event Mapping** in their Linkrunner dashboard.
+- **You**, from **Event Mapping** in your affiliate dashboard.
+
+Each mapping picks one of the advertiser's events and the name it is sent to you as, for example `purchase` sent as `sale`. It can also turn on **Send Revenue** so the postback includes the event's revenue and currency.
+
+<Note>
+  Missing an event you expected? Check that it has a mapping for this advertiser.
+</Note>
+
 ## Allowlist Linkrunner postback IPs
 
 If your endpoint restricts incoming traffic by source IP, allowlist both Linkrunner production egress addresses:
@@ -93,7 +113,7 @@ Any macro on this page can arrive empty when the value is not known for that con
 
 | Macro          | Description                                                                                  |
 | -------------- | -------------------------------------------------------------------------------------------- |
-| `{event_name}` | The conversion name: `install`, `signup`, or the in-app event name (for example `purchase`). |
+| `{event_name}` | The conversion name: `install`, `signup`, or the mapped in-app event name (for example `purchase`, or your goal name if the mapping renames it). |
 | `{event}`      | Same value as `{event_name}`.                                                                |
 | `{timestamp}`  | Time when Linkrunner builds the postback, as a Unix timestamp in seconds.                    |
 
@@ -129,7 +149,7 @@ All three are Unix timestamps in seconds, UTC.
 
 | Macro           | Description                                                                                                                        |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `{revenue}`     | Revenue amount in major currency units, with two decimal places (for example `9.99`). Populated only on events that carry revenue. |
+| `{revenue}`     | Revenue amount in major currency units, with two decimal places (for example `9.99`). Populated only on events that carry revenue and whose mapping has **Send Revenue** on. |
 | `{sale_amount}` | Same value as `{revenue}`.                                                                                                         |
 | `{amount}`      | Same value as `{revenue}`.                                                                                                         |
 | `{currency}`    | ISO 4217 currency code (for example `USD`, `INR`).                                                                                 |
@@ -268,6 +288,9 @@ The value was not available for that conversion. For example, `{idfa}` is empty 
 
 **A macro arrives as literal text.**
 That macro is not supported by the current Linkrunner postback renderer. Use one of the macros listed on this page.
+
+**You do not receive an in-app event.**
+In-app events are sent only after they are mapped. Ask the advertiser to map the event, or add the mapping yourself from **Event Mapping** in your affiliate dashboard. See [Event mapping](#event-mapping).
 
 **You receive the same conversion twice.**
 Postbacks are at-least-once. Deduplicate on your click ID plus event name, or use a fixed value you send in `s4` on the click link.
