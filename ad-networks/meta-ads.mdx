@@ -84,7 +84,7 @@ This process connects your app and Meta ad account with Linkrunner.
 3. In that same dataset, open **Settings → Conversions API**, generate an access token, and paste it into **CAPI access token** in Linkrunner
 4. Click **Check access & save**
 
-Linkrunner checks whether the token can access the dataset before saving. If the check fails, see [CAPI dataset access errors](#capi-dataset-access-errors).
+Linkrunner checks that the token was generated for this dataset before saving. If the check fails, see [CAPI dataset access errors](#capi-dataset-access-errors).
 
 <img src="/images/meta/configure-capi.png" alt="Configure CAPI modal in Linkrunner" />
 
@@ -347,7 +347,12 @@ For answers to common questions and an explanation of why numbers in Meta Ads Ma
 
 A missing CAPI configuration means the ad account needs a dataset ID and token saved in Linkrunner. An error after **Check access & save** means the save attempt failed or could not be confirmed. Follow the message shown in the modal.
 
-If the modal says it could not verify dataset access or asks you to check dataset permissions, Linkrunner rejected the new configuration before saving. The dataset ID and token may not match, or the token may lack access. A valid Events Manager token can also be rejected because of a Linkrunner validation limitation. The error alone does not prove that you need a new token or broader permissions.
+If the modal rejects the configuration, nothing was saved. The two most common messages are:
+
+- **This token was generated for a different dataset:** the Dataset ID does not match the dataset the token belongs to. This usually means an App ID or ad account ID was entered as the Dataset ID. Enter the ID of the dataset the token was generated for. You do not need a new token.
+- **We couldn't confirm this token belongs to this dataset:** Linkrunner could not find proof that the token is tied to this dataset. It does not mean the token is invalid. Generate the token from the dataset in Events Manager under **Settings → Conversions API**. Linkrunner can confirm that kind of token.
+
+To check the configuration:
 
 1. Open [Meta Events Manager](https://business.facebook.com/events_manager2/list) and select the dataset that should receive your events. Check that its ID matches **Dataset ID** in Linkrunner, not your App ID or ad account ID.
 2. For an Events Manager token, confirm that it was generated under **Settings → Conversions API** for that same dataset and was pasted completely. If it belongs to another dataset, use a token for the intended dataset. If you see **Saved token**, click **Replace token** only when you need to replace it.
@@ -361,7 +366,7 @@ For other messages:
 - **Save could not be confirmed:** Click **Reload configuration** and review the saved values before retrying. Your changes may already have been saved.
 - **Configuration changed during the check:** Reopen the configuration before trying again.
 
-**Configuration saved** with **Dataset access checked** confirms access to the dataset, not event delivery. Continue with [event mapping](#2-set-up-event-mapping) and verify receipt in Meta Events Manager separately.
+**Configuration saved** with **Configuration verified** confirms the token belongs to the dataset. Event delivery stays pending until Meta receives a live event. Continue with [event mapping](#2-set-up-event-mapping) and verify receipt in Meta Events Manager separately.
 
 If the error persists, contact [support@linkrunner.io](mailto:support@linkrunner.io) with the dataset ID, ad account ID, exact error, and a screenshot with the token masked. Never send access tokens, app secrets, or referrer decryption keys in WhatsApp, email, or screenshots.
 
