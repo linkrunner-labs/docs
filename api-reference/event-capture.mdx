@@ -68,6 +68,14 @@ POST: /capture-event
 | user_id    | string | **Required** unless `install_instance_id` is sent. User identifier to associate with the event |
 | install_instance_id | string | **Required** unless `user_id` is sent. Linkrunner's ID for the install |
 | event_id   | string | **Optional**. Your own unique identifier for the event, useful for deduplication and correlating with your backend |
+| client_ip_address | string | **Optional**. Public IP of the user's device when the event happened. See [End-user IP address](#end-user-ip-address) |
+
+### End-user IP address
+
+These calls come from your server, so Linkrunner never sends your server's IP to ad networks as the user's IP. If you know the IP of the user's device at the time of the action, pass it as `client_ip_address`. Linkrunner forwards it to ad networks (for example Meta `client_ip_address`) to improve matching.
+
+- Send only the device's public IP. Private, loopback and link-local addresses are ignored.
+- Leave it out if you don't have it. No IP is sent in that case.
 
 ### Responses
 
