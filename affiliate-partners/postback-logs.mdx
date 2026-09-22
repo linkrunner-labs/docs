@@ -1,0 +1,94 @@
+---
+title: "Postback Logs"
+description: "Check whether each conversion reached your endpoint, and what your endpoint answered"
+icon: "list-check"
+---
+
+## What this page is for
+
+**Postback Logs** lists every conversion Linkrunner sent to your endpoint, with the result. Use it when you need to know whether a postback landed, or why it did not.
+
+Open it from the left sidebar in the affiliate dashboard, or go straight to it: [dashboard.linkrunner.io/affiliate/postback-logs](https://dashboard.linkrunner.io/affiliate/postback-logs).
+
+The log shows one customer at a time. Switch customers with the project picker at the top of the sidebar.
+
+<Info>
+The screenshots on this page use sample data. The endpoint, click IDs, and campaign names are examples.
+</Info>
+
+## Reading the log
+
+Each row is one conversion. Retries for the same conversion are grouped into that one row.
+
+![The Postback Logs page with filters and columns marked](/images/affiliate-partners/postback-logs-annotated.webp)
+
+1. **Status filter.** Show only postbacks with one status. Defaults to **All**.
+2. **Search.** Find a conversion by event name or by your click ID.
+3. **Date range.** Limit the log to specific days.
+4. **Status.** Where the conversion ended up. See [Statuses](#statuses).
+5. **Attempts.** How many times Linkrunner called your endpoint. A dash means it landed on the first try.
+
+The other columns:
+
+| Column | What it shows |
+| --- | --- |
+| **Event** | The conversion, under the name you receive it as (for example `install`, or your mapped name). |
+| **Timestamp** | When Linkrunner first called your endpoint about this conversion. |
+| **Campaign** | The campaign the conversion was attributed to. |
+| **Latency** | How long your endpoint took to answer the last attempt. |
+
+Click **Clear filters** to go back to the full log.
+
+## Statuses
+
+![The status filter open](/images/affiliate-partners/postback-status-filter.webp)
+
+| Status | What it means |
+| --- | --- |
+| **Delivered** | Your endpoint answered with a success (2xx) response. |
+| **Retrying** | Your endpoint has not accepted it yet. Linkrunner will try again. |
+| **Failed** | Every attempt failed, or your endpoint gave an answer that is not worth retrying. |
+| **Not sent** | Linkrunner never called your endpoint for this conversion. |
+
+<Tip>
+Pick **Failed** to see only the postbacks that need your attention.
+</Tip>
+
+## See the details of a postback
+
+Click a row to expand it.
+
+![An expanded failed postback showing every attempt](/images/affiliate-partners/postback-log-detail.webp)
+
+1. **Attempts.** Every call Linkrunner made, with the time, the response code, how long it took, and whether it would retry.
+2. **Request sent.** The exact URL Linkrunner called, with your macros filled in. Secret values are removed.
+3. **Last response received.** What your endpoint answered on the last attempt, exactly as it came back.
+4. **Click ID.** The `tid` you sent on the click. Use it to find the conversion in your own system.
+
+The expanded row also shows the final response code, the time of the first and last attempt, the campaign, and the **Install instance** ID. Share the install instance ID with Linkrunner support when you ask about a specific conversion.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="A postback shows Failed">
+    Expand the row and read **Last response received**. A `5xx` means your server had an error. A `4xx` usually means the URL or a parameter was rejected. Fix it on your side. If your endpoint only accepts listed IPs, check you have allowlisted [Linkrunner's postback IPs](/affiliate-partners/postbacks#allowlist-linkrunner-postback-ips).
+  </Accordion>
+
+  <Accordion title="A postback shows Not sent">
+    Linkrunner did not build a postback for this conversion, so nothing reached your endpoint. For an in-app event, check that it has a mapping on [Event Mapping](/affiliate-partners/event-mapping). If the event is mapped, contact support with the install instance ID.
+  </Accordion>
+
+  <Accordion title="An event I expect is not in the log at all">
+    In-app events appear only after they are mapped. Add the mapping on [Event Mapping](/affiliate-partners/event-mapping), or ask the customer to add it.
+  </Accordion>
+
+  <Accordion title="The Click ID is empty">
+    The click did not carry a `tid`. Check that your platform sends a unique click ID on every click. See [Tracking links](/affiliate-partners/tracking-links).
+  </Accordion>
+
+  <Accordion title="The log says no postbacks match">
+    Clear the filters and widen the date range. If it is still empty, no conversion has been attributed to you for this customer yet.
+  </Accordion>
+</AccordionGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
