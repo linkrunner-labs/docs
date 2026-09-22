@@ -186,11 +186,18 @@ All three are Unix timestamps in seconds, UTC.
 | Macro           | Description                                                                          | Example |
 | --------------- | ------------------------------------------------------------------------------------ | ------- |
 | `{is_reinstall}` | `1` if the user had installed the app before, `0` if this is a first install.        | `0`     |
+| `{is_reattribution}` | `1` if the conversion was credited to a re-engagement, `0` if it is a new acquisition. | `0`     |
 | `{touch_type}`  | The type of touch the conversion was attributed to.                                  | `click` |
 
 <Note>
   `{touch_type}` is always `click` today. Linkrunner does not run impression
   tracking for affiliate partners.
+</Note>
+
+<Note>
+  `{is_reinstall}` and `{is_reattribution}` are not the same signal. A reinstall
+  that falls outside the advertiser's re-engagement window arrives as
+  `is_reinstall=1` with `is_reattribution=0`.
 </Note>
 
 ### Click passthrough
@@ -259,13 +266,13 @@ https://partner.example.com/postback?tid=a1b2c3d4e5&event=purchase&amount=9.99&c
 Your template:
 
 ```
-https://partner.example.com/postback?tid={click_id}&event={event_name}&brand={device_brand}&model={device_model}&os={os_version}&app_version={app_version}&ip={ip}&reinstall={is_reinstall}&touch={touch_type}
+https://partner.example.com/postback?tid={click_id}&event={event_name}&brand={device_brand}&model={device_model}&os={os_version}&app_version={app_version}&ip={ip}&reinstall={is_reinstall}&reattribution={is_reattribution}&touch={touch_type}
 ```
 
 What Linkrunner sends:
 
 ```
-https://partner.example.com/postback?tid=a1b2c3d4e5&event=install&brand=POCO&model=Xiaomi+2302EPCC4I&os=13&app_version=15.2.209&ip=203.0.113.24&reinstall=0&touch=click
+https://partner.example.com/postback?tid=a1b2c3d4e5&event=install&brand=POCO&model=Xiaomi+2302EPCC4I&os=13&app_version=15.2.209&ip=203.0.113.24&reinstall=0&reattribution=0&touch=click
 ```
 
 ## Deduplication
@@ -280,7 +287,7 @@ Linkrunner retries a postback if your endpoint does not respond with a success s
 | Revenue (`{revenue}`)                                                      | Decimal, two places, major currency units. |
 | Currency (`{currency}`)                                                    | ISO 4217 three-letter code.                |
 | Platform (`{platform}`)                                                    | Lowercase `android` or `ios`.              |
-| Reinstall flag (`{is_reinstall}`)                                          | `1` or `0`.                                |
+| Boolean flags (`{is_reinstall}`, `{is_reattribution}`)                     | `1` or `0`.                                |
 | All values                                                                 | URL-encoded.                               |
 
 ## Troubleshooting
