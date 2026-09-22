@@ -26,6 +26,8 @@ Either side can add a mapping:
 
 Each mapping picks one of the advertiser's events and the name it is sent to you as, for example `purchase` sent as `sale`. It can also turn on **Send Revenue** so the postback includes the event's revenue and currency.
 
+See [Event Mapping](/affiliate-partners/event-mapping) for a walkthrough of the screen, including how to apply a mapping to all your customers or only one.
+
 <Note>
   Missing an event you expected? Check that it has a mapping for this advertiser.
 </Note>
@@ -291,6 +293,9 @@ That macro is not supported by the current Linkrunner postback renderer. Use one
 
 **You do not receive an in-app event.**
 In-app events are sent only after they are mapped. Ask the advertiser to map the event, or add the mapping yourself from **Event Mapping** in your affiliate dashboard. See [Event mapping](#event-mapping).
+
+**You want to check whether a postback reached you.**
+Open [Postback Logs](/affiliate-partners/postback-logs) in your affiliate dashboard. It shows every conversion sent to you and what your endpoint answered.
 
 **You receive the same conversion twice.**
 Postbacks are at-least-once. Deduplicate on your click ID plus event name, or use a fixed value you send in `s4` on the click link.
