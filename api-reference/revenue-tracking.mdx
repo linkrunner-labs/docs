@@ -72,6 +72,13 @@ If `type` is omitted, it defaults to **DEFAULT**.
 
 If `status` is omitted, it defaults to **PAYMENT_COMPLETED**.
 
+### End-user IP address
+
+These calls come from your server, so Linkrunner never sends your server's IP to ad networks as the user's IP. By default it sends the device IP captured when the app was installed. If you know the IP of the user's device at the time of the payment, pass it as `client_ip_address`. Linkrunner forwards it to ad networks (for example Meta `client_ip_address`) to improve matching.
+
+- Send only the device's public IP. Private, loopback and link-local addresses are ignored.
+- Leave it out if you don't have it. Linkrunner then uses the install-time device IP.
+
 ### Responses
 
 1. **201** Payment captured
