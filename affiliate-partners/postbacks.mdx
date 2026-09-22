@@ -186,7 +186,7 @@ All three are Unix timestamps in seconds, UTC.
 | Macro           | Description                                                                          | Example |
 | --------------- | ------------------------------------------------------------------------------------ | ------- |
 | `{is_reinstall}` | `1` if the user had installed the app before, `0` if this is a first install.        | `0`     |
-| `{is_reattribution}` | `1` if the conversion was credited to a re-engagement, `0` if it is a new acquisition. | `0`     |
+| `{is_reattribution}` | `1` if the conversion was credited to a re-engagement of a user who had the app before. See the note below for what `0` means. | `0`     |
 | `{touch_type}`  | The type of touch the conversion was attributed to.                                  | `click` |
 
 <Note>
@@ -195,9 +195,15 @@ All three are Unix timestamps in seconds, UTC.
 </Note>
 
 <Note>
-  `{is_reinstall}` and `{is_reattribution}` are not the same signal. A reinstall
-  that falls outside the advertiser's re-engagement window arrives as
-  `is_reinstall=1` with `is_reattribution=0`.
+  `{is_reinstall}` and `{is_reattribution}` are not the same signal, and they are
+  not symmetric. `is_reattribution=1` always comes with `is_reinstall=1`, because it
+  marks a user who had the app before and came back inside the advertiser's
+  re-engagement window. A reinstall outside that window arrives as `is_reinstall=1`
+  with `is_reattribution=0`.
+
+  Do not read `is_reattribution=0` as "new user". It covers new users, reinstalls
+  outside the window, and re-engagements attributed through a deeplink rather than a
+  reinstall. Treat `1` as a positive signal and `0` as "not this specific case".
 </Note>
 
 ### Click passthrough
