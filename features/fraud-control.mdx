@@ -1,0 +1,179 @@
+---
+title: "Fraud Control: Flag and Suppress Invalid Traffic"
+sidebarTitle: "Fraud Control"
+description: "Measure how much of your traffic is invalid, then decide what Linkrunner does about it with rules on clicks, installs, and in-app events. Attribution is never changed."
+keywords: ["fraud control", "invalid traffic", "click injection", "click flooding", "SDK spoofing", "install hijacking", "fraud rules", "suppress postbacks", "mobile ad fraud", "fraud detection"]
+icon: "shield-check"
+---
+
+**Fraud Control measures how much of your traffic is invalid, and lets you decide what happens when a record looks fraudulent.** You write rules against clicks, installs, and in-app events, see how much traffic each rule would flag before you save it, and choose whether a match is only recorded or also stops postbacks going out to ad networks.
+
+Open it at **Settings → Fraud Control** in the [dashboard](https://dashboard.linkrunner.io/dashboard/settings/fraud-control).
+
+## Attribution is never changed
+
+A fraud rule never moves credit between networks and never turns an attributed install into an organic one. Whatever a rule matches, the install keeps the campaign it was attributed to, and your reporting keeps the same totals.
+
+This is deliberate. Reattributing traffic on a rule you are still tuning would change the numbers your ad networks optimise against, and an over-broad rule would be difficult to unwind. Fraud Control changes what is *reported* about a record, and at most whether its postback is sent.
+
+## What a rule can do
+
+Every rule has one response:
+
+| Response | What happens |
+| :--- | :--- |
+| **Tag only** | The record is flagged and counted in Fraud Control reporting. Nothing downstream changes. |
+| **Tag and suppress postbacks** | The record is flagged, and its postbacks to ad networks are withheld. Attribution is kept. |
+
+Start every new rule on **Tag only**. It is a measurement with no side effects, so you can leave it running for a few days and see what it catches before it affects anything a network receives.
+
+Move a rule to **Tag and suppress postbacks** only when its flagged volume looks right. Suppressing a postback means the ad network is not told about that conversion, so an over-broad rule quietly starves a network's optimisation.
+
+<Note>
+Click rules are always **Tag only**. A click has no postback of its own, so there is nothing to suppress. A flagged click still matters: see [How a flag spreads](#how-a-flag-spreads).
+</Note>
+
+## Read the overview
+
+The overview answers "how much of my traffic is invalid, and where is it coming from" before you change anything.
+
+![Fraud Control overview showing fraud rate, install postbacks withheld, clicks flagged, and flagged installs and in-app events](/images/fraud-control/fraud-overview.webp)
+
+| Figure | Meaning |
+| :--- | :--- |
+| **Fraud rate** | Installs flagged by at least one rule, as a share of the installs the engine checked in the window. Each install counts once however many rules it matched. |
+| **Install postbacks withheld** | Flagged installs whose postbacks were withheld, because a matching rule is set to suppress. Counts installs only. |
+| **Clicks flagged** | Clicks tagged by a click rule. |
+| **Flagged installs** and **Flagged in-app events** | Volumes for each record type in the window. |
+| **Inherited from install** | In-app events flagged because their install was flagged, rather than by an event rule of their own. |
+
+The fraud rate is a share of *checked* records, not of all traffic. A record is checked once the engine has evaluated it, so a rule saved an hour ago has not yet been applied to last week's installs.
+
+### Where it comes from
+
+**By rule** shows which rules are doing the work, and **By channel** attributes flagged volume to the ad network that delivered it.
+
+![By rule breakdown listing each rule with its flagged and withheld counts](/images/fraud-control/fraud-by-rule.webp)
+
+A rule with a high flagged count and a `0` in **Withheld** is running on Tag only. That is the expected state while you are still measuring.
+
+Use **By channel** to tell a traffic-quality problem from a rule problem. Flagged volume concentrated in one network is usually that network's traffic; flagged volume spread evenly across every network, including **Organic / no network**, usually means the rule is too broad.
+
+## Create a rule
+
+Select **Create rule**. You can start from a template, describe the rule in plain English, or build it condition by condition.
+
+### Start from a template
+
+Templates cover the common fraud patterns and arrive already configured, including the conditions that make them accurate.
+
+![Rule builder with the template gallery open, showing click injection, install hijacking, SDK spoofing, and install from a fraudulent click](/images/fraud-control/fraud-templates.webp)
+
+| Template | What it flags |
+| :--- | :--- |
+| **Click injection** | Android installs that open within 3 seconds of their Play referrer click, faster than a real download. |
+| **Install hijacking** | Android installs whose Play referrer click was recorded after the install had already begun. |
+| **SDK spoofing** | Installs whose SDK signature verification failed, so the request did not come from your app. Unverified requests are excluded. |
+| **Install from a fraudulent click** | Installs matched to a click that a click rule already flagged. |
+
+A template is a starting point, not a fixed rule. Adjust its threshold and check the impact before saving.
+
+### Describe it in plain English
+
+Select **Describe** and write what you want in a sentence, for example `Tag installs that open less than 3 seconds after the click`. Linkrunner drafts the conditions and the response.
+
+Always review the draft. It is a starting point, and the thresholds it picks are guesses until you check them against your own traffic.
+
+### Build it by hand
+
+![Rule builder editing a click injection rule, with conditions, response, and the impact preview showing 28,210 records checked and 2.1% flagged](/images/fraud-control/fraud-rule-builder.webp)
+
+1. **Rule name.** Used in reporting and in the change history, so name it after what it catches.
+2. **Check.** The record type this rule runs against: **Clicks**, **Installs**, or **In-app events**. A saved rule checks one record type.
+3. **Conditions.** Each condition is a property, an operator, and usually a value. **All must match** for the rule to fire.
+4. **What should happen when it matches.** Tag only, or tag and suppress postbacks.
+
+Some properties need a companion condition to be meaningful, and the builder says so inline. Click-to-install time is the important one: it is only comparable when a Play referrer click timestamp is present, and iOS installs do not have one. Without that guard the rule compares two different measurements and flags legitimate installs.
+
+## Check the impact before you save
+
+The **Impact** panel is a dry run of the rule against your recent traffic over 7, 14, or 30 days. Nothing is saved and no record is changed by running it.
+
+It shows how many records were checked and what share the rule would flag. Use it to size a threshold: tighten or loosen the value and watch the percentage move.
+
+A plausible flagged share depends on the pattern you are targeting, but a rule that flags a large share of all traffic is almost always too broad. Check it against **By channel** afterwards to confirm the flagged volume is concentrated where you expect.
+
+<Note>
+Some conditions cannot be previewed, and the panel says so instead of showing a number. IP list membership, frequency caps, and percentile comparisons are all evaluated against state that only exists for live traffic or is recalculated nightly, so there is no honest way to replay them over past records. A missing preview does not mean the rule is broken. Save it on **Tag only** and read its real flagged count in **By rule** after a day.
+</Note>
+
+## Manage rules
+
+![Rules table listing each rule with its record type, response, and actions](/images/fraud-control/fraud-rules-table.webp)
+
+Each row shows what the rule checks, its response, and the actions available:
+
+- **History** opens the change log for that rule.
+- **The toggle** turns the rule on or off. A disabled rule stops flagging immediately and keeps its history.
+- **Edit** reopens the builder, including the impact preview for the current conditions.
+- **Delete** removes the rule. Records it already flagged keep their flag.
+
+A saved change takes effect within about a minute. If a rule you just enabled shows no flagged records yet, wait a minute and check again before editing it.
+
+### Rules Linkrunner manages
+
+Rules marked **Linkrunner** are baseline protections maintained for every project. You can see them and read their history, but you cannot edit or delete them, and the ones that apply to every project cannot be turned off.
+
+They exist so that a new project has working fraud detection before anyone writes a rule. Their conditions are maintained by Linkrunner and updated as fraud patterns change.
+
+### Suggested rules
+
+Linkrunner suggests rules based on patterns in your own traffic. A suggestion explains what it would flag and why, and opens in the builder so you can check its impact before saving.
+
+![A suggested install hijacking rule with an explanation and a review action](/images/fraud-control/fraud-suggested-rules.webp)
+
+## How a flag spreads
+
+Clicks, installs, and in-app events are evaluated separately, but a verdict carries forward:
+
+- **A flagged click passes its verdict to the install it leads to.** The install is not flagged automatically. The **Install from a fraudulent click** rule is what acts on it, which keeps the decision yours rather than making every flagged click cost you an install.
+- **An in-app event inherits its install's verdict.** Events flagged this way appear as **Inherited from install** in the overview, separately from events flagged by an event rule.
+
+This is why click rules are worth running on Tag only even though they cannot suppress anything: they feed the install-level decision.
+
+## Change history
+
+Every change to a rule is recorded: who made it, what changed, and when. Open it from the history action on any rule.
+
+![Rule history for a Linkrunner-managed rule, showing it was created and is managed by Linkrunner](/images/fraud-control/fraud-rule-history.webp)
+
+The log covers creation, enabling and disabling, condition and scope changes, and response changes. Changes made by Linkrunner on a managed rule are listed as Linkrunner rather than as a person. Rules created before change history existed show their original creation time instead of a full log.
+
+## Who can change rules
+
+| Action | Required role |
+| :--- | :--- |
+| View Fraud Control, rules, and history | Any project member |
+| Create, edit, enable, disable, or delete a rule | Admin or Member |
+
+## Recommended rollout
+
+1. **Read the overview first.** The Linkrunner-managed rules already report a fraud rate before you write anything.
+2. **Add one rule at a time, on Tag only.** Start from a template where one fits.
+3. **Check the impact preview**, and adjust the threshold until the flagged share looks plausible.
+4. **Leave it for a few days**, then read its real flagged count in **By rule** and its distribution in **By channel**.
+5. **Move it to Tag and suppress postbacks** only once the volume looks right. Suppressing postbacks affects what your ad networks see.
+
+Adding several suppressing rules at once makes a drop in reported conversions impossible to attribute to one rule.
+
+## Troubleshooting
+
+**A rule I saved is flagging nothing.** Check it is enabled, then confirm a minute has passed. If it uses an IP list, a frequency cap, or a percentile, it has no impact preview and its first real counts appear in **By rule** after traffic arrives. Also confirm the rule's record type matches what you meant to check.
+
+**A click-to-install rule is flagging iOS installs.** Add the condition requiring a Play referrer click timestamp to be present. iOS installs have no Play referrer, so without that guard the rule is comparing different measurements.
+
+**My fraud rate looks too high.** Open **By channel**. Volume concentrated in one network points at that network's traffic; volume spread evenly across every network, including organic, points at an over-broad rule. Open the rule and re-check its impact preview.
+
+**An ad network is reporting fewer conversions than before.** Check **Install postbacks withheld** and **By rule** for the rules running on Tag and suppress postbacks. Switch a rule back to Tag only to restore its postbacks while you re-tune it.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).
