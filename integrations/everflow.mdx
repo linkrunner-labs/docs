@@ -65,10 +65,11 @@ On the **Connection** tab:
 2. Choose where your events are defined in Everflow:
    - **Offer events**: IDs from the offer's Revenue & Payout tab. Sent as `event_id`.
    - **Advertiser events**: IDs from **Advertisers → Events**. Sent as `adv_event_id`.
-3. Pick **Your Everflow base conversion**. Leave it on **Install** unless your offer converts before the install.
-4. Turn on **Send postbacks to Everflow** and click **Save connection**.
+3. Turn on **Send postbacks to Everflow** and click **Save connection**.
 
-<img src="/images/integrations/everflow/lr-everflow-connection.png" alt="Everflow Connection tab in Linkrunner: postback domain, network ID, advertiser ID, event type, base conversion and the send postbacks switch" />
+Your base conversion is picked on the **Event Mapping** tab, beside the events it chooses between. See [Which conversion is your base conversion](#which-conversion-is-your-base-conversion).
+
+<img src="/images/integrations/everflow/lr-everflow-connection.png" alt="Everflow Connection tab in Linkrunner: postback domain, network ID, advertiser ID, where events are defined, the send postbacks switch and the resulting install postback URL" />
 
 ### Which conversion is your base conversion
 
@@ -79,7 +80,7 @@ Everflow books the one postback that carries **no event ID** as the offer's base
 | App install offer. The partner is paid for the install | **Install** (the default) | Sent with no event ID |
 | Web to app funnel. The partner is paid for a signup or purchase that happens before the install | The event you pick, such as `signup` | Sent with its own **Install event ID** |
 
-Pick the event on the Connection tab and Linkrunner moves the base conversion for you: that event's postback drops its event ID, and the install gains the one you enter. Exactly one conversion is ever the base conversion, so Everflow never sees two on the same click.
+Pick it with the **Base conversion** radio on the Event Mapping tab and Linkrunner moves it for you: that event's postback drops its event ID, and the install gains the one you enter. The radio is a single choice, so exactly one conversion is ever the base conversion and Everflow never sees two on the same click.
 
 ### 2. Create your events in Everflow
 
@@ -118,17 +119,18 @@ Open the **Event Mapping** tab and click **Add Mapping** for each event you want
 
 - **Your Events**: an event your app sends, such as `signup`, `add_to_cart` or a payment type like `FIRST_PAYMENT`.
 - **Everflow Event ID**: the ID Everflow assigned when you created the event above.
+- **Base conversion**: the one row sent with no event ID. Leave it on **Install** unless your offer converts before the install.
 - **Send Revenue**: turn it on to send the purchase amount, for revenue-based payouts.
 
 Click **Save Mapping**.
 
-<img src="/images/integrations/everflow/lr-everflow-mapping.png" alt="Everflow Event Mapping tab in Linkrunner: your event, the Everflow event ID and the Send Revenue switch" />
+<img src="/images/integrations/everflow/lr-everflow-mapping.png" alt="Everflow Event Mapping tab in Linkrunner: the read-only Install row, mapped events with their Everflow event IDs, the base conversion radio column and the Send Revenue switch" />
 
 <Warning>
 Only mapped events are sent. Everflow books a postback without an event ID as a base conversion, so Linkrunner never forwards an event you have not mapped.
 </Warning>
 
-The **Install** row at the top of the table is read only. It shows whether the install is your base conversion or carries its own event ID, both of which are set on the Connection tab.
+The **Install** row at the top of the table has no event dropdown, because the install is not one of your app's events. Its Everflow Event ID box is empty and reads **Sent with no event ID** while the install is your base conversion; move the radio to another row and the box becomes editable, so you can paste the event ID you created for the install.
 
 ### 4. Create an Everflow campaign and copy the link
 
@@ -168,7 +170,7 @@ Event:            https://<domain>/?nid=<nid>[&aid=<aid>]&event_id=<event id>&tr
 Purchase:         ...&amount=<amount>
 ```
 
-The base conversion is the install by default, or the event you picked on the Connection tab. With advertiser events, `event_id` is `adv_event_id`.
+The base conversion is the install by default, or the event you picked on the Event Mapping tab. With advertiser events, `event_id` is `adv_event_id`.
 
 {/* Commented out until Everflow ships the Linkrunner card on their Integrations page.
     Our side of that path is built and live; the card itself is theirs to build, and a
