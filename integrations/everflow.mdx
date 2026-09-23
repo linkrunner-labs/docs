@@ -33,8 +33,6 @@ Partner traffic → Everflow tracking link → Linkrunner link (tid={transaction
 
 Everflow is white label. **Every network runs on its own postback domain and its own Network ID**, so there is no single Everflow address to send to. `www.serve-eflow-test.com` and `www.jb8np9ux.com` are both Everflow, they are just different networks. You have to copy these two values from the network you actually work with, and each Linkrunner project connects to one network.
 
-This is the same thing AppsFlyer asks for. Their Everflow setup takes a "Custom Everflow Domain" and the Network ID, and builds `https://www.YOUR_DOMAIN.com/?nid=[EVERFLOW_NETWORK_ID]&...`. If you have set Everflow up with another MMP before, these are the same two values.
-
 In Everflow, go to **Control Center → Platform Configurations**.
 
 <img src="/images/integrations/everflow/everflow-platform-config.png" alt="Everflow Platform Configurations showing the Network ID and the Global Postback URL" />
@@ -186,7 +184,7 @@ The base conversion is the install by default, or the event you picked on the Co
 The Linkrunner card is being added to Everflow's Integrations page. Until it is live, use Option 1.
 </Note>
 
-The card works like Everflow's AppsFlyer and Adjust integrations: Everflow uses your Linkrunner server key to import your app, campaigns, sources, events and daily stats.
+Everflow uses your Linkrunner server key to import your app, campaigns, sources, events and daily stats.
 
 ### 1. Copy your server key
 
