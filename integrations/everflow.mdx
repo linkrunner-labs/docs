@@ -1,6 +1,6 @@
 ---
 title: "Everflow"
-description: "Send installs and in-app events to your Everflow network, or bring Linkrunner reporting into Everflow"
+description: "Send installs and in-app events to your Everflow network"
 icon: "/images/logos/everflow.png"
 ---
 
@@ -8,19 +8,13 @@ icon: "/images/logos/everflow.png"
 
 Everflow is a partner marketing platform. Many affiliate networks run on it, and each one has its own tracking domain and Network ID (`nid`).
 
-You can connect Linkrunner and Everflow in two ways:
+Linkrunner sends each install and in-app event to your Everflow network as it happens, carrying the Everflow click ID that brought the user in.
 
-| | Option 1: Postbacks | Option 2: Linkrunner card in Everflow |
-|---|---|---|
-| What it does | Linkrunner sends each install and in-app event to Everflow as it happens | Everflow imports Linkrunner campaigns, events and daily stats |
-| Use it when | Your affiliates run on Everflow tracking links and Everflow pays them | You want Linkrunner numbers in Everflow reports |
-| Where you set it up | Linkrunner (**Integrations → Everflow**) and your Everflow offer | Everflow (**Integrations → MMP → Linkrunner**) |
-
-Use one option for the same traffic, not both. With both on, a click is counted twice.
+You set it up in two places: **Integrations → Everflow** in Linkrunner, and your offer in Everflow.
 
 ---
 
-## Option 1: Send postbacks to Everflow
+## How it works
 
 When a user clicks an Everflow tracking link, Everflow redirects them to your Linkrunner link with its click ID (`transaction_id`). Linkrunner attributes the install and events, then sends each one back to your Everflow network with that same `transaction_id`, so Everflow can credit and pay the right partner.
 
@@ -176,12 +170,18 @@ Purchase:         ...&amount=<amount>
 
 The base conversion is the install by default, or the event you picked on the Connection tab. With advertiser events, `event_id` is `adv_event_id`.
 
+{/* Commented out until Everflow ships the Linkrunner card on their Integrations page.
+    Our side of that path is built and live; the card itself is theirs to build, and a
+    customer who reads about it today can only open a ticket asking where it is.
+    To publish: delete these comment markers, restore the `## Option 1:` heading above and
+    the comparison table in Overview.
+
 ---
 
 ## Option 2: Linkrunner card in Everflow
 
 <Note>
-The Linkrunner card is being added to Everflow's Integrations page. Until it is live, use Option 1.
+The Linkrunner card is being added to Everflow's Integrations page. Until it is live, use the postback setup above.
 </Note>
 
 Everflow uses your Linkrunner server key to import your app, campaigns, sources, events and daily stats.
@@ -212,6 +212,7 @@ In Linkrunner, go to **Settings → Data Export → Data APIs** and copy the ser
 With the card connected, partners should use your **Linkrunner links** for that traffic, not Everflow tracking links.
 
 To disconnect Everflow, deactivate the server key in Linkrunner. Everflow can no longer read your data.
+*/}
 
 ---
 
