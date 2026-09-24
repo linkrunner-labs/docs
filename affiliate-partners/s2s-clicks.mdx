@@ -23,7 +23,7 @@ User taps your ad ────────────────────�
       │                                              │
       │ your server, in real time                    │ user installs and opens the app
       ▼                                              ▼
-GET https://s2s.linkrunner.io/v1/click      Linkrunner SDK reports the install
+GET s2s.linkrunner.io/v1/click/<app_id>     Linkrunner SDK reports the install
       │                                              │
       └──────────── Linkrunner matches the install to your click
                                    │
@@ -55,16 +55,17 @@ Postbacks work exactly as for regular clicks. Your existing [postback templates]
     ```
   </Step>
   <Step title="Turn it into the S2S URL">
-    Keep your parameters, then change two things:
-
-    1. Send the request to `https://s2s.linkrunner.io/v1/click`.
-    2. Add `d=` with the tracking link's domain (`app.example.com` here).
+    Keep your parameters, and send them to `https://s2s.linkrunner.io/v1/click/<app_id>` instead. `<app_id>` is the app's Android package name (`com.example.app`) or its App Store ID (`id1234567890`), the same app ID you use with AppsFlyer.
 
     Then add the device fields your server has: `gaid` or `idfa`, and optionally `ip`, `ua` and `click_time`.
 
     ```
-    https://s2s.linkrunner.io/v1/click?d=app.example.com&c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}&gaid={gaid}&ip={device_ip}&ua={user_agent}&click_time={timestamp_ms}
+    https://s2s.linkrunner.io/v1/click/com.example.app?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}&gaid={gaid}&ip={device_ip}&ua={user_agent}&click_time={timestamp_ms}
     ```
+
+    <Tip>
+    You can name the advertiser by the tracking link's domain instead: `https://s2s.linkrunner.io/v1/click?d=app.example.com&c=...`. Use `d` if the advertiser tells you their test and live apps share an app ID and the same campaign code.
+    </Tip>
   </Step>
   <Step title="Fire it from your server when the user clicks">
     Replace your macros and call the URL with `GET`, at the moment of the click. The user doesn't wait on this call; send them to the store directly.
@@ -82,11 +83,11 @@ Send each click as it happens. Linkrunner only attributes an install to a click 
 
 ## Coming from AppsFlyer
 
-If you already send S2S clicks to AppsFlyer, you can reuse that template. Linkrunner accepts the AppsFlyer names below, so only the host, `d` and `c` change.
+If you already send S2S clicks to AppsFlyer, you can reuse that template. Linkrunner takes the app ID in the path just like AppsFlyer and accepts the AppsFlyer parameter names, so only the host and `c` change.
 
 | AppsFlyer | Linkrunner | Notes |
 |---|---|---|
-| `app.appsflyer.com/<app_id>` | `s2s.linkrunner.io/v1/click?d=<domain>` | `d` is the domain of your Linkrunner tracking link |
+| `app.appsflyer.com/<app_id>` | `s2s.linkrunner.io/v1/click/<app_id>` | The same app ID: Android package name or App Store ID |
 | `c` (campaign name) | `c` (campaign code) | Use the `c` value from your Linkrunner tracking link, not a campaign name |
 | `clickid` | `tid` | Either name works |
 | `advertising_id` | `gaid` | Either name works |
@@ -106,7 +107,7 @@ https://app.appsflyer.com/com.example.app?pid=xyz_int&c=summer&clickid={click_id
 becomes:
 
 ```
-https://s2s.linkrunner.io/v1/click?d=app.example.com&c=OgWmhiSXhG&clickid={click_id}&advertising_id={gaid}&af_ip={ip}&af_ua={ua}&af_sub1={pub}
+https://s2s.linkrunner.io/v1/click/com.example.app?c=OgWmhiSXhG&clickid={click_id}&advertising_id={gaid}&af_ip={ip}&af_ua={ua}&af_sub1={pub}
 ```
 
 ## Retries
@@ -125,7 +126,13 @@ See the [S2S Click API reference](/api-reference/s2s-clicks) for every parameter
 ## Troubleshooting
 
 **Every request returns `unknown_campaign`.**
-`c` must be the campaign code from your Linkrunner tracking link, and `d` its domain. An AppsFlyer campaign name in `c` doesn't match.
+`c` must be the campaign code from your Linkrunner tracking link. An AppsFlyer campaign name in `c` doesn't match.
+
+**Requests return `unknown_app`.**
+Check the app ID against the store listing: the package name for Android, `id` plus the number for iOS. An app newly set up in Linkrunner can take a few minutes to be recognised.
+
+**Requests return `ambiguous_app`.**
+The advertiser has more than one Linkrunner project for this app (for example test and live), and the campaign code exists in both. Send `d` with the tracking link's domain instead of the app ID.
 
 **Requests return `unreplaced_macro`.**
 A value still contains a macro such as `{click_id}` or `%7Bgaid%7D`. Your platform must replace every macro before it sends the request.
