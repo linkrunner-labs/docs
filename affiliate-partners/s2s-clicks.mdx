@@ -13,7 +13,7 @@ Some placements never open a browser. OEM app-store icons on Xiaomi, OPPO and vi
 For this traffic, your **server** reports each click to Linkrunner, and the user goes directly to the store as before. It works like server-to-server clicks in AppsFlyer (`redirect=false`), and accepts the same parameter names.
 
 <Note>
-S2S clicks are enabled per advertiser. Ask the advertiser or [Linkrunner support](mailto:support@linkrunner.io) to turn them on for the project before you send traffic. Until then, requests are rejected with `project_not_enabled`.
+The advertiser turns on S2S clicks for each partner separately. Ask them, or [Linkrunner support](mailto:support@linkrunner.io), to turn them on for your partner account before you send traffic. Until then, requests are rejected with `partner_not_enabled`. S2S clicks stop if the advertiser disconnects your account.
 </Note>
 
 ## How it works
@@ -127,6 +127,9 @@ See the [S2S Click API reference](/api-reference/s2s-clicks) for every parameter
 
 **Every request returns `unknown_campaign`.**
 `c` must be the campaign code from your Linkrunner tracking link. An AppsFlyer campaign name in `c` doesn't match.
+
+**Requests return `partner_not_enabled`.**
+The advertiser hasn't turned on S2S clicks for your partner account on this app, or `c` is a campaign that isn't yours. Changes take up to 5 minutes to apply.
 
 **Requests return `unknown_app`.**
 Check the app ID against the store listing: the package name for Android, `id` plus the number for iOS. An app newly set up in Linkrunner can take a few minutes to be recognised.

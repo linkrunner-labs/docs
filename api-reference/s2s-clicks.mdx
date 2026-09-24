@@ -14,7 +14,7 @@ GET https://s2s.linkrunner.io/v1/click?app_id={app_id}
 GET https://s2s.linkrunner.io/v1/click?d={domain}
 ```
 
-No API key is needed. The advertiser is identified by the app ID (or the tracking link's domain), the campaign by `c`, and S2S clicks must be enabled for the advertiser's project.
+No API key is needed. The advertiser is identified by the app ID (or the tracking link's domain) and the campaign by `c`. The campaign must belong to your partner account, and the advertiser must have turned on S2S clicks for you.
 
 ## Parameters
 
@@ -79,10 +79,10 @@ The response is always JSON, never a redirect.
 | 400 | `invalid_click_time` | `click_time` is not a Unix timestamp. | No |
 | 400 | `click_too_old` | `click_time` is more than 24 hours ago. A time in the future is treated as now. | No |
 | 400 | `unknown_app` | No Linkrunner project has this app ID. | No |
-| 400 | `ambiguous_app` | More than one of the advertiser's projects has this app ID and campaign code (for example test and live). Send `d` instead. | No |
+| 400 | `ambiguous_app` | More than one of the advertiser's projects with S2S on for you has this app ID and campaign code (for example test and live). Send `d` instead. | No |
 | 400 | `unknown_domain` | `d` is not a Linkrunner click domain. | No |
 | 400 | `unknown_campaign` | `c` does not match a campaign of that app or domain. | No |
-| 403 | `project_not_enabled` | S2S clicks are not enabled for this advertiser. | No |
+| 403 | `partner_not_enabled` | The advertiser hasn't turned on S2S clicks for the partner that owns campaign `c`. | No |
 | 404 | `s2s_disabled` | The S2S click API is turned off. | No |
 | 429 | `rate_limited` | Too many clicks for this campaign. | Yes, after `Retry-After` |
 | 503 | `unavailable` | A temporary error. | Yes, after `Retry-After` |
