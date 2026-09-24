@@ -1,0 +1,139 @@
+---
+title: "S2S Click API"
+description: "Report affiliate clicks server-to-server"
+icon: "server"
+---
+
+Affiliate partners use this endpoint to report a click from their server when the user never opens a Linkrunner tracking link. For the setup guide, see [Server-to-Server Clicks](/affiliate-partners/s2s-clicks).
+
+## Endpoint
+
+```
+GET https://s2s.linkrunner.io/v1/click
+```
+
+No API key is needed. The campaign is identified by `d` and `c`, and S2S clicks must be enabled for the advertiser's project.
+
+## Parameters
+
+Send all parameters as URL-encoded query parameters. Each value is limited to 256 characters.
+
+| Parameter | Alias | Required | Description |
+|---|---|---|---|
+| `d` | | Yes | Domain of your Linkrunner tracking link, for example `app.example.com`. |
+| `c` | | Yes | Campaign code, the `c` value of your tracking link. Must match a campaign on that domain exactly. |
+| `tid` | `clickid` | Yes | Your unique click ID. Returned in the `{click_id}` and `{tid}` postback macros. |
+| `gaid` | `advertising_id` | See below | Google Advertising ID, as a UUID. |
+| `idfa` | | See below | Apple IDFA, as a UUID. |
+| `ip` | `af_ip` | See below | The user's device IP. Only public addresses are used. |
+| `ua` | `af_ua` | No | The user's device user agent. |
+| `s2` | `af_sub1` | No | Passthrough value, returned in `{s2}`. |
+| `s3` | `af_sub2` | No | Passthrough value, returned in `{s3}`. |
+| `s4` | `af_sub3` | No | Passthrough value, returned in `{s4}`. |
+| `click_time` | | No | Unix timestamp of the click, in milliseconds or seconds. Defaults to the time of the request. Returned in `{click_time}`. |
+
+Every click needs at least one of `gaid`, `idfa` or a public `ip`. A device ID matches the install exactly; an IP alone matches probabilistically.
+
+If both a name and its alias are sent, the name wins. `redirect`, `pid`, `af_siteid` and `af_lang` are ignored, so an AppsFlyer S2S template works once the host, `d` and `c` are changed.
+
+Linkrunner never uses the IP address or user agent of the request itself, because those belong to your server.
+
+## Responses
+
+The response is always JSON, never a redirect.
+
+<CodeGroup>
+
+```json 200 Accepted
+{
+  "status": "accepted",
+  "click_id": "42c0d258-11c3-5692-a85f-b87931249e82"
+}
+```
+
+```json 400 Rejected
+{
+  "status": "rejected",
+  "reason": "missing_device_id"
+}
+```
+
+</CodeGroup>
+
+`click_id` is Linkrunner's ID for the click. It is the same for every retry of the same `tid` on the same campaign. To match an Android install exactly without a device ID, open the Play Store with `referrer=lr_ia_id%3D<click_id>`.
+
+### Status codes
+
+| Status | Reason | Meaning | Retry |
+|---|---|---|---|
+| 200 | | Click recorded. | |
+| 400 | `missing_d`, `missing_c`, `missing_tid` | A required parameter is missing or empty. | No |
+| 400 | `missing_device_id` | No `gaid`, no `idfa`, and no public `ip`. An all-zero ID counts as missing. | No |
+| 400 | `invalid_device_id` | `gaid` or `idfa` is not a UUID, for example `null` or `unknown`. | No |
+| 400 | `unreplaced_macro` | A value still contains a macro, such as `{click_id}` or `%7Bgaid%7D`. | No |
+| 400 | `value_too_long` | A value is longer than 256 characters. | No |
+| 400 | `invalid_click_time` | `click_time` is not a Unix timestamp. | No |
+| 400 | `click_too_old` | `click_time` is more than 24 hours ago. A time in the future is treated as now. | No |
+| 400 | `unknown_domain` | `d` is not a Linkrunner click domain. | No |
+| 400 | `unknown_campaign` | `c` does not match a campaign on that domain. | No |
+| 403 | `project_not_enabled` | S2S clicks are not enabled for this advertiser. | No |
+| 404 | `s2s_disabled` | The S2S click API is turned off. | No |
+| 429 | `rate_limited` | Too many clicks for this campaign. | Yes, after `Retry-After` |
+| 503 | `unavailable` | A temporary error. | Yes, after `Retry-After` |
+
+## Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -G "https://s2s.linkrunner.io/v1/click" \
+  --data-urlencode "d=app.example.com" \
+  --data-urlencode "c=OgWmhiSXhG" \
+  --data-urlencode "tid=a1b2c3d4e5" \
+  --data-urlencode "gaid=38400000-8cf0-11bd-b23e-10b96e40000d" \
+  --data-urlencode "ip=49.36.10.20" \
+  --data-urlencode "s2=xiaomi" \
+  --data-urlencode "click_time=1790242900596"
+```
+
+```javascript Node.js
+const params = new URLSearchParams({
+  d: "app.example.com",
+  c: "OgWmhiSXhG",
+  tid: clickId,
+  gaid: advertisingId,
+  ip: deviceIp,
+  s2: "xiaomi",
+  click_time: String(Date.now()),
+});
+
+const res = await fetch(`https://s2s.linkrunner.io/v1/click?${params}`);
+const body = await res.json(); // { status: "accepted", click_id: "..." }
+```
+
+```python Python
+import time, requests
+
+res = requests.get("https://s2s.linkrunner.io/v1/click", params={
+    "d": "app.example.com",
+    "c": "OgWmhiSXhG",
+    "tid": click_id,
+    "gaid": advertising_id,
+    "ip": device_ip,
+    "s2": "xiaomi",
+    "click_time": int(time.time() * 1000),
+}, timeout=5)
+body = res.json()  # {"status": "accepted", "click_id": "..."}
+```
+
+</CodeGroup>
+
+An IP-only click, with no device ID:
+
+```
+https://s2s.linkrunner.io/v1/click?d=app.example.com&c=OgWmhiSXhG&tid=a1b2c3d4e6&ip=49.36.10.20&ua=Mozilla%2F5.0%20(Linux%3B%20Android%2014)
+```
+
+## Retries and deduplication
+
+The same `tid` on the same campaign always maps to the same `click_id`, and the click is stored once, so it is safe to retry. Retry only `429` and `503`, after the delay in the `Retry-After` header. Keep `tid` unique per campaign for good: a reused `tid` is treated as a retry of the earlier click, so the new click is not recorded.

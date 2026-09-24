@@ -4,97 +4,136 @@ description: "Report clicks from your server when the user never opens a trackin
 icon: "server"
 ---
 
-## Overview
+## When to use S2S clicks
 
-Some placements never open a browser. OEM app-store icons on Xiaomi, OPPO and vivo, for example, send the user straight to the Play Store. The user never hits a Linkrunner tracking link, so Linkrunner never sees the click.
+Normally the user taps your ad, opens the Linkrunner [tracking link](/affiliate-partners/tracking-links) in a browser, and is redirected to the store. Linkrunner records the click on the way through.
 
-For this traffic, your server reports each click to Linkrunner directly. Linkrunner matches the install to the click by the device advertising ID (GAID or IDFA), then sends your install postback as usual.
+Some placements never open a browser. OEM app-store icons on Xiaomi, OPPO and vivo, preloaded placements, and some in-app units send the user straight to the Play Store or App Store. Linkrunner never sees those clicks, so their installs look organic.
+
+For this traffic, your **server** reports each click to Linkrunner, and the user goes directly to the store as before. It works like server-to-server clicks in AppsFlyer (`redirect=false`), and accepts the same parameter names.
 
 <Note>
-The S2S click API is enabled per advertiser. Ask Linkrunner support to turn it on before you send traffic.
+S2S clicks are enabled per advertiser. Ask the advertiser or [Linkrunner support](mailto:support@linkrunner.io) to turn them on for the project before you send traffic. Until then, requests are rejected with `project_not_enabled`.
 </Note>
 
-## Endpoint
+## How it works
 
 ```
-GET https://s2s.linkrunner.io/v1/click
+User taps your ad ──────────────────────────► Play Store / App Store
+      │                                              │
+      │ your server, in real time                    │ user installs and opens the app
+      ▼                                              ▼
+GET https://s2s.linkrunner.io/v1/click      Linkrunner SDK reports the install
+      │                                              │
+      └──────────── Linkrunner matches the install to your click
+                                   │
+                                   ▼
+                    Install postback to your endpoint
+                    ({click_id}, {tid}, {s2}..{s4}, {click_time}, ...)
 ```
 
-Send one request per click, in real time.
+Linkrunner matches the install to your click in one of three ways, strongest first:
+
+| Match | What you send | Precision |
+|---|---|---|
+| **Referrer** | Open the Play Store with `referrer=lr_ia_id%3D<click_id>`, using the `click_id` from our response | Exact |
+| **Device ID** | `gaid` (Android) or `idfa` (iOS) on the click | Exact |
+| **IP** | The user's public device `ip`, plus `ua`, when there is no device ID | Probabilistic |
+
+Send a device ID whenever you have one. IP matching is a fallback: users behind the same public IP can be confused with each other.
+
+Postbacks work exactly as for regular clicks. Your existing [postback templates](/affiliate-partners/postbacks), [event mapping](/affiliate-partners/event-mapping) and [postback logs](/affiliate-partners/postback-logs) apply unchanged.
+
+## Set it up
+
+<Steps>
+  <Step title="Create the campaign link">
+    Create the link in your affiliate dashboard as usual. See [Create a campaign link](/affiliate-partners/create-campaign-link). You get a tracking link like this:
+
+    ```
+    https://app.example.com/?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}
+    ```
+  </Step>
+  <Step title="Turn it into the S2S URL">
+    Keep your parameters, then change two things:
+
+    1. Send the request to `https://s2s.linkrunner.io/v1/click`.
+    2. Add `d=` with the tracking link's domain (`app.example.com` here).
+
+    Then add the device fields your server has: `gaid` or `idfa`, and optionally `ip`, `ua` and `click_time`.
+
+    ```
+    https://s2s.linkrunner.io/v1/click?d=app.example.com&c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}&gaid={gaid}&ip={device_ip}&ua={user_agent}&click_time={timestamp_ms}
+    ```
+  </Step>
+  <Step title="Fire it from your server when the user clicks">
+    Replace your macros and call the URL with `GET`, at the moment of the click. The user doesn't wait on this call; send them to the store directly.
+
+    A `200` with `"status":"accepted"` means the click is recorded. See [retries](#retries) for the other responses.
+  </Step>
+  <Step title="Test it end to end">
+    Send one click with the GAID of a test device, then install and open the app on that device. The install postback arrives with your `tid` in `{click_id}` / `{tid}`. Check it in [Postback logs](/affiliate-partners/postback-logs).
+  </Step>
+</Steps>
 
 <Warning>
-Send the click as it happens. Linkrunner can only attribute an install to a click it received before the install, and there is no way to upgrade an install after the fact. Clicks older than 24 hours are rejected.
+Send each click as it happens. Linkrunner only attributes an install to a click it received first, and there is no way to re-attribute an install afterwards. Clicks older than 24 hours are rejected.
 </Warning>
 
-## Parameters
+## Coming from AppsFlyer
 
-URL-encode every value.
+If you already send S2S clicks to AppsFlyer, you can reuse that template. Linkrunner accepts the AppsFlyer names below, so only the host, `d` and `c` change.
 
-| Parameter | Required | Description |
+| AppsFlyer | Linkrunner | Notes |
 |---|---|---|
-| `d` | Yes | The advertiser's Linkrunner click domain, for example `app.example.com`. |
-| `c` | Yes | The campaign code. It must match a campaign on that domain exactly. |
-| `tid` | Yes | Your unique click ID. Linkrunner returns it in the `{click_id}` and `{tid}` postback macros. |
-| `gaid` or `idfa` | Yes | The device advertising ID. Send `gaid` for Android and `idfa` for iOS. An all-zero ID counts as missing. |
-| `s2`, `s3`, `s4` | No | Passthrough values, returned in the `{s2}`, `{s3}` and `{s4}` postback macros. |
-| `click_time` | No | When the click happened, as a Unix timestamp in milliseconds or seconds. Defaults to the time Linkrunner receives the request. |
-| `ip` | No | The user's device IP. Only public IPs are used. Never send your own server's IP. |
-| `ua` | No | The user's device user agent. |
+| `app.appsflyer.com/<app_id>` | `s2s.linkrunner.io/v1/click?d=<domain>` | `d` is the domain of your Linkrunner tracking link |
+| `c` (campaign name) | `c` (campaign code) | Use the `c` value from your Linkrunner tracking link, not a campaign name |
+| `clickid` | `tid` | Either name works |
+| `advertising_id` | `gaid` | Either name works |
+| `idfa` | `idfa` | Same |
+| `af_ip` | `ip` | Either name works |
+| `af_ua` | `ua` | Either name works |
+| `af_sub1`, `af_sub2`, `af_sub3` | `s2`, `s3`, `s4` | Either name works. Returned in `{s2}`–`{s4}` |
+| `redirect=false` | — | Not needed; this endpoint never redirects. Ignored if present |
+| `pid`, `af_siteid`, `af_lang` | — | Ignored |
 
-Linkrunner never uses the IP or user agent of the request itself, since those belong to your server.
-
-## Example
-
-Request:
+An AppsFlyer template like this:
 
 ```
-https://s2s.linkrunner.io/v1/click?d=app.example.com&c=oem-icons&tid=a1b2c3d4e5&gaid=38400000-8cf0-11bd-b23e-10b96e40000d&s2=xiaomi&s3=slot_4&click_time=1790242900596
+https://app.appsflyer.com/com.example.app?pid=xyz_int&c=summer&clickid={click_id}&advertising_id={gaid}&af_ip={ip}&af_ua={ua}&af_sub1={pub}&redirect=false
 ```
 
-Accepted:
+becomes:
 
-```json
-{ "status": "accepted", "click_id": "42c0d258-11c3-5692-a85f-b87931249e82" }
 ```
-
-Rejected:
-
-```json
-{ "status": "rejected", "reason": "missing_device_id" }
+https://s2s.linkrunner.io/v1/click?d=app.example.com&c=OgWmhiSXhG&clickid={click_id}&advertising_id={gaid}&af_ip={ip}&af_ua={ua}&af_sub1={pub}
 ```
-
-The response is always JSON, never a redirect.
 
 ## Retries
 
-Retrying is safe. The same `tid` for the same campaign always returns the same `click_id` and is stored once. Retry on a `429` or `5xx` response. Do not retry a `4xx` rejection other than `429` without fixing the request.
+Retrying is safe. The same `tid` for the same campaign always returns the same `click_id` and is stored once.
 
-## Rejection reasons
+- Retry `429` and `503`, after the `Retry-After` delay.
+- Don't retry other `4xx` responses. Fix the request instead. The `reason` tells you what's wrong.
 
-| Status | Reason | Meaning |
-|---|---|---|
-| 400 | `missing_d`, `missing_c`, `missing_tid` | A required parameter is missing or empty. |
-| 400 | `missing_device_id` | No usable `gaid` or `idfa`. |
-| 400 | `unreplaced_macro` | A value still contains a macro such as `{click_id}` or `%7Bgaid%7D`. Replace your macros before sending. |
-| 400 | `invalid_click_time` | `click_time` is not a Unix timestamp. |
-| 400 | `click_too_old` | `click_time` is more than 24 hours ago. |
-| 400 | `unknown_domain` | `d` is not a Linkrunner click domain. |
-| 400 | `unknown_campaign` | `c` does not match a campaign on that domain. |
-| 403 | `project_not_enabled` | S2S clicks are not enabled for this advertiser yet. |
-| 404 | `s2s_disabled` | The S2S click API is turned off. |
-| 429 | `rate_limited` | Too many clicks for this campaign. Retry later. |
-| 503 | `unavailable` | A temporary error. Retry later. |
+<Note>
+Keep `tid` unique per campaign for good. A reused `tid` is treated as a retry of the earlier click, so the new click is not recorded.
+</Note>
 
-## Exact matching without a device ID
-
-If your placement can open the Play Store with a custom referrer, add `referrer=lr_ia_id%3D<click_id>` to the Play Store URL, using the `click_id` from the response. Linkrunner then matches the install to the click exactly, even without a GAID.
+See the [S2S Click API reference](/api-reference/s2s-clicks) for every parameter, response and rejection reason.
 
 ## Troubleshooting
 
-**Installs are not attributed.**
-Check that each click carries the device's real `gaid` or `idfa`, and that you send it before the install happens. A device that already has a recent click from another source may be matched to that click instead.
+**Every request returns `unknown_campaign`.**
+`c` must be the campaign code from your Linkrunner tracking link, and `d` its domain. An AppsFlyer campaign name in `c` doesn't match.
+
+**Requests return `unreplaced_macro`.**
+A value still contains a macro such as `{click_id}` or `%7Bgaid%7D`. Your platform must replace every macro before it sends the request.
+
+**Clicks are accepted but installs aren't attributed.**
+Check that the click carries the user's real GAID or IDFA, not a placeholder, and that it arrives before the install. With IP only, make sure `ip` is the user's device IP, not your server's. A device that clicked another source more recently may be credited to that click instead.
 
 **Postbacks arrive without your click ID.**
-Confirm that `tid` was set on the click and that the response was `accepted`.
+Confirm the click had `tid` (or `clickid`) and the response was `accepted`.
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
