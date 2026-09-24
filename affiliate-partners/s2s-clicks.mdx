@@ -1,0 +1,100 @@
+---
+title: "Server-to-Server Clicks"
+description: "Report clicks from your server when the user never opens a tracking link"
+icon: "server"
+---
+
+## Overview
+
+Some placements never open a browser. OEM app-store icons on Xiaomi, OPPO and vivo, for example, send the user straight to the Play Store. The user never hits a Linkrunner tracking link, so Linkrunner never sees the click.
+
+For this traffic, your server reports each click to Linkrunner directly. Linkrunner matches the install to the click by the device advertising ID (GAID or IDFA), then sends your install postback as usual.
+
+<Note>
+The S2S click API is enabled per advertiser. Ask Linkrunner support to turn it on before you send traffic.
+</Note>
+
+## Endpoint
+
+```
+GET https://s2s.linkrunner.io/v1/click
+```
+
+Send one request per click, in real time.
+
+<Warning>
+Send the click as it happens. Linkrunner can only attribute an install to a click it received before the install, and there is no way to upgrade an install after the fact. Clicks older than 24 hours are rejected.
+</Warning>
+
+## Parameters
+
+URL-encode every value.
+
+| Parameter | Required | Description |
+|---|---|---|
+| `d` | Yes | The advertiser's Linkrunner click domain, for example `app.example.com`. |
+| `c` | Yes | The campaign code. It must match a campaign on that domain exactly. |
+| `tid` | Yes | Your unique click ID. Linkrunner returns it in the `{click_id}` and `{tid}` postback macros. |
+| `gaid` or `idfa` | Yes | The device advertising ID. Send `gaid` for Android and `idfa` for iOS. An all-zero ID counts as missing. |
+| `s2`, `s3`, `s4` | No | Passthrough values, returned in the `{s2}`, `{s3}` and `{s4}` postback macros. |
+| `click_time` | No | When the click happened, as a Unix timestamp in milliseconds or seconds. Defaults to the time Linkrunner receives the request. |
+| `ip` | No | The user's device IP. Only public IPs are used. Never send your own server's IP. |
+| `ua` | No | The user's device user agent. |
+
+Linkrunner never uses the IP or user agent of the request itself, since those belong to your server.
+
+## Example
+
+Request:
+
+```
+https://s2s.linkrunner.io/v1/click?d=app.example.com&c=oem-icons&tid=a1b2c3d4e5&gaid=38400000-8cf0-11bd-b23e-10b96e40000d&s2=xiaomi&s3=slot_4&click_time=1790242900596
+```
+
+Accepted:
+
+```json
+{ "status": "accepted", "click_id": "42c0d258-11c3-5692-a85f-b87931249e82" }
+```
+
+Rejected:
+
+```json
+{ "status": "rejected", "reason": "missing_device_id" }
+```
+
+The response is always JSON, never a redirect.
+
+## Retries
+
+Retrying is safe. The same `tid` for the same campaign always returns the same `click_id` and is stored once. Retry on a `429` or `5xx` response. Do not retry a `4xx` rejection other than `429` without fixing the request.
+
+## Rejection reasons
+
+| Status | Reason | Meaning |
+|---|---|---|
+| 400 | `missing_d`, `missing_c`, `missing_tid` | A required parameter is missing or empty. |
+| 400 | `missing_device_id` | No usable `gaid` or `idfa`. |
+| 400 | `unreplaced_macro` | A value still contains a macro such as `{click_id}` or `%7Bgaid%7D`. Replace your macros before sending. |
+| 400 | `invalid_click_time` | `click_time` is not a Unix timestamp. |
+| 400 | `click_too_old` | `click_time` is more than 24 hours ago. |
+| 400 | `unknown_domain` | `d` is not a Linkrunner click domain. |
+| 400 | `unknown_campaign` | `c` does not match a campaign on that domain. |
+| 403 | `project_not_enabled` | S2S clicks are not enabled for this advertiser yet. |
+| 404 | `s2s_disabled` | The S2S click API is turned off. |
+| 429 | `rate_limited` | Too many clicks for this campaign. Retry later. |
+| 503 | `unavailable` | A temporary error. Retry later. |
+
+## Exact matching without a device ID
+
+If your placement can open the Play Store with a custom referrer, add `referrer=lr_ia_id%3D<click_id>` to the Play Store URL, using the `click_id` from the response. Linkrunner then matches the install to the click exactly, even without a GAID.
+
+## Troubleshooting
+
+**Installs are not attributed.**
+Check that each click carries the device's real `gaid` or `idfa`, and that you send it before the install happens. A device that already has a recent click from another source may be matched to that click instead.
+
+**Postbacks arrive without your click ID.**
+Confirm that `tid` was set on the click and that the response was `accepted`.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
