@@ -46,7 +46,7 @@ So for affiliates, a rule set to **Tag and suppress postbacks** does one of two 
 
 Rejection notices are off for every partner by default. Contact support to turn them on for a partner once the partner confirms its endpoint reads the `status` parameter. An endpoint that counts every postback it receives as a paid conversion would otherwise pay out on a rejection.
 
-The reasons are machine codes built from the rule type and the property that matched, for example `click_injection.ctit_seconds`. They never include the rule's name, its threshold, or anything else you wrote. The partner sees both outcomes, **Rejected (fraud)** and **Withheld (fraud)**, in its [postback logs](/affiliate-partners/postback-logs#statuses). See [Rejected conversions](/affiliate-partners/postbacks#rejected-conversions) for what the partner's endpoint receives.
+The reasons are machine codes built from the rule type and the property that matched, for example `click_injection.ctit_seconds`. They never include the rule's name, its threshold, or anything else you wrote. The partner sees both outcomes, **Rejected (fraud)** and **Withheld (fraud)**, in its [postback logs](/affiliate-partners/postback-logs#conversions-rejected-by-fraud-control). See [Rejected conversions](/affiliate-partners/postbacks#rejected-conversions) for what the partner's endpoint receives.
 
 Ad networks with a native integration, such as Meta, Google, and TikTok, and your own webhook never receive a suppressed conversion.
 

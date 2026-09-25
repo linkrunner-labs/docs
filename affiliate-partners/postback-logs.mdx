@@ -67,6 +67,21 @@ Click a row to expand it.
 
 The expanded row also shows the final response code, the time of the first and last attempt, the campaign, and the **Install instance** ID. Share the install instance ID with Linkrunner support when you ask about a specific conversion.
 
+## Conversions rejected by Fraud Control
+
+A customer can run Fraud Control rules on the conversions attributed to you. A conversion one of those rules rejects shows as **Rejected (fraud)** or **Withheld (fraud)**. To list only those conversions, pick either status in the status filter.
+
+![Postback Logs listing rejected and withheld conversions](/images/affiliate-partners/postback-logs-fraud.webp)
+
+Click a **Rejected (fraud)** row to see the notice Linkrunner sent.
+
+![An expanded rejected postback showing the reason codes in the request](/images/affiliate-partners/postback-log-rejected-detail.webp)
+
+- **Attempt.** There is only one. Linkrunner never retries a rejected conversion, whatever your endpoint answers.
+- **Request sent.** Your usual postback URL, ending in `status=rejected` and a `reason` parameter with the reason codes. Scroll the box to read the whole URL. See [Rejected conversions](/affiliate-partners/postbacks#rejected-conversions) for what the codes mean.
+
+A **Withheld (fraud)** row has no request. Linkrunner did not call your endpoint, because rejection notices are off for your account.
+
 ## Troubleshooting
 
 <AccordionGroup>
