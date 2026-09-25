@@ -30,6 +30,7 @@
                             "sdk/ios",
                             "sdk/android",
                             "sdk/expo",
+                            "sdk/appbrew",
                             "sdk/web",
                             "sdk/unity",
                             "sdk/shopify"
@@ -169,6 +170,7 @@
                             "affiliate-partners/create-account",
                             "affiliate-partners/create-campaign-link",
                             "affiliate-partners/tracking-links",
+                            "affiliate-partners/s2s-clicks",
                             "affiliate-partners/postbacks",
                             "affiliate-partners/event-mapping",
                             "affiliate-partners/postback-logs"
@@ -223,6 +225,7 @@
                             "api-reference/revenue-tracking",
                             "api-reference/event-capture",
                             "api-reference/campaign-apis",
+                            "api-reference/s2s-clicks",
                             "api-reference/reporting-campaigns"
                         ]
                     },
