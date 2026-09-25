@@ -51,18 +51,115 @@ Postbacks may originate from either address. Add both before testing or activati
 
 ## Rejected conversions
 
-A customer can run Fraud Control rules that reject conversions. If Linkrunner has turned on rejection notices for your account, a rejected conversion still reaches your endpoint, with two parameters added to your usual postback URL:
+A customer can run Fraud Control rules that reject conversions attributed to you. To be told about them, add rejection postback URLs in your affiliate dashboard under **Settings → Postback URLs → Rejection postbacks**.
 
-| Parameter | Value |
+| URL | Called for |
 | --- | --- |
-| `status` | `rejected` |
-| `reason` | Comma-separated reason codes, for example `click_injection.ctit_seconds` |
+| **Install Rejection URL** | A rejected install |
+| **Event Rejection URL** | A rejected in-app event, signup, or revenue event |
 
-If your postback URL already carries a `status` or `reason` parameter, Linkrunner replaces it on a rejection. Treat a postback with `status=rejected` as a conversion you must not pay out on. It is sent once and never retried.
+![The Rejection postbacks section in the affiliate Settings page, with both URLs and the macros they can use](/images/affiliate-partners/rejection-postbacks-settings.webp)
 
-Reason codes name the kind of rule and the property that matched. New codes can be added, and existing codes do not change meaning, so handle a code you do not recognise as a rejection.
+Both are optional. Leave one empty and you receive none of that kind. You can add them once your application is approved.
 
-Rejection notices are off until you confirm your endpoint handles them. Contact [support@linkrunner.io](mailto:support@linkrunner.io) to turn them on. While they are off, a rejected conversion is not sent to you at all and shows as **Withheld (fraud)** in [Postback Logs](/affiliate-partners/postback-logs#conversions-rejected-by-fraud-control).
+A rejection is sent only for a conversion you would otherwise have received, so your event mappings still apply. It is sent once and never retried, whatever your endpoint answers. Treat it as a conversion you must not pay out on. Your usual postback URL is not called for a rejected conversion.
+
+### Rejection macros
+
+A rejection URL can use the macros above, plus three that exist only in a rejection URL:
+
+| Macro | Value |
+| --- | --- |
+| `{click_id}` | Your click ID for the rejected conversion |
+| `{event_name}` | `install`, or the name you receive the event under |
+| `{rejection_reason}` | Reason codes, comma separated, for example `click_injection.ctit_seconds` |
+| `{rejection_reason_label}` | The same reasons in plain words, separated by `; ` |
+| `{rejected_at}` | When Linkrunner rejected the conversion, in Unix seconds |
+
+For example, this rejection URL:
+
+```
+https://postback.example.com/reject?click_id={click_id}&event={event_name}&reason={rejection_reason}&at={rejected_at}
+```
+
+is sent as:
+
+```
+https://postback.example.com/reject?click_id=a1b2c3d4e5&event=install&reason=device_farm.manufacturer%2Cclick_injection.ctit_seconds&at=1790353906
+```
+
+### Reason codes
+
+Each code is `<rule type>.<property>`: the kind of rule that matched, and the property it matched on. A code can be a rule type alone when the rule did not match on a single property. A conversion can carry several codes, and each code appears once.
+
+A rule type that is not in this list is sent as `custom_rule`, for example `custom_rule.device_model`. New codes can be added, and existing codes do not change meaning, so treat a code you do not recognise as a rejection.
+
+| Rule type | Meaning |
+| --- | --- |
+| `click_injection` | Click injection |
+| `click_flooding` | Click flooding |
+| `click_flooding_ip` | Click flooding from one IP |
+| `click_flooding_device` | Click flooding from one device |
+| `install_hijacking` | Install hijacking |
+| `sdk_spoofing` | SDK spoofing |
+| `sdk_spoofing_ip_mismatch` | SDK spoofing with IP mismatch |
+| `flagged_click_install` | Install from a fraudulent click |
+| `flagged_click_reinstall` | Reinstall from a fraudulent click |
+| `anonymous_traffic` | Anonymous traffic |
+| `datacenter_ip` | Anonymous traffic |
+| `datacenter_reinstall` | Anonymous traffic reinstall |
+| `datacenter_ip_mismatch` | Anonymous traffic with IP mismatch |
+| `bots` | Bots |
+| `bots_user_agent` | Bots |
+| `device_farm` | Device farm |
+| `custom_rule` | Custom rule |
+
+| Property | Meaning |
+| --- | --- |
+| `os_version` | OS version |
+| `app_version` | App version |
+| `package_version` | SDK version |
+| `platform` | Platform |
+| `country` | Country |
+| `locale` | Locale |
+| `carrier` | Carrier |
+| `manufacturer` | Manufacturer |
+| `device_model` | Device model |
+| `att_status` | ATT status |
+| `limit_ad_tracking` | Limit ad tracking |
+| `gaid` | Google advertising ID |
+| `idfa` | IDFA |
+| `ip_address` | Server-observed IP |
+| `device_ip` | SDK-reported device IP |
+| `device_ip_matches_server_ip` | Device IP matches server IP |
+| `attribution_source` | Attribution source |
+| `ad_network_id` | Ad network |
+| `campaign_id` | Campaign |
+| `is_reinstall` | Is reinstall |
+| `signature_verification_status` | SDK signature status |
+| `ctit_seconds` | Click-to-install time (s) |
+| `install_ref_referrer_click_ts` | Play referrer click timestamp |
+| `install_ref_install_begin_ts` | Play install-begin timestamp |
+| `click_after_install_begin` | Click recorded after install began |
+| `first_open_at` | First open timestamp |
+| `matched_click_is_fraud` | Matched a flagged click |
+| `matched_click_fraud_reasons` | Flagged click reasons |
+| `event_name` | Event name |
+| `event_type` | Event type |
+| `amount` | Revenue amount |
+| `currency` | Currency |
+| `revenue_type` | Revenue type |
+| `revenue_status` | Revenue status |
+| `days_since_click` | Days since click |
+| `user_agent` | User agent |
+| `os` | OS |
+| `device_type` | Device type |
+| `device_vendor` | Device vendor |
+| `browser_name` | Browser |
+| `referrer_domain` | Referrer domain |
+| `device_id` | Device ID (GAID or IDFA) |
+| `link` | Click URL |
+| `is_unique` | Is unique click |
 
 ## Click tracking link
 

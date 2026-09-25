@@ -23,11 +23,11 @@ Every rule has one response:
 | Response | What happens |
 | :--- | :--- |
 | **Tag only** | The record is flagged and counted in Fraud Control reporting. Nothing downstream changes. |
-| **Tag and suppress postbacks** | The record is flagged, and its postbacks to ad networks are withheld. Attribution is kept. Affiliate partners enabled for rejection notices receive the postback marked as rejected instead, see [Affiliate partners](#affiliate-partners). |
+| **Tag and suppress postbacks** | The record is flagged, and its postbacks to ad networks are withheld. Attribution is kept. Affiliate partners with a rejection postback URL are told the conversion was rejected instead, see [Affiliate partners](#affiliate-partners). |
 
 Start every new rule on **Tag only**. It is a measurement with no side effects, so you can leave it running for a few days and see what it catches before it affects anything a network receives.
 
-Move a rule to **Tag and suppress postbacks** only when its flagged volume looks right. Suppressing a postback means the ad network is not told about that conversion, so an over-broad rule quietly starves a network's optimisation. The one exception is an affiliate partner enabled for rejection notices, which is told the conversion was rejected.
+Move a rule to **Tag and suppress postbacks** only when its flagged volume looks right. Suppressing a postback means the ad network is not told about that conversion, so an over-broad rule quietly starves a network's optimisation. The one exception is an affiliate partner with a rejection postback URL, which is told the conversion was rejected.
 
 <Note>
 Click rules are always **Tag only**. A click has no postback of its own, so there is nothing to suppress. A flagged click still matters: see [How a flag spreads](#how-a-flag-spreads).
@@ -41,10 +41,10 @@ So for affiliates, a rule set to **Tag and suppress postbacks** does one of two 
 
 | Affiliate partner | What it receives |
 | :--- | :--- |
-| Enabled for rejection notices | The postback, marked `status=rejected` with the reasons. It is sent once and never retried. |
-| Not enabled | Nothing. The postback is withheld, as it is for an ad network. |
+| Has a rejection postback URL | A call to that URL, with the reasons. It is sent once and never retried. The partner's usual postback URL is not called. |
+| Has none | Nothing. The postback is withheld, as it is for an ad network. |
 
-Rejection notices are off for every partner by default. Contact support to turn them on for a partner once the partner confirms its endpoint reads the `status` parameter. An endpoint that counts every postback it receives as a paid conversion would otherwise pay out on a rejection.
+Each partner sets its own rejection postback URLs, one for installs and one for events, in its affiliate dashboard. A rejection is sent only for a conversion the partner would otherwise have received, so its event mappings still apply.
 
 The reasons are machine codes built from the rule type and the property that matched, for example `click_injection.ctit_seconds`. They never include the rule's name, its threshold, or anything else you wrote. The partner sees both outcomes, **Rejected (fraud)** and **Withheld (fraud)**, in its [postback logs](/affiliate-partners/postback-logs#conversions-rejected-by-fraud-control). See [Rejected conversions](/affiliate-partners/postbacks#rejected-conversions) for what the partner's endpoint receives.
 
