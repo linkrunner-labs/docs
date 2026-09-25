@@ -49,6 +49,21 @@ Postbacks may originate from either address. Add both before testing or activati
   macros before sending traffic to Linkrunner.
 </Note>
 
+## Rejected conversions
+
+A customer can run Fraud Control rules that reject conversions. If Linkrunner has turned on rejection notices for your account, a rejected conversion still reaches your endpoint, with two parameters added to your usual postback URL:
+
+| Parameter | Value |
+| --- | --- |
+| `status` | `rejected` |
+| `reason` | Comma-separated reason codes, for example `click_injection.ctit_seconds` |
+
+If your postback URL already carries a `status` or `reason` parameter, Linkrunner replaces it on a rejection. Treat a postback with `status=rejected` as a conversion you must not pay out on. It is sent once and never retried.
+
+Reason codes name the kind of rule and the property that matched. New codes can be added, and existing codes do not change meaning, so handle a code you do not recognise as a rejection.
+
+Rejection notices are off until you confirm your endpoint handles them. Contact [support@linkrunner.io](mailto:support@linkrunner.io) to turn them on. While they are off, a rejected conversion is not sent to you at all and shows as **Withheld (fraud)** in [Postback Logs](/affiliate-partners/postback-logs#statuses).
+
 ## Click tracking link
 
 The Linkrunner dashboard shows a click tracking link for your campaign. For affiliate campaigns, the click link uses Linkrunner's click parameters:

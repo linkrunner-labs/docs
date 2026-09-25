@@ -23,15 +23,32 @@ Every rule has one response:
 | Response | What happens |
 | :--- | :--- |
 | **Tag only** | The record is flagged and counted in Fraud Control reporting. Nothing downstream changes. |
-| **Tag and suppress postbacks** | The record is flagged, and its postbacks to ad networks are withheld. Attribution is kept. |
+| **Tag and suppress postbacks** | The record is flagged, and its postbacks to ad networks are withheld. Attribution is kept. Affiliate partners enabled for rejection notices receive the postback marked as rejected instead, see [Affiliate partners](#affiliate-partners). |
 
 Start every new rule on **Tag only**. It is a measurement with no side effects, so you can leave it running for a few days and see what it catches before it affects anything a network receives.
 
-Move a rule to **Tag and suppress postbacks** only when its flagged volume looks right. Suppressing a postback means the ad network is not told about that conversion, so an over-broad rule quietly starves a network's optimisation.
+Move a rule to **Tag and suppress postbacks** only when its flagged volume looks right. Suppressing a postback means the ad network is not told about that conversion, so an over-broad rule quietly starves a network's optimisation. The one exception is an affiliate partner enabled for rejection notices, which is told the conversion was rejected.
 
 <Note>
 Click rules are always **Tag only**. A click has no postback of its own, so there is nothing to suppress. A flagged click still matters: see [How a flag spreads](#how-a-flag-spreads).
 </Note>
+
+## Affiliate partners
+
+An affiliate pays its own publishers from the postbacks it receives. If a suppressed postback never arrives, the affiliate cannot tell it apart from a delay, and it can keep paying for traffic your rule rejected.
+
+So for affiliates, a rule set to **Tag and suppress postbacks** does one of two things:
+
+| Affiliate partner | What it receives |
+| :--- | :--- |
+| Enabled for rejection notices | The postback, marked `status=rejected` with the reasons. It is sent once and never retried. |
+| Not enabled | Nothing. The postback is withheld, as it is for an ad network. |
+
+Rejection notices are off for every partner by default. Contact support to turn them on for a partner once the partner confirms its endpoint reads the `status` parameter. An endpoint that counts every postback it receives as a paid conversion would otherwise pay out on a rejection.
+
+The reasons are machine codes built from the rule type and the property that matched, for example `click_injection.ctit_seconds`. They never include the rule's name, its threshold, or anything else you wrote. The partner sees both outcomes, **Rejected (fraud)** and **Withheld (fraud)**, in its [postback logs](/affiliate-partners/postback-logs#statuses). See [Rejected conversions](/affiliate-partners/postbacks#rejected-conversions) for what the partner's endpoint receives.
+
+Ad networks with a native integration, such as Meta, Google, and TikTok, and your own webhook never receive a suppressed conversion.
 
 ## Read the overview
 
@@ -42,7 +59,7 @@ The overview answers "how much of my traffic is invalid, and where is it coming 
 | Figure | Meaning |
 | :--- | :--- |
 | **Fraud rate** | Installs flagged by at least one rule, as a share of the installs the engine checked in the window. Each install counts once however many rules it matched. |
-| **Install postbacks withheld** | Flagged installs whose postbacks were withheld, because a matching rule is set to suppress. Counts installs only. |
+| **Install postbacks withheld** | Flagged installs whose postbacks were withheld, because a matching rule is set to suppress. Counts installs only. An install whose postback was sent to an affiliate as a rejection is not counted. |
 | **Clicks flagged** | Clicks tagged by a click rule. |
 | **Flagged installs** and **Flagged in-app events** | Volumes for each record type in the window. |
 | **Inherited from install** | In-app events flagged because their install was flagged, rather than by an event rule of their own. |

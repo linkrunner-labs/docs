@@ -47,6 +47,8 @@ Click **Clear filters** to go back to the full log.
 | **Retrying** | Your endpoint has not accepted it yet. Linkrunner will try again. |
 | **Failed** | Every attempt failed, or your endpoint gave an answer that is not worth retrying. |
 | **Not sent** | Linkrunner never called your endpoint for this conversion. |
+| **Rejected (fraud)** | The customer's Fraud Control rejected the conversion. Linkrunner called your endpoint once with `status=rejected` and the reasons. Do not pay out on it. |
+| **Withheld (fraud)** | The customer's Fraud Control rejected the conversion, and Linkrunner did not call your endpoint. |
 
 <Tip>
 Pick **Failed** to see only the postbacks that need your attention.
@@ -74,6 +76,10 @@ The expanded row also shows the final response code, the time of the first and l
 
   <Accordion title="A postback shows Not sent">
     Linkrunner did not build a postback for this conversion, so nothing reached your endpoint. For an in-app event, check that it has a mapping on [Event Mapping](/affiliate-partners/event-mapping). If the event is mapped, contact support with the install instance ID.
+  </Accordion>
+
+  <Accordion title="A postback shows Rejected (fraud) or Withheld (fraud)">
+    A fraud rule on the customer's side matched the conversion. Linkrunner kept the attribution but will not confirm the conversion. Expand the row to see the attempt. For a rejected conversion, **Request sent** shows the `reason` codes. See [Rejected conversions](/affiliate-partners/postbacks#rejected-conversions). To dispute a rejection, contact the customer.
   </Accordion>
 
   <Accordion title="An event I expect is not in the log at all">
