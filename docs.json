@@ -65,6 +65,7 @@
                             "features/send-consent",
                             "features/ios-campaign-data-limitations",
                             "features/attribution-windows",
+                            "features/fraud-control",
                             {
                                 "group": "SKAdNetwork",
                                 "icon": "apple",
