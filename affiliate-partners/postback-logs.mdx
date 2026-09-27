@@ -47,6 +47,8 @@ Click **Clear filters** to go back to the full log.
 | **Retrying** | Your endpoint has not accepted it yet. Linkrunner will try again. |
 | **Failed** | Every attempt failed, or your endpoint gave an answer that is not worth retrying. |
 | **Not sent** | Linkrunner never called your endpoint for this conversion. |
+| **Rejected (fraud)** | The customer's Fraud Control rejected the conversion. Linkrunner called your rejection postback URL once, with the reasons. Do not pay out on it. |
+| **Withheld (fraud)** | The customer's Fraud Control rejected the conversion, and Linkrunner did not call your endpoint, because you have no rejection postback URL for it. |
 
 <Tip>
 Pick **Failed** to see only the postbacks that need your attention.
@@ -65,6 +67,19 @@ Click a row to expand it.
 
 The expanded row also shows the final response code, the time of the first and last attempt, the campaign, and the **Install instance** ID. Share the install instance ID with Linkrunner support when you ask about a specific conversion.
 
+## Conversions rejected by Fraud Control
+
+A customer can run Fraud Control rules on the conversions attributed to you. A conversion one of those rules rejects shows as **Rejected (fraud)** or **Withheld (fraud)**. To list only those conversions, pick either status in the status filter.
+
+![Postback Logs listing rejected and withheld conversions](/images/affiliate-partners/postback-logs-fraud.webp)
+
+Click a **Rejected (fraud)** row to see the notice Linkrunner sent.
+
+- **Attempt.** There is only one. Linkrunner never retries a rejected conversion, whatever your endpoint answers.
+- **Request sent.** Your rejection postback URL, with the reason codes filled in. Scroll the box to read the whole URL. See [Reason codes](/affiliate-partners/postbacks#reason-codes) for what the codes mean.
+
+A **Withheld (fraud)** row has no request. Linkrunner did not call your endpoint, because you have not added a rejection postback URL for that kind of conversion. Add one under **Settings → Postback URLs → Rejection postbacks** to receive them. See [Rejected conversions](/affiliate-partners/postbacks#rejected-conversions).
+
 ## Troubleshooting
 
 <AccordionGroup>
@@ -74,6 +89,10 @@ The expanded row also shows the final response code, the time of the first and l
 
   <Accordion title="A postback shows Not sent">
     Linkrunner did not build a postback for this conversion, so nothing reached your endpoint. For an in-app event, check that it has a mapping on [Event Mapping](/affiliate-partners/event-mapping). If the event is mapped, contact support with the install instance ID.
+  </Accordion>
+
+  <Accordion title="A postback shows Rejected (fraud) or Withheld (fraud)">
+    A fraud rule on the customer's side matched the conversion. Linkrunner kept the attribution but will not confirm the conversion. Expand the row to see the attempt. For a rejected conversion, **Request sent** shows the reason codes. See [Rejected conversions](/affiliate-partners/postbacks#rejected-conversions). To dispute a rejection, contact the customer.
   </Accordion>
 
   <Accordion title="An event I expect is not in the log at all">
