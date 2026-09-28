@@ -1,0 +1,64 @@
+---
+title: "Getting Started as an Affiliate Partner"
+sidebarTitle: "Getting Started"
+description: "What Linkrunner offers affiliate partners, and the steps from sign-up to your first postback"
+icon: "rocket"
+---
+
+Linkrunner is the Mobile Measurement Partner (MMP) for the apps you run traffic to. It records your clicks, credits installs and in-app events to them, and sends you a postback for each conversion. You don't integrate an SDK: the advertiser's app already runs Linkrunner.
+
+This page lists what you get and what to set up, in order.
+
+## What Linkrunner offers you
+
+| Feature | What it does | Guide |
+|---|---|---|
+| **Affiliate dashboard** | Your own workspace for every advertiser connected to you: campaigns, postback URLs, event mappings and logs. | [Create an account](/affiliate-partners/create-account) |
+| **Tracking links** | Campaign links generated with your click ID and passthrough parameters already in the template. | [Create a campaign link](/affiliate-partners/create-campaign-link) |
+| **Server-to-server clicks** | Report clicks from your server for placements that send users straight to the store, such as OEM app-store icons and preloads. | [S2S clicks](/affiliate-partners/s2s-clicks) |
+| **Postbacks** | A postback for every install, signup and mapped in-app event credited to you, carrying your click ID and the macros you choose. | [Postbacks and macros](/affiliate-partners/postbacks) |
+| **Event mapping** | Choose which in-app events reach you, rename them to your goal names, and include revenue. | [Event mapping](/affiliate-partners/event-mapping) |
+| **Postback logs** | See every postback Linkrunner sent you and what your endpoint answered. | [Postback logs](/affiliate-partners/postback-logs) |
+| **Rejection postbacks** | Get told when an advertiser's Fraud Control rejects a conversion, with the reason. | [Rejected conversions](/affiliate-partners/postbacks#rejected-conversions) |
+
+## What you need to do
+
+<Steps>
+  <Step title="Create your affiliate account">
+    Sign up, add your network details and postback URLs, and submit your workspace. Linkrunner emails you once it's approved. See [Create an affiliate account](/affiliate-partners/create-account).
+  </Step>
+  <Step title="Get connected to an advertiser">
+    The advertiser connects your workspace to their app. Their project then appears in your dashboard's project selector. If you're approved but see no project, contact [Linkrunner support](mailto:support@linkrunner.io).
+  </Step>
+  <Step title="Create a campaign link">
+    In the advertiser's project, open **All Campaigns → Create Link** and copy the generated template. Don't build the URL by hand. See [Create a campaign link](/affiliate-partners/create-campaign-link).
+  </Step>
+  <Step title="Add the link to your platform">
+    Your platform must replace every macro, such as `{click_id}`, before the click reaches Linkrunner, and send a unique `tid` on every click. See [Tracking links](/affiliate-partners/tracking-links).
+
+    If your placement sends users straight to the store without opening a browser, report the click from your server instead. See [S2S clicks](/affiliate-partners/s2s-clicks).
+  </Step>
+  <Step title="Set up your postbacks">
+    Installs are sent automatically, and signups once a signup postback is set up. In-app events are sent only after they are mapped, so map the ones you want in [Event mapping](/affiliate-partners/event-mapping).
+
+    If your endpoint filters incoming traffic, [allowlist Linkrunner's postback IPs](/affiliate-partners/postbacks#allowlist-linkrunner-postback-ips).
+  </Step>
+  <Step title="Test, then go live">
+    Send a test click from a device, then install and open the app on it. In [Postback logs](/affiliate-partners/postback-logs), confirm the install postback reached your endpoint with your click ID.
+  </Step>
+</Steps>
+
+For how a click becomes a postback, see [How attribution works](/affiliate-partners/overview).
+
+## Common questions
+
+**Which conversions do I get by default?**
+Installs. Signups arrive once a signup postback is set up for you. In-app events arrive only after they are mapped, by you or by the advertiser.
+
+**How do I match a postback to my click?**
+Linkrunner returns the `tid` you sent on the click in the `{click_id}` and `{tid}` macros.
+
+**I already send traffic through AppsFlyer templates. Can I reuse them?**
+For server-to-server clicks, yes. The S2S click API accepts the AppsFlyer parameter names. See [Coming from AppsFlyer](/affiliate-partners/s2s-clicks#coming-from-appsflyer).
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
