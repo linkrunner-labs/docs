@@ -5,7 +5,7 @@ description: "What Linkrunner offers affiliate partners, and the steps from sign
 icon: "rocket"
 ---
 
-Linkrunner is the Mobile Measurement Partner (MMP) for the apps you run traffic to. It records your clicks, credits installs and in-app events to them, and sends you a postback for each conversion. You don't integrate an SDK: the advertiser's app already runs Linkrunner.
+Linkrunner is the Mobile Measurement Partner (MMP) for the apps you run traffic to. It records your clicks, credits installs and in-app events to them, and sends you a postback for each conversion.
 
 This page lists what you get and what to set up, in order.
 
@@ -52,13 +52,19 @@ For how a click becomes a postback, see [How attribution works](/affiliate-partn
 
 ## Common questions
 
-**Which conversions do I get by default?**
-Installs. Signups arrive once a signup postback is set up for you. In-app events arrive only after they are mapped, by you or by the advertiser.
-
-**How do I match a postback to my click?**
-Linkrunner returns the `tid` you sent on the click in the `{click_id}` and `{tid}` macros.
-
-**I already send traffic through AppsFlyer templates. Can I reuse them?**
-For server-to-server clicks, yes. The S2S click API accepts the AppsFlyer parameter names. See [Coming from AppsFlyer](/affiliate-partners/s2s-clicks#coming-from-appsflyer).
+<AccordionGroup>
+  <Accordion title="Which conversions do I get by default?" icon="list-check">
+    Installs. Signups arrive once a signup postback is set up for you. In-app events arrive only after they are mapped, by you or by the advertiser. See [Event mapping](/affiliate-partners/event-mapping).
+  </Accordion>
+  <Accordion title="How do I match a postback to my click?" icon="link">
+    Linkrunner returns the `tid` you sent on the click in the `{click_id}` and `{tid}` macros. See [Postbacks and macros](/affiliate-partners/postbacks).
+  </Accordion>
+  <Accordion title="Can I reuse my AppsFlyer templates?" icon="arrows-rotate">
+    For server-to-server clicks, yes. The S2S click API accepts the AppsFlyer parameter names, so only the host and `c` change. See [Coming from AppsFlyer](/affiliate-partners/s2s-clicks#coming-from-appsflyer).
+  </Accordion>
+  <Accordion title="Do I need to integrate an SDK?" icon="mobile">
+    No. The advertiser's app already runs the Linkrunner SDK. You send clicks and receive postbacks.
+  </Accordion>
+</AccordionGroup>
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
