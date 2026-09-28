@@ -164,34 +164,6 @@
                         ]
                     },
                     {
-                        "group": "Affiliate Partners",
-                        "pages": [
-                            "affiliate-partners/overview",
-                            "affiliate-partners/create-account",
-                            "affiliate-partners/create-campaign-link",
-                            "affiliate-partners/tracking-links",
-                            "affiliate-partners/s2s-clicks",
-                            "affiliate-partners/postbacks",
-                            "affiliate-partners/event-mapping",
-                            "affiliate-partners/postback-logs"
-                        ]
-                    },
-                    {
-                        "group": "Affiliate Platforms",
-                        "pages": [
-                            "integrations/everflow"
-                        ]
-                    },
-                    {
-                        "group": "Agency Partners",
-                        "pages": [
-                            "agency-partners/overview",
-                            "agency-partners/accept-invitation",
-                            "agency-partners/manage-workspace",
-                            "agency-partners/invite-an-agency"
-                        ]
-                    },
-                    {
                         "group": "Analytics Integrations",
                         "pages": [
                             "analytics-integrations/amplitude",
@@ -234,6 +206,46 @@
                         "pages": [
                             "features/webhooks",
                             "features/mcp"
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": "Partners",
+                "groups": [
+                    {
+                        "group": "Affiliate Partners",
+                        "pages": [
+                            "affiliate-partners/getting-started",
+                            "affiliate-partners/overview",
+                            "affiliate-partners/create-account",
+                            "affiliate-partners/create-campaign-link",
+                            "affiliate-partners/tracking-links",
+                            "affiliate-partners/s2s-clicks",
+                            "affiliate-partners/postbacks",
+                            "affiliate-partners/event-mapping",
+                            "affiliate-partners/postback-logs"
+                        ]
+                    },
+                    {
+                        "group": "Affiliate APIs",
+                        "pages": [
+                            "affiliate-partners/affiliate-apis"
+                        ]
+                    },
+                    {
+                        "group": "Affiliate Platforms",
+                        "pages": [
+                            "integrations/everflow"
+                        ]
+                    },
+                    {
+                        "group": "Agency Partners",
+                        "pages": [
+                            "agency-partners/overview",
+                            "agency-partners/accept-invitation",
+                            "agency-partners/manage-workspace",
+                            "agency-partners/invite-an-agency"
                         ]
                     }
                 ]
