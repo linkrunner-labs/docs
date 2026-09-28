@@ -12,6 +12,8 @@ Linkrunner is a Mobile Measurement Partner (MMP). When you run traffic to an adv
 1. **You send us clicks.** You point your traffic at a Linkrunner tracking link and append your own identifiers (most importantly your click ID). Linkrunner records the click and uses it to attribute installs.
 2. **We send you postbacks.** When an install or a post-install event is attributed to your click, Linkrunner fires a server-to-server postback to your endpoint with the data filled into the macros you define.
 
+Optionally, you can also **send us impressions** (the ad was shown but not tapped), so Linkrunner can credit an install to your ad view when there is no click. See [View-through (optional)](#view-through-optional).
+
 This is the same model used across the industry, so if you have integrated with other MMPs the flow will feel familiar.
 
 <Note>
@@ -37,11 +39,21 @@ The link between a click and a conversion is your **click ID**. You generate a u
 Pass a unique `tid` on every click. Without it, Linkrunner cannot echo an identifier back to you on the postback, and you cannot reconcile conversions against your clicks.
 </Note>
 
+### View-through (optional)
+
+If you report impressions through [S2S impressions](/affiliate-partners/s2s-impressions), an install with no click can be credited to an impression instead:
+
+- **Off by default.** The advertiser turns on view-through for your partner account and sets your window, from 1 to 24 hours.
+- **Device ID only.** The impression must carry the installing device's `gaid` or `idfa`.
+- **Clicks always win.** An impression is credited only when no click, from any source, can be credited.
+
+The postback carries the `tid` you sent on the impression, and `{touch_type}` is `impression` instead of `click`, so you can tell view-through installs apart.
+
 ## What you can receive postbacks for
 
 | Conversion | When it fires |
 |---|---|
-| **Install** | A new app install is attributed to your click. Sent automatically. |
+| **Install** | A new app install is attributed to your click, or to your impression if you use [view-through](#view-through-optional). Sent automatically. |
 | **Signup** | The user completes registration, as defined by the advertiser. Sent automatically once a signup postback is set up. |
 | **In-app event** | A post-install event the advertiser tracks (for example a purchase). Sent only for events that have an event mapping. |
 
@@ -63,6 +75,9 @@ You provide one postback URL template per conversion you want to receive. See [E
   </Card>
   <Card title="Server-to-server clicks" icon="server" href="/affiliate-partners/s2s-clicks">
     Report clicks from your server when the user goes straight to the store.
+  </Card>
+  <Card title="Server-to-server impressions" icon="eye" href="/affiliate-partners/s2s-impressions">
+    Report ad impressions so installs without a click can be credited to your views.
   </Card>
   <Card title="Postbacks and macros" icon="satellite-dish" href="/affiliate-partners/postbacks">
     The macros Linkrunner fills into your postback URLs, with examples.

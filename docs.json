@@ -198,6 +198,7 @@
                             "api-reference/event-capture",
                             "api-reference/campaign-apis",
                             "api-reference/s2s-clicks",
+                            "api-reference/s2s-impressions",
                             "api-reference/reporting-campaigns"
                         ]
                     },
@@ -222,6 +223,7 @@
                             "affiliate-partners/create-campaign-link",
                             "affiliate-partners/tracking-links",
                             "affiliate-partners/s2s-clicks",
+                            "affiliate-partners/s2s-impressions",
                             "affiliate-partners/postbacks",
                             "affiliate-partners/event-mapping",
                             "affiliate-partners/postback-logs"

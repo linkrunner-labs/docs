@@ -298,11 +298,11 @@ All three are Unix timestamps in seconds, UTC.
 | Macro           | Description                                                                          | Example |
 | --------------- | ------------------------------------------------------------------------------------ | ------- |
 | `{is_reinstall}` | `1` if the user had installed the app before, `0` if this is a first install.        | `0`     |
-| `{touch_type}`  | The type of touch the conversion was attributed to.                                  | `click` |
+| `{touch_type}`  | The type of touch the conversion was attributed to: `click`, or `impression` for a view-through install. | `click` |
 
 <Note>
-  `{touch_type}` is always `click` today. Linkrunner does not run impression
-  tracking for affiliate partners.
+  `{touch_type}` is `impression` only when the install was credited to an
+  impression you reported through [S2S impressions](/affiliate-partners/s2s-impressions).
 </Note>
 
 ### Click passthrough

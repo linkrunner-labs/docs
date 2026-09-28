@@ -16,6 +16,7 @@ This page lists what you get and what to set up, in order.
 | **Affiliate dashboard** | Your own workspace for every advertiser connected to you: campaigns, postback URLs, event mappings and logs. | [Create an account](/affiliate-partners/create-account) |
 | **Tracking links** | Campaign links generated with your click ID and passthrough parameters already in the template. | [Create a campaign link](/affiliate-partners/create-campaign-link) |
 | **Server-to-server clicks** | Report clicks from your server for placements that send users straight to the store, such as OEM app-store icons and preloads. | [S2S clicks](/affiliate-partners/s2s-clicks) |
+| **Server-to-server impressions** (optional) | Report ad impressions so installs from users who saw your ad, but didn't tap it, can be credited to you (view-through). | [S2S impressions](/affiliate-partners/s2s-impressions) |
 | **Postbacks** | A postback for every install, signup and mapped in-app event credited to you, carrying your click ID and the macros you choose. | [Postbacks and macros](/affiliate-partners/postbacks) |
 | **Event mapping** | Choose which in-app events reach you, rename them to your goal names, and include revenue. | [Event mapping](/affiliate-partners/event-mapping) |
 | **Postback logs** | See every postback Linkrunner sent you and what your endpoint answered. | [Postback logs](/affiliate-partners/postback-logs) |
@@ -37,6 +38,8 @@ This page lists what you get and what to set up, in order.
     Your platform must replace every macro, such as `{click_id}`, before the click reaches Linkrunner, and send a unique `tid` on every click. See [Tracking links](/affiliate-partners/tracking-links).
 
     If your placement sends users straight to the store without opening a browser, report the click from your server instead. See [S2S clicks](/affiliate-partners/s2s-clicks).
+
+    Optional: to get credit for users who see your ad but don't tap it, also report impressions. See [S2S impressions](/affiliate-partners/s2s-impressions).
   </Step>
   <Step title="Set up your postbacks">
     Installs are sent automatically, and signups once a signup postback is set up. In-app events are sent only after they are mapped, so map the ones you want in [Event mapping](/affiliate-partners/event-mapping).
