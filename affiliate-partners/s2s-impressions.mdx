@@ -1,0 +1,136 @@
+---
+title: "Server-to-Server Impressions"
+description: "Report ad impressions from your server so Linkrunner can credit view-through installs"
+icon: "eye"
+---
+
+## When to use S2S impressions
+
+A click link only credits users who tap your ad. Many users see an ad, don't tap it, and install the app later from the store. Without impression data, those installs look organic.
+
+Your **server** reports each impression (the ad was shown) to Linkrunner. If the same device installs the app within the view-through window and there is no click to credit, Linkrunner credits the install to your impression. This is **view-through attribution**. It works like impression tracking in AppsFlyer and accepts the same parameter names.
+
+<Note>
+View-through is off by default. The advertiser turns on S2S traffic and view-through for each partner separately, and sets your view-through window. Ask them, or [Linkrunner support](mailto:support@linkrunner.io), before you send impressions. Until then, requests are rejected with `partner_not_enabled` or `view_through_disabled`.
+</Note>
+
+## How it works
+
+```
+Ad is shown to the user
+      │
+      │ your server, in real time
+      ▼
+GET s2s.linkrunner.io/v1/impression/<app_id>
+      │
+      │ later, the user installs and opens the app (no click)
+      ▼
+Linkrunner matches the install to your impression by GAID / IDFA
+      │
+      ▼
+Install postback to your endpoint ({touch_type} = impression)
+```
+
+Linkrunner credits an impression only when all of these hold:
+
+| Rule | Detail |
+|---|---|
+| **Device ID match** | The impression carries the same `gaid` (Android) or `idfa` (iOS) as the installing device. IP is never used for view-through. |
+| **No click wins** | Any click from any source that can be credited, including an IP match, wins over every impression. |
+| **Inside the window** | The install happens within the view-through window after the impression. The advertiser sets it for you, from 1 to 24 hours (24 by default). Your `vt_lookback` can shorten it, never lengthen it. |
+| **Latest impression** | If several impressions match, the most recent one inside its own window is credited. Each impression is credited to at most one install. |
+
+Postbacks work as for clicks. Your [postback templates](/affiliate-partners/postbacks), [event mapping](/affiliate-partners/event-mapping) and [postback logs](/affiliate-partners/postback-logs) apply unchanged, and `{touch_type}` is `impression` for view-through installs.
+
+## Set it up
+
+<Steps>
+  <Step title="Start from your campaign link">
+    Create the link in your affiliate dashboard as usual. See [Create a campaign link](/affiliate-partners/create-campaign-link). You get a tracking link like this:
+
+    ```
+    https://app.example.com/?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}
+    ```
+  </Step>
+  <Step title="Turn it into the impression URL">
+    Keep your parameters, and send them to `https://s2s.linkrunner.io/v1/impression/<app_id>`. `<app_id>` is the app's Android package name (`com.example.app`) or its App Store ID (`id1234567890`).
+
+    Then add the device ID (`gaid` or `idfa`, required), the time of the impression, and optionally a shorter view-through window:
+
+    ```
+    https://s2s.linkrunner.io/v1/impression/com.example.app?c=OgWmhiSXhG&tid={impression_id}&s2={campaign_id}&gaid={gaid}&impression_time={timestamp_ms}&vt_lookback=24h
+    ```
+
+    `tid` is your ID for this impression. Use a value that is unique per impression, not your click ID.
+
+    <Tip>
+    You can name the advertiser by the tracking link's domain instead: `https://s2s.linkrunner.io/v1/impression?d=app.example.com&c=...`. Use `d` if the advertiser's test and live apps share an app ID and the same campaign code.
+    </Tip>
+  </Step>
+  <Step title="Fire it from your server when the ad is shown">
+    Replace your macros and call the URL with `GET` when the impression happens. A `200` with `"status":"accepted"` means the impression is recorded. See [retries](#retries) for the other responses.
+  </Step>
+  <Step title="Test it end to end">
+    Send one impression with the GAID of a test device. Don't tap any ad on that device. Install and open the app within the window. The install postback arrives with your `tid` and `{touch_type}` = `impression`. Check it in [Postback logs](/affiliate-partners/postback-logs).
+  </Step>
+</Steps>
+
+<Warning>
+Send each impression as it happens. An impression that arrives after the install can't be credited, and impressions older than 24 hours are rejected.
+</Warning>
+
+## Coming from AppsFlyer
+
+If you already send impressions to AppsFlyer, you can reuse that template. Only the host and `c` change.
+
+| AppsFlyer | Linkrunner | Notes |
+|---|---|---|
+| `impression.appsflyer.com/<app_id>` | `s2s.linkrunner.io/v1/impression/<app_id>` | The same app ID: Android package name or App Store ID |
+| `c` (campaign name) | `c` (campaign code) | Use the `c` value from your Linkrunner tracking link, not a campaign name |
+| `clickid` | `tid` | Either name works. Send a unique ID per impression |
+| `advertising_id` | `gaid` | Either name works |
+| `idfa` | `idfa` | Same |
+| `af_viewthrough_lookback` | `vt_lookback` | Either name works. `1h` to `24h`, or `1d`. Longer values are capped at 24 hours |
+| `af_ip`, `af_ua` | `ip`, `ua` | Either name works. Stored, never used for matching |
+| `af_sub1`, `af_sub2`, `af_sub3` | `s2`, `s3`, `s4` | Either name works. Returned in `{s2}` to `{s4}` |
+| `pid`, `af_siteid`, `af_lang` | Not needed | Ignored if present |
+
+An AppsFlyer template like this:
+
+```
+https://impression.appsflyer.com/com.example.app?pid=xyz_int&c=summer&clickid={impression_id}&advertising_id={gaid}&af_viewthrough_lookback=24h&af_sub1={pub}
+```
+
+becomes:
+
+```
+https://s2s.linkrunner.io/v1/impression/com.example.app?c=OgWmhiSXhG&clickid={impression_id}&advertising_id={gaid}&af_viewthrough_lookback=24h&af_sub1={pub}
+```
+
+## Retries
+
+Retrying is safe. The same `tid` for the same campaign always returns the same `impression_id` and is stored once.
+
+- Retry `429` and `503`, after the `Retry-After` delay.
+- Don't retry other `4xx` responses. Fix the request instead. The `reason` tells you what's wrong.
+
+See the [S2S Impression API reference](/api-reference/s2s-impressions) for every parameter, response and rejection reason.
+
+## Troubleshooting
+
+**Requests return `missing_device_id`.**
+Impressions need a `gaid` or `idfa`. Unlike S2S clicks, an IP address alone is not enough. An all-zero ID counts as missing.
+
+**Requests return `partner_not_enabled` or `view_through_disabled`.**
+The advertiser hasn't turned on S2S traffic, or view-through, for your partner account on this app. Changes take up to 5 minutes to apply.
+
+**Requests return `impression_too_old`.**
+`impression_time` is more than 24 hours ago. Send impressions as they happen.
+
+**Requests return `invalid_viewthrough_lookback`.**
+Use whole hours (`6h`, `24h`, or `6`) or `1d`. Fractions, weeks and `0` are rejected.
+
+**Impressions are accepted but installs aren't credited to them.**
+Check that the impression carries the user's real GAID or IDFA and arrives before the install. A click from any source, or a more recent impression, takes priority. The install must also fall inside the view-through window the advertiser set for you.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
