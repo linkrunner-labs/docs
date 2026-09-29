@@ -113,7 +113,7 @@ Your token is valid for every app you're connected to, for both S2S impressions 
 
 ### Rotate or revoke your token
 
-Manage your token in **Settings → S2S credentials**.
+Manage your token in **Settings → S2S Credentials**.
 
 - **Rotate:** generate a new token. Your previous token keeps working for 24 hours, so update your servers within that time.
 - **Revoke all:** stops every token at once. All your S2S requests are rejected until you generate a new token and send it.
@@ -168,7 +168,7 @@ See the [S2S Impression API reference](/api-reference/s2s-impressions) for every
 The request has no `X-Linkrunner-Token` header and no `lr_token` parameter. Check that your server or ad platform sends the header on every call, not only on some of them.
 
 **Requests return `invalid_token`.**
-The token is wrong, was revoked, or was replaced more than 24 hours ago. Copy the current token from your server's secret store, not from an old template. If you no longer have it, rotate it in **Settings → S2S credentials**.
+The token is wrong, was revoked, or was replaced more than 24 hours ago. Copy the current token from your server's secret store, not from an old template. If you no longer have it, rotate it in **Settings → S2S Credentials**.
 
 **Requests return `missing_device_id`.**
 Impressions need a `gaid` or `idfa`. Unlike S2S clicks, an IP address alone is not enough. An all-zero ID counts as missing.
