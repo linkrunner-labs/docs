@@ -14,7 +14,7 @@ GET https://s2s.linkrunner.io/v1/impression?app_id={app_id}
 GET https://s2s.linkrunner.io/v1/impression?d={domain}
 ```
 
-The advertiser is identified by the app ID (or the tracking link's domain) and the campaign by `c`. The campaign must belong to your partner account, and the advertiser must have turned on S2S traffic and view-through for you.
+The advertiser is identified by the app ID (or the tracking link's domain) and the campaign by `c`. The campaign must belong to your partner account, and the advertiser must have turned on S2S traffic and [view-through](/features/attribution-windows#view-through-attribution) for you.
 
 ## Authentication
 
@@ -105,7 +105,7 @@ The response is always JSON.
 | 401 | `missing_token` | No `X-Linkrunner-Token` header and no `lr_token` parameter. | No |
 | 401 | `invalid_token` | The token is wrong, revoked, or was rotated more than 24 hours ago, or your partner account is suspended. | No |
 | 403 | `partner_not_enabled` | The advertiser hasn't turned on S2S traffic for the partner that owns campaign `c`. | No |
-| 403 | `view_through_disabled` | S2S traffic is on, but the advertiser hasn't turned on view-through for this partner. | No |
+| 403 | `view_through_disabled` | S2S traffic is on, but the advertiser hasn't turned on view-through for this partner. Ask them to turn it on in [Settings → Attribution Windows](/features/attribution-windows#view-through-attribution). | No |
 | 404 | `s2s_disabled` | The S2S impression API is turned off. | No |
 | 429 | `rate_limited` | Too many impressions for this campaign. | Yes, after `Retry-After` |
 | 503 | `unavailable` | A temporary error. | Yes, after `Retry-After` |

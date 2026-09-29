@@ -13,7 +13,7 @@ Your **server** reports each impression (the ad was shown) to Linkrunner. If the
 Every S2S request must carry your partner token. See [Authenticate your requests](#authenticate-your-requests).
 
 <Note>
-View-through is off by default. The advertiser turns on S2S traffic and view-through for each partner separately, and sets your view-through window. Ask them, or [Linkrunner support](mailto:support@linkrunner.io), before you send impressions. Until then, requests are rejected with `partner_not_enabled` or `view_through_disabled`.
+View-through is off by default. Until the advertiser turns it on for you, your impressions are rejected with `403` and `view_through_disabled`. Ask the advertiser to turn on view-through for your partner account in **Settings → Attribution Windows** and set your window. See [View-through attribution](/features/attribution-windows#view-through-attribution). S2S traffic must also be on for you, or requests are rejected with `partner_not_enabled`.
 </Note>
 
 ## How it works
@@ -39,7 +39,7 @@ Linkrunner credits an impression only when all of these hold:
 |---|---|
 | **Device ID match** | The impression carries the same `gaid` (Android) or `idfa` (iOS) as the installing device. IP is never used for view-through. |
 | **No click wins** | Any click from any source that can be credited, including an IP match, wins over every impression. |
-| **Inside the window** | The install happens within the view-through window after the impression. The advertiser sets it for you, from 1 to 24 hours (24 by default). Your `vt_lookback` can shorten it, never lengthen it. |
+| **Inside the window** | The install happens within the view-through window after the impression. The advertiser sets it for you, from 1 to 24 hours (24 by default). You can see it, read only, in your dashboard. Your `vt_lookback` can shorten it, never lengthen it. |
 | **Latest impression** | If several impressions match, the most recent one inside its own window is credited. Each impression is credited to at most one install. |
 
 Postbacks work as for clicks. Your [postback templates](/affiliate-partners/postbacks), [event mapping](/affiliate-partners/event-mapping) and [postback logs](/affiliate-partners/postback-logs) apply unchanged, and `{touch_type}` is `impression` for view-through installs.
@@ -173,8 +173,11 @@ The token is wrong, was revoked, or was replaced more than 24 hours ago. You als
 **Requests return `missing_device_id`.**
 Impressions need a `gaid` or `idfa`. Unlike S2S clicks, an IP address alone is not enough. An all-zero ID counts as missing.
 
-**Requests return `partner_not_enabled` or `view_through_disabled`.**
-The advertiser hasn't turned on S2S traffic, or view-through, for your partner account on this app. Changes take up to 5 minutes to apply.
+**Requests return `view_through_disabled`.**
+The advertiser hasn't turned on view-through for your partner account on this app. Ask them to turn it on in **Settings → Attribution Windows** ([how](/features/attribution-windows#view-through-attribution)). Changes take up to 5 minutes to apply.
+
+**Requests return `partner_not_enabled`.**
+The advertiser hasn't turned on S2S traffic for your partner account on this app. Ask them, or [Linkrunner support](mailto:support@linkrunner.io). Changes take up to 5 minutes to apply.
 
 **Requests return `impression_too_old`.**
 `impression_time` is more than 24 hours ago. Send impressions as they happen.
