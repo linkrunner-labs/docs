@@ -40,6 +40,8 @@ This page lists what you get and what to set up, in order.
     If your placement sends users straight to the store without opening a browser, report the click from your server instead. See [S2S clicks](/affiliate-partners/s2s-clicks).
 
     Optional: to get credit for users who see your ad but don't tap it, also report impressions. See [S2S impressions](/affiliate-partners/s2s-impressions).
+
+    Every S2S click and impression must carry your partner token. Generate it once in [**Settings → S2S credentials**](https://dashboard.linkrunner.io/affiliate/settings); it works for every app you're connected to. See [Authenticate your requests](/affiliate-partners/s2s-clicks#authenticate-your-requests).
   </Step>
   <Step title="Set up your postbacks">
     Installs are sent automatically, and signups once a signup postback is set up. In-app events are sent only after they are mapped, so map the ones you want in [Event mapping](/affiliate-partners/event-mapping).
@@ -63,7 +65,7 @@ For how a click becomes a postback, see [How attribution works](/affiliate-partn
     Linkrunner returns the `tid` you sent on the click in the `{click_id}` and `{tid}` macros. See [Postbacks and macros](/affiliate-partners/postbacks).
   </Accordion>
   <Accordion title="Can I reuse my AppsFlyer templates?" icon="arrows-rotate">
-    For server-to-server clicks, yes. The S2S click API accepts the AppsFlyer parameter names, so only the host and `c` change. See [Coming from AppsFlyer](/affiliate-partners/s2s-clicks#coming-from-appsflyer).
+    For server-to-server clicks, yes. The S2S click API accepts the AppsFlyer parameter names. You change the host and `c`, and add your partner token. See [Coming from AppsFlyer](/affiliate-partners/s2s-clicks#coming-from-appsflyer).
   </Accordion>
   <Accordion title="Do I need to integrate an SDK?" icon="mobile">
     No. The advertiser's app already runs the Linkrunner SDK. You send clicks and receive postbacks.

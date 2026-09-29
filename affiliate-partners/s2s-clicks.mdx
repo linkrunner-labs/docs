@@ -12,6 +12,8 @@ Some placements never open a browser. OEM app-store icons on Xiaomi, OPPO and vi
 
 For this traffic, your **server** reports each click to Linkrunner, and the user goes directly to the store as before. It works like server-to-server clicks in AppsFlyer (`redirect=false`), and accepts the same parameter names.
 
+Every S2S request must carry your partner token. See [Authenticate your requests](#authenticate-your-requests).
+
 <Note>
 The advertiser turns on S2S clicks for each partner separately. Ask them, or [Linkrunner support](mailto:support@linkrunner.io), to turn them on for your partner account before you send traffic. Until then, requests are rejected with `partner_not_enabled`. S2S clicks stop if the advertiser disconnects your account.
 </Note>
@@ -49,6 +51,11 @@ Postbacks work exactly as for regular clicks. Your existing [postback templates]
 ## Set it up
 
 <Steps>
+  <Step title="Get your S2S token">
+    In your affiliate dashboard, open [**Settings → S2S credentials**](https://dashboard.linkrunner.io/affiliate/settings) and click **Generate token**. Copy the token (it starts with `lrs2s_`) and store it as a secret on your server. It is shown only once.
+
+    One token works for every app you're connected to, so you only do this once.
+  </Step>
   <Step title="Create the campaign link">
     Create the link in your affiliate dashboard as usual. See [Create a campaign link](/affiliate-partners/create-campaign-link). You get a tracking link like this:
 
@@ -59,10 +66,11 @@ Postbacks work exactly as for regular clicks. Your existing [postback templates]
   <Step title="Turn it into the S2S URL">
     Keep your parameters, and send them to `https://s2s.linkrunner.io/v1/click/<app_id>` instead. `<app_id>` is the app's Android package name (`com.example.app`) or its App Store ID (`id1234567890`), the same app ID you use with AppsFlyer.
 
-    Then add the device fields your server has: `gaid` or `idfa`, and optionally `ip`, `ua` and `click_time`.
+    Then add the device fields your server has: `gaid` or `idfa`, and optionally `ip`, `ua` and `click_time`. Your token goes in the `X-Linkrunner-Token` header:
 
-    ```
-    https://s2s.linkrunner.io/v1/click/com.example.app?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}&gaid={gaid}&ip={device_ip}&ua={user_agent}&click_time={timestamp_ms}
+    ```http
+    GET https://s2s.linkrunner.io/v1/click/com.example.app?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}&gaid={gaid}&ip={device_ip}&ua={user_agent}&click_time={timestamp_ms}
+    X-Linkrunner-Token: <your_token>
     ```
 
     <Tip>
@@ -70,7 +78,7 @@ Postbacks work exactly as for regular clicks. Your existing [postback templates]
     </Tip>
   </Step>
   <Step title="Fire it from your server when the user clicks">
-    Replace your macros and call the URL with `GET`, at the moment of the click. The user doesn't wait on this call; send them to the store directly.
+    Replace your macros and call the URL with `GET` and the token header, at the moment of the click. The user doesn't wait on this call; send them to the store directly.
 
     A `200` with `"status":"accepted"` means the click is recorded. See [retries](#retries) for the other responses.
   </Step>
@@ -83,9 +91,46 @@ Postbacks work exactly as for regular clicks. Your existing [postback templates]
 Send each click as it happens. Linkrunner only attributes an install to a click it received first, and there is no way to re-attribute an install afterwards. Clicks older than 24 hours are rejected.
 </Warning>
 
+## Authenticate your requests
+
+Linkrunner rejects any S2S request that doesn't carry your partner token, with `401` and `missing_token` or `invalid_token`. The token proves the traffic comes from you, so nobody else can send clicks in your name.
+
+Send it in the `X-Linkrunner-Token` header on every request. This example reads it from the `LINKRUNNER_S2S_TOKEN` environment variable:
+
+```bash
+curl -G "https://s2s.linkrunner.io/v1/click/com.example.app" \
+  -H "X-Linkrunner-Token: $LINKRUNNER_S2S_TOKEN" \
+  --data-urlencode "c=OgWmhiSXhG" \
+  --data-urlencode "tid=a1b2c3d4e5" \
+  --data-urlencode "gaid=38400000-8cf0-11bd-b23e-10b96e40000d"
+```
+
+If your ad server can only fire a URL and can't set headers, add the token as the `lr_token` query parameter instead:
+
+```text wrap
+https://s2s.linkrunner.io/v1/click/com.example.app?lr_token=<your_token>&c=OgWmhiSXhG&tid={click_id}&gaid={gaid}
+```
+
+Linkrunner removes `lr_token` before it stores the click, so the token never appears in reports or postbacks. Use the header when you can, because full URLs often end up in server logs.
+
+Your token is valid for every app you're connected to, for both S2S clicks and [S2S impressions](/affiliate-partners/s2s-impressions).
+
+### Rotate or revoke your token
+
+Manage your token in **Settings → S2S credentials**.
+
+- **Rotate:** generate a new token. Your previous token keeps working for 24 hours, so update your servers within that time.
+- **Revoke all:** stops every token at once. All your S2S requests are rejected until you generate a new token and send it.
+
+New, rotated and revoked tokens take up to a minute to apply.
+
+<Warning>
+Treat the token like a password. Don't put it in client apps, public repositories or tracking links you share. If it leaks, use **Revoke all** and then generate a new token. Rotating alone keeps the leaked token working for 24 hours.
+</Warning>
+
 ## Coming from AppsFlyer
 
-If you already send S2S clicks to AppsFlyer, you can reuse that template. Linkrunner takes the app ID in the path just like AppsFlyer and accepts the AppsFlyer parameter names, so only the host and `c` change.
+If you already send S2S clicks to AppsFlyer, you can reuse that template. Linkrunner takes the app ID in the path just like AppsFlyer and accepts the AppsFlyer parameter names. You change the host and `c`, and add your [token](#authenticate-your-requests).
 
 | AppsFlyer | Linkrunner | Notes |
 |---|---|---|
@@ -97,8 +142,8 @@ If you already send S2S clicks to AppsFlyer, you can reuse that template. Linkru
 | `af_ip` | `ip` | Either name works |
 | `af_ua` | `ua` | Either name works |
 | `af_sub1`, `af_sub2`, `af_sub3` | `s2`, `s3`, `s4` | Either name works. Returned in `{s2}`–`{s4}` |
-| `redirect=false` | — | Not needed; this endpoint never redirects. Ignored if present |
-| `pid`, `af_siteid`, `af_lang` | — | Ignored |
+| `redirect=false` | Not needed | This endpoint never redirects. Ignored if present |
+| `pid`, `af_siteid`, `af_lang` | Not needed | Ignored if present |
 
 An AppsFlyer template like this:
 
@@ -108,8 +153,9 @@ https://app.appsflyer.com/com.example.app?pid=xyz_int&c=summer&clickid={click_id
 
 becomes:
 
-```
-https://s2s.linkrunner.io/v1/click/com.example.app?c=OgWmhiSXhG&clickid={click_id}&advertising_id={gaid}&af_ip={ip}&af_ua={ua}&af_sub1={pub}
+```http
+GET https://s2s.linkrunner.io/v1/click/com.example.app?c=OgWmhiSXhG&clickid={click_id}&advertising_id={gaid}&af_ip={ip}&af_ua={ua}&af_sub1={pub}
+X-Linkrunner-Token: <your_token>
 ```
 
 ## Retries
@@ -126,6 +172,12 @@ Keep `tid` unique per campaign for good. A reused `tid` is treated as a retry of
 See the [S2S Click API reference](/api-reference/s2s-clicks) for every parameter, response and rejection reason.
 
 ## Troubleshooting
+
+**Requests return `missing_token`.**
+The request has no `X-Linkrunner-Token` header and no `lr_token` parameter. Check that your server or ad platform sends the header on every call, not only on some of them.
+
+**Requests return `invalid_token`.**
+The token is wrong, was revoked, or was replaced more than 24 hours ago. Copy the current token from your server's secret store, not from an old template. If you no longer have it, rotate it in **Settings → S2S credentials**.
 
 **Every request returns `unknown_campaign`.**
 `c` must be the campaign code from your Linkrunner tracking link. An AppsFlyer campaign name in `c` doesn't match.

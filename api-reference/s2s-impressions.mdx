@@ -14,7 +14,19 @@ GET https://s2s.linkrunner.io/v1/impression?app_id={app_id}
 GET https://s2s.linkrunner.io/v1/impression?d={domain}
 ```
 
-No API key is needed. The advertiser is identified by the app ID (or the tracking link's domain) and the campaign by `c`. The campaign must belong to your partner account, and the advertiser must have turned on S2S traffic and view-through for you.
+The advertiser is identified by the app ID (or the tracking link's domain) and the campaign by `c`. The campaign must belong to your partner account, and the advertiser must have turned on S2S traffic and view-through for you.
+
+## Authentication
+
+Every request must carry your partner token. Send it in a header:
+
+```
+X-Linkrunner-Token: <your_token>
+```
+
+If your ad server can only fire URLs, send it as the `lr_token` query parameter instead: `&lr_token=<your_token>`. Linkrunner removes `lr_token` before it stores the impression, so it never appears in reports or postbacks.
+
+Generate the token in your affiliate dashboard under [**Settings → S2S credentials**](https://dashboard.linkrunner.io/affiliate/settings). It is shown once, so store it as a secret. One token covers every app you're connected to, for both S2S clicks and impressions. A request without a valid token is rejected with `401`. For rotation and revocation, see [Authenticate your requests](/affiliate-partners/s2s-impressions#authenticate-your-requests).
 
 ## Parameters
 
@@ -25,6 +37,7 @@ Send all parameters as URL-encoded query parameters. Each value is limited to 25
 | `app_id` | path | One of `app_id` or `d` | The app's Android package name (`com.example.app`) or App Store ID (`id1234567890` or `1234567890`). Can also be sent in the path: `/v1/impression/{app_id}`. |
 | `d` | | One of `app_id` or `d` | Domain of your Linkrunner tracking link, for example `app.example.com`. Wins over `app_id` when both are sent. |
 | `c` | | Yes | Campaign code, the `c` value of your tracking link. Must match a campaign of that app or domain exactly. |
+| `lr_token` | | Only without the header | Your partner token, for ad servers that can't set the `X-Linkrunner-Token` header. Removed before the request is stored. |
 | `tid` | `clickid` | Yes | Your unique impression ID. Returned in the `{click_id}` and `{tid}` postback macros. |
 | `gaid` | `advertising_id` | One of `gaid` or `idfa` | Google Advertising ID, as a UUID. |
 | `idfa` | | One of `gaid` or `idfa` | Apple IDFA, as a UUID. |
@@ -38,7 +51,7 @@ Send all parameters as URL-encoded query parameters. Each value is limited to 25
 
 Every impression needs a `gaid` or an `idfa`. View-through attribution matches on device ID only, so unlike [S2S clicks](/api-reference/s2s-clicks), an IP address alone is rejected.
 
-If both a name and its alias are sent, the name wins. `click_time` is ignored on this endpoint; use `impression_time`. `pid`, `af_siteid` and `af_lang` are ignored, so an AppsFlyer impression template works once the host and `c` are changed.
+If both a name and its alias are sent, the name wins. `click_time` is ignored on this endpoint; use `impression_time`. `pid`, `af_siteid` and `af_lang` are ignored, so an AppsFlyer impression template works once the host and `c` are changed and your token is added.
 
 ## Responses
 
@@ -57,6 +70,13 @@ The response is always JSON.
 {
   "status": "rejected",
   "reason": "missing_device_id"
+}
+```
+
+```json 401 Unauthorized
+{
+  "status": "rejected",
+  "reason": "invalid_token"
 }
 ```
 
@@ -82,6 +102,8 @@ The response is always JSON.
 | 400 | `ambiguous_app` | More than one of the advertiser's projects with S2S on for you has this app ID and campaign code (for example test and live). Send `d` instead. | No |
 | 400 | `unknown_domain` | `d` is not a Linkrunner click domain. | No |
 | 400 | `unknown_campaign` | `c` does not match a campaign of that app or domain. | No |
+| 401 | `missing_token` | No `X-Linkrunner-Token` header and no `lr_token` parameter. | No |
+| 401 | `invalid_token` | The token is wrong, revoked, or was rotated more than 24 hours ago. | No |
 | 403 | `partner_not_enabled` | The advertiser hasn't turned on S2S traffic for the partner that owns campaign `c`. | No |
 | 403 | `view_through_disabled` | S2S traffic is on, but the advertiser hasn't turned on view-through for this partner. | No |
 | 404 | `s2s_disabled` | The S2S impression API is turned off. | No |
@@ -90,10 +112,13 @@ The response is always JSON.
 
 ## Examples
 
+The examples read your token from the `LINKRUNNER_S2S_TOKEN` environment variable.
+
 <CodeGroup>
 
 ```bash cURL
 curl -G "https://s2s.linkrunner.io/v1/impression/com.example.app" \
+  -H "X-Linkrunner-Token: $LINKRUNNER_S2S_TOKEN" \
   --data-urlencode "c=OgWmhiSXhG" \
   --data-urlencode "tid=imp-7f3a91" \
   --data-urlencode "gaid=38400000-8cf0-11bd-b23e-10b96e40000d" \
@@ -112,12 +137,14 @@ const params = new URLSearchParams({
   s2: "banner_top",
 });
 
-const res = await fetch(`https://s2s.linkrunner.io/v1/impression/com.example.app?${params}`);
+const res = await fetch(`https://s2s.linkrunner.io/v1/impression/com.example.app?${params}`, {
+  headers: { "X-Linkrunner-Token": process.env.LINKRUNNER_S2S_TOKEN },
+});
 const body = await res.json(); // { status: "accepted", impression_id: "..." }
 ```
 
 ```python Python
-import time, requests
+import os, time, requests
 
 res = requests.get("https://s2s.linkrunner.io/v1/impression/com.example.app", params={
     "c": "OgWmhiSXhG",
@@ -126,7 +153,7 @@ res = requests.get("https://s2s.linkrunner.io/v1/impression/com.example.app", pa
     "impression_time": int(time.time() * 1000),
     "vt_lookback": "6h",
     "s2": "banner_top",
-}, timeout=5)
+}, headers={"X-Linkrunner-Token": os.environ["LINKRUNNER_S2S_TOKEN"]}, timeout=5)
 body = res.json()  # {"status": "accepted", "impression_id": "..."}
 ```
 
@@ -134,8 +161,9 @@ body = res.json()  # {"status": "accepted", "impression_id": "..."}
 
 An iOS impression, with the advertiser's default window:
 
-```
-https://s2s.linkrunner.io/v1/impression/id1234567890?c=OgWmhiSXhG&tid=imp-7f3a92&idfa=6D92078A-8246-4BA4-AE5B-76104861E7DC
+```http
+GET https://s2s.linkrunner.io/v1/impression/id1234567890?c=OgWmhiSXhG&tid=imp-7f3a92&idfa=6D92078A-8246-4BA4-AE5B-76104861E7DC
+X-Linkrunner-Token: <your_token>
 ```
 
 ## Retries and deduplication

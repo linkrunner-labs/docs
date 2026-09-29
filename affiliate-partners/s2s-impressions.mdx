@@ -10,6 +10,8 @@ A click link only credits users who tap your ad. Many users see an ad, don't tap
 
 Your **server** reports each impression (the ad was shown) to Linkrunner. If the same device installs the app within the view-through window and there is no click to credit, Linkrunner credits the install to your impression. This is **view-through attribution**. It works like impression tracking in AppsFlyer and accepts the same parameter names.
 
+Every S2S request must carry your partner token. See [Authenticate your requests](#authenticate-your-requests).
+
 <Note>
 View-through is off by default. The advertiser turns on S2S traffic and view-through for each partner separately, and sets your view-through window. Ask them, or [Linkrunner support](mailto:support@linkrunner.io), before you send impressions. Until then, requests are rejected with `partner_not_enabled` or `view_through_disabled`.
 </Note>
@@ -45,6 +47,11 @@ Postbacks work as for clicks. Your [postback templates](/affiliate-partners/post
 ## Set it up
 
 <Steps>
+  <Step title="Get your S2S token">
+    If you already send [S2S clicks](/affiliate-partners/s2s-clicks), use the same token and skip this step.
+
+    Otherwise, in your affiliate dashboard, open [**Settings → S2S credentials**](https://dashboard.linkrunner.io/affiliate/settings) and click **Generate token**. Copy the token (it starts with `lrs2s_`) and store it as a secret on your server. It is shown only once.
+  </Step>
   <Step title="Start from your campaign link">
     Create the link in your affiliate dashboard as usual. See [Create a campaign link](/affiliate-partners/create-campaign-link). You get a tracking link like this:
 
@@ -55,10 +62,11 @@ Postbacks work as for clicks. Your [postback templates](/affiliate-partners/post
   <Step title="Turn it into the impression URL">
     Keep your parameters, and send them to `https://s2s.linkrunner.io/v1/impression/<app_id>`. `<app_id>` is the app's Android package name (`com.example.app`) or its App Store ID (`id1234567890`).
 
-    Then add the device ID (`gaid` or `idfa`, required), the time of the impression, and optionally a shorter view-through window:
+    Then add the device ID (`gaid` or `idfa`, required), the time of the impression, and optionally a shorter view-through window. Your token goes in the `X-Linkrunner-Token` header:
 
-    ```
-    https://s2s.linkrunner.io/v1/impression/com.example.app?c=OgWmhiSXhG&tid={impression_id}&s2={campaign_id}&gaid={gaid}&impression_time={timestamp_ms}&vt_lookback=24h
+    ```http
+    GET https://s2s.linkrunner.io/v1/impression/com.example.app?c=OgWmhiSXhG&tid={impression_id}&s2={campaign_id}&gaid={gaid}&impression_time={timestamp_ms}&vt_lookback=24h
+    X-Linkrunner-Token: <your_token>
     ```
 
     `tid` is your ID for this impression. Use a value that is unique per impression, not your click ID.
@@ -68,7 +76,7 @@ Postbacks work as for clicks. Your [postback templates](/affiliate-partners/post
     </Tip>
   </Step>
   <Step title="Fire it from your server when the ad is shown">
-    Replace your macros and call the URL with `GET` when the impression happens. A `200` with `"status":"accepted"` means the impression is recorded. See [retries](#retries) for the other responses.
+    Replace your macros and call the URL with `GET` and the token header when the impression happens. A `200` with `"status":"accepted"` means the impression is recorded. See [retries](#retries) for the other responses.
   </Step>
   <Step title="Test it end to end">
     Send one impression with the GAID of a test device. Don't tap any ad on that device. Install and open the app within the window. The install postback arrives with your `tid` and `{touch_type}` = `impression`. Check it in [Postback logs](/affiliate-partners/postback-logs).
@@ -79,9 +87,46 @@ Postbacks work as for clicks. Your [postback templates](/affiliate-partners/post
 Send each impression as it happens. An impression that arrives after the install can't be credited, and impressions older than 24 hours are rejected.
 </Warning>
 
+## Authenticate your requests
+
+Linkrunner rejects any S2S request that doesn't carry your partner token, with `401` and `missing_token` or `invalid_token`. The token proves the traffic comes from you, so nobody else can send impressions in your name.
+
+Send it in the `X-Linkrunner-Token` header on every request. This example reads it from the `LINKRUNNER_S2S_TOKEN` environment variable:
+
+```bash
+curl -G "https://s2s.linkrunner.io/v1/impression/com.example.app" \
+  -H "X-Linkrunner-Token: $LINKRUNNER_S2S_TOKEN" \
+  --data-urlencode "c=OgWmhiSXhG" \
+  --data-urlencode "tid=imp-7f3a91" \
+  --data-urlencode "gaid=38400000-8cf0-11bd-b23e-10b96e40000d"
+```
+
+If your ad server can only fire a URL and can't set headers, add the token as the `lr_token` query parameter instead:
+
+```text wrap
+https://s2s.linkrunner.io/v1/impression/com.example.app?lr_token=<your_token>&c=OgWmhiSXhG&tid={impression_id}&gaid={gaid}
+```
+
+Linkrunner removes `lr_token` before it stores the impression, so the token never appears in reports or postbacks. Use the header when you can, because full URLs often end up in server logs.
+
+Your token is valid for every app you're connected to, for both S2S impressions and [S2S clicks](/affiliate-partners/s2s-clicks).
+
+### Rotate or revoke your token
+
+Manage your token in **Settings → S2S credentials**.
+
+- **Rotate:** generate a new token. Your previous token keeps working for 24 hours, so update your servers within that time.
+- **Revoke all:** stops every token at once. All your S2S requests are rejected until you generate a new token and send it.
+
+New, rotated and revoked tokens take up to a minute to apply.
+
+<Warning>
+Treat the token like a password. Don't put it in client apps, public repositories or tracking links you share. If it leaks, use **Revoke all** and then generate a new token. Rotating alone keeps the leaked token working for 24 hours.
+</Warning>
+
 ## Coming from AppsFlyer
 
-If you already send impressions to AppsFlyer, you can reuse that template. Only the host and `c` change.
+If you already send impressions to AppsFlyer, you can reuse that template. You change the host and `c`, and add your [token](#authenticate-your-requests).
 
 | AppsFlyer | Linkrunner | Notes |
 |---|---|---|
@@ -103,8 +148,9 @@ https://impression.appsflyer.com/com.example.app?pid=xyz_int&c=summer&clickid={i
 
 becomes:
 
-```
-https://s2s.linkrunner.io/v1/impression/com.example.app?c=OgWmhiSXhG&clickid={impression_id}&advertising_id={gaid}&af_viewthrough_lookback=24h&af_sub1={pub}
+```http
+GET https://s2s.linkrunner.io/v1/impression/com.example.app?c=OgWmhiSXhG&clickid={impression_id}&advertising_id={gaid}&af_viewthrough_lookback=24h&af_sub1={pub}
+X-Linkrunner-Token: <your_token>
 ```
 
 ## Retries
@@ -117,6 +163,12 @@ Retrying is safe. The same `tid` for the same campaign always returns the same `
 See the [S2S Impression API reference](/api-reference/s2s-impressions) for every parameter, response and rejection reason.
 
 ## Troubleshooting
+
+**Requests return `missing_token`.**
+The request has no `X-Linkrunner-Token` header and no `lr_token` parameter. Check that your server or ad platform sends the header on every call, not only on some of them.
+
+**Requests return `invalid_token`.**
+The token is wrong, was revoked, or was replaced more than 24 hours ago. Copy the current token from your server's secret store, not from an old template. If you no longer have it, rotate it in **Settings → S2S credentials**.
 
 **Requests return `missing_device_id`.**
 Impressions need a `gaid` or `idfa`. Unlike S2S clicks, an IP address alone is not enough. An all-zero ID counts as missing.
