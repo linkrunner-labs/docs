@@ -26,7 +26,7 @@ X-Linkrunner-Token: <your_token>
 
 If your ad server can only fire URLs, send it as the `lr_token` query parameter instead: `&lr_token=<your_token>`. Linkrunner removes `lr_token` before it stores the impression, so it never appears in reports or postbacks.
 
-Generate the token in your affiliate dashboard under [**Settings → S2S credentials**](https://dashboard.linkrunner.io/affiliate/settings). It is shown once, so store it as a secret. One token covers every app you're connected to, for both S2S clicks and impressions. A request without a valid token is rejected with `401`. For rotation and revocation, see [Authenticate your requests](/affiliate-partners/s2s-impressions#authenticate-your-requests).
+Generate the token in your affiliate dashboard under [**Settings → S2S Credentials**](https://dashboard.linkrunner.io/affiliate/settings?tab=s2s). It is shown once, so store it as a secret. One token covers every app you're connected to, for both S2S clicks and impressions. A request without a valid token is rejected with `401`. For rotation and revocation, see [Authenticate your requests](/affiliate-partners/s2s-impressions#authenticate-your-requests).
 
 ## Parameters
 
