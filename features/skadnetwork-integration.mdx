@@ -114,10 +114,11 @@ Linkrunner converts your event list into SKAN conversion values (0–63). The or
 1. Go to **Settings → SKAN Setup → Events Setup** in the [Linkrunner Dashboard](https://dashboard.linkrunner.io/dashboard/settings/skan-setup?tab=event-setup)
 2. Add the events that matter for optimization (e.g., `Purchase`, `Subscription Started`, `Onboarding Complete`)
 3. Drag rows to set priority (the topmost event has the highest priority)
-4. For revenue events, set a **min** and **max** range; for occurrence events, set an **average**
-5. Click **Generate SKAN Mapping** to produce the fine and coarse conversion values
+4. For revenue events, set a **min** and **max** range. For other events, click **Add Average** to track how often the event happens. Without an average, Linkrunner only records whether the event happened.
+5. Click **Next: Generate SKAN Mapping** to produce the fine and coarse conversion values
+6. Turn the switch at the top of **Settings → SKAN Setup** to **Enabled**. Linkrunner does not send conversion values to your app while SKAN is disabled.
 
-Apple's SKAN allows up to **64 conversion values total**. The dashboard shows the combination count in real time and warns if your configuration would exceed the limit.
+Apple's SKAN allows up to **64 conversion values total**. **Next: Generate SKAN Mapping** stays disabled while your configuration would exceed the limit. Remove an event or an average until it becomes available.
 
 <Note>
     The schema is configured once and shared. Linkrunner automatically generates the fine and coarse conversion values
