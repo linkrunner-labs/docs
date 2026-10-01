@@ -1267,6 +1267,10 @@ var userData = new LinkrunnerUserData
 LinkrunnerSDK.Signup(userData);
 ```
 
+### Set Customer User ID
+
+The reference C# wrapper in this guide does not expose `SetCustomerUserId`. Pass your customer user ID in `LinkrunnerUserData.id` when calling `Signup` or `SetUserData`.
+
 ### Handle Deeplinks
 
 Call `HandleDeeplink` when your app is opened via a deeplink — both cold start (app was closed) and warm start (app was in background):
@@ -1464,6 +1468,14 @@ LinkrunnerSDK.RemovePayment(userId: "user_123", paymentId: "pay_abc123");
 LinkrunnerSDK.SetPushToken("your_firebase_or_apns_token");
 ```
 
+### Set Additional Data
+
+Use `SetAdditionalData` to pass your CleverTap ID through the reference wrapper's `clevertapId` parameter.
+
+### Set Consent
+
+Use `SetConsent` to report Google Ads consent before `Initialize` and whenever your user's consent state changes. See [Report consent](/sdk/unity#google-integrated-conversion-measurement-optional) for the parameters and setup example.
+
 ### Privacy Controls
 
 ```csharp
@@ -1478,18 +1490,22 @@ LinkrunnerSDK.SetDisableAaidCollection(true);
 
 ## Function Placement Guide
 
-| Function | Where to Call | When |
-|---|---|---|
-| `Initialize` | First scene / App startup | Once at launch |
-| `GetAttributionData` | After init completes | When you need campaign/deeplink info |
-| `Signup` | After onboarding | Once per user |
-| `SetUserData` | Auth/session logic | Every app open with logged-in user |
-| `TrackEvent` | Throughout the app | On user actions |
-| `CapturePayment` | Payment flow | When payment succeeds |
-| `RemovePayment` | Refund flow | When payment is reversed |
-| `SetPushToken` | After token refresh | When push token changes |
-| `SetConsent` | Before `Initialize` | At launch and whenever consent changes |
-| `HandleDeeplink` | Deeplink entry points | When app is opened via a deeplink |
+| Function | Requirement | Where to Call | When |
+|---|---|---|---|
+| [`Initialize`](/sdk/unity#initialization-required) | Required | First scene / App startup | Once at launch |
+| [`Signup`](/sdk/unity#user-identification-required) | Required | Signup/login flow | As soon as the user is identified |
+| [`SetCustomerUserId`](/sdk/unity#set-customer-user-id) | Required | Not exposed by this reference wrapper | Pass the customer user ID through `LinkrunnerUserData.id` instead |
+| [`HandleDeeplink`](/sdk/unity#handle-deeplinks) | Required | Deeplink entry points | When app is opened via a deeplink |
+| [`GetAttributionData`](/sdk/unity#get-attribution-data) | Optional | After init completes | When you need campaign/deeplink info |
+| [`SetUserData`](/sdk/unity#set-user-data-on-app-open) | Optional | Profile update flow after `Signup` | When additional user details become available |
+| [`TrackEvent`](/sdk/unity#track-events) | Optional | Throughout the app | On user actions |
+| [`CapturePayment`](/sdk/unity#capture-payment) | Optional | Payment flow | When payment succeeds |
+| [`RemovePayment`](/sdk/unity#remove-payment-refunds) | Optional | Refund flow | When payment is reversed |
+| [`SetPushToken`](/sdk/unity#push-token) | Optional | After token refresh | When push token changes |
+| [`SetConsent`](/sdk/unity#set-consent) | Optional | Before `Initialize` | At launch and whenever consent changes |
+| [`SetAdditionalData`](/sdk/unity#set-additional-data) | Optional | Integration setup | When the CleverTap ID is available |
+| [`EnablePIIHashing`](/sdk/unity#privacy-controls) | Optional | Privacy configuration | When enabling or disabling PII hashing |
+| [`SetDisableAaidCollection`](/sdk/unity#privacy-controls) | Optional | Android privacy configuration, before `Initialize` | When disabling advertising ID collection |
 
 ---
 

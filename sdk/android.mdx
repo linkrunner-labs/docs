@@ -962,21 +962,24 @@ Connect Firebase Cloud Messaging (FCM) with Linkrunner
 
 ## Function Placement Guide
 
-| Function                                            | Where to Place                         | When to Call                                   |
-| --------------------------------------------------- | -------------------------------------- | ---------------------------------------------- |
-| `LinkRunner.getInstance().init`                     | Application class                      | Once when app starts                           |
-| `LinkRunner.getInstance().getAttributionData`       | Attribution data handling flow         | Whenever the attribution data is needed        |
-| `LinkRunner.getInstance().setAdditionalData`        | Integration code                       | When third-party integration IDs are available |
-| `LinkRunner.getInstance().signup`                   | Identification flow (signup or login)  | Once when the user is identified               |
-| `LinkRunner.getInstance().setUserData`              | Authentication logic                   | Every time app opens with logged-in user       |
-| `LinkRunner.getInstance().trackEvent`               | Throughout app                         | When specific user actions occur               |
-| `LinkRunner.getInstance().capturePayment`           | Payment processing                     | When user makes a payment                      |
-| `LinkRunner.getInstance().removePayment`            | Refund flow                            | When payment needs to be removed               |
-| `LinkRunner.getInstance().setPushToken`             | Push notification setup                | When FCM token is available                    |
-| `LinkRunner.getInstance().handleDeeplink`           | Deep link entry points                 | When app is opened via a deep link             |
-| `LinkRunner.getInstance().setConsent`               | App initialization or consent flow     | Before `init`, and again when consent changes |
-| `LinkRunner.getInstance().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection       |
-| `LinkRunner.getInstance().isAaidCollectionDisabled` | Privacy settings or compliance checks  | When you need to check AAID collection status  |
+| Function | Requirement | Where to Place | When to Call |
+| --- | --- | --- | --- |
+| [`LinkRunner.getInstance().init`](/sdk/android#initialization-required) | Required | Application class | Once when app starts |
+| [`LinkRunner.getInstance().signup`](/sdk/android#user-identification-required) | Required | Identification flow (signup or login) | Once when the user is identified |
+| [`LinkRunner.getInstance().setCustomerUserId`](/sdk/android#setting-the-customer-user-id) | Required | App initialization or identification flow | After `init`, as soon as your user ID is available |
+| [`LinkRunner.getInstance().handleDeeplink`](/sdk/android#handle-deeplink) | Required | Deep link entry points | When app is opened via a deep link |
+| [`LinkRunner.getInstance().getAttributionData`](/sdk/android#getting-attribution-data) | Optional | Attribution data handling flow | Whenever the attribution data is needed |
+| [`LinkRunner.getInstance().setAdditionalData`](/sdk/android#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
+| [`LinkRunner.getInstance().setUserData`](/sdk/android#setting-user-data) | Optional | Authentication or profile update logic | After `signup`, when additional user details become available |
+| [`LinkRunner.getInstance().trackEvent`](/sdk/android#tracking-custom-events) | Optional | Throughout app | When specific user actions occur, including [ecommerce events](/sdk/android#ecommerce-events) |
+| [`LinkRunner.getInstance().capturePayment`](/sdk/android#capturing-payments) | Optional | Payment processing | When user makes a payment, including [ecommerce purchases](/sdk/android#ecommerce-events) |
+| [`LinkRunner.getInstance().removePayment`](/sdk/android#removing-payments) | Optional | Refund flow | When payment needs to be removed |
+| [`LinkRunner.getInstance().setPushToken`](/sdk/android#uninstall-tracking) | Optional | Push notification setup | When FCM token is available |
+| [`LinkRunner.getInstance().setConsent`](/sdk/android#google-ads-consent) | Optional | App initialization or consent flow | Before `init`, and again when consent changes |
+| [`LinkRunner.getInstance().enablePIIHashing`](/sdk/android#enhanced-privacy-controls) | Optional | Privacy settings | When you want to enable PII hashing |
+| [`LinkRunner.getInstance().isPIIHashingEnabled`](/sdk/android#enhanced-privacy-controls) | Optional | Privacy settings or compliance checks | When you need to check PII hashing status |
+| [`LinkRunner.getInstance().setDisableAaidCollection`](/sdk/android#disable-aaid-collection) | Optional | App initialization or privacy settings | Before `init`, when you need to disable AAID collection |
+| [`LinkRunner.getInstance().isAaidCollectionDisabled`](/sdk/android#disable-aaid-collection) | Optional | Privacy settings or compliance checks | When you need to check AAID collection status |
 
 ## Complete Example
 
