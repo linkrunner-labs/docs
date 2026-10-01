@@ -106,11 +106,16 @@ Linkrunner converts your event list into SKAN conversion values (0-63) and sends
         matter for optimization and drag rows to set priority. The topmost event has the highest priority.
     </Step>
     <Step title="Set ranges">
-        For revenue events, set a **min** and **max** range. For occurrence events, set an **average**.
+        For revenue events, set a **min** and **max** range. For other events, click **Add Average** to track how often
+        the event happens. Without an average, Linkrunner only records whether the event happened.
     </Step>
     <Step title="Generate the mapping">
-        Click **Generate SKAN Mapping**. The dashboard shows the combination count in real time and warns if your
-        configuration would exceed Apple's limit of 64 conversion values.
+        Click **Next: Generate SKAN Mapping**. The button stays disabled while your configuration would exceed Apple's
+        limit of 64 conversion values. Remove an event or an average until it becomes available.
+    </Step>
+    <Step title="Turn on SKAN">
+        Turn the switch at the top of **Settings → SKAN Setup** to **Enabled**. Linkrunner does not send conversion
+        values to your app while SKAN is disabled.
     </Step>
 </Steps>
 
