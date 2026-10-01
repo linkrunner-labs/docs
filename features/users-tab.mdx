@@ -76,9 +76,9 @@ This does not mean the data is missing or broken. It means your app has not yet 
 To see real names and contact details, your app needs to identify the user once it knows who they are. See [User Identification](/sdk/react-native#user-identification-required) in your SDK guide, or [Setting the Customer User ID](/sdk/react-native#setting-the-customer-user-id) if you would rather attach your own identifier.
 
 <Note>
-    In the [Events tab](/features/events-tab) you will also come across **Unidentified**, which is a different state.
-    **Hashed** means there is a user record and only the personal details are held back, so the user still has a user
-    ID. **Unidentified** means no user record is attached to that event at all, so it has no user ID either.
+    In the [Events tab](/features/events-tab) you will also come across two other states. A user ID with **No name or
+    email** under it means Linkrunner knows the user, but your app has not shared their name or contact details.
+    **Anonymous** means no user is attached to that event at all, so it has no user ID either.
 </Note>
 
 ## Exporting users
