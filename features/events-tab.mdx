@@ -78,7 +78,13 @@ While you are editing, the chart keeps showing the last set of results, so the f
 
 **Events Log** is the record of every action Linkrunner has received, newest first, shown a page at a time. Each row shows **Event Name**, **Timestamp**, **Event Type**, **User**, **SDK Version**, and **Platform**.
 
-The **User** column shows **Unidentified** when no user record is attached to the action, and **Hashed** when there is one but the personal details are held back. See [Hashed and identified users](/features/users-tab#hashed-and-identified-users).
+The **User** column shows the user's name when your app has shared it. Otherwise it shows one of these:
+
+-   **The user ID with "No name or email" under it.** Linkrunner knows who the user is, but your app has not shared their name or contact details yet.
+-   **Hashed**: the personal details are held back. See [Hashed and identified users](/features/users-tab#hashed-and-identified-users).
+-   **Anonymous**: no user is attached to the action, so there is no user ID either.
+
+In the **Users** filter, **No name or email** shows both the user ID rows and the **Anonymous** rows.
 
 Filter by **All Channels**, **All Events**, platform, **Select dates**, and **Users**. There is also an **All / Organic / Attributed** toggle, which narrows the log to actions from users who arrived on their own versus users Linkrunner matched to an ad click.
 
