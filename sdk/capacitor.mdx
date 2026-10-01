@@ -628,18 +628,20 @@ Connect APNs with Linkrunner
 
 ## Function Placement Guide
 
-| Function                        | Where to Place                 | When to Call                                   |
-| ------------------------------- | ------------------------------ | ---------------------------------------------- |
-| `linkrunner.init`               | App initialization             | Once when app starts                           |
-| `linkrunner.getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed        |
-| `linkrunner.setAdditionalData`  | Integration code               | When third-party integration IDs are available |
-| `linkrunner.signup`             | Identification flow (signup or login) | Once when the user is identified        |
-| `linkrunner.setUserData`        | Authentication logic           | Every time app opens with logged-in user       |
-| `linkrunner.trackEvent`         | Throughout app                 | When specific user actions occur               |
-| `linkrunner.capturePayment`     | Payment processing             | When user makes a payment                      |
-| `linkrunner.removePayment`      | Refund flow                    | When payment needs to be removed               |
-| `linkrunner.setPushToken`       | Push notification setup        | When push token is available                   |
-| `linkrunner.handleDeeplink`     | Deep link entry points         | When app is opened via a deep link             |
+| Function | Requirement | Where to Place | When to Call |
+| --- | --- | --- | --- |
+| [`linkrunner.init`](/sdk/capacitor#initialization-required) | Required | App initialization | Once when app starts |
+| [`linkrunner.signup`](/sdk/capacitor#user-identification-required) | Required | Identification flow (signup or login) | Once when the user is identified |
+| [`linkrunner.setCustomerUserId`](/sdk/capacitor#setting-the-customer-user-id) | Required | After `init`, when your user ID is available | As early as the user's ID is available |
+| [`linkrunner.handleDeeplink`](/sdk/capacitor#handle-deeplink) | Required | Deep link entry points | When app is opened via a deep link |
+| [`linkrunner.getAttributionData`](/sdk/capacitor#getting-attribution-data) | Optional | Attribution data handling flow | Whenever the attribution data is needed |
+| [`linkrunner.setAdditionalData`](/sdk/capacitor#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
+| [`linkrunner.setUserData`](/sdk/capacitor#setting-user-data) | Optional | Profile update flow after `signup` | When additional user details become available |
+| [`linkrunner.trackEvent`](/sdk/capacitor#tracking-custom-events) | Optional | Throughout app | When specific user actions occur |
+| [`linkrunner.capturePayment`](/sdk/capacitor#capture-payment) | Optional | Payment processing | When user makes a payment |
+| [`linkrunner.removePayment`](/sdk/capacitor#removing-payments) | Optional | Refund flow | When payment needs to be removed |
+| [`linkrunner.setPushToken`](/sdk/capacitor#uninstall-tracking) | Optional | Push notification setup | When push token is available |
+| [`linkrunner.enablePIIHashing`](/sdk/capacitor#enhanced-privacy-controls) | Optional | Privacy configuration | When enabling PII hashing |
 
 ## Next Steps
 

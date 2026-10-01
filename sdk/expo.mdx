@@ -181,6 +181,28 @@ Since `expo-linkrunner` is a config plugin that prepares your project, the actua
 - Ecommerce Events
 - Enhanced privacy controls
 
+## Function Placement Guide
+
+Expo uses the `rn-linkrunner` runtime. The function links below open the implementation details in the React Native guide.
+
+| Function | Requirement | Where to Place | When to Call |
+| --- | --- | --- | --- |
+| [`linkrunner.init`](/sdk/react-native#initialization-required) | Required | `App.tsx` within `useEffect` | Once when app starts |
+| [`linkrunner.signup`](/sdk/react-native#user-identification-required) | Required | Identification flow (signup or login) | Once when the user is identified |
+| [`linkrunner.setCustomerUserId`](/sdk/react-native#setting-the-customer-user-id) | Required | After `init`, when your user ID is available | As early as the user's ID is available |
+| [`linkrunner.handleDeeplink`](/sdk/react-native#handle-deeplink) | Required | Deep link entry points | When app is opened via a deep link |
+| [`linkrunner.getAttributionData`](/sdk/react-native#getting-attribution-data) | Optional | Attribution data handling flow | Whenever the attribution data is needed |
+| [`linkrunner.setAdditionalData`](/sdk/react-native#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
+| [`linkrunner.setUserData`](/sdk/react-native#setting-user-data) | Optional | Profile update flow after `signup` | When additional user details become available |
+| [`linkrunner.trackEvent`](/sdk/react-native#tracking-custom-events) | Optional | Throughout app, including ecommerce flows | When specific user actions occur, including AddToCart or ViewContent events |
+| [`linkrunner.capturePayment`](/sdk/react-native#capture-payment) | Optional | Payment processing, including ecommerce purchases | When user makes a payment, including Purchase events with ecommerce data |
+| [`linkrunner.removePayment`](/sdk/react-native#removing-payments) | Optional | Refund flow | When payment needs to be removed |
+| [`linkrunner.setPushToken`](/sdk/react-native#uninstall-tracking) | Optional | Push notification setup | When FCM/APNs token is available |
+| [`linkrunner.setConsent`](/sdk/react-native#google-integrated-conversion-measurement-optional) | Optional | App initialization or consent flow | Before `init`, and again when consent changes |
+| [`linkrunner.enablePIIHashing`](/sdk/react-native#enhanced-privacy-controls) | Optional | Privacy configuration | When enabling PII hashing |
+| [`linkrunner.enableTCFConsentCollection`](/sdk/react-native#tcf-consent-collection) | Optional | iOS consent configuration | On every launch before `init`, if you opt into TCF consent collection |
+| [`linkrunner.getPackageVersion`](/sdk/react-native#sdk-package-version) | Optional | Diagnostics | When you need the installed SDK package version |
+
 ## Migration Guide
 
 If you are using expo-linkrunner with v1.x.x or v2.x.x then moving forward you'll need to migrate to a v3.x.x.

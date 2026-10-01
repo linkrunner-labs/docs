@@ -1037,20 +1037,23 @@ Connect APNs with Linkrunner
 
 ## Function Placement Guide
 
-| Function                                | Where to Place                         | When to Call                                   |
-| --------------------------------------- | -------------------------------------- | ---------------------------------------------- |
-| `LinkRunner().init`                     | App initialization                     | Once when app starts                           |
-| `LinkRunner().getAttributionData`       | Attribution data handling flow         | Whenever the attribution data is needed        |
-| `LinkRunner().setAdditionalData`        | Integration code                       | When third-party integration IDs are available |
-| `LinkRunner().signup`                   | Identification flow (signup or login)  | Once when the user is identified               |
-| `LinkRunner().setUserData`              | Authentication logic                   | Every time app opens with logged-in user       |
-| `LinkRunner().trackEvent`               | Throughout app                         | When specific user actions occur               |
-| `LinkRunner().capturePayment`           | Payment processing                     | When user makes a payment                      |
-| `LinkRunner().removePayment`            | Refund flow                            | When payment needs to be removed               |
-| `LinkRunner().handleDeeplink`           | Deep link entry points                 | When app is opened via a deep link             |
-| `LinkRunner().setConsent`               | App initialization or consent flow     | Before `init`, and again when consent changes |
-| `LinkRunner().setDisableAaidCollection` | App initialization or privacy settings | When you need to disable AAID collection       |
-| `LinkRunner().isAaidCollectionDisabled` | Privacy settings or compliance checks  | When you need to check AAID collection status  |
+| Function | Requirement | Where to Place | When to Call |
+| --- | --- | --- | --- |
+| [`LinkRunner().init`](/sdk/flutter#initialization-required) | Required | App initialization | Once when app starts |
+| [`LinkRunner().signup`](/sdk/flutter#user-identification-required) | Required | Identification flow (signup or login) | Once when the user is identified |
+| [`LinkRunner().setCustomerUserId`](/sdk/flutter#setting-the-customer-user-id) | Required | App initialization or identification flow | After `init`, as soon as your user ID is available |
+| [`LinkRunner().handleDeeplink`](/sdk/flutter#handle-deeplink) | Required | Deep link entry points | When app is opened via a deep link |
+| [`LinkRunner().getAttributionData`](/sdk/flutter#getting-attribution-data) | Optional | Attribution data handling flow | Whenever the attribution data is needed |
+| [`LinkRunner().setAdditionalData`](/sdk/flutter#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
+| [`LinkRunner().setUserData`](/sdk/flutter#setting-user-data) | Optional | Authentication or profile update logic | After `signup`, when additional user details become available |
+| [`LinkRunner().trackEvent`](/sdk/flutter#tracking-custom-events) | Optional | Throughout app | When specific user actions occur, including [ecommerce events](/sdk/flutter#ecommerce-events) |
+| [`LinkRunner().capturePayment`](/sdk/flutter#capturing-payments) | Optional | Payment processing | When user makes a payment, including [ecommerce purchases](/sdk/flutter#ecommerce-events) |
+| [`LinkRunner().removePayment`](/sdk/flutter#removing-payments) | Optional | Refund flow | When payment needs to be removed |
+| [`LinkRunner().setPushToken`](/sdk/flutter#uninstall-tracking) | Optional | Push notification setup | When FCM (Android) or APNs (iOS) token is available |
+| [`LinkRunner().setConsent`](/sdk/flutter#google-integrated-conversion-measurement-optional) | Optional | App initialization or consent flow | Before `init`, and again when consent changes |
+| [`LinkRunner().enablePIIHashing`](/sdk/flutter#enhanced-privacy-controls) | Optional | Privacy settings | When you want to enable PII hashing |
+| [`LinkRunner().setDisableAaidCollection`](/sdk/flutter#disable-aaid-collection) | Optional | App initialization or privacy settings | Before `init`, when you need to disable AAID collection on Android |
+| [`LinkRunner().isAaidCollectionDisabled`](/sdk/flutter#disable-aaid-collection) | Optional | Privacy settings or compliance checks | When you need to check AAID collection status on Android |
 
 ## Complete Example
 

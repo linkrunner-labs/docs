@@ -177,6 +177,25 @@ await setAdditionalData({ clevertapId })
 
 The same five calls exist as methods on the `LinkrunnerTrackerV2` instance.
 
+## Function Placement Guide
+
+Register `LinkrunnerTrackerV2` once. The tracker handles the required React Native SDK calls below through Appbrew's lifecycle; do not duplicate them in your app. Call the exported `handleDeeplink` helper only for links that bypass the tracker, such as push notification taps.
+
+| Function | Requirement | Where to Place | When to Call |
+| --- | --- | --- | --- |
+| [`linkrunner.init`](/sdk/appbrew#2-register-the-tracker) | Required | Appbrew tracker lifecycle (automatic) | When the app opens with a configured token |
+| [`linkrunner.signup`](/sdk/appbrew#what-the-tracker-does-on-its-own) | Required | Appbrew identity lifecycle (automatic) | Once per install and customer |
+| [`linkrunner.setCustomerUserId`](/sdk/appbrew#what-the-tracker-does-on-its-own) | Required | Appbrew identity lifecycle (automatic) | At app open and when the customer identity changes |
+| [`handleDeeplink`](/sdk/appbrew#handling-deep-links-yourself) | Required | Automatic for incoming links; push notification handlers for links that bypass the tracker | When the app opens through a deep link |
+| [`getAttributionData`](/sdk/appbrew#getting-attribution-data) | Optional | Campaign-specific onboarding or referral flow | When your app needs install attribution |
+| [`setUserData`](/sdk/appbrew#extra-user-fields) | Optional | User data or analytics integration flow | When you add fields to the current user |
+| [`setAdditionalData`](/sdk/appbrew#extra-user-fields) | Optional | Third-party integration setup | When the CleverTap ID is available |
+| [`setConsent`](/sdk/appbrew#consent) | Optional | Consent settings or your CMP callback | Before initialization and when consent changes |
+| [`linkrunner.trackEvent`](/sdk/appbrew#what-the-tracker-does-on-its-own) | Optional | Appbrew event lifecycle (automatic) | When Appbrew emits an event |
+| [`linkrunner.capturePayment`](/sdk/appbrew#what-the-tracker-does-on-its-own) | Optional | Appbrew purchase lifecycle (automatic) | When Appbrew emits `purchase` |
+| [`linkrunner.removePayment`](/sdk/appbrew#what-the-tracker-does-on-its-own) | Optional | Appbrew refund lifecycle (automatic) | When Appbrew emits `refund` and `enableRefunds` is on |
+| [`linkrunner.setPushToken`](/sdk/appbrew#what-the-tracker-does-on-its-own) | Optional | Appbrew push token lifecycle (automatic) | When a push token is available and uninstall tracking is on |
+
 ## Testing
 
 1. Build with `debug: true` and look for `Linkrunner initialised successfully` in the console.
