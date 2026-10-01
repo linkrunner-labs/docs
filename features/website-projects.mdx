@@ -1,0 +1,46 @@
+---
+title: "Set Up a Website Project"
+sidebarTitle: "Website Projects"
+description: "Track your website in Linkrunner, with or without an app."
+icon: "globe"
+---
+
+## Create a website project
+
+<Steps>
+<Step title="Start a new project">
+If you are new to Linkrunner, you reach this screen during onboarding. Otherwise, open the project switcher at the top of the sidebar and click **Create Project**.
+</Step>
+
+<Step title="Choose Website">
+Under **What do you want to track?**, select **Website**, then enter your company name, website, and product name. If you also have an app, choose **Both** and add your store link.
+
+![Project creation form with Website selected](/images/website-projects/onboarding-choose-website.webp)
+</Step>
+
+<Step title="Create the project">
+Click **Create project**. Linkrunner opens **SDK Testing → Web SDK** with your Web SDK snippet ready. Follow [Test the Web SDK](/testing/web-sdk-testing) to install it and check that it works.
+</Step>
+</Steps>
+
+## Add your app later
+
+Tabs that need an app show a lock. To use them, open any locked tab, click **Add app**, and search for your app on the App Store or Play Store.
+
+![Add your app dialog with the App Store and Play Store search](/images/website-projects/add-app-dialog.webp)
+
+## Track your website in an app project
+
+If your project already tracks an app, a project admin can add website tracking to it:
+
+1. Go to [Settings → Project Details](https://dashboard.linkrunner.io/dashboard/settings/project-details).
+2. Turn on **Web Campaigns**.
+3. Click **Set up and test in SDK Testing**, then follow [Test the Web SDK](/testing/web-sdk-testing).
+
+![Project Details with the Web Campaigns switch turned on](/images/website-projects/project-details-web-campaigns-switch.webp)
+
+## Find your Web project token
+
+Your Web project token is in [Settings → Project Details](https://dashboard.linkrunner.io/dashboard/settings/project-details), under **Web project token**. Use it for the [Web SDK](/sdk/web). The app SDK's **Project token** does not work on a website.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

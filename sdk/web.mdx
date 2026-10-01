@@ -7,9 +7,9 @@ icon: "globe"
 The Linkrunner Web SDK tracks page views, known users, custom events, and the traffic sources that brought visitors to your website.
 
 <Warning>
-    Web Attribution is currently in beta. To request access, email
-    [support@linkrunner.io](mailto:support@linkrunner.io) with your project name and website domain.
-    We will enable Web Attribution and send you a Web SDK token.
+    Web Attribution is currently in beta. To use it, [create a website project](/features/website-projects), or ask a
+    project admin to turn on **Web Campaigns** in **Settings → Project Details** for your app project. Linkrunner then
+    creates your Web project token.
 </Warning>
 
 The SDK automatically captures:
@@ -28,7 +28,7 @@ The direct script tag and the Next.js helper both load `https://cdn.linkrunner.i
 
 <Tabs>
 <Tab title="CDN script (preferred)">
-Add this script before the closing `</head>` tag. Replace `YOUR_WEB_SDK_TOKEN` with the token provided by Linkrunner.
+Add this script before the closing `</head>` tag. Replace `YOUR_WEB_SDK_TOKEN` with your **Web project token** from **Settings → Project Details**.
 
 ```html
 <script
@@ -162,13 +162,15 @@ Then open your browser's developer tools:
 
 Debug logging turns on automatically on `localhost`, `127.0.0.1`, and `[::1]`. Remove `data-debug="true"` after testing.
 
+To confirm sign-ups, campaign attribution, custom events, and purchases end to end from your own browser, follow [Test the Web SDK](/testing/web-sdk-testing).
+
 ## Configuration
 
 ### Script tag attributes
 
 | Attribute | Required | Description | Default |
 | --- | --- | --- | --- |
-| `data-token` | Yes | Your Web SDK token | None |
+| `data-token` | Yes | Your Web project token | None |
 | `data-domain` | No | Your first-party collection hostname, such as `lr.example.com` | None |
 | `data-endpoint` | No | A full URL or same-origin path for a proxy you operate | None |
 | `data-spa` | No | Set to `"false"` to disable automatic SPA page views | `true` |
@@ -316,7 +318,7 @@ The 24-hour `localStorage` copy preserves last-touch UTMs when a payment gateway
 
 <AccordionGroup>
 <Accordion title="The SDK says the token is invalid">
-Confirm that you are using the Web SDK token provided by Linkrunner. Mobile SDK project tokens do not work with the Web SDK. If you need a token, contact [support@linkrunner.io](mailto:support@linkrunner.io).
+Confirm that you are using the **Web project token** from **Settings → Project Details**. Mobile SDK project tokens do not work with the Web SDK. If the Web project token is not shown, turn on **Web Campaigns** first, as described in [Track your website in an app project](/features/website-projects#track-your-website-in-an-app-project).
 </Accordion>
 
 <Accordion title="Page views are duplicated">
@@ -346,4 +348,4 @@ Do not trust client-side events for payments, entitlements, or other sensitive s
     </Card>
 </CardGroup>
 
-**Need help or beta access?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).
