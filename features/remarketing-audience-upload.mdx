@@ -1,26 +1,163 @@
 ---
 title: "Audience from Customer List"
+description: "Send a Linkrunner cohort to Google Ads or Meta, either as a one-off CSV upload or as a sync that keeps the audience in step with the cohort."
 icon: "upload"
 ---
 
-Upload a list of customers directly to the ad platform to create a custom audience for remarketing.
+Send a Linkrunner cohort to Google Ads or Meta as a custom audience. There are two ways to do it.
 
-## Google
+|                                    | Sync from Linkrunner | Manual upload            |
+| ---------------------------------- | -------------------- | ------------------------ |
+| Setup                              | Once per cohort      | Every time               |
+| Stays in step with the cohort      | Yes                  | No                       |
+| Removes people who stop matching   | Yes                  | No                       |
 
-### 1. Prepare Your Data
+<Note>
+  A cohort is a live rule, not a fixed list of people. It is recalculated every time it is
+  read, so a CSV you exported last week describes who matched last week.
+</Note>
+
+## Sync from Linkrunner
+
+Map a cohort to an audience once. Each sync recalculates the cohort and replaces the
+audience membership, so people who stop matching drop out.
+
+### Before you start
+
+<Steps>
+  <Step title="Connect the ad account">
+    Connect Google Ads or Meta from **Integrations**.
+  </Step>
+  <Step title="Create the audience">
+    Linkrunner writes into an audience you already own. It does not create one for you.
+
+    In Google Ads, create a **Customer list** in **Audience manager** and leave it empty.
+    In Meta, create a **Custom Audience** with **Customer list** as the source.
+
+    <Warning>
+      On Google this must be a **Customer list**. Audiences that Google builds from rules
+      (for example "All converters") cannot receive uploads, and a sync pointed at one
+      always fails.
+    </Warning>
+  </Step>
+</Steps>
+
+### Set up the sync
+
+<Steps>
+  <Step title="Open the cohort">
+    Go to **Users → Cohorts** and click the cohort.
+
+    <img src="/images/audience_sync/cohorts-tab.png" alt="Cohorts tab listing each cohort with its member count" />
+  </Step>
+  <Step title="Add a destination">
+    Scroll to **Ad network sync**, choose the ad network and ad account, then paste the
+    audience ID.
+
+    In Google Ads, go to **Tools → Shared library → Audience manager**, open the segment,
+    and read **List ID** on its detail page. It also appears in the URL as `userListId`.
+    In Meta, the **Custom Audience ID** is in the ID column in **Ads Manager → Audiences**.
+
+    <img src="/images/audience_sync/google-list-id.png" alt="List ID shown on a segment detail page in Google Ads Audience manager" />
+
+    <Note>
+      The segment above is rule based. It is shown only because **List ID** appears in the
+      same place on every segment. The ID you paste must belong to a Customer list.
+    </Note>
+
+    Set **Default Country** if your phone numbers are stored without a country code. See
+    [Match rate](#match-rate).
+  </Step>
+  <Step title="Run a sync">
+    Click **Sync now**. The chip on the destination shows the result, and the line beneath
+    it explains anyone who was left out.
+
+    <img src="/images/audience_sync/ad-network-sync.png" alt="Ad network sync panel showing a Google Ads destination, its status and the add destination form" />
+  </Step>
+</Steps>
+
+### Status
+
+| Chip                     | Meaning                                                        |
+| ------------------------ | -------------------------------------------------------------- |
+| **Never synced**         | Mapped, but nothing has been sent yet                           |
+| **Syncing...**           | A sync is running                                               |
+| **Up to date**           | The last sync succeeded                                         |
+| **Cohort unchanged**     | Nobody joined or left, so nothing was re-uploaded               |
+| **Last sync failed**     | The reason is shown underneath                                  |
+| **Paused**               | Syncing is off until you resume it                              |
+| **Reconnect ad account** | The ad account authorisation expired. Reconnect it in Integrations |
+
+### How long it takes to reflect
+
+The sync finishes in seconds. The wait is on the ad platform.
+
+<Tabs>
+  <Tab title="Google Ads">
+    Google accepts the upload straight away but applies it in the background. Allow up to
+    48 hours for membership to appear.
+
+    Google also hides audiences that are too small. A list needs roughly 100 matched members
+    before it can be used for Display, and around 1,000 for Search and YouTube. Below that it
+    shows a size of 0 even though the upload succeeded, which is the most common reason a
+    working sync looks like it did nothing.
+
+    <Warning>
+      Set the membership duration deliberately. People leave a Google audience by expiring,
+      not by being deleted. Each sync refreshes everyone who still matches, so anyone who
+      stops matching drops out when their membership ends. Left at the 540 day maximum,
+      nobody is ever removed. Set it close to how often you sync (30 days is a reasonable
+      default).
+    </Warning>
+  </Tab>
+  <Tab title="Meta">
+    Meta usually reflects a replaced audience within an hour. It needs roughly 1,000 matched
+    people before the audience can be targeted.
+  </Tab>
+</Tabs>
+
+### Match rate
+
+Only people carrying an identifier the ad platform can match are uploaded. The cohort preview
+shows how much of the cohort is matchable, split by email, phone, GAID and IDFA.
+
+- Email and phone are hashed with SHA-256 before they leave Linkrunner. Advertising IDs (GAID
+  and IDFA) are sent unhashed, which is what both platforms require.
+- Phone numbers need a country code. A number stored as `9876543210` cannot be matched,
+  because there is no way to tell which country it belongs to. **Default Country** fixes those.
+- People who opted out of ad tracking are never uploaded.
+- People with no identifier at all are skipped.
+
+### Pausing and removing
+
+**Pause** stops syncing and leaves the mapping in place. **Remove** deletes the mapping only.
+The audience in the ad platform is left untouched.
+
+## Manual upload
+
+Use this for a one-off audience, or when you would rather not connect the ad account.
+
+<Note>
+  A manual upload is a snapshot. It does not update as the cohort changes, and people who
+  stop matching are not removed. Uploading a fresh file only adds to the audience.
+</Note>
+
+### Google Ads
+
+#### 1. Prepare your data
 
 - Create a segment in Linkrunner from Audience Cohort and download the CSV
 
-### 2. Upload to Google Ads
+#### 2. Upload to Google Ads
 
-#### Navigate to Audience Manager
+##### Navigate to Audience Manager
 
 1. In your Google Ads account, click the **Tools** icon (the wrench) in the left menu
 2. Under the "Shared library" section, click **Audience manager**
 
 <img src="/images/google_ads/custom_audience/1.png" alt="Google Ads Audience Manager" />
 
-#### Create a New Customer List
+##### Create a New Customer List
 
 1. Click the blue **+** button
 
@@ -34,7 +171,7 @@ Upload a list of customers directly to the ad platform to create a custom audien
 
 <img src="/images/google_ads/custom_audience/4.png" alt="Upload a file manually" />
 
-#### Configure the List
+##### Configure the List
 
 - **Segment Name**: Give your audience a clear, recognizable name (e.g., "Newsletter Subscribers Q1")
 - **Data Type**: Choose "Upload emails, phones, and/or mailing addresses"
@@ -45,15 +182,15 @@ Upload a list of customers directly to the ad platform to create a custom audien
 
 Click on **"Save and continue"** to create the customer list.
 
-## Meta
+### Meta
 
-### 1. Prepare Your Data
+#### 1. Prepare your data
 
 - Create a segment in Linkrunner from Audience Cohort and download the CSV
 
-### 2. Upload to Meta Ads
+#### 2. Upload to Meta Ads
 
-#### Navigate to the Audiences Dashboard
+##### Navigate to the Audiences Dashboard
 
 1. Open Meta Ads Manager
 2. Click the **All Tools** menu (the three horizontal lines or "hamburger" icon) on the left sidebar
@@ -61,14 +198,14 @@ Click on **"Save and continue"** to create the customer list.
 
 <img src="/images/meta/custom_audience/1.png" alt="Meta Audiences Dashboard" />
 
-#### Create a Custom Audience
+##### Create a Custom Audience
 
 1. Click the blue **Create Audience** dropdown button
 2. Select **Custom Audience**
 
 <img src="/images/meta/custom_audience/2.png" alt="Create Custom Audience" />
 
-#### Choose Your Source
+##### Choose Your Source
 
 1. Under "Your sources," select **Customer list** and click **Next**
 
@@ -78,15 +215,44 @@ Click on **"Save and continue"** to create the customer list.
 
 <img src="/images/meta/custom_audience/4.png" alt="Upload file" />
 
-#### Set Up Your List
+##### Set Up Your List
 
 1. **Customer Value**: Meta will ask if your list includes a column for customer value. Select **No**, then click **Next**
 2. **Name Your Audience**: Give it a clear, descriptive name (e.g., "Purchasers - March 2026") and an optional description. Click **Next**
 
-#### Map Your Identifiers
+##### Map Your Identifiers
 
 1. Meta will preview your data and attempt to map your columns to its accepted identifiers
 2. **Action Needed**: Review the "Mapped" and "Unmapped" tabs. If a column is unmapped, manually select the correct identifier from the dropdown menu, or tell Meta to ignore that column
 
 <img src="/images/meta/custom_audience/5.png" alt="Map Your Identifiers" />
 3. Click **Import and Create** to create the audience.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="The audience shows 0 members after a successful sync">
+    Google applies uploads in the background and hides audiences below roughly 100 matched
+    members. Wait up to 48 hours, then check the cohort is large enough. See
+    [How long it takes to reflect](#how-long-it-takes-to-reflect).
+  </Accordion>
+  <Accordion title="The sync fails on a Google audience">
+    Check the audience is a **Customer list**. Audiences Google builds from rules cannot
+    receive uploads.
+  </Accordion>
+  <Accordion title="Most of the cohort is not uploaded">
+    Open the cohort and read the line under the destination. It breaks the drop down by
+    reason. Missing country codes on phone numbers are the usual cause, which
+    **Default Country** fixes.
+  </Accordion>
+  <Accordion title="The chip says Reconnect ad account">
+    The stored authorisation expired or is missing a permission. Reconnect the account from
+    **Integrations**, then run the sync again.
+  </Accordion>
+  <Accordion title="Nobody is ever removed from the Google audience">
+    Members leave by expiring. Lower the audience's membership duration in Google Ads so it
+    is close to how often you sync.
+  </Accordion>
+</AccordionGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
