@@ -1,0 +1,92 @@
+---
+title: "Multi-Touch Attribution: Credit Every Channel in the Journey"
+sidebarTitle: "Multi-Touch Attribution"
+description: "See which channels open, assist and close your installs, side by side with last-click, and how much of Google's view-through claim holds up."
+keywords: ["multi-touch attribution", "MTA", "markov attribution", "removal effect", "assisted conversions", "view-through", "google view-through conversions", "incrementality", "geo lift", "last click"]
+icon: "route"
+---
+
+Open **Attribution** from the left sidebar of the [dashboard](https://dashboard.linkrunner.io/dashboard/attribution). Multi-touch attribution is available for projects where it changes the answer; see [Who can use it](#who-can-use-it).
+
+## What you get
+
+| View | What it shows |
+| :--- | :--- |
+| **Overview** | Credit per channel under multi-touch attribution, next to last-click, with the change for each channel. |
+| **Campaigns** | Revenue and ROAS per campaign under four models: Last touch, Platform reported, Markov and Hybrid. |
+| **Assists** | For each channel or campaign, the installs it won, the installs it helped another channel win, and which channels assist which. |
+| **Ad groups and creatives** | Direct and assisted conversions, cost per conversion and creative fatigue for each ad group and creative. |
+| **Google view-through** | How many conversions Google claims through views, an estimate of their revenue, and the discount a lift test found. |
+| **Journeys** | The most common paths to conversion, which channel starts, assists and closes them, and how long they take. |
+
+<Info>
+**Last-click is never replaced.** Every view shows multi-touch credit beside last-click, so you can see exactly what changed and by how much. Your existing reports and postbacks are not affected.
+</Info>
+
+## How credit is assigned
+
+Linkrunner builds each user's journey from the touches it can observe before an install: tracking link clicks and the claims ad networks make on the install. Repeated touches on the same channel count once, and only the 20 most recent steps are kept.
+
+Credit comes from a Markov model. For each channel, Linkrunner measures how much the chance of conversion would fall if that channel were removed from every journey. That drop is the channel's **removal effect**. Each conversion is then split across the channels on its path in proportion to their removal effects.
+
+A journey with one channel gives that channel all the credit, the same as last-click. The **single-channel share** above the Overview table tells you how many journeys that applies to. Multi-touch attribution only moves credit within the remaining journeys.
+
+### What the model cannot see
+
+- **Self-attributing networks are only seen when they convert.** Google, Meta and Apple report the installs they win, not the users who saw an ad and never installed. Their credit is therefore an upper bound.
+- **Users without a device identifier cannot be joined to a journey.** Clicks with no advertising ID or other identifier are left out.
+- **Views do not enter the journey.** Google's view-through conversions are shown on their own, never added to the credit total. See the next section.
+
+## Assisted installs
+
+The **Assists** view counts, without any model, how often each channel helps an install it does not win:
+
+- **Last touch** is the number of installs attributed to the channel.
+- **Assisted** is the number of installs where the channel was in the journey but another channel won the attribution. A channel that touched a journey several times counts once.
+- **First touch** is the number of installs whose journey started with the channel.
+- **Assist ratio** is assisted divided by last touch. Above 1, the channel mostly helps other channels convert; below 1, it mostly closes. Prospecting campaigns usually assist, retargeting and search usually close.
+
+**Who assisted whom** shows, for the installs each channel won, which other channels were in those journeys. Switch between **Network** and **Campaign** to see the same counts per campaign. Views are not counted as assists.
+
+## Google view-through conversions
+
+Google reports view-through conversions per campaign, ad group and ad. These are conversions Google counts after a user saw an ad without clicking it.
+
+Linkrunner shows them as **Google-reported**, because:
+
+- Google counts them itself, and does not deduplicate them against installs another network won.
+- Google reports a count, not revenue. Linkrunner estimates revenue by multiplying the count by Google's own value per conversion for the same campaign, or by your Linkrunner revenue per conversion when Google reports no value. Every estimate is labelled with its basis.
+
+The **Hybrid** model adds view-through revenue only after a lift test has measured how much of Google's claim is real. Until then, Hybrid shows the same numbers as Markov, and the multiplier column reads **Not calibrated**.
+
+### Calibrate with a geo lift test
+
+A geo lift test turns your Google campaigns on in some regions and off in others, then compares installs between them.
+
+<Steps>
+  <Step title="Plan the test">
+    Pick test regions where the campaigns run and control regions where they are paused. Geo-target the campaigns to the test regions only for the whole test window.
+  </Step>
+  <Step title="Record the test">
+    Open **Attribution → Google view-through**, select **New lift test**, and enter the campaigns, regions and dates, including a pre-test period of normal activity.
+  </Step>
+  <Step title="Recalibrate when the test ends">
+    Select **Recalibrate**. Linkrunner compares installs in the test and control regions, subtracts the installs it already attributed to those campaigns, and divides what is left by Google's claimed view-through conversions. The result is the **discount factor**, shown with a confidence range.
+  </Step>
+</Steps>
+
+If you ran a lift study elsewhere, for example in Google Ads, you can enter its result manually instead.
+
+## Recommendations
+
+The Campaigns view labels each campaign **Scale**, **Maintain** or **Reduce** by comparing its ROAS under the selected model with your project's overall ROAS. Campaigns with no spend or fewer than 20 conversions show **Insufficient data**. The tooltip says whether the recommendation uses calibrated or uncalibrated numbers.
+
+## Who can use it
+
+Multi-touch attribution only helps when users touch more than one ad network before installing. Linkrunner measures this every week for each project. Attribution shows its numbers when at least 5% of your identifiable devices touched two or more ad networks in the last 30 days.
+
+When your project is below that threshold, the Attribution page explains why instead of showing numbers. A low share usually reflects your media mix, for example buying on a single network, rather than a tracking gap.
+
+Only project admins and members can open Attribution. Revenue is hidden for roles that cannot view financial data.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).
