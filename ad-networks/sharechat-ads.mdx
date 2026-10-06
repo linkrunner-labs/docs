@@ -55,6 +55,14 @@ On **Integration Partner**, do not pick any of the listed MMPs. Click **Direct I
   With Direct Integration you stop here in the ShareChat wizard. **Integration Type**, **Test Links**, **Validation**, and **Verification** (steps 3 to 6) are only for the listed MMP partners, so you do not need them. ShareChat verifies a Direct Integration through its ad-ops team instead, which is step 4 of this guide.
 </Note>
 
+### Find your ADVID
+
+Ads Manager does not show a field called ADVID. Your ADVID is the app name you entered on **App Details**. To look it up later, open **Event Manager**: the panel on the right lists your registered app names under **Mobile app conversion API**. Copy the name exactly as it appears there.
+
+![Finding your ADVID in ShareChat Event Manager](/images/sharechat-ads/sharechat-ads-manager-find-advid.webp)
+
+The **Advertiser Id** at the top of that panel is your ad account ID. It is not the ADVID, so do not use it in Linkrunner.
+
 <Warning>
   The ADVID must match what ShareChat has on file exactly, including its case. ShareChat can accept a postback with a wrong ADVID, so a typo does not show up as an error, but the conversions will not land on your app. Confirm the value with your ShareChat account manager.
 </Warning>
