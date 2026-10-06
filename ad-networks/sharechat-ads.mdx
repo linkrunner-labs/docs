@@ -1,0 +1,214 @@
+---
+title: "ShareChat Ads"
+description: "Attribute ShareChat and Moj ad installs with Linkrunner and send install and in-app event postbacks to ShareChat"
+icon: "/images/logos/sharechat.svg"
+---
+
+## Overview
+
+Use ShareChat Ads with Linkrunner when you want ShareChat and Moj ad clicks to go through a Linkrunner campaign link, attribute the installs and in-app events, and send those conversions back to ShareChat server side so ShareChat can optimize delivery.
+
+Linkrunner uses ShareChat's **Direct Integration for Mobile Conversion APIs**. The setup is:
+
+1. Confirm your ShareChat **App ID (ADVID)** with ShareChat.
+2. Add the ADVID in Linkrunner.
+3. Map the in-app events you want ShareChat to receive.
+4. Create a Linkrunner campaign link with **ShareChat Ads** as the ad channel.
+5. Use that link as the click URL of your ShareChat ad.
+6. Test the click, install, and event flow before you scale spend.
+
+<Warning>
+  ShareChat attribution is **click-through only**, and only clicks on your Linkrunner campaign link are attributed. An ad that sends users straight to the Play Store has no Linkrunner click, so its installs show as organic and no postback is sent to ShareChat.
+</Warning>
+
+## What you need
+
+- A Linkrunner project with the Linkrunner SDK installed in your Android app
+- The Play Store URL configured in Linkrunner
+- Access to a [ShareChat Ads Manager](https://ads.sharechat.com) account
+- Your ShareChat **App ID (ADVID)**
+
+## 1. Get your ShareChat App ID (ADVID)
+
+ShareChat identifies your app in every postback with an **ADVID**. Despite the name, the ADVID is not your Advertiser ID from Ads Manager. It is the app name agreed between you and ShareChat, for example `MyApp`.
+
+<Warning>
+  The ADVID must match what ShareChat has on file exactly, including its case. Confirm the value with your ShareChat account manager before you add it to Linkrunner. ShareChat can accept a postback with a wrong ADVID, so a typo does not show up as an error, but the conversions will not land on your app.
+</Warning>
+
+You can see where ShareChat registers your app in Ads Manager under **Event Manager → Setup New Data Source**. Choose **Mobile app conversion APIs**, then click **Get Started**.
+
+![Connect New Data Source in ShareChat Ads Manager](/images/sharechat-ads/sharechat-ads-manager-new-data-source.webp)
+
+On **App Details**, enter your app name and Play Store URL.
+
+![App Details step of the Mobile app conversion APIs setup in ShareChat Ads Manager](/images/sharechat-ads/sharechat-ads-manager-app-details.webp)
+
+On **Integration Partner**, ShareChat lists the MMPs it has a prebuilt partner setup with. Linkrunner works through ShareChat's **Direct Integration**, so do not pick a partner from this list. Share your app name and Linkrunner as your measurement partner with your ShareChat account manager, and ask them to confirm the ADVID and enable the server-to-server postbacks for your app.
+
+![Integration Partner step with the Direct Integration link in ShareChat Ads Manager](/images/sharechat-ads/sharechat-ads-manager-integration-partner.webp)
+
+## 2. Add the ADVID in Linkrunner
+
+Open your Linkrunner project and go to **Dashboard → Integrations**. Under ad networks, open **ShareChat Ads**.
+
+![The ShareChat Ads card on the Linkrunner Integrations page](/images/sharechat-ads/linkrunner-integrations-sharechat-card.webp)
+
+On the **Connection** tab, add your ShareChat App ID (ADVID) and click **Save**.
+
+![Adding the ShareChat App ID (ADVID) in Linkrunner](/images/sharechat-ads/linkrunner-sharechat-app-id.webp)
+
+The connection then shows as **Connected**. The **Tracking link** section lists the ShareChat click parameters Linkrunner adds to every ShareChat campaign link.
+
+![The ShareChat Ads connection in Linkrunner](/images/sharechat-ads/linkrunner-sharechat-connection.webp)
+
+To change the ADVID later, open the menu on the connection row and edit it.
+
+## 3. Map events for ShareChat
+
+Open the **Event Mapping** tab. It is available once the ADVID is saved.
+
+![ShareChat event mapping in Linkrunner](/images/sharechat-ads/linkrunner-sharechat-event-mapping.webp)
+
+Two rows are always sent and cannot be removed:
+
+| Linkrunner event | ShareChat event |
+| --- | --- |
+| Install | `install` |
+| Sign up | `registration` |
+
+Click **Add Mapping** to send another app event. Choose your event on the left and the ShareChat event on the right:
+
+| ShareChat event | Use it for |
+| --- | --- |
+| **Registration** (`registration`) | Your real registration step, if it is not the SDK signup, for example KYC completed |
+| **Transaction** (`transaction`) | Purchases, payments, deposits, or any revenue event |
+| **Page Visits** (`page_visits`) | Key screen or content views |
+
+ShareChat accepts only these event names. An app event that is not mapped is not sent to ShareChat. You can map more than one of your events to the same ShareChat event, for example two payment events to **Transaction**.
+
+For a revenue event, turn on **Send Revenue** and pick the currency. Linkrunner sends the event amount as ShareChat's `eventValue`. With revenue off, `eventValue` is `1`.
+
+To check a mapping, click the send icon on its row. Linkrunner sends a test postback for that event to ShareChat with your ADVID.
+
+## 4. Create a Linkrunner campaign link
+
+1. Go to **All Campaigns** in Linkrunner and click **Create Link**.
+2. Enter a campaign name. The **Display ID** fills in automatically.
+3. Turn on **Enable Deferred deeplinking** if the ad should open a specific in-app screen after install.
+4. Open **Advanced Options**, and under **Ad Channel** select **ShareChat Ads**.
+5. Click **Create Campaign**.
+
+![Selecting ShareChat Ads as the ad channel in Linkrunner](/images/sharechat-ads/linkrunner-create-sharechat-campaign.webp)
+
+The campaign link already carries ShareChat's click macros. Copy the full link.
+
+![A ShareChat campaign link with the click macros added](/images/sharechat-ads/linkrunner-sharechat-campaign-link.webp)
+
+The link looks like this:
+
+```text
+https://app.product.com/?c=AbCdEf&gaid=%%ADVERTISER_IDENTIFIER%%&sc_ad_id=%%AD_ID%%&sc_user_id=%%PUBLISHER_IDENTIFIER%%&sc_click_id=%%DELIVERY_IDENTIFIER%%&sc_campaign_id=%%CAMPAIGN_ID%%&sc_campaign_name=%%CAMPAIGN_NAME%%
+```
+
+ShareChat replaces each `%%...%%` macro when someone clicks the ad:
+
+| Link parameter | ShareChat macro | What it holds |
+| --- | --- | --- |
+| `sc_click_id` | `%%DELIVERY_IDENTIFIER%%` | ShareChat click ID, sent back as `clickId` |
+| `gaid` | `%%ADVERTISER_IDENTIFIER%%` | Google Advertising ID |
+| `sc_ad_id` | `%%AD_ID%%` | ShareChat ad ID |
+| `sc_user_id` | `%%PUBLISHER_IDENTIFIER%%` | ShareChat user ID, sent back as `userId` |
+| `sc_campaign_id` | `%%CAMPAIGN_ID%%` | ShareChat campaign ID |
+| `sc_campaign_name` | `%%CAMPAIGN_NAME%%` | ShareChat campaign name |
+
+<Warning>
+  Do not remove or rename these parameters. `sc_click_id` is the key ShareChat matches every postback on. Without it, Linkrunner still records the click and the install, but sends nothing to ShareChat.
+</Warning>
+
+<Note>
+  Create a separate Linkrunner campaign for each ShareChat campaign you want reported separately in Linkrunner.
+</Note>
+
+## 5. Use the link in your ShareChat ad
+
+In ShareChat Ads Manager, create your app campaign as usual. Wherever the ad asks for its click URL (the CTA or landing URL), paste the full Linkrunner campaign link from step 4.
+
+<Warning>
+  Do not paste the Play Store URL into the ad. ShareChat must send the click to Linkrunner first, so Linkrunner can capture `sc_click_id`, redirect the user to the store, attribute the install, and send the postbacks.
+</Warning>
+
+<Note>
+  ShareChat may lock the **Conversion** objective on new accounts. If you cannot select it, ask your ShareChat account manager to enable it.
+</Note>
+
+<Tip>
+  Start with a small daily budget and confirm the full click, install, and event flow before you scale.
+</Tip>
+
+## How postbacks work
+
+When a user clicks your ShareChat ad, ShareChat fills `sc_click_id` and the other macros on your Linkrunner link. Linkrunner stores them with the click and carries them through install attribution.
+
+For each attributed install, signup, and mapped event, Linkrunner sends a server-to-server `GET` request to ShareChat:
+
+```text
+https://sc-s2s-external.sharechat.com/a1s-s2s-service/v1/events/<ADVID>/post?clickId=<sc_click_id>&gaid=<gaid>&campaignName=<sc_campaign_name>&adId=<sc_ad_id>&userId=<sc_user_id>&EventTime=<unix seconds>&eventName=<event>&eventValue=<value>
+```
+
+- `eventName` is `install`, `registration`, `transaction`, or `page_visits`.
+- `eventValue` is the revenue amount for a mapped event with **Send Revenue** on, otherwise `1`.
+- The install postback also carries `installType=0`.
+- `EventTime` is the install time for `install` and the event time for everything else.
+
+ShareChat answers `200` with `{"message":"Events received."}` when it accepts a postback. Linkrunner retries a postback when ShareChat is unavailable or rate limits the request, and does not retry a request ShareChat rejects as invalid.
+
+## Test the setup
+
+1. Click the send icon on each row of **Event Mapping** to send a test postback to ShareChat.
+2. On an Android test device, uninstall your app, then open your Linkrunner ShareChat campaign link with test values for the macros, for example `sc_click_id=test-click-1`.
+3. Install the app from the Play Store and open it.
+4. Check that the install shows on the ShareChat campaign in Linkrunner.
+5. Trigger a signup and one mapped event in the app.
+6. Ask your ShareChat account manager to confirm they received the `install`, `registration`, and mapped events for your ADVID.
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Why are installs from my ShareChat ads showing as organic?">
+    The ad is not using your Linkrunner campaign link, or the link lost its parameters. Check that the ad's click URL is the full Linkrunner link from step 4, with `sc_click_id=%%DELIVERY_IDENTIFIER%%` still on it. Installs from ads that link straight to the Play Store are always organic.
+  </Accordion>
+
+  <Accordion title="Will installs from my existing ShareChat campaigns show up in Linkrunner?">
+    Only after the ads use a Linkrunner campaign link. ShareChat does not report its own attributions to Linkrunner, so a campaign that was running before you switched its link has no Linkrunner clicks to match.
+  </Accordion>
+
+  <Accordion title="What is the ADVID and where do I find it?">
+    The ADVID is the app name agreed between you and ShareChat, for example `MyApp`. It is not the Advertiser ID shown in Ads Manager. Your ShareChat account manager confirms the exact value.
+  </Accordion>
+
+  <Accordion title="Why is an event not sent to ShareChat?">
+    ShareChat receives only Install, Sign up, and the events you mapped on **Event Mapping**. An event is also skipped when the install did not come from a ShareChat click with `sc_click_id`.
+  </Accordion>
+
+  <Accordion title="Is view-through attribution supported?">
+    No. ShareChat attribution in Linkrunner is click-through only.
+  </Accordion>
+
+  <Accordion title="Does Linkrunner import ShareChat spend?">
+    No. ShareChat has no reporting API for Linkrunner to read, so ShareChat campaigns in Linkrunner show clicks, installs, events, and revenue, but no cost.
+  </Accordion>
+</AccordionGroup>
+
+## Related setup
+
+<CardGroup cols={2}>
+  <Card title="Deep Linking Setup" icon="link" href="/features/deep-linking-setup">
+    Configure Android App Links and iOS Universal Links.
+  </Card>
+  <Card title="Deferred Deep Linking" icon="route" href="/features/deferred-deep-linking">
+    Read deferred deep link data after first app open.
+  </Card>
+</CardGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
