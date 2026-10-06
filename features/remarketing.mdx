@@ -35,6 +35,17 @@ Linkrunner supports two reactivation events:
 On iOS, ATT (App Tracking Transparency) permission must be granted by the user for reattribution to work. Without ATT consent, Linkrunner cannot access the IDFA needed to identify returning users.
 </Note>
 
+## Viewing Returning Users
+
+On the [Campaigns](https://dashboard.linkrunner.io/dashboard/campaigns) page, switch the **Install Attribution** dropdown to **Retargeting**. The Retargeting view shows returning users per campaign, split into two columns:
+
+| Column | What it counts |
+| --- | --- |
+| **Reinstalls** | Users who reinstalled the app through the campaign. |
+| **Reengagements** | Users who already had the app and opened it through the campaign's deep link. |
+
+The [reporting API](/api-reference/reporting-campaigns) returns the same numbers with `view=retargeting`.
+
 ## Push Notification Campaigns
 
 Remarketing campaigns also include push notification campaigns run through engagement platforms like **MoEngage** and **WebEngage**. These campaigns are tracked as remarketing campaigns within Linkrunner.

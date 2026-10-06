@@ -41,16 +41,16 @@ These journeys open the app directly through the Linkrunner link. You track the 
 
 | Journey | What Linkrunner tracks | Where in the dashboard | What to set up |
 | --- | --- | --- | --- |
-| **Website → App Open** | Link click + app re-engagement via `handleDeeplink` | Campaigns → **Clicks**; switch **Install Attribution** to **Re-engagement** | Deep linking configured; `handleDeeplink` called on every launch; "Open App" button uses a Linkrunner link |
+| **Website → App Open** | Link click + app re-engagement via `handleDeeplink` | Campaigns → **Clicks**; switch **Install Attribution** to **Retargeting** | Deep linking configured; `handleDeeplink` called on every launch; "Open App" button uses a Linkrunner link |
 | **Web content → specific screen** | Same, with a deep link **path** that routes in-app (e.g. `/product/123`) | Same as above; in-screen actions show in event columns | App routes match the link's paths; encode the path in the link |
 | **Web CTA → in-app conversion** | Re-engagement + in-app [`trackEvent`](/sdk/react-native#tracking-custom-events) or [`capturePayment`](/sdk/react-native#revenue-tracking) | Custom **event columns**; **Revenue**, **ROAS**, **Paying Users** | Call `signup` first; instrument the conversion event or payment |
 | **CRM → app** (email, SMS, WhatsApp, push) | One tagged link per channel + downstream events | One **campaign per channel**: Clicks, Reengagements, and event columns | A Linkrunner link per channel; for push, carry the link in the notification payload |
 
 <Tip>
-At the top of the [Campaigns](https://dashboard.linkrunner.io/dashboard/campaigns) page, switch the **Install Attribution** dropdown to **Re-engagement** to see already-installed opens instead of new installs.
+At the top of the [Campaigns](https://dashboard.linkrunner.io/dashboard/campaigns) page, switch the **Install Attribution** dropdown to **Retargeting** to see returning users (reengagements and reinstalls) instead of new installs.
 </Tip>
 
-![Install Attribution dropdown on the Campaigns page switched to Re-engagement](/images/web-to-app/re-engagement-toggle.png)
+![Install Attribution dropdown on the Campaigns page switched to Retargeting](/images/web-to-app/re-engagement-toggle.png)
 
 ---
 
@@ -90,7 +90,7 @@ The end-to-end question (*which campaign drove this user, and what did they even
 | Source / Channel / Campaign / Ad Set / Ad / Creative | Campaigns table (expand ad set and creative rows) |
 | Clicks | Campaigns table + Overview |
 | Installs (All / Attributed / Organic / iOS / Android) | Overview stat cards + Installs column |
-| App re-engagement | Campaigns → **Re-engagement** view |
+| App re-engagement | Campaigns → **Retargeting** view (Reengagements column) |
 | Sign-ups / Conversion | Sign-ups and Conversion columns; user list in the campaign drawer |
 | Activation / custom events | Custom event columns; [Events](https://dashboard.linkrunner.io/dashboard/events) |
 | Purchase / Revenue / ROAS | Revenue, ROAS, Paying Users, Daywise Revenue columns |
