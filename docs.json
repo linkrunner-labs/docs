@@ -15,13 +15,14 @@
                 "groups": [
                     {
                         "group": "Getting Started",
-                        "pages": ["introduction", "quickstart", "ai-agent-skills"]
+                        "pages": ["introduction", "quickstart", "features/website-projects", "ai-agent-skills"]
                     },
                     {
                         "group": "SDK Guides",
                         "pages": [
                             "testing/integration-testing",
                             "testing/event-and-revenue-testing",
+                            "testing/web-sdk-testing",
                             "testing/meta-android-attribution-testing",
                             "sdk/react-native",
                             "sdk/flutter",
