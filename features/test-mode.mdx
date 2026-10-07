@@ -1,0 +1,80 @@
+---
+title: "Test mode"
+description: "Keep installs, events and revenue from your test builds out of your live numbers, billing and ad networks"
+icon: "flask"
+---
+
+Test mode gives your project a separate test copy. Installs from your debug builds and registered test phones go there automatically. They never count in your live numbers, are never billed, and are never sent to Meta, Google or any other ad network.
+
+You keep **one SDK token**. There is nothing to switch in your app before a release. Linkrunner decides for each install whether it belongs to live or test, from facts about the build and the device that the app stores enforce.
+
+## How Linkrunner picks live or test
+
+Linkrunner checks these rules in order when the app opens for the first time. The first rule that matches wins.
+
+| Order | When | Goes to |
+| --- | --- | --- |
+| 1 | **Force live** is on for the project | Live |
+| 2 | The app uses an SDK version without test mode support | Live |
+| 3 | The phone is on your **test device** list | Test |
+| 4 | The app was installed from Google Play, the App Store or another app store | Live |
+| 5 | The app is a debug build (Android debuggable build, or an iOS build run from Xcode) | Test |
+| 6 | Anything else, for example a release APK shared by hand | Live |
+
+When Linkrunner is not sure, the install goes to live. A real install that lands in test would lose its attribution, so live is the safe side.
+
+<Note>
+    A store build can never go to test by itself. Google Play rejects debuggable builds and the App Store rejects development-signed builds, so the only way a store install reaches test is a phone you registered as a test device.
+</Note>
+
+Events, revenue and user data follow their install. If an install went to test, every event, payment and signup from that app session is recorded in test too, including events you send from your server.
+
+## Turn on test mode
+
+You need the **Admin** role on the project.
+
+1. Open the [dashboard](https://dashboard.linkrunner.io).
+2. In the left sidebar, turn on **Test mode** under your project name.
+3. The first time, review the **Set up test mode** dialog and select **Set up test mode**.
+
+Linkrunner creates the test copy of your project. It copies your store listings, attribution windows, event mapping and deep link settings from live. Campaigns, test devices and the test webhook URL start empty. Ad network connections are not available in test mode.
+
+While test mode is on, an orange band shows at the top of every page with **Exit test mode**, and the browser tab title starts with **[Test]**. Every number, campaign and link you see is from test.
+
+## Test a debug build
+
+No setup is needed. Build and run your app from Android Studio or Xcode, open it, and the install appears in test mode.
+
+Builds you install from Android Studio or Xcode do not have Play Install Referrer or Meta referrer data. To check click attribution on these builds, open a test link on the same phone before you open the app. Linkrunner then matches the install by device or network.
+
+## Test a TestFlight or Play internal testing build
+
+TestFlight builds and Play internal, closed or open testing builds are real release builds installed from a store, so they go to live by default. To send them to test, register the phone as a test device.
+
+1. Turn on test mode.
+2. Go to **Settings → Project Details** and find **Test devices**.
+3. Select **Add device** and enter the phone's GAID (Android advertising ID) or IDFA (iOS advertising ID).
+
+Installs from a registered phone go to test, whatever the build. A registration lasts 30 days. Renew it from the same list, or it expires and the phone goes back to live. A project can have up to 50 active test devices.
+
+<Warning>
+    Remove a phone from the list when you stop testing on it. While it is registered, installs from that phone go to test even from the App Store or Google Play.
+</Warning>
+
+## Check where an install went
+
+In test mode, **Settings → Project Details** lists recent installs that went to test, and debug builds that went to live, with the reason. For example, **Test: debug build**, **Test: registered device** or **Live: Play Store or App Store install**.
+
+## Webhooks in test mode
+
+Test events are never sent to your live webhook URL. To receive them, set a separate test webhook URL in test mode under **Settings → Data Export → Webhooks**. Each test payload includes `"environment": "test"`.
+
+## Force live
+
+If installs go to test that should not, turn on **Force live** in test mode under **Settings → Project Details**. All new installs then go to live within one minute. You do not need to release a new app version. Turn it off to start routing debug builds and registered phones to test again.
+
+## What is not available in test mode
+
+Usage and billing, Signals, SKAN, Fraud Control and Creatives show live data only. Open them in live mode.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).
