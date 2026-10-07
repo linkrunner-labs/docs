@@ -141,6 +141,17 @@ Only send personal data when you have permission to do so. Calling `identify` do
     Calls made before the SDK finishes loading are queued and replayed after initialization.
 </Note>
 
+## Function Placement Guide
+
+The Web SDK initializes when the script loads. It uses `identify` for the customer user ID and `track('signup', ...)` for signup, rather than the mobile SDK method names. It captures incoming URL attribution automatically and does not expose `handleDeeplink`.
+
+| Function | Requirement | Where to Place | When to Call |
+| --- | --- | --- | --- |
+| [SDK script / `LinkrunnerScript`](/sdk/web#1-add-the-sdk) | Required | HTML head, root layout, or `_app.tsx` | Once when your website loads |
+| [`lr.track('signup', ...)`](/sdk/web#2-identify-users-and-track-events) | Required | Signup or login flow, after `identify` | When you identify a signed-up user |
+| [`lr.identify`](/sdk/web#2-identify-users-and-track-events) | Required | Authentication logic | When you know your user's stable ID |
+| [`lr.track`](/sdk/web#2-identify-users-and-track-events) | Optional | Event handlers throughout your website | When you record other user actions |
+
 ## 3. Verify the integration
 
 Set `data-debug="true"` while testing:

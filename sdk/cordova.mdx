@@ -734,18 +734,20 @@ Connect APNs with Linkrunner
 
 ## Function Placement Guide
 
-| Function                        | Where to Place                 | When to Call                                   |
-| ------------------------------- | ------------------------------ | ---------------------------------------------- |
-| `linkrunner.init`               | `deviceready` event handler    | Once when app starts                           |
-| `linkrunner.getAttributionData` | Attribution data handling flow | Whenever the attribution data is needed        |
-| `linkrunner.setAdditionalData`  | Integration code               | When third-party integration IDs are available |
-| `linkrunner.signup`             | Identification flow (signup or login) | Once when the user is identified        |
-| `linkrunner.setUserData`        | Authentication logic           | Every time app opens with logged-in user       |
-| `linkrunner.trackEvent`         | Throughout app                 | When specific user actions occur               |
-| `linkrunner.capturePayment`     | Payment processing             | When user makes a payment                      |
-| `linkrunner.removePayment`      | Refund flow                    | When payment needs to be removed               |
-| `linkrunner.setPushToken`       | Push notification setup        | When push token is available                   |
-| `linkrunner.handleDeeplink`     | `handleOpenURL` handler        | When app is opened via a deep link             |
+| Function | Requirement | Where to Place | When to Call |
+| --- | --- | --- | --- |
+| [`linkrunner.init`](/sdk/cordova#initialization-required) | Required | `deviceready` event handler | Once when app starts |
+| [`linkrunner.signup`](/sdk/cordova#user-identification-required) | Required | Identification flow (signup or login) | Once when the user is identified |
+| [`linkrunner.setCustomerUserId`](/sdk/cordova#setting-the-customer-user-id) | Required | After `init`, when your user ID is available | As early as the user's ID is available |
+| [`linkrunner.handleDeeplink`](/sdk/cordova#handle-deeplink) | Required | `handleOpenURL` handler | When a deep link opens the already-running app |
+| [`linkrunner.getAttributionData`](/sdk/cordova#getting-attribution-data) | Optional | Attribution data handling flow | Whenever the attribution data is needed |
+| [`linkrunner.setAdditionalData`](/sdk/cordova#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
+| [`linkrunner.setUserData`](/sdk/cordova#setting-user-data) | Optional | Profile update flow after `signup` | When additional user details become available |
+| [`linkrunner.trackEvent`](/sdk/cordova#tracking-custom-events) | Optional | Throughout app, including ecommerce flows | When specific user actions occur, including AddToCart or ViewContent events |
+| [`linkrunner.capturePayment`](/sdk/cordova#capture-payment) | Optional | Payment processing, including ecommerce purchases | When user makes a payment, including Purchase events with ecommerce data |
+| [`linkrunner.removePayment`](/sdk/cordova#removing-payments) | Optional | Refund flow | When payment needs to be removed |
+| [`linkrunner.setPushToken`](/sdk/cordova#uninstall-tracking) | Optional | Push notification setup | When push token is available |
+| [`linkrunner.enablePIIHashing`](/sdk/cordova#enhanced-privacy-controls) | Optional | Privacy configuration | When enabling PII hashing |
 
 ## Next Steps
 

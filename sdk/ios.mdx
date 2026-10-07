@@ -866,19 +866,22 @@ Connect APNs with Linkrunner
 
 ## Function Placement Guide
 
-| Function                                     | Where to Place                 | When to Call                                   |
-| -------------------------------------------- | ------------------------------ | ---------------------------------------------- |
-| `LinkrunnerSDK.shared.initialize`            | App initialization             | Once when app starts                           |
-| `LinkrunnerSDK.shared.getAttributionData`    | Attribution data handling flow | Whenever the attribution data is needed        |
-| `LinkrunnerSDK.shared.setAdditionalData`     | Integration code               | When third-party integration IDs are available |
-| `LinkrunnerSDK.shared.signup`                | Identification flow (signup or login) | Once when the user is identified        |
-| `LinkrunnerSDK.shared.setUserData`           | Authentication logic           | Every time app opens with logged-in user       |
-| `LinkrunnerSDK.shared.trackEvent`            | Throughout app                 | When specific user actions occur               |
-| `LinkrunnerSDK.shared.capturePayment`        | Payment processing             | When user makes a payment                      |
-| `LinkrunnerSDK.shared.removePayment`         | Refund flow                    | When payment needs to be removed               |
-| `LinkrunnerSDK.shared.setPushToken`          | Push notification setup        | When APNs token is available                   |
-| `LinkrunnerSDK.shared.handleDeeplink`        | SceneDelegate deep link entry points | When app is opened via a deep link       |
-| `LinkrunnerSDK.shared.setConsent`            | App initialization or consent flow | Before `initialize`, and again when consent changes |
+| Function | Requirement | Where to Place | When to Call |
+| --- | --- | --- | --- |
+| [`LinkrunnerSDK.shared.initialize`](/sdk/ios#initialization-required) | Required | App initialization | Once when app starts |
+| [`LinkrunnerSDK.shared.signup`](/sdk/ios#user-identification-required) | Required | Identification flow (signup or login) | Once when the user is identified |
+| [`LinkrunnerSDK.shared.setCustomerUserId`](/sdk/ios#setting-the-customer-user-id) | Required | App initialization or identification flow | After `initialize`, as soon as your user ID is available |
+| [`LinkrunnerSDK.shared.handleDeeplink`](/sdk/ios#handle-deeplink) | Required | SceneDelegate deep link entry points | When app is opened via a deep link |
+| [`LinkrunnerSDK.shared.getAttributionData`](/sdk/ios#getting-attribution-data) | Optional | Attribution data handling flow | Whenever the attribution data is needed |
+| [`LinkrunnerSDK.shared.setAdditionalData`](/sdk/ios#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
+| [`LinkrunnerSDK.shared.setUserData`](/sdk/ios#setting-user-data) | Optional | Authentication or profile update logic | After `signup`, when additional user details become available |
+| [`LinkrunnerSDK.shared.trackEvent`](/sdk/ios#tracking-custom-events) | Optional | Throughout app | When specific user actions occur, including [ecommerce events](/sdk/ios#ecommerce-events) |
+| [`LinkrunnerSDK.shared.capturePayment`](/sdk/ios#capturing-payments) | Optional | Payment processing | When user makes a payment, including [ecommerce purchases](/sdk/ios#ecommerce-events) |
+| [`LinkrunnerSDK.shared.removePayment`](/sdk/ios#removing-payments) | Optional | Refund flow | When payment needs to be removed |
+| [`LinkrunnerSDK.shared.setPushToken`](/sdk/ios#uninstall-tracking) | Optional | Push notification setup | When APNs token is available |
+| [`LinkrunnerSDK.shared.setConsent`](/sdk/ios#consent) | Optional | App initialization or consent flow | Before `initialize`, and again when consent changes |
+| [`LinkrunnerSDK.shared.enablePIIHashing`](/sdk/ios#enhanced-privacy-controls) | Optional | Privacy settings | When you want to enable PII hashing |
+| [`LinkrunnerSDK.shared.isPIIHashingEnabled`](/sdk/ios#enhanced-privacy-controls) | Optional | Privacy settings or compliance checks | When you need to check PII hashing status |
 
 ## Complete Example
 

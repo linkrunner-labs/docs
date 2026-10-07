@@ -10,6 +10,10 @@ Direct users to specific screens after they install your app from a campaign lin
     For Meta App Promotion campaigns, you can add the app link in Meta Ads Manager. Linkrunner syncs the Meta ad creative app link and returns it from `getAttributionData()`. Manual ad set and ad creative deep links saved in Linkrunner override synced Meta links.
 </Note>
 
+<Note>
+    Google App Campaigns have no Linkrunner link to click. Set the deep link on the Google campaign in Linkrunner instead. This covers iOS installs that Google credits through ICM, see [Deferred deep links with ICM](/features/google-icm#deferred-deep-links).
+</Note>
+
 ## Quick Example
 
 **Campaign Setup:** Enable deferred deep linking, set URL to `get.yourdomain.com/product/123`

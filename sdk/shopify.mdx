@@ -278,6 +278,19 @@ that brought the shopper in.
     </Step>
 </Steps>
 
+## Function Placement Guide
+
+Shopify uses the Web SDK: loading the script initializes it, `identify` sets the customer user ID, and `track('signup', ...)` records signup. Incoming URL attribution is automatic; there is no `handleDeeplink` method.
+
+| Function | Requirement | Where to Place | When to Call |
+| --- | --- | --- | --- |
+| [SDK script](/sdk/shopify#installation) | Required | `layout/theme.liquid`, before `</head>` | Once on each storefront page load |
+| [`lr.track('signup', ...)`](/sdk/shopify#installation) | Required | Sign-up snippet in `layout/theme.liquid` | Once per signed-in customer in each browser |
+| [`lr.identify`](/sdk/shopify#installation) | Required | Sign-up snippet, before the signup event | When the signed-in Shopify customer ID is available |
+| [`lr.track`](/sdk/shopify#track-custom-events) | Optional | Storefront event handlers | When you record other shopper actions |
+
+Follow all [installation steps](/sdk/shopify#installation) for checkout tracking. The checkout pixel is separate from the storefront SDK calls above.
+
 ## Track custom events
 
 Use `lr.track` to record other actions on your storefront, such as clicks on a button or

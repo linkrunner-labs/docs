@@ -58,7 +58,7 @@ A customer can run Fraud Control rules that reject conversions attributed to you
 | **Install Rejection URL** | A rejected install |
 | **Event Rejection URL** | A rejected in-app event, signup, or revenue event |
 
-![The Rejection postbacks section in the affiliate Settings page, with both URLs and the macros they can use](/images/affiliate-partners/rejection-postbacks-settings.webp)
+![The Rejection postbacks section in the affiliate Settings page, with both URLs](/images/affiliate-partners/rejection-postbacks-settings.webp)
 
 Both are optional. Leave one empty and you receive none of that kind. You can add them once your application is approved.
 
@@ -328,7 +328,6 @@ Do not use `{secret.postbackKey}`. If your endpoint requires a secret key, confi
 - **Country code.** There is no country macro. Derive it from `{ip}` if you need one.
 - **App store ID.** Use `{bundle_id}`. On Android it is the same value as the Play Store listing ID.
 - **Retargeting and re-engagement conversions.** Linkrunner does not send affiliate postbacks for these.
-- **Rejected and fraud postbacks.** Linkrunner does not send these.
 
 ## Examples
 
