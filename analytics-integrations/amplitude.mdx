@@ -1,138 +1,268 @@
 ---
 title: "Amplitude"
-description: "Connect Linkrunner with Amplitude to import attribution data and understand your user acquisition campaigns"
+description: "Send acquisition properties to Amplitude, including events before signup"
 icon: "/images/logos/amplitude.png"
 ---
 
-Linkrunner integrates with Amplitude to automatically send attribution data, helping you understand which campaigns are driving user acquisition and engagement.
+Choose your setup based on which events need campaign attribution:
 
-## How it works
+- **Events after signup:** configure the automatic integration below. Linkrunner sends attribution properties asynchronously after you call `signup`.
+- **Install, first-open, or pre-login onboarding events:** also [send attribution from your app](#send-attribution-before-login), before tracking the events you want to segment by campaign.
 
-Every time a user is attributed by Linkrunner, we automatically send a request to Amplitude to update the corresponding user's profile with custom properties:
+<Warning>
+Amplitude does not add newly received user properties to earlier events. A user profile can show the correct campaign while an earlier event still shows `(none)` when grouped by that property. This applies to user properties as well as event properties. Awaiting Linkrunner `signup` does not guarantee that the Amplitude update has finished.
+</Warning>
 
-- `lr_campaign` - The campaign identifier
-- `lr_ad_network` - The ad network source
+## How attribution properties work
 
-### Example
+The automatic integration sends these user properties through Amplitude's Identify API using `$setOnce`:
 
-- User ID `24` came from campaign link: `https://app.linkrunner.io/?c=AXb1c2`
-- In Amplitude, for user profile with ID `24`, you'll see `lr_campaign` set to `AXb1c2` and `lr_ad_network` set to an ad network source
+- `lr_campaign`: the Linkrunner campaign identifier, such as `AXb1c2`, rather than the campaign name.
+- `lr_ad_network`: the ad network source, when available.
 
-## Prerequisites
+`$setOnce` preserves an existing value. It does not overwrite it on subsequent updates.
 
-| Requirement | Description |
-|---|---|
-| Linkrunner account | A Linkrunner account is required to take advantage of this integration. |
-| Amplitude account | An Amplitude account with API access. |
-| iOS or Android app | This integration supports iOS and Android apps. |
-| Linkrunner SDK | You must have the [Linkrunner SDK](/introduction) installed in your app. |
+If Amplitude receives `Onboarding Viewed`, then the attribution update, then `Purchase`, only `Purchase` inherits the new campaign properties. The order Amplitude receives the requests matters. See [Amplitude's Identify API](https://amplitude.com/docs/apis/analytics/identify) and [ingestion ordering](https://amplitude.com/docs/data/data-backfill#data-ingestion-system).
 
-## Steps to setup
+## Configure the automatic integration
 
-<Steps>
-  <Step title="Create API Key in Amplitude and Configure in Linkrunner">
-    First, you need to get your API key from your Amplitude dashboard.
+Start with the Linkrunner and Amplitude SDKs installed and initialized in your app. Use the API key for the Amplitude project that receives your app's events.
 
-    1. In your Amplitude dashboard, navigate to **Settings** > **Projects** > **API Keys**
-    2. Copy your **API Key**
+### 1. Add your Amplitude API key
 
-    3. In Linkrunner, navigate to **Integrations** from the left-hand panel
-    4. Under **Analytics**, click **Configure** for Amplitude
-    5. Enter your **API Key**
-  </Step>
+1. In Amplitude, open **Settings → Projects → API Keys** and copy your project's **API Key**.
+2. In the [Linkrunner dashboard](https://dashboard.linkrunner.io/dashboard/integrations), open **Integrations → Amplitude → Configure** and enter the key.
 
-  <Step title="Map User Identifiers in SDK">
-    To properly link users between Linkrunner and Amplitude, you need to pass the correct identifier in the `signup` function.
+### 2. Match the user IDs at signup or login
 
-    <Info>
-      **Important:** If you are using the `identify` function of the Amplitude SDK to set a user ID, pass the same user ID in the `userData` parameter of the Linkrunner `signup` function. If you are not using `identify`, pass the `distinct_id` or `device_id` instead.
-    </Info>
+When your app knows the authenticated user ID, set it in Amplitude with `setUserId` and pass the same value to Linkrunner `signup`. Amplitude `identify` updates user properties; it does not replace `setUserId`.
 
-    <Tabs>
-      <Tab title="Android (Kotlin)">
-        ```kotlin
-        import io.linkrunner.sdk.LinkRunner
-        import io.linkrunner.sdk.models.request.UserDataRequest
+These fragments belong in your signup/login handler, after both SDKs are initialized. `userId` is your stable authenticated account ID.
 
-        val userData = UserDataRequest(
-            id = "123", // Your user ID (same as Amplitude identify)
-            // ...other user fields
-            amplitudeDeviceId = "AMPLITUDE_DEVICE_ID", // Required if not using identify
-        )
+<Tabs>
+  <Tab title="Android (Kotlin)">
+    ```kotlin
+    import com.amplitude.android.Amplitude
+    import io.linkrunner.sdk.LinkRunner
+    import io.linkrunner.sdk.models.request.UserDataRequest
 
-        LinkRunner.getInstance().signup(userData = userData)
-        ```
-      </Tab>
+    suspend fun identifyAccount(amplitude: Amplitude, userId: String) {
+        amplitude.setUserId(userId)
+        LinkRunner.getInstance().signup(
+            userData = UserDataRequest(id = userId)
+        ).getOrThrow()
+    }
+    ```
+  </Tab>
+  <Tab title="iOS (Swift)">
+    ```swift
+    import AmplitudeSwift
+    import LinkrunnerKit
 
-      <Tab title="iOS (Swift)">
-        ```swift
-        import LinkrunnerKit
+    @MainActor
+    func identifyAccount(amplitude: Amplitude, userId: String) async {
+        amplitude.setUserId(userId: userId)
+        await LinkrunnerSDK.shared.signup(userData: UserData(id: userId))
+    }
+    ```
+  </Tab>
+  <Tab title="React Native">
+    ```typescript
+    import * as amplitude from "@amplitude/analytics-react-native";
+    import linkrunner from "rn-linkrunner";
 
-        let userData = UserData(
-            id: "123", // Your user ID (same as Amplitude identify)
-            // ...other user fields
-            amplitudeDeviceId: "AMPLITUDE_DEVICE_ID" // Required if not using identify
-        )
+    export async function identifyAccount(userId: string) {
+        amplitude.setUserId(userId);
+        await linkrunner.signup({ user_data: { id: userId }, data: {} });
+    }
+    ```
+  </Tab>
+  <Tab title="Flutter">
+    ```dart
+    import 'package:amplitude_flutter/amplitude.dart';
+    import 'package:linkrunner/main.dart';
 
-        try await LinkrunnerSDK.shared.signup(userData: userData)
-        ```
-      </Tab>
+    Future<void> identifyAccount(Amplitude amplitude, String userId) async {
+      await amplitude.setUserId(userId);
+      await LinkRunner().signup(userData: LRUserData(id: userId), data: {});
+    }
+    ```
+  </Tab>
+</Tabs>
 
-      <Tab title="React Native">
-        ```javascript
-        import linkrunner from "rn-linkrunner";
+<Warning>
+For this setup, omit `amplitudeDeviceId` / `amplitude_device_id`. The current automatic integration uses that override as an Amplitude `user_id`, not a `device_id`. Passing Amplitude's generated device ID there can update a different profile. For anonymous users, use the app-side setup below.
+</Warning>
 
-        await linkrunner.signup({
-            user_data: {
-                id: "123", // Your user ID (same as Amplitude identify)
-                // ...other user fields
-                amplitude_device_id: "AMPLITUDE_DEVICE_ID", // Required if not using identify
-            },
-            data: {},
-        });
-        ```
-      </Tab>
+Do not assign a temporary user ID to anonymous Amplitude users. Keep their existing Amplitude device identity and set the real user ID when they authenticate. Identity merging connects their activity, but does not add missing campaign properties to earlier events. See [Amplitude's identity rules](https://amplitude.com/docs/data/sources/instrument-track-unique-users).
 
-      <Tab title="Flutter">
-        ```dart
-        import 'package:linkrunner/main.dart';
+## Send attribution before login
 
-        await LinkRunner().signup(
-          userData: LRUserData(
-            id: '123', // Your user ID (same as Amplitude identify)
-            // ...other user fields
-            amplitudeDeviceId: 'AMPLITUDE_DEVICE_ID', // Required if not using identify
-          ),
-          data: {},
-        );
-        ```
-      </Tab>
-    </Tabs>
+Use this setup when campaign reporting or onboarding decisions depend on events before signup. Amplitude can set user properties on its current anonymous device without an authenticated user ID.
 
-    <Tip>
-      You can get the `amplitudeDeviceId` from the Amplitude SDK in your app.
-    </Tip>
-  </Step>
+1. Initialize both SDKs using the same Amplitude instance and project as your event tracking.
+2. Call `getAttributionData()` from your app's startup analytics code.
+3. If a paid campaign is available, queue an Amplitude Identify with its properties.
+4. Track your first onboarding event after that Identify operation. Continue calling Linkrunner `signup` when the user authenticates.
 
-  <Step title="Sync with Amplitude (Optional)">
-    Use the **Sync** feature in the following scenarios:
+<Warning>
+Amplitude's automatic lifecycle or session tracking can emit events during initialization. Configure that tracking before initialization if those events must carry campaign properties, or use a manual onboarding event after the attribution step. The code below does not repair events already emitted by automatic tracking.
+</Warning>
 
-    - First time after adding your Amplitude API Key
-    - If you see discrepancies in attribution data on Amplitude profiles
+### Apply the available campaign
 
-    To sync, click the **Sync with Amplitude** button in the Linkrunner integration settings. This process may take a while depending on the number of users.
-  </Step>
-</Steps>
+These helper fragments assume both SDKs are initialized. Add the helper to your startup analytics module and call it before your first manual Amplitude event. They write user properties for an available `INORGANIC` campaign only; they leave missing or organic values unset.
 
-## Viewing Attribution Data
+`true` means the SDK accepted the local Identify operation, not that Amplitude has received it. `false` means no campaign properties were queued. Handle that result using [the fallback guidance](#handle-attribution-that-is-not-ready).
 
-After the integration is complete, you can view the attribution data in Amplitude:
+<Tabs>
+  <Tab title="Android (Kotlin)">
+    ```kotlin
+    import com.amplitude.android.Amplitude
+    import com.amplitude.core.events.Identify
+    import io.linkrunner.sdk.LinkRunner
 
-1. Navigate to a user profile in the Amplitude dashboard
-2. Look for the user properties section
-3. You'll see `lr_campaign` and `lr_ad_network` attributes with the corresponding values
+    suspend fun applyLinkrunnerAttribution(amplitude: Amplitude): Boolean {
+        val attribution = LinkRunner.getInstance()
+            .getAttributionData().getOrNull() ?: return false
+        val campaign = attribution.campaignData
+        if (campaign.type != "INORGANIC" || campaign.id.isBlank()) return false
 
-This data can be used to:
-- Create cohorts based on acquisition source
-- Personalize experiences based on campaign origin
-- Analyze user behavior by acquisition channel
+        val identify = Identify().setOnce("lr_campaign", campaign.id)
+        campaign.adNetwork?.takeIf { it.isNotBlank() }?.let {
+            identify.setOnce("lr_ad_network", it)
+        }
+        amplitude.identify(identify)
+        return true
+    }
+    ```
+
+    From your startup coroutine, call `applyLinkrunnerAttribution(amplitude)` before `amplitude.track("Onboarding Viewed")`.
+  </Tab>
+  <Tab title="iOS (Swift)">
+    ```swift
+    import AmplitudeSwift
+    import LinkrunnerKit
+
+    @MainActor
+    func applyLinkrunnerAttribution(amplitude: Amplitude) async -> Bool {
+        let attribution = await LinkrunnerSDK.shared.getAttributionData()
+        guard let campaign = attribution.campaignData,
+              campaign.type == .inorganic, !campaign.id.isEmpty else {
+            return false
+        }
+
+        let identify = Identify()
+        identify.setOnce(property: "lr_campaign", value: campaign.id)
+        if let network = campaign.adNetwork {
+            identify.setOnce(property: "lr_ad_network", value: network.rawValue)
+        }
+        amplitude.identify(identify: identify)
+        return true
+    }
+    ```
+
+    From your startup task, call `await applyLinkrunnerAttribution(amplitude: amplitude)` before `amplitude.track(eventType: "Onboarding Viewed")`.
+  </Tab>
+  <Tab title="React Native">
+    ```typescript
+    import * as amplitude from "@amplitude/analytics-react-native";
+    import linkrunner from "rn-linkrunner";
+
+    export async function applyLinkrunnerAttribution(): Promise<boolean> {
+        try {
+            const attribution = await linkrunner.getAttributionData();
+            if (!attribution) return false;
+            const campaign = attribution.campaignData;
+            if (campaign?.type !== "INORGANIC" || !campaign.id) return false;
+
+            const identify = new amplitude.Identify()
+                .setOnce("lr_campaign", campaign.id);
+            if (campaign.adNetwork) {
+                identify.setOnce("lr_ad_network", campaign.adNetwork);
+            }
+            await amplitude.identify(identify).promise;
+            return true;
+        } catch {
+            return false;
+        }
+    }
+    ```
+
+    From your async startup function, call `await applyLinkrunnerAttribution()` before `amplitude.track("Onboarding Viewed")`.
+  </Tab>
+  <Tab title="Flutter">
+    ```dart
+    import 'package:amplitude_flutter/amplitude.dart';
+    import 'package:amplitude_flutter/events/identify.dart';
+    import 'package:linkrunner/main.dart';
+
+    Future<bool> applyLinkrunnerAttribution(Amplitude amplitude) async {
+      try {
+        final attribution = await LinkRunner().getAttributionData();
+        final campaign = attribution?.campaignData;
+        if (campaign == null || campaign.type != 'INORGANIC' ||
+            campaign.id.isEmpty) return false;
+
+        final identify = Identify()..setOnce('lr_campaign', campaign.id);
+        final network = campaign.adNetwork;
+        if (network != null && network.isNotEmpty) {
+          identify.setOnce('lr_ad_network', network);
+        }
+        await amplitude.identify(identify);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+    ```
+
+    From your async startup function, call `await applyLinkrunnerAttribution(amplitude)` before `amplitude.track(BaseEvent('Onboarding Viewed'))`. Import `BaseEvent` from `package:amplitude_flutter/events/base_event.dart` for that tracking call.
+  </Tab>
+</Tabs>
+
+Use Amplitude's [Android Kotlin](https://amplitude.com/docs/sdks/analytics/android/android-kotlin-sdk), [iOS Swift](https://amplitude.com/docs/sdks/analytics/ios/ios-swift-sdk), [React Native](https://amplitude.com/docs/sdks/analytics/react-native/react-native-sdk), or [Flutter 4](https://amplitude.com/docs/sdks/analytics/flutter/flutter-sdk-4) SDK. Older Amplitude SDKs use different APIs.
+
+For additional properties, map available SDK fields such as `campaignData.name` to your own user property, for example `acquisition_campaign_name`. The automatic integration does not send the campaign name. Fetching attribution alone does not navigate the user; your app chooses its onboarding route.
+
+### Handle attribution that is not ready
+
+Attribution may not be available on your first request, including when an ad network such as Google has not returned its attribution result yet. Fetching attribution once does not guarantee campaign coverage for every first-open event.
+
+- Choose a bounded wait or retry policy for your app. Do not block onboarding indefinitely.
+- On timeout, failure, or no available paid campaign, continue with your fallback onboarding flow. Events sent at this point may have no campaign properties.
+- Fetch attribution again at an appropriate later point and apply newly available campaign properties before subsequent events. Do not replay the onboarding event solely to attach attribution.
+- Do not set `lr_campaign` or `lr_ad_network` to permanent placeholders such as `unknown` or `organic` using `setOnce`. Those values prevent later `setOnce` calls from filling in the campaign.
+
+The helper intentionally does not set an organic label. Use Linkrunner's attribution result to understand acquisition source; missing Amplitude properties alone do not establish that a user is organic. If your app needs to record an unresolved routing decision, use a separate app-defined diagnostic property.
+
+## Verify event-level attribution
+
+Use a test account and a campaign test install. Check both the profile and the individual events:
+
+1. Open the app before logging in. With the app-side setup and available attribution, inspect the first manually tracked onboarding event in Amplitude. Its user properties should contain the expected `lr_campaign` and available `lr_ad_network`.
+2. Sign up or log in. Confirm the subsequent event uses the intended account identity and retains the campaign properties.
+3. Group the onboarding event by `lr_campaign` in a chart. Do not use a populated profile alone as proof that the earlier event has the properties.
+4. Test the failure or delayed-attribution path. Confirm onboarding continues, early events can remain unclassified, and later events reflect attribution once available.
+
+For the automatic-only setup, events received before the server-side Identify can lack the campaign properties, including the signup event itself. A later event after the update should reflect them.
+
+## Troubleshooting
+
+### The profile has attribution, but the chart shows `(none)`
+
+Inspect the user properties on the specific event, then compare them with a later event on the same profile. The profile displays current properties; charts use the properties attached to each event. Properties sent after the early event do not update it.
+
+`(none)` means that event has no value for the selected property. It can reflect timing, an unmatched identity, missing configuration, or an organic user. Do not treat the entire `(none)` bucket as organic.
+
+To analyze earlier activity for users whose campaign is now known, create a cohort using `lr_campaign` with **Most recently**, then filter your chart by that cohort. That cohort uses the most recent active event's property value, so the user needs a later active event reflecting the attribution. This does not change historical event properties or recover attribution for users who never receive it. See [Amplitude's cohort property clauses](https://amplitude.com/docs/analytics/define-cohort#user-property-clauses).
+
+### The properties are missing on later events too
+
+Check that both integrations use the same Amplitude project and that the account ID passed to Linkrunner matches Amplitude's `user_id`. For the automatic setup, confirm `signup` is called and the Amplitude API key is configured. For the app-side setup, check the attribution response and whether your Identify runs before the event on the same Amplitude instance.
+
+### Does Sync with Amplitude repair earlier events?
+
+No. **Sync with Amplitude** sends profile property updates for existing users. It does not rewrite historical event properties, and `$setOnce` does not replace properties that are already set. Use it when adding the integration for existing users, then verify a subsequent event. It is not a historical-event backfill.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

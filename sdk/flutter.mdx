@@ -443,6 +443,10 @@ Linkrunner sends the updated deeplink back after processing. For Linkrunner camp
 
 ## Getting Attribution Data
 
+<Note>
+Using Amplitude for install or pre-login onboarding reports? [Send attribution from your app before tracking those events](/analytics-integrations/amplitude#send-attribution-before-login). The automatic signup integration does not add campaign properties to earlier events.
+</Note>
+
 To get attribution data and deeplink information for the current installation, use the `getAttributionData` function:
 
 ```dart
