@@ -13,7 +13,7 @@ Your app is responsible for creating referral codes, validating them, and applyi
 
 - [Configure a Linkrunner subdomain](/features/subdomain-setup), such as `get.example.com`.
 - [Set up deep linking](/features/deep-linking-setup) for your app.
-- Choose one query parameter name, such as `referrer`, and use it consistently.
+- Use `referrer` as the query parameter name. Linkrunner reports links that carry it under the **Referrals** channel.
 
 ## 1. Create a referral link
 
@@ -32,7 +32,7 @@ https://get.example.com/product/987?referrer=user_123
 Generate the link in your app or backend when a user opens your referral or invite screen. URL-encode the value before adding it to the link.
 
 <Note>
-  You do not need to create a campaign to pass a referral code. Direct subdomain links do not appear in campaign reporting.
+  You do not need to create a campaign to pass a referral code. Clicks and installs from these links appear in the **Referrals** row of the Channels table.
 </Note>
 
 ## 2. Share the link
@@ -113,15 +113,19 @@ At a minimum, reject:
   Validate referrals and grant rewards on your backend. Do not trust a referral code submitted only by the client.
 </Tip>
 
-## Add campaign reporting
+## See referral results
 
-If you also need click and install reporting in Linkrunner, append the referral parameter to a generated campaign link instead of using the subdomain directly.
+Open **App Campaigns → Channels** in the [dashboard](https://dashboard.linkrunner.io/dashboard/campaigns?tab=channel). Clicks, installs, sign-ups, and revenue from referral links appear in the **Referrals** row.
+
+A click counts as a referral when it uses your subdomain without a campaign and carries a referral code in `referrer`. Linkrunner also accepts AppsFlyer's `af_referrer_customer_id` and `af_referrer_uid`. The value must be a plain code, such as `user_123`.
+
+To report a referral program as its own campaign instead, append the referral parameter to a generated campaign link:
 
 ```text
 https://get.example.com/AbCdEf?referrer=user_123
 ```
 
-See [Deep Link Management](/features/deep-link-management) for the campaign setup and parameter precedence rules.
+These clicks and installs appear under that campaign's channel, not under **Referrals**. See [Deep Link Management](/features/deep-link-management) for the campaign setup and parameter precedence rules.
 
 ## Testing
 
@@ -144,7 +148,7 @@ See [Deep Link Management](/features/deep-link-management) for the campaign setu
 
 **The previous referral code is returned.** Uninstall the app before testing another link. Attribution data is cached from the first install.
 
-**The referral is not visible in campaign reporting.** Direct subdomain links are not associated with a campaign. Use a generated campaign link when you need dashboard reporting.
+**The referral is not in the Referrals row.** Confirm that the link uses your subdomain without a campaign and that the `referrer` value is a plain code. Referral links inside a campaign appear under that campaign's channel. Clicks from before the Referrals channel was released stay under **Linkrunner Links**.
 
 **The code is present but no referral is recorded.** Check the app-to-backend request and your referral validation logic. Linkrunner forwards the code but does not apply referral rules or rewards.
 
