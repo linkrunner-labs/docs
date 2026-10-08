@@ -187,7 +187,7 @@ Each campaign, ad set and ad creative in the response then carries:
 | `filters`    | Yes      | Up to 10 filters, each `{ "key": "...", "op": "...", "values": [...] }`.                                     |
 | `combinator` | No       | `and` (default) needs every filter to match. `or` needs any one of them.                                      |
 
-Each filter compares one top-level parameter key. Keys are case sensitive and up to 128 characters. Values are strings of up to 256 characters, at most 50 per filter.
+Each filter compares one top-level parameter key. Keys are case sensitive and up to 128 characters. Values are strings of up to 256 characters, at most 50 per filter. Across all columns in one request, send at most 60 filters and 1,000 filter values in total.
 
 | `op`                                  | `values` | Matches events where the parameter                                                         |
 | ------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
@@ -237,7 +237,7 @@ Each result comes back under its `name`, in `custom_events` for custom columns a
 
 | Status | When                                                                         |
 | ------ | ---------------------------------------------------------------------------- |
-| `400`  | `event_columns` is invalid: not a JSON array, more than 10 columns, a missing or repeated `name`, an unknown `op`, a filter missing the values its `op` needs, a non-number value for a number `op`, or a filter over its limits. |
+| `400`  | `event_columns` is invalid: not a JSON array, more than 10 columns, a missing or repeated `name`, an unknown `op`, a filter missing the values its `op` needs, a non-number value for a number `op`, a filter over its limits, or more than 60 filters or 1,000 values across all columns. |
 | `401`  | Missing or invalid `linkrunner-key`.                                         |
 | `402`  | Billing account suspended. Body includes `payment_link`.                     |
 | `422`  | `limit` is non-numeric, less than 1, or greater than 100.                    |
