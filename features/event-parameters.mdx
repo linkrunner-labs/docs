@@ -283,6 +283,7 @@ These limits apply:
 | Filters on one event | 10 | |
 | Values in one filter | 50 | |
 | Break downs | Top 10 values, the rest grouped as **Other** | In App Campaigns, up to 10 columns from one break down |
+| Filtered event columns in App Campaigns | 25 per view | |
 
 The parameter list for each event covers the last 30 days. A parameter you start sending today shows up in it within an hour. For payments, the list is built from completed payments.
 
@@ -306,10 +307,10 @@ Your own keys sit next to these in the same object, for example `{ "content_ids"
 | Where | What you can do |
 | --- | --- |
 | [Events → Your Events](/features/events-tab#your-events) | The **Parameters** column counts each event's parameters. Click it to see each parameter's type, how many events sent it, how many different values it has, and its most common values |
-| [Events → Events Log](/features/events-tab#filtering-by-event-parameters) | Pick an event, click **Filter**, and add rows such as "where `plan` is gold". Expand a row to see its parameters under **Additional Data** |
+| [Events → Events Log](/features/events-tab#filtering-by-event-parameters) | Pick an event, click **Filter**, and add rows such as "where `plan` is gold". Expand a row to see its parameters under **Additional Data**, and click **Filter by this value** next to one to filter by it |
 | [Events → Events Funnel](/features/events-tab#filtering-and-breaking-down-by-parameters) | Filter any step by its parameters, for example step 2 is "`purchase` where `plan` is gold". Break the funnel down by a parameter of the step 1 event |
 | [Users and cohorts](/features/users-tab#filtering-by-event-parameters) | Filter users by events with parameters, for example "did `purchase` where `plan` is diamond", and save the filter as a cohort. A user's **Journey** shows each event's **Parameters** |
-| App Campaigns | In **Edit Columns**, use **Filter by a parameter** on an event column to count only matching events, for example "`purchase` (plan is gold)". **Break down by a parameter** adds one column for each value you tick, up to 10. The CSV export uses the same columns |
+| App Campaigns | In **Edit Columns**, use **Filter by a parameter** on an event column to count only matching events, for example "`purchase` (plan is gold)". **Break down by a parameter** adds one column for each value you tick, up to 10. The CSV export and a campaign's **Flow** use the same columns |
 | [Reporting API](/api-reference/reporting-campaigns#event-columns-with-parameter-filters) | Request the same filtered columns with `event_columns` |
 
 Filters and break downs work on app events. Parameters you send from a website (the Web SDK or Shopify) are stored, but website reports cannot filter by them yet.

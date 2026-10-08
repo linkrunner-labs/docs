@@ -70,7 +70,7 @@ Any action your app reports can be a step, so a funnel can cover the whole path 
 
 Each event in a step can be narrowed by its [event parameters](/features/event-parameters). Click **Filter by a parameter** next to the event and add a row such as "where `plan` is gold", so only gold purchases count as reaching that step. Rows after the first start with **and**; click it to switch the whole group to **or**.
 
-On step 1, **Break down by a parameter** splits the result by one of that event's parameters. A table under the chart shows one row per value, for the 10 most common values, with the rest grouped as **Other**. The break down is a view option and is not saved with the funnel. A parameter marked **Filter only** (more than 1,000 different values, such as an ID) cannot be used for a break down.
+On step 1, **+ Break down by a parameter** splits the result by one of that event's parameters; once set, it reads **Break down by** and the key. A table under the chart shows one row per value, with columns for each step and **Overall conversion**. You get the 10 most common values, the rest grouped as **Other**, and **(not set)** for users whose step 1 event did not carry the key. The break down is a view option and is not saved with the funnel. A parameter marked **Filter only** (more than 1,000 different values, such as an ID) cannot be used for a break down.
 
 ### Managing saved funnels
 
@@ -120,7 +120,7 @@ Click a row to expand it and see everything recorded about that action.
 | **Referral URL**              | The link that originally brought the user in                                |
 | **User Agent**                | Raw technical details about the device and app, as sent                     |
 
-Below the grid, **Additional Data** lists the event parameters your app sent with the event. A custom event with a numeric `amount` parameter also shows it as **Amount**, with **Currency** when the event carried one.
+Below the grid, **Additional Data** lists the event parameters your app sent with the event. Click the funnel icon next to a parameter (**Filter by this value**) to filter the log to that event and value. A custom event with a numeric `amount` parameter also shows it as **Amount**, with **Currency** when the event carried one.
 
 ### Payment events
 
