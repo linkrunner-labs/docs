@@ -107,7 +107,7 @@ Numeric fields are returned as **formatted strings** (`"3,201"`, `"$12,540.50"`)
 `from` and `to` choose the window over which metrics (clicks, installs, revenue, spend) are computed. They do not filter which campaigns are returned: a campaign created after `to` still appears, with zeros for the window. This matches the dashboard campaign table, where the date picker changes the numbers, not the list. To fetch only campaigns created in a range, see [Troubleshooting](#troubleshooting).
 </Note>
 
-See [Event columns](#event-columns) below for `events`, `payment_events`, `unique_user_events`, `cost_per_event`, and `active_users`.
+See [Event columns](#event-columns) below for `events`, `payment_events`, `unique_user_events`, `cost_per_event`, and `active_users`, and [Event columns with parameter filters](#event-columns-with-parameter-filters) for `event_columns`.
 
 ### Event columns
 
@@ -120,8 +120,9 @@ Event columns are opt-in. Name the events you want and the response carries thos
 | `cost_per_event`     | Add `cost_per_custom_events` / `cost_per_payment_events` for these names (spend divided by that event's count).          | `cost_per_event=Purchase,PURCHASE` |
 | `unique_user_events` | Make these events' `count` distinct users instead of total occurrences. The field name stays `count`.                    | `unique_user_events=Purchase`      |
 | `active_users`       | Override the active-users window, in days. Defaults to 7.                                                              | `active_users=14`                  |
+| `event_columns`      | Return event counts filtered by [event parameters](/features/event-parameters). A JSON array. See [below](#event-columns-with-parameter-filters). | `event_columns=[{...}]`            |
 
-All five take a comma-separated list. Unknown event names are dropped silently, since they match no rows.
+The first five take a comma-separated list. Unknown event names are dropped silently, since they match no rows.
 
 Naming an event in **any** of `events`, `payment_events`, `cost_per_event` or `unique_user_events` puts its count in the response, because a cost-per value is spend divided by that count and a distinct-user count replaces it. The extra columns are what you add on top:
 
@@ -174,10 +175,69 @@ Each campaign, ad set and ad creative in the response then carries:
 
 `Purchase` reports distinct users because it was named in `unique_user_events`; `AddToCart` reports total occurrences. Both use the `count` field, so the parameter you sent is the only thing that tells them apart. `payment_events` is empty because no revenue types were requested.
 
+### Event columns with parameter filters
+
+`event_columns` counts only the events whose [event parameters](/features/event-parameters) match, for example purchases where `plan` is gold. It matches the filtered columns you can add in the dashboard's App Campaigns table. Send it as a URL-encoded JSON array of up to 10 columns:
+
+| Field        | Required | Description                                                                                                  |
+| ------------ | -------- | ------------------------------------------------------------------------------------------------------------ |
+| `name`       | Yes      | The key the result comes back under. Up to 256 characters. Must be unique and must not repeat a name in `events` or `payment_events`. |
+| `event_name` | Yes      | The event to count. For a payment column, the payment type, such as `FIRST_PAYMENT`.                         |
+| `event_type` | No       | `custom` (default) or `payment`.                                                                             |
+| `filters`    | Yes      | Up to 10 filters, each `{ "key": "...", "op": "...", "values": [...] }`.                                     |
+| `combinator` | No       | `and` (default) needs every filter to match. `or` needs any one of them.                                      |
+
+Each filter compares one top-level parameter key. Keys are case sensitive and up to 128 characters. Values are strings of up to 256 characters, at most 50 per filter.
+
+| `op`                                  | `values` | Matches events where the parameter                                                         |
+| ------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `is`, `is_not`                        | 1 or more | equals any listed value / equals none of them, case sensitive. `is_not` also matches events without the key |
+| `contains`, `not_contains`            | 1        | contains the text / does not contain it, ignoring case. Lists and objects match on their JSON text |
+| `eq`, `neq`, `gt`, `gte`, `lt`, `lte` | 1        | compares as a number. A stored value that is not a number never matches, except with `neq`. The filter value must be a number |
+| `between`, `not_between`              | 2        | is inside / outside the range, both ends included. Both values must be numbers             |
+| `is_true`, `is_false`                 | 0        | is `true` / `false`, or the text `"true"` / `"false"` in any case                          |
+| `is_set`, `is_not_set`                | 0        | is present / is missing                                                                    |
+
+Values are compared as text, so `"5"` and `5` match the same events.
+
+```bash
+curl -G 'https://api.linkrunner.io/api/v1/reporting/campaigns' \
+  -H 'linkrunner-key: YOUR_API_KEY' \
+  --data-urlencode 'from=2026-04-01' \
+  --data-urlencode 'to=2026-04-30' \
+  --data-urlencode 'events=purchase' \
+  --data-urlencode 'event_columns=[
+    {"name": "purchase (plan is gold)", "event_name": "purchase",
+     "filters": [{"key": "plan", "op": "is", "values": ["gold"]}]},
+    {"name": "big team first payments", "event_name": "FIRST_PAYMENT", "event_type": "payment",
+     "filters": [{"key": "seats", "op": "gt", "values": ["10"]}, {"key": "plan", "op": "is", "values": ["gold", "diamond"]}],
+     "combinator": "and"}
+  ]'
+```
+
+Each result comes back under its `name`, in `custom_events` for custom columns and `payment_events` for payment columns, in the same shape as the plain columns:
+
+```json
+{
+    "custom_events": {
+        "purchase": { "count": "1,240", "amount": "0.00" },
+        "purchase (plan is gold)": { "count": "312", "amount": "0.00" }
+    },
+    "payment_events": {
+        "big team first payments": { "count": "48", "total": "71,520.00" }
+    }
+}
+```
+
+- Add a column's `name` to `unique_user_events` to count distinct users instead of events.
+- `cost_per_event` does not apply to `event_columns`. A column named there gets no cost-per value.
+- An invalid `event_columns` value returns `400` with the reason in `msg`.
+
 ### Errors
 
 | Status | When                                                                         |
 | ------ | ---------------------------------------------------------------------------- |
+| `400`  | `event_columns` is invalid: not a JSON array, more than 10 columns, a missing or repeated `name`, an unknown `op`, a filter missing the values its `op` needs, or a filter over its limits. |
 | `401`  | Missing or invalid `linkrunner-key`.                                         |
 | `402`  | Billing account suspended. Body includes `payment_link`.                     |
 | `422`  | `limit` is non-numeric, less than 1, or greater than 100.                    |

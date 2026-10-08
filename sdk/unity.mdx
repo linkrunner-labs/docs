@@ -1415,13 +1415,32 @@ The result arrives as a JSON string on the `OnAttributionData` event. With the r
 // Simple event
 LinkrunnerSDK.TrackEvent("level_complete");
 
-// Event with data (pass as JSON string)
-string eventData = JsonUtility.ToJson(new { level = 5, score = 1200, time_seconds = 45 });
+// Event with parameters (pass them as a JSON string)
+var levelParams = new LevelParams { level = 5, score = 1200, time_seconds = 45 };
+string eventData = JsonUtility.ToJson(levelParams);
 LinkrunnerSDK.TrackEvent("level_complete", eventData);
 
 // Event with deduplication ID
-LinkrunnerSDK.TrackEvent("purchase", eventData, eventId: "purchase_abc123");
+LinkrunnerSDK.TrackEvent("level_complete", eventData, eventId: "level_5_run_abc123");
 ```
+
+`JsonUtility.ToJson` only serializes a class or struct marked `[System.Serializable]` with public fields. Declare one for each set of parameters:
+
+```csharp
+[System.Serializable]
+public class LevelParams
+{
+    public int level;
+    public int score;
+    public int time_seconds;
+}
+```
+
+An anonymous object such as `new { level = 5 }` serializes to `{}`, so the event arrives with no parameters. You can also write the JSON string by hand, as in the `CapturePayment` example below.
+
+#### Event parameters
+
+Put details that change from one event to the next, such as a level or a difficulty, in the event's JSON instead of creating one event per variant. Track `level_complete` with a `level` parameter, not `level_5_complete`. You can then filter and break down the event by each parameter in the dashboard. See [Event parameters](/features/event-parameters) for value types, limits, and reserved keys.
 
 <Note>
 When tracking revenue-related events, the `amount` field must be a number (not a string) for ad network revenue optimization to work correctly.
@@ -1438,7 +1457,7 @@ LinkrunnerSDK.CapturePayment(
     status: "PAYMENT_COMPLETED"
 );
 
-// With event data
+// With event parameters
 string eventData = "{\"product_id\": \"prod_456\", \"currency\": \"USD\"}";
 LinkrunnerSDK.CapturePayment(
     userId: "user_123",

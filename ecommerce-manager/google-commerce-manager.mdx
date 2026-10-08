@@ -222,6 +222,10 @@ The `content_ids` you send must exactly match the **ID (`offer_id`)** of the pro
 The `amount` field in `capturePayment` and the `value` field in `event_data` should be consistent. Both represent the total order value. Google reads `value` from `event_data` for conversion reporting.
 </Tip>
 
+### Adding your own event parameters
+
+The fields above are [event parameters](/features/event-parameters) with a fixed meaning for Google. Add your own keys in the same `event_data` object to analyze these events in Linkrunner, for example `"category": "apparel"` or `"coupon_code": "DIWALI10"` next to `content_ids` and `value`. Only the fields above are used for Google. Linkrunner stores every key, so you can filter and break down these events by your own parameters in the dashboard. Do not reuse the reserved field names for anything else.
+
 ## Verifying Events in Google Ads
 
 Once you start sending events through Linkrunner, you can verify they're being received in Google Ads under **Goals → Summary**. You'll see your mapped conversion actions (`view_item`, `add_to_cart`, `ecommerce_purchase`) listed there with their recorded conversion counts.

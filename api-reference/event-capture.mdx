@@ -64,7 +64,7 @@ POST: /capture-event
 | Parameter  | Type   | Description                                                                            |
 | ---------- | ------ | ------------------------------------------------------------------------------------- |
 | event_name | string | **Required**. Name of the event to track                                              |
-| event_data | object | **Optional**. Additional data associated with the event                               |
+| event_data | object | **Optional**. [Event parameters](/features/event-parameters): key-value pairs that describe the event, such as `plan` or `product_id` |
 | user_id    | string | **Required** unless `install_instance_id` is sent. User identifier to associate with the event |
 | install_instance_id | string | **Required** unless `user_id` is sent. Linkrunner's ID for the install |
 | event_id   | string | **Optional**. Your own unique identifier for the event, useful for deduplication and correlating with your backend |
@@ -114,7 +114,7 @@ Here are some common event names you might want to track:
 
 ## Revenue Sharing with Ad Networks
 
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in `event_data`. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
 
 ```json
 {
@@ -135,10 +135,31 @@ To enable revenue sharing with ad networks like Google Ads and Meta, include an 
 
 ## Best Practices
 
-1. **Consistent naming**: Use consistent naming conventions for your events (snake_case is recommended)
-2. **Structured data**: Include structured data with each event to get more insights
+1. **Consistent naming**: Use consistent naming conventions for your events and parameter keys (snake_case is recommended)
+2. **One event with parameters, not one event per variant**: Send `purchase` with `"plan": "gold"` in `event_data`, not `purchase_gold`. You can then filter and break down `purchase` by `plan` in the dashboard
 3. **Meaningful events**: Track events that provide valuable insights into user behavior
 4. **Data efficiency**: Don't include sensitive or unnecessary data in event payloads
+
+### Event parameter types and limits
+
+Send `event_data` as a JSON object. Each top-level key becomes a parameter you can filter and break down by in the dashboard.
+
+| Value you send | Type in the dashboard | Notes |
+| -------------- | --------------------- | ----- |
+| `"gold"` | Text | Text filters such as is, is not, and contains |
+| `3`, `49.99` | Number | Send numbers as JSON numbers so number filters such as is greater than are offered. `"5"` and `5` count as the same value |
+| `true`, `false` | True or false | |
+| `["a", "b"]`, `{ "id": 1 }` | List or object | Only searchable with contains. Nested keys cannot be filtered on their own |
+
+| Limit | Value |
+| ----- | ----- |
+| Request body | 1 MB. Larger requests are rejected with `413` |
+| Key name | Up to 128 characters to be filterable |
+| Value | Up to 256 characters to be listed as a value and matched exactly |
+| Parameters listed per event | 200, most sent first |
+| Different values per key | Above 1,000 in 30 days, the key can be filtered but not broken down |
+
+Keys and exact matches are case sensitive. See [Event parameters](/features/event-parameters) for reserved keys such as `amount`, `value`, and `currency`.
 
 ## Example
 
@@ -188,7 +209,7 @@ _Note: Any event you want to send for an add to cart action should be mapped wit
 
 _Similarly, any event you want to send for viewing a product should be mapped with **ViewContent**. For example, map **item_viewed** with **ViewContent** or **view_content** with **ViewContent**._
 
-While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events in order to correctly attribute catalog sales and optimize campaigns.
+While you can include any event parameters in the `event_data` object, Meta requires specific fields for ecommerce events in order to correctly attribute catalog sales and optimize campaigns.
 
 ### Example Ecommerce Payload
 

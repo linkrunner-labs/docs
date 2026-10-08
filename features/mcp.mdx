@@ -184,15 +184,16 @@ automatically based on your question.
 | `get_project_info` | Project name, timezone, display currency. |
 | `get_project_stats` | Headline KPIs (clicks, installs, sign-ups, revenue) as lifetime and current-month totals. |
 | `get_metrics_trend` | Day-by-day trend for clicks, organic installs, sign-ups, and revenue. Current calendar month only. |
-| `list_campaigns` | One row per campaign, with filters (date range, network, platform, search) and selectable metrics. |
+| `list_campaigns` | One row per campaign, with filters (date range, network, platform, search) and selectable metrics. Can count an event filtered by its parameters, for example purchases where `plan` is gold. |
 | `find_campaign` | Resolve a campaign name to its `display_id`, with no metrics computed. |
 | `get_campaign_details` | One named campaign day by day, over any date range. |
-| `get_channel_performance` | One row per acquisition channel (Meta, Google, TikTok, Snapchat, Apple Search Ads, Linkrunner Links, Organic). |
-| `get_organic_performance` | Installs, sign-ups, and revenue carrying no campaign, as a single organic total. |
-| `list_event_names` | Custom and revenue event names you've defined. |
-| `search_event_log` | Individual event rows with timestamp, user, campaign, platform, and device. |
+| `get_channel_performance` | One row per acquisition channel (Meta, Google, TikTok, Snapchat, Apple Search Ads, Linkrunner Links, Organic). Can count an event filtered by its parameters. |
+| `get_organic_performance` | Installs, sign-ups, and revenue carrying no campaign, as a single organic total. Can count an event filtered by its parameters. |
+| `list_event_names` | Custom and revenue event names you've defined, optionally with how many [event parameters](/features/event-parameters) each one carries. |
+| `get_event_parameters` | The parameters one event was sent with over the last 30 days: each key, its type and top values, or every value of one key. |
+| `search_event_log` | Individual event rows with timestamp, user, campaign, platform, and device. Can filter by event parameters, and can include each event's parameters on request. |
 | `list_funnels` | Names and step definitions of the funnels saved in your dashboard. |
-| `run_funnel` | Step-to-step conversion and drop-off, for a saved funnel or an ad-hoc one you describe in chat. |
+| `run_funnel` | Step-to-step conversion and drop-off, for a saved funnel or an ad-hoc one you describe in chat. Steps can be filtered by event parameters, and the funnel can be split by a parameter of the first step. |
 | `lookup_attribution` | Attribution result for a single user or device: campaign, ad network, ad set, creative, keyword (Apple Search Ads), organic vs inorganic flag, device IDs (gaid/idfa), and click/install timestamps. |
 | `get_billing_usage` | Free-install allowance and current-month usage. Only fetched when you explicitly ask about billing. |
 | `list_domains` | Tracking domains on the project, and which one is primary. |
@@ -203,6 +204,10 @@ automatically based on your question.
 
 Your assistant reads these tools' descriptions and decides which to call. You
 don't need to invoke them manually.
+
+The connector shows only the name and type of [event parameter](/features/event-parameters) keys that look
+personal, such as email, phone, name or token. Their values appear as `[redacted]`, and the connector cannot
+filter, search or break down by them.
 
 <Note>
 `list_campaigns`, `get_channel_performance`, and `get_organic_performance`
@@ -326,8 +331,8 @@ Campaigns cannot be deleted through the connector. Pause them with
 
 | Tool | Use it for |
 |------|------------|
-| `create_funnel` | Save a funnel so it appears in your dashboard and in `list_funnels`. |
-| `update_funnel` | Rename a saved funnel or change its steps. |
+| `create_funnel` | Save a funnel so it appears in your dashboard and in `list_funnels`. Steps accept event parameter filters. |
+| `update_funnel` | Rename a saved funnel or change its steps, including their event parameter filters. |
 
 ### Domains and store listings
 
