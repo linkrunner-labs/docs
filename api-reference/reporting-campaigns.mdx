@@ -192,9 +192,9 @@ Each filter compares one top-level parameter key. Keys are case sensitive and up
 | `op`                                  | `values` | Matches events where the parameter                                                         |
 | ------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
 | `is`, `is_not`                        | 1 or more | equals any listed value / equals none of them, case sensitive. `is_not` also matches events without the key |
-| `contains`, `not_contains`            | 1        | contains the text / does not contain it, ignoring case. Lists and objects match on their JSON text |
+| `contains`, `not_contains`            | 1        | contains the text / does not contain it, ignoring case. Lists and objects match on their JSON text. The value cannot be empty |
 | `eq`, `neq`, `gt`, `gte`, `lt`, `lte` | 1        | compares as a number. A stored value that is not a number never matches, except with `neq`. The filter value must be a number |
-| `between`, `not_between`              | 2        | is inside / outside the range, both ends included. Both values must be numbers             |
+| `between`, `not_between`              | 2        | is inside / outside the range, both ends included. Both values must be numbers, lower bound first |
 | `is_true`, `is_false`                 | 0        | is `true` / `false`, or the text `"true"` / `"false"` in any case                          |
 | `is_set`, `is_not_set`                | 0        | is present / is missing                                                                    |
 
@@ -237,7 +237,7 @@ Each result comes back under its `name`, in `custom_events` for custom columns a
 
 | Status | When                                                                         |
 | ------ | ---------------------------------------------------------------------------- |
-| `400`  | `event_columns` is invalid: not a JSON array, more than 10 columns, a missing or repeated `name`, an unknown `op`, a filter missing the values its `op` needs, or a filter over its limits. |
+| `400`  | `event_columns` is invalid: not a JSON array, more than 10 columns, a missing or repeated `name`, an unknown `op`, a filter missing the values its `op` needs, a non-number value for a number `op`, or a filter over its limits. |
 | `401`  | Missing or invalid `linkrunner-key`.                                         |
 | `402`  | Billing account suspended. Body includes `payment_link`.                     |
 | `422`  | `limit` is non-numeric, less than 1, or greater than 100.                    |
