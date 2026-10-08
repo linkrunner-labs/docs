@@ -76,6 +76,8 @@ A rejection URL can use the macros above, plus three that exist only in a reject
 | `{rejection_reason_label}` | The same reasons in plain words, separated by `; ` |
 | `{rejected_at}` | When Linkrunner rejected the conversion, in Unix seconds |
 
+The **Event Rejection URL** can also use [`{event_param.<key>}`](#event-parameters) to receive one of the rejected event's parameters.
+
 For example, this rejection URL:
 
 ```
@@ -195,6 +197,8 @@ Macros are written in lowercase inside curly braces:
 {macro_name}
 ```
 
+The one exception is the parameter key in [`{event_param.<key>}`](#event-parameters), which keeps the case of the parameter name.
+
 Rules:
 
 - Linkrunner replaces every macro it recognizes with the conversion's value.
@@ -272,6 +276,20 @@ All three are Unix timestamps in seconds, UTC.
   `{revenue}` is in major currency units, not minor units. `9.99` means 9.99,
   not 9.99 cents. Parse it as a decimal amount.
 </Warning>
+
+### Event parameters
+
+| Macro                 | Description                                                                  | Example |
+| --------------------- | ---------------------------------------------------------------------------- | ------- |
+| `{event_param.<key>}` | One of the event's [parameters](/features/event-parameters), by its key. `{event_param.plan}` is the event's `plan`. | `gold`  |
+
+Use it in your **Post-Install Event URL** and your **Event Rejection URL**. The advertiser decides which parameters their events send, so agree on the keys with them first.
+
+- Write the key exactly as the advertiser sends it. Keys are case sensitive, so `{event_param.Plan}` does not read `plan`.
+- Only top-level parameters can be read. Use single braces: `{{event_param.plan}}` is not supported.
+- Text is sent as is (`gold`). Numbers and true or false are sent as written (`3`, `49.99`, `true`). Lists and objects are sent as their JSON text, for example `["a","b"]`. Every value is URL-encoded.
+- The value is empty when the event did not send that parameter. It is always empty on install and signup postbacks.
+- For a payment, the macro reads the parameters sent with the payment.
 
 ### Device
 
@@ -365,6 +383,22 @@ What Linkrunner sends:
 https://partner.example.com/postback?tid=a1b2c3d4e5&event=purchase&amount=9.99&currency=USD&event_time=1789667620&ts=1789667623
 ```
 
+### Purchase postback with an event parameter
+
+Your template:
+
+```
+https://partner.example.com/postback?tid={click_id}&event={event_name}&amount={revenue}&currency={currency}&plan={event_param.plan}
+```
+
+What Linkrunner sends for a purchase sent with `{ "plan": "gold" }`:
+
+```
+https://partner.example.com/postback?tid=a1b2c3d4e5&event=purchase&amount=9.99&currency=USD&plan=gold
+```
+
+For a purchase sent without `plan`, the value is empty: `&plan=`.
+
 ### Device and attribution detail
 
 Your template:
@@ -392,12 +426,16 @@ Linkrunner retries a postback if your endpoint does not respond with a success s
 | Currency (`{currency}`)                                                    | ISO 4217 three-letter code.                |
 | Platform (`{platform}`)                                                    | Lowercase `android` or `ios`.              |
 | Reinstall flag (`{is_reinstall}`)                                          | `1` or `0`.                                |
+| Event parameters (`{event_param.<key>}`)                                   | Text as is, numbers and true or false as written, lists and objects as JSON text. |
 | All values                                                                 | URL-encoded.                               |
 
 ## Troubleshooting
 
 **A macro arrives empty.**
 The value was not available for that conversion. For example, `{idfa}` is empty on Android, and `{revenue}` is `0` on events without revenue. Device advertising IDs depend on the value being present on the click and on user consent.
+
+**`{event_param.<key>}` arrives empty.**
+The event did not send that parameter, or the key's case does not match. Check the key with the advertiser. On install and signup postbacks it is always empty.
 
 **A macro arrives as literal text.**
 That macro is not supported by the current Linkrunner postback renderer. Use one of the macros listed on this page.

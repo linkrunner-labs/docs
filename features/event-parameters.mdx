@@ -37,9 +37,11 @@ Send one `purchase` event with a `plan` parameter instead of `purchase_gold`, `p
 The same rule applies to any detail that changes from one event to the next: a product category, a payment method, a level number, a screen name. Keep the event name for the action and put the details in parameters.
 
 <Warning>
-    Ad network event mapping (Meta, Google, and the other networks) and SKAN conversion values still work by event name.
-    If an ad network must receive only one variant, for example only gold purchases, keep a separate event for that
-    variant and send the parameter as well.
+    Meta, Google, TikTok, Snapchat, Reddit, and ChatGPT Ads mappings can check parameters, so one of these networks can
+    receive only gold purchases. See [Send a mapping only when parameters
+    match](/ad-networks/meta-ads#send-a-mapping-only-when-parameters-match). LinkedIn, affiliate partner, and Everflow
+    mappings, and SKAN conversion values, still work by event name. If one of these must receive only one variant, keep
+    a separate event for that variant and send the parameter as well.
 </Warning>
 
 ## Send event parameters
@@ -312,6 +314,8 @@ Your own keys sit next to these in the same object, for example `{ "content_ids"
 | [Users and cohorts](/features/users-tab#filtering-by-event-parameters) | Filter users by events with parameters, for example "did `purchase` where `plan` is diamond", and save the filter as a cohort. A user's **Journey** shows each event's **Parameters** |
 | App Campaigns | In **Edit Columns**, use **Filter by a parameter** on an event column to count only matching events, for example "`purchase` (plan is gold)". **Break down by a parameter** adds one column for each value you tick, up to 10. The CSV export and a campaign's **Flow** use the same columns |
 | [Reporting API](/api-reference/reporting-campaigns#event-columns-with-parameter-filters) | Request the same filtered columns with `event_columns` |
+| [Ad network event mapping](/ad-networks/meta-ads#send-a-mapping-only-when-parameters-match) | Use **Only when** to send a mapping only for matching events, for example `purchase` sent to Meta as `Subscribe_Gold` only when `plan` is gold. Works for Meta, Google, TikTok, Snapchat, Reddit, and ChatGPT Ads |
+| [Affiliate partner postbacks](/affiliate-partners/postbacks#event-parameters) | A partner adds `{event_param.<key>}`, such as `{event_param.plan}`, to their event postback URL to receive that parameter |
 
 Filters and break downs work on app events. Parameters you send from a website (the Web SDK or Shopify) are stored, but website reports cannot filter by them yet.
 
