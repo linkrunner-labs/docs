@@ -137,7 +137,7 @@ Every mapping whose condition matches is sent, and a mapping without a condition
 - If two mappings of one event match and send the same Meta event, Meta receives it once. Two different events mapped to the same Meta event can still count one conversion twice.
 - For SKAN, Linkrunner reads only mappings without a condition. Keep one for each event in your [SKAN schema](/features/meta-skan-setup).
 - The paper plane test event does not check the condition. To test a condition, trigger the event in your app with and without the parameter, then check Meta Events Manager.
-- You need the **Admin** or **Member** role on the project to add or change a condition.
+- Only the project's **Admin** and **Member** roles can add, change, or see conditions.
 
 ## 3. Configure Events in Meta Events Manager
 

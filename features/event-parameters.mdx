@@ -315,7 +315,7 @@ Your own keys sit next to these in the same object, for example `{ "content_ids"
 | App Campaigns | In **Edit Columns**, use **Filter by a parameter** on an event column to count only matching events, for example "`purchase` (plan is gold)". **Break down by a parameter** adds one column for each value you tick, up to 10. The CSV export and a campaign's **Flow** use the same columns |
 | [Reporting API](/api-reference/reporting-campaigns#event-columns-with-parameter-filters) | Request the same filtered columns with `event_columns` |
 | [Ad network event mapping](/ad-networks/meta-ads#send-a-mapping-only-when-parameters-match) | Use **Only when** to send a mapping only for matching events, for example `purchase` sent to Meta as `Subscribe_Gold` only when `plan` is gold. Works for Meta, Google, TikTok, Snapchat, Reddit, and ChatGPT Ads |
-| [Affiliate partner postbacks](/affiliate-partners/postbacks#event-parameters) | A partner adds `{event_param.<key>}`, such as `{event_param.plan}`, to their event postback URL to receive that parameter |
+| Affiliate partner postbacks | To send one of your event parameters to an affiliate partner, ask [support@linkrunner.io](mailto:support@linkrunner.io); Linkrunner staff add it to that partner's postback URL |
 
 Filters and break downs work on app events. Parameters you send from a website (the Web SDK or Shopify) are stored, but website reports cannot filter by them yet.
 
