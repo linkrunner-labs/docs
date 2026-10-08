@@ -177,7 +177,7 @@ Tracks a custom event. Events are stored for all users, including organic ones. 
 | --- | --- | --- |
 | `token` | string | **Required**. |
 | `event_name` | string | **Required**. |
-| `event_data` | object | Optional. Custom attributes. Add `amount` as a number to share revenue with ad networks. |
+| `event_data` | object | Optional. [Event parameters](/features/event-parameters): key-value pairs that describe the event. Add `amount` as a number to share revenue with ad networks. |
 | `install_instance_id` | string | The persisted UUID. |
 | `user_id` | string | Optional. |
 | `platform` | string | `"ANDROID"`. |
@@ -192,7 +192,7 @@ Tracks a custom event. Events are stored for all users, including organic ones. 
 POST /api/client/capture-payment
 ```
 
-Tracks revenue. Like events, the user must be attributed via `signup`.
+Tracks revenue. Like events, payments are stored for all users, including organic ones. Identify the user with `user_id` or `install_instance_id`.
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -202,7 +202,7 @@ Tracks revenue. Like events, the user must be attributed via `signup`.
 | `payment_id` | string | **Required**. Used to deduplicate. Sending the same `payment_id` twice is ignored. |
 | `type` | string | Optional. Defaults to `DEFAULT`. |
 | `status` | string | Optional. Defaults to `PAYMENT_COMPLETED`. |
-| `event_data` | object | Optional. Ecommerce attributes. |
+| `event_data` | object | Optional. [Event parameters](/features/event-parameters) for the payment, including the ecommerce keys. |
 | `install_instance_id` | string | The persisted UUID. |
 | `platform` | string | `"ANDROID"`. |
 

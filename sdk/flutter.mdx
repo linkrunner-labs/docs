@@ -585,7 +585,7 @@ Future<void> capturePayment() async {
         paymentId: 'payment456', // Required: Unique payment identifier
         type: PaymentType.FIRST_PAYMENT, // Optional: Payment type
         status: PaymentStatus.PAYMENT_COMPLETED, // Optional: Payment status
-        eventData: { // Optional: Ecommerce/custom event data
+        eventData: { // Optional: event parameters, including ecommerce keys
           'content_ids': ['product_123'],
           'content_type': 'product',
           'currency': 'USD',
@@ -628,7 +628,7 @@ Future<void> capturePayment() async {
   - `PaymentStatus.PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
   - `PaymentStatus.PAYMENT_FAILED` - Payment attempt failed
   - `PaymentStatus.PAYMENT_CANCELLED` - Payment was cancelled
-- `eventData`: `Map<String, dynamic>` (optional) - Key-value pairs for additional event data, including ecommerce properties for Meta and Google.
+- `eventData`: `Map<String, dynamic>` (optional) - [Event parameters](/features/event-parameters): key-value pairs that describe the payment, including the Meta and Google ecommerce keys.
 
 ### Removing Payments
 
@@ -784,7 +784,7 @@ Future<void> trackEvent() async {
   try {
     await LinkRunner().trackEvent(
       eventName: 'purchase_initiated', // Event name
-      eventData: { // Optional: Event data
+      eventData: { // Optional: event parameters
         'product_id': '12345',
         'category': 'electronics',
         'amount': 99.99, // Include amount as a number for revenue sharing with ad networks like Google and Meta
@@ -801,12 +801,27 @@ Future<void> trackEvent() async {
 #### Parameters for `LinkRunner().trackEvent`
 
 - `eventName`: `String` (required) - Name of the event to track
-- `eventData`: `Map<String, dynamic>` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventData`: `Map<String, dynamic>` (optional) - [Event parameters](/features/event-parameters): key-value pairs that describe the event, including the Meta and Google ecommerce keys
 - `eventId`: `Object` (optional) - Your own unique identifier for the event (`String` or `num`), useful for deduplication and correlating with your backend
+
+### Event parameters
+
+Put details that change from one event to the next, such as a plan or a product category, in `eventData` instead of creating one event per variant. Track `purchase` with a `plan` parameter, not `purchase_gold` and `purchase_silver`. You can then filter and break down the event by each parameter in the dashboard. See [Event parameters](/features/event-parameters) for value types, limits, and reserved keys.
+
+```dart
+await LinkRunner().trackEvent(
+  eventName: 'purchase',
+  eventData: {
+    'plan': 'gold',
+    'billing_period': 'yearly',
+    'is_trial': false,
+  },
+);
+```
 
 ### Revenue Sharing with Ad Networks
 
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your event parameters. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
 
 ```dart
 Future<void> trackPurchaseEvent() async {

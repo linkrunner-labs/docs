@@ -41,11 +41,17 @@ POST: /capture-payment
   "amount": 25096, // Send amount in one currency only
   "type": "FIRST_PAYMENT", // optional
   // "type": "SECOND_PAYMENT", // optional
-  "status": "PAYMENT_COMPLETED" // optional
+  "status": "PAYMENT_COMPLETED", // optional
+  "event_data": { // optional: event parameters
+    "plan": "gold",
+    "billing_period": "yearly"
+  }
 }
 ```
 
 **NOTE:** If you accept payments in multiple currencies convert them to one currency before calling the API.
+
+`event_data` holds [event parameters](/features/event-parameters) for the payment: key-value pairs such as the `plan` that was bought. You can filter and break down payments by them in the dashboard, the same way as custom events. It also carries the ecommerce keys described in [Meta Ecommerce Events](#meta-ecommerce-events).
 
 **Deduplication:** We perform idempotent deduplication using a combination of `type` and `payment_id`. For each unique combination of payment type and payment ID, only one record will be created. If you send multiple requests with the same `type` and `payment_id` combination, only the first will be recorded and subsequent ones will be ignored. To ensure proper deduplication, always provide a unique `payment_id` for each transaction of a given type.
 
@@ -113,7 +119,7 @@ If you are tracking `Purchase` events to sync with Meta Catalog Sales, **you mus
 
 _Note: Any Payment event you send should be mapped with **Purchase** for Commerce Event Manager. For example, map **FIRST_PAYMENT** with **Purchase** or **DEFAULT** with **Purchase**._
 
-While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events to correctly attribute catalog sales. Your `event_data` object should include the following fields:
+While you can include any event parameters in the `event_data` object, Meta requires specific fields for ecommerce events to correctly attribute catalog sales. Your `event_data` object should include the following fields:
 
 For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event_data) documentation.
 

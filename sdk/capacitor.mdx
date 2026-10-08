@@ -385,6 +385,13 @@ const capturePayment = async () => {
     -   `PAYMENT_FAILED` - Payment attempt failed
     -   `PAYMENT_CANCELLED` - Payment was cancelled
 
+<Note>
+    The Capacitor SDK's `capturePayment` does not take `eventData`, so you cannot attach [event
+    parameters](/features/event-parameters) to a payment from the app. If you need parameters on payments, such as the
+    `plan` that was bought, send the payment from your server with the [Revenue Tracking
+    API](/api-reference/revenue-tracking) and put them in `event_data`.
+</Note>
+
 ### Removing Payments
 
 Remove payment records (for refunds or cancellations):
@@ -425,7 +432,7 @@ import linkrunner from "capacitor-linkrunner";
 const trackEvent = async () => {
     await linkrunner.trackEvent(
         "purchase_initiated", // Event name
-        { product_id: "12345", category: "electronics", amount: 99.99 }, // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
+        { product_id: "12345", category: "electronics", amount: 99.99 }, // Optional: event parameters. Send amount as a number for revenue sharing with ad networks like Google and Meta
         "order_12345" // Optional: Your own unique event identifier (string or number)
     );
 };
@@ -434,12 +441,24 @@ const trackEvent = async () => {
 #### Parameters for `linkrunner.trackEvent`
 
 - `eventName`: string (required) - Name of the event to track
-- `eventData`: object (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventData`: object (optional) - [Event parameters](/features/event-parameters): key-value pairs that describe the event, including the Meta and Google ecommerce keys
 - `eventId`: string | number (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
+
+### Event parameters
+
+Put details that change from one event to the next, such as a plan or a product category, in `eventData` instead of creating one event per variant. Track `purchase` with a `plan` parameter, not `purchase_gold` and `purchase_silver`. You can then filter and break down the event by each parameter in the dashboard. See [Event parameters](/features/event-parameters) for value types, limits, and reserved keys.
+
+```typescript
+await linkrunner.trackEvent("purchase", {
+    plan: "gold",
+    billing_period: "yearly",
+    is_trial: false,
+});
+```
 
 ### Revenue Sharing with Ad Networks
 
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your event parameters. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
 
 ```typescript
 const trackPurchaseEvent = async () => {

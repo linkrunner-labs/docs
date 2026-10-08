@@ -4,7 +4,7 @@ description: "Build conversion funnels, inspect any raw event your app sent, and
 icon: "list-timeline"
 ---
 
-An event is a single action someone takes in your app that your app reports to Linkrunner, such as opening the app, adding an item to a cart, or completing a purchase. Your app decides which actions to report, and each one gets a name like `add_to_cart` or `purchase`.
+An event is a single action someone takes in your app that your app reports to Linkrunner, such as opening the app, adding an item to a cart, or completing a purchase. Your app decides which actions to report, and each one gets a name like `add_to_cart` or `purchase`. An event can also carry [event parameters](/features/event-parameters), details such as the `plan` that was bought. The sub-tabs below let you see those parameters and filter by them.
 
 The **Events** tab is where you analyze those actions. It has three sub-tabs:
 
@@ -66,6 +66,12 @@ A step holding more than one event gets a band per event. Step 2 above splits in
 
 Any action your app reports can be a step, so a funnel can cover the whole path from install through to purchase.
 
+### Filtering and breaking down by parameters
+
+Each event in a step can be narrowed by its [event parameters](/features/event-parameters). Click **Filter by a parameter** next to the event and add a row such as "where `plan` is gold", so only gold purchases count as reaching that step. Rows after the first start with **and**; click it to switch the whole group to **or**.
+
+On step 1, **+ Break down by a parameter** splits the result by one of that event's parameters; once set, it reads **Break down by** and the key. A table under the chart shows one row per value, with columns for each step and **Overall conversion**. You get the 10 most common values, the rest grouped as **Other**, and **(not set)** for users whose step 1 event did not carry the key. The break down is a view option and is not saved with the funnel. A parameter marked **Filter only** (more than 1,000 different values, such as an ID) cannot be used for a break down.
+
 ### Managing saved funnels
 
 -   Switch between your saved funnels using the dropdown at the top.
@@ -88,6 +94,12 @@ In the **Users** filter, **No name or email** shows both the user ID rows and th
 
 Filter by **All Channels**, **All Events**, platform, **Select dates**, and **Users**. There is also an **All / Organic / Attributed** toggle, which narrows the log to actions from users who arrived on their own versus users Linkrunner matched to an ad click.
 
+### Filtering by event parameters
+
+After you pick an event in **All Events**, click **Filter** next to it to filter by its [event parameters](/features/event-parameters). Each row reads "where `plan` is gold". The parameter list shows each parameter's type and its most common values, so you can pick a value instead of typing it.
+
+Click **Add filter** for another row, up to 10. Rows after the first start with **and**; click it to switch the whole group to **or**. A row without a value stays on screen but is not applied until you finish it.
+
 ### Inspecting a single event
 
 Click a row to expand it and see everything recorded about that action.
@@ -108,13 +120,17 @@ Click a row to expand it and see everything recorded about that action.
 | **Referral URL**              | The link that originally brought the user in                                |
 | **User Agent**                | Raw technical details about the device and app, as sent                     |
 
+Below the grid, **Additional Data** lists the event parameters your app sent with the event. Click the funnel icon next to a parameter (**Filter by this value**) to filter the log to that event and value. A custom event with a numeric `amount` parameter also shows it as **Amount**, with **Currency** when the event carried one.
+
 ### Payment events
 
 Payments carry four extra fields: **Amount**, **Currency**, **Payment ID**, and **Payment Status**. These show the transaction exactly as Linkrunner received it, so check them first if your revenue numbers look wrong somewhere else.
 
 ## Your Events
 
-**Your Events** lists the action names Linkrunner has received for this project. Each row shows the **Event Name**, its **Event Type**, and the **Channels** that have sent it.
+**Your Events** lists the action names Linkrunner has received for this project. Each row shows the **Event Name**, its **Event Type**, the **Channels** that have sent it, and how many **Parameters** it carries.
+
+Click an event's **Parameters** cell to see each parameter's **Type**, how many events it was **Sent on**, how many different **Values** it has, and its **Most common values**. Parameters with more than 1,000 different values, such as IDs, are marked **Filter only**. The list covers the last 30 days, and a new parameter shows up in it within an hour. Use it to check that your app sends the parameters you expect before you filter a report by them.
 
 There are two ways to read it:
 
@@ -133,15 +149,18 @@ If this sub-tab is empty, nothing has arrived yet. The empty state links to the 
 
 **Look into a single payment.** Filter to the user, expand the payment, and read the amount, currency, and status.
 
+**See one event by plan, product, or level.** Filter `purchase` by its `plan` parameter in the Events Log, or break a funnel down by it, instead of asking your developers for a new event per plan.
+
 **Compare the same flow across campaigns.** Set the campaign filter on step 1 and read the same funnel one campaign at a time.
 
 ## Troubleshooting
 
 <AccordionGroup>
     <Accordion title="My event is not in the Events Log">
-        Linkrunner only keeps data for users it has attributed, meaning it has matched their install back to the click
-        or link that led to it. If the device never completed a click and install that Linkrunner could match, its
-        actions are not recorded. Check the flow with [SDK Integration Testing](/testing/integration-testing).
+        Linkrunner keeps events from every user, including organic users who did not come from a campaign. Events from
+        users with no matching click are stored without a campaign, so set the **All / Organic / Attributed** toggle to
+        **All** and check the date range. If the event is still missing, check the flow with [SDK Integration
+        Testing](/testing/integration-testing).
     </Accordion>
     <Accordion title="I cannot save my funnel">
         A funnel needs at least two steps, and step 1 must have exactly one event. Add a second step, or cut step 1 down
@@ -150,6 +169,10 @@ If this sub-tab is empty, nothing has arrived yet. The empty state links to the 
     <Accordion title="An event shows in Your Events but my funnel returns no users">
         Check the date range and campaign filters on step 1. They apply to the whole funnel, so a narrow window there
         empties every step below it.
+    </Accordion>
+    <Accordion title="A parameter I send is not in the parameter list">
+        The list covers the last 30 days, and a parameter you started sending in the last hour may not show yet. Only top-level keys are listed, up to 200 per event. Keys are case sensitive, so `Plan` and `plan`
+        appear separately. See [Value types and limits](/features/event-parameters#value-types-and-limits).
     </Accordion>
     <Accordion title="Payment fields are empty on a payment event">
         The amount, currency, and payment ID come from the `capturePayment` call in your app. Confirm your app is

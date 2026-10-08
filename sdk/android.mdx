@@ -472,7 +472,7 @@ private fun capturePayment() {
                 type = PaymentType.FIRST_PAYMENT,  // Optional: Defaults to DEFAULT
                 // type = PaymentType.SECOND_PAYMENT,  // Optional: Defaults to DEFAULT
                 status = PaymentStatus.PAYMENT_COMPLETED,  // Optional: Defaults to PAYMENT_COMPLETED
-                eventData = mapOf(          // Optional: Ecommerce/custom event data
+                eventData = mapOf(          // Optional: event parameters, including ecommerce keys
                     "content_ids" to listOf("product_123"),
                     "content_type" to "product",
                     "currency" to "USD",
@@ -572,7 +572,7 @@ private fun trackEvent() {
         try {
             val result = LinkRunner.getInstance().trackEvent(
                 eventName = "purchase_initiated", // Event name
-                eventData = mapOf( // Optional: Event data
+                eventData = mapOf( // Optional: event parameters
                     "product_id" to "12345",
                     "category" to "electronics",
                     "amount" to 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
@@ -595,12 +595,29 @@ private fun trackEvent() {
 #### Parameters for `LinkRunner.getInstance().trackEvent`
 
 - `eventName`: `String` (required) - Name of the event to track
-- `eventData`: `Map<String, Any>` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventData`: `Map<String, Any>` (optional) - [Event parameters](/features/event-parameters): key-value pairs that describe the event, including the Meta and Google ecommerce keys
 - `eventId`: `String` (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
+
+### Event parameters
+
+Put details that change from one event to the next, such as a plan or a product category, in `eventData` instead of creating one event per variant. Track `purchase` with a `plan` parameter, not `purchase_gold` and `purchase_silver`. You can then filter and break down the event by each parameter in the dashboard. See [Event parameters](/features/event-parameters) for value types, limits, and reserved keys.
+
+```kotlin
+LinkRunner.getInstance().trackEvent(
+    eventName = "purchase",
+    eventData = mapOf(
+        "plan" to "gold",
+        "billing_period" to "yearly",
+        "is_trial" to false
+    )
+)
+```
+
+Call it inside a coroutine, as in the example above.
 
 ### Revenue Sharing with Ad Networks
 
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your event parameters. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
 
 ```kotlin
 private fun trackPurchaseEvent() {
