@@ -110,6 +110,28 @@ Recommended starting mappings:
   Start with the default install/signup behavior and a purchase mapping. Add search, add-to-cart, lead, or custom mappings after your first campaign is sending clean traffic and Reddit Events Manager shows successful event delivery.
 </Tip>
 
+### Send a mapping only when parameters match
+
+Use **Only when** to send a mapping only for events with certain [event parameters](/features/event-parameters). For example, send `PURCHASE` to Reddit only for `purchase` events where `plan` is gold, so Reddit optimizes toward gold buyers, without adding a `purchase_gold` event to your app.
+
+1. On a mapping row, click the filter icon **Only when** next to **Your Events**.
+2. Pick a parameter, then its value. The row under the mapping reads, for example, `Only when plan is gold`.
+3. To add another condition, click **+ Filter**. Click the **and** between two conditions to switch it to **or**.
+4. Click **Save condition**, or **Cancel** to discard the change. On a new mapping, the condition is saved with the mapping.
+
+Every mapping whose condition matches is sent, and a mapping without a condition is sent for every event. With the two mappings below, a gold purchase sends both `PURCHASE` and `LEAD` to Reddit, and a silver purchase sends only `PURCHASE`.
+
+| Your Events | Reddit Ads Event |
+| --- | --- |
+| `purchase` | `PURCHASE` |
+| `purchase`, only when `plan is gold` | `LEAD` |
+
+- Conditions use the same filters as the Events Log, such as **is**, **contains**, and **is greater than**. See [value types and limits](/features/event-parameters#value-types-and-limits). **is not** also matches events that do not send the parameter.
+- One event can have several mappings, one per condition. The same event with the same condition is refused as a duplicate.
+- If two mappings of one event match and send the same Reddit event, Reddit receives it once. Two different events mapped to the same Reddit event can still count one conversion twice.
+- Linkrunner's test-event action does not check the condition. To test a condition, trigger the event in your app with and without the parameter, then check Reddit Events Manager.
+- Only the project's **Admin** and **Member** roles can add, change, or see conditions.
+
 ## 4. Create a Linkrunner campaign link
 
 Before you create the Reddit ad, create the Linkrunner campaign link that Reddit will send users to.
