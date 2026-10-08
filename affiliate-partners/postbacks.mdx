@@ -286,9 +286,10 @@ All three are Unix timestamps in seconds, UTC.
 Use it in your **Post-Install Event URL** and your **Event Rejection URL**. The advertiser decides which parameters their events send, so agree on the keys with them first.
 
 - Write the key exactly as the advertiser sends it. Keys are case sensitive, so `{event_param.Plan}` does not read `plan`.
+- The key can use only letters, digits, underscores, and dots, such as `{event_param.plan_type}`. A parameter whose key has a hyphen or a space cannot be read.
 - Only top-level parameters can be read. Use single braces: `{{event_param.plan}}` is not supported.
 - Text is sent as is (`gold`). Numbers and true or false are sent as written (`3`, `49.99`, `true`). Lists and objects are sent as their JSON text, for example `["a","b"]`. Every value is URL-encoded.
-- The value is empty when the event did not send that parameter. It is always empty on install and signup postbacks.
+- The value is empty when the event did not send that parameter, and the postback is still sent. It is always empty on install and signup postbacks.
 - For a payment, the macro reads the parameters sent with the payment.
 
 ### Device
