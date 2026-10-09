@@ -8,7 +8,9 @@ Linkrunner integrates with CleverTap to automatically send attribution data, hel
 
 ## How it works
 
-Every time a user is attributed by Linkrunner, we send an install event to CleverTap's attribution API for the corresponding user profile. The profile is matched using the CleverTap ID you pass to the Linkrunner SDK (see [Map User Identifiers](#steps-to-setup)).
+When a user is attributed by Linkrunner and their CleverTap ID has been linked, we send an install event to CleverTap's attribution API for the corresponding user profile. The profile is matched using the CleverTap ID you pass to the Linkrunner SDK (see [Map User Identifiers](#steps-to-setup)).
+
+Delivery isn't guaranteed to happen the instant a user is attributed — the most reliable way to make sure every install reaches CleverTap is the **Sync with CleverTap** feature described below.
 
 The event carries these attribution fields:
 
@@ -51,6 +53,10 @@ The event carries these attribution fields:
 
   <Step title="Map User Identifiers in SDK">
     To properly link users between Linkrunner and CleverTap, you need to pass the CleverTap ID in the `signup` function.
+
+    <Warning>
+      **This step is required, not optional.** If `clevertapId` is never passed to the `signup` function, no attribution data will reach CleverTap for that user — there's no error or partial data, the integration simply has nothing to send. If you've completed Step 1 but don't see any data in CleverTap, this is the most likely cause: check that your app is actually calling `signup` with `clevertapId` set.
+    </Warning>
 
     <Info>
       **Important:** Make sure to use CleverTap's functions correctly to retrieve the CleverTap ID and send it to the Linkrunner SDK.
@@ -133,11 +139,73 @@ The event carries these attribution fields:
 
 ## Viewing Attribution Data
 
-After the integration is complete, you can view the attribution data in CleverTap:
+After the integration is complete, you can view the attribution data in CleverTap.
 
-1. Navigate to a user profile in the CleverTap dashboard
-2. Look for the install events section
-3. You'll see an `organic_install` or `inorganic_install` event with the `utm_source`, `utm_campaign`, and `platform` values described above
+Opening your CleverTap project lands you on the **Snapshot** dashboard first — general engagement metrics (DAU/WAU/MAU, active users, activations, uninstalls) tracked by CleverTap's own SDK, not attribution data from Linkrunner:
+
+<Frame>
+  <img src="/images/clevertap-guide/09-main-dashboard.png" alt="CleverTap Snapshot dashboard showing general engagement metrics" />
+</Frame>
+
+For the actual attribution data this integration sends, navigate to Analytics instead:
+
+1. Navigate to **Analytics > Events** in the CleverTap dashboard
+
+   <Frame>
+     <img src="/images/clevertap-guide/01-analytics-events.png" alt="Analytics > Events in the CleverTap dashboard" />
+   </Frame>
+
+2. Select the **UTM Visited** event
+
+   <Frame>
+     <img src="/images/clevertap-guide/02-events-utm-visited-selected.png" alt="Selecting the UTM Visited event" />
+   </Frame>
+
+   Your project's event list will also show events CleverTap's own SDK tracks automatically — `App Installed`, `App Launched`, and so on — plus any custom events your app sends. Those come directly from the CleverTap SDK in your app and are unrelated to Linkrunner. `UTM Visited` is the event CleverTap's dashboard uses for attribution data received via its Attribution API, which is what this integration sends to:
+
+   <Frame>
+     <img src="/images/clevertap-guide/00-event-list.png" alt="UTM Visited in the event picker, alongside a project's other events" />
+   </Frame>
+
+   Selecting it opens the event's Quick View, showing total events and users for the selected time range.
+
+   <Frame>
+     <img src="/images/clevertap-guide/03-utm-visited-quick-view.png" alt="UTM Visited event Quick View" />
+   </Frame>
+
+3. For the actual `utm_source` / `utm_medium` / `utm_campaign` breakdown, open the **Session** tab. Its **By top UTM parameters** table is the most direct view of the attribution data this integration sends:
+
+   <Frame>
+     <img src="/images/clevertap-guide/05-session.png" alt="Session tab showing the By top UTM parameters breakdown table" />
+   </Frame>
+
+   Alternatively, use the **Pivots** tool (in the left-hand Analytics panel) with the **UTM Visited** event to build a custom breakdown — for example pivoting `platform` against `event_type` (`organic_install` or `inorganic_install`):
+
+   <Frame>
+     <img src="/images/clevertap-guide/04-utm-parameters-breakdown.png" alt="Pivot table breaking down UTM Visited installs by platform and event_type" />
+   </Frame>
+
+4. The event's other tabs give a few more angles on the same data:
+
+   - **Technographics** breaks installs down by OS/browser/device — useful for a quick platform (Android vs iOS) check:
+
+     <Frame>
+       <img src="/images/clevertap-guide/07-technographics.png" alt="Technographics tab showing installs by operating system" />
+     </Frame>
+
+   - **Geography** breaks installs down by city, region, and country:
+
+     <Frame>
+       <img src="/images/clevertap-guide/06-geography.png" alt="Geography tab showing installs by city, region, and country" />
+     </Frame>
+
+   - **People** lists sample profiles and demographics for users who fired the event:
+
+     <Frame>
+       <img src="/images/clevertap-guide/08-people.png" alt="People tab showing sample profiles and demographics" />
+     </Frame>
+
+Individual user profiles won't show this data under "Initially acquired from" — that field only reflects CleverTap's own SDK-side install-referrer capture, not attribution data sent via this integration.
 
 This data can be used to:
 - Create segments based on acquisition source
