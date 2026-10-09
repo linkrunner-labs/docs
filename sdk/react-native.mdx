@@ -354,9 +354,13 @@ The `getAttributionData` function returns:
         adSetName?: string | null; // Ad set name
         adCreativeId?: string | null; // Ad creative ID
         adCreativeName?: string | null; // Ad creative name
-    }
+    };
+    gaid?: string | null; // Android only
+    idfa?: string | null; // iOS only, null when ATT is not authorized
 }
 ```
+
+`gaid` is set on Android and `idfa` on iOS. Each one is `null` when it is not available, for example on the other platform, when the user has not allowed tracking (ATT), or when limited ad tracking is on. Requires `rn-linkrunner` 3.2.1 or later.
 
 **Example response:**
 
@@ -370,7 +374,7 @@ The `getAttributionData` function returns:
         "adNetwork": "META",
         "installedAt": "2024-03-20T10:30:00Z",
         "storeClickAt": "2024-03-20T10:29:45Z",
-        "groupName": "iOS Campaign",
+        "groupName": "Summer Sale Group",
         "assetName": "Banner Ad 1",
         "assetGroupName": "Product Catalog",
         "adNetworkCampaignId": "120214682829390250",
@@ -378,7 +382,9 @@ The `getAttributionData` function returns:
         "adSetName": "Productivity",
         "adCreativeId": "120214682926100250",
         "adCreativeName": "Static_2"
-    }
+    },
+    "gaid": "38400000-8cf0-11bd-b23e-10b96e40000d",
+    "idfa": null
 }
 ```
 

@@ -59,7 +59,7 @@ In your Unity project, create or edit the file `Assets/Plugins/Android/mainTempl
 
 ```gradle
 dependencies {
-    implementation 'io.linkrunner:android-sdk:4.1.0'
+    implementation 'io.linkrunner:android-sdk:4.2.0'
 }
 ```
 
@@ -634,6 +634,7 @@ func linkrunnerGetAttributionData() {
         var result: [String: Any] = [:]
         if let deeplink = response.deeplink { result["deeplink"] = deeplink }
         result["attributionSource"] = response.attributionSource
+        if let idfa = response.idfa { result["idfa"] = idfa }
 
         if let campaign = response.campaignData {
             var campaignDict: [String: Any] = [:]
@@ -1391,6 +1392,7 @@ The result arrives as a JSON string on the `OnAttributionData` event. With the r
 {
     "deeplink": "https://...",      // optional
     "attributionSource": "string",  // "ORGANIC", "META", "GOOGLE", etc.
+    "idfa": "string",               // optional, only when ATT is authorized (LinkrunnerKit 4.2.0+)
     "campaignData": {
         "id": "string",
         "name": "string",

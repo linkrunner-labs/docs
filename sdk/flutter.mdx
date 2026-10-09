@@ -466,6 +466,8 @@ The `getAttributionData` function returns an `AttributionData` object with the f
 class AttributionData {
   final String? deeplink;            // Optional: The deep link URL that led to app installation
   final CampaignData campaignData;   // Required: Campaign information
+  final String? gaid;                // Optional: Android only
+  final String? idfa;                // Optional: iOS only, null when ATT is not authorized
 }
 
 class CampaignData {
@@ -486,28 +488,31 @@ class CampaignData {
 }
 ```
 
-Example response:
+`gaid` is set on Android and `idfa` on iOS. Each one is `null` when it is not available, for example on the other platform, when the user has not allowed tracking (ATT), or when limited ad tracking is on. Requires `linkrunner` 4.2.0 or later.
 
-```dart
-// getAttributionData() returns a typed AttributionData object — access fields in camelCase.
+**Example response** (fields of the returned `AttributionData` object, shown as JSON):
+
+```json
 {
-  "deeplink": "https://app.yourdomain.com/product/123",
-  "campaignData": {
-    "id": "camp_123",
-    "name": "Summer Sale 2024",
-    "adNetwork": "META",
-    "groupName": "iOS Campaign",
-    "assetGroupName": "Product Catalog",
-    "assetName": "Banner Ad 1",
-    "adNetworkCampaignId": "120214682829390250",
-    "adSetId": "120214682829640250",
-    "adSetName": "Productivity",
-    "adCreativeId": "120214682926100250",
-    "adCreativeName": "Static_2",
-    "type": "INORGANIC",
-    "installedAt": "2024-03-20T10:30:00Z",
-    "storeClickAt": "2024-03-20T10:29:45Z"
-  }
+    "deeplink": "https://app.yourdomain.com/product/123",
+    "campaignData": {
+        "id": "camp_123",
+        "name": "Summer Sale 2024",
+        "type": "INORGANIC",
+        "adNetwork": "META",
+        "installedAt": "2024-03-20T10:30:00Z",
+        "storeClickAt": "2024-03-20T10:29:45Z",
+        "groupName": "Summer Sale Group",
+        "assetName": "Banner Ad 1",
+        "assetGroupName": "Product Catalog",
+        "adNetworkCampaignId": "120214682829390250",
+        "adSetId": "120214682829640250",
+        "adSetName": "Productivity",
+        "adCreativeId": "120214682926100250",
+        "adCreativeName": "Static_2"
+    },
+    "gaid": "38400000-8cf0-11bd-b23e-10b96e40000d",
+    "idfa": null
 }
 ```
 

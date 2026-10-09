@@ -39,7 +39,7 @@ Alternatively, you can add the package dependency to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "4.1.0")
+    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "4.2.0")
 ]
 ```
 
@@ -413,6 +413,8 @@ public struct LRAttributionDataResponse: Codable, Sendable {
     public let deeplink: String?
     public let campaignData: CampaignData?
     public let attributionSource: String
+    public let gaid: String?   // Always nil on iOS
+    public let idfa: String?   // nil when ATT is not authorized
 }
 
 public struct CampaignData: Codable, Sendable {
@@ -451,11 +453,11 @@ public enum AdNetwork: String, Codable, Sendable {
     "campaignData": {
         "id": "camp_123",
         "name": "Summer Sale 2024",
-        "adNetwork": "META",
         "type": "INORGANIC",
+        "adNetwork": "META",
         "installedAt": "2024-03-20T10:30:00Z",
         "storeClickAt": "2024-03-20T10:29:45Z",
-        "groupName": "iOS Campaign",
+        "groupName": "Summer Sale Group",
         "assetName": "Banner Ad 1",
         "assetGroupName": "Product Catalog",
         "adNetworkCampaignId": "120214682829390250",
@@ -464,9 +466,13 @@ public enum AdNetwork: String, Codable, Sendable {
         "adCreativeId": "120214682926100250",
         "adCreativeName": "Static_2"
     },
-    "attributionSource": "META"
+    "attributionSource": "META",
+    "gaid": null,
+    "idfa": "6D92078A-8246-4BA4-AE5B-76104861E7DC"
 }
 ```
+
+`idfa` is `nil` unless the user allowed tracking through App Tracking Transparency (ATT). Requires LinkrunnerKit 4.2.0 or later.
 
 ## Setting User Data
 
