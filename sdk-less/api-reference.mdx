@@ -102,12 +102,16 @@ Returns the attribution result for an install. Safe to poll. The result is cache
       "installed_at": "2026-06-14T10:00:00Z",
       "store_click_at": "2026-06-14T09:55:00Z"
     },
-    "attribution_source": "META"
+    "attribution_source": "META",
+    "gaid": "38400000-8cf0-11bd-b23e-10b96e40000d",
+    "idfa": null
   }
 }
 ```
 
 For an organic install, `campaign_data` is `null` and `attribution_source` is `"ORGANIC"`.
+
+`gaid` and `idfa` are the advertising IDs the install was recorded with. If none was stored, they come from the `device_data` in the request. Each one is `null` when it is not available, for example on the other platform, when the user has not allowed tracking, or when the IDFA is all zeros.
 
 ## trigger (signup)
 

@@ -28,7 +28,7 @@ Add the Linkrunner SDK to your app's `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation 'io.linkrunner:android-sdk:4.1.0'
+    implementation 'io.linkrunner:android-sdk:4.2.0'
 }
 ```
 
@@ -340,13 +340,16 @@ attributionDataResult.onSuccess { attributionData ->
     // Attribution data includes:
     // - deeplink: The deep link URL that led to app installation
     // - campaignData: Campaign information
+    // - gaid: Google Advertising ID used for the install
 }
 ```
 
 ```kotlin
 data class AttributionData(
     val deeplink: String?,
-    val campaignData: CampaignData
+    val campaignData: CampaignData,
+    val gaid: String?,  // Google Advertising ID, null when not available
+    val idfa: String?   // Always null on Android
 )
 
 data class CampaignData(
@@ -387,9 +390,13 @@ data class CampaignData(
         "adSetName": "Productivity",
         "adCreativeId": "120214682926100250",
         "adCreativeName": "Static_2"
-    }
+    },
+    "gaid": "38400000-8cf0-11bd-b23e-10b96e40000d",
+    "idfa": null
 }
 ```
+
+`gaid` is `null` when the GAID is not available, for example when limited ad tracking is on or GAID collection is disabled. Requires Android SDK 4.2.0 or later.
 
 ## Setting User Data
 

@@ -466,6 +466,8 @@ The `getAttributionData` function returns an `AttributionData` object with the f
 class AttributionData {
   final String? deeplink;            // Optional: The deep link URL that led to app installation
   final CampaignData campaignData;   // Required: Campaign information
+  final String? gaid;                // Optional: Android only
+  final String? idfa;                // Optional: iOS only, null when ATT is not authorized
 }
 
 class CampaignData {
@@ -485,6 +487,8 @@ class CampaignData {
   final String storeClickAt;         // Required: Store click timestamp
 }
 ```
+
+`gaid` is set on Android and `idfa` on iOS. Each one is `null` when it is not available, for example on the other platform, when the user has not allowed tracking (ATT), or when limited ad tracking is on. Requires `linkrunner` 4.2.0 or later.
 
 Example response:
 

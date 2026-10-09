@@ -268,9 +268,13 @@ The `getAttributionData` function returns:
         adSetName?: string; // Ad set name
         adCreativeId?: string; // Ad creative ID
         adCreativeName?: string; // Ad creative name
-    }
+    };
+    gaid?: string | null; // Android only
+    idfa?: string | null; // iOS only, null when ATT is not authorized
 }
 ```
+
+`gaid` is set on Android and `idfa` on iOS. Each one is `null` when it is not available, for example on the other platform, when the user has not allowed tracking (ATT), or when limited ad tracking is on. Requires `capacitor-linkrunner` 2.2.0 or later.
 
 **Example response:**
 
