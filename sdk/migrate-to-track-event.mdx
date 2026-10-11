@@ -39,7 +39,12 @@ Any other name is stored exactly as you send it, letter case included. Add a map
 | --- | --- | --- | --- |
 | `type: FIRST_PAYMENT` (or any old type) | `"FIRST_PAYMENT"` or `"first_payment"` | `FIRST_PAYMENT` | None |
 | No `type` (the default) | `"DEFAULT"` or `"default"` | `DEFAULT` | None |
+| Flutter `PaymentType.DEFAULT_PAYMENT` (the Flutter default) | `"DEFAULT"` | `DEFAULT` | None |
 | Any type, and you want a new name | `"purchase"` | `purchase` | Add a mapping for `purchase` |
+
+<Note>
+  In Flutter, `DEFAULT_PAYMENT` was always stored as `DEFAULT`. Pass `"DEFAULT"`, not `"DEFAULT_PAYMENT"`. `DEFAULT_PAYMENT` is not an old payment type, so it would be stored as a new name and would not match your existing mappings.
+</Note>
 
 A payment with the same `paymentId`, name, and status counts as one payment, so retries are safe. The same `paymentId` sent under two different names counts as two payments. Pick one name per payment and keep it.
 
