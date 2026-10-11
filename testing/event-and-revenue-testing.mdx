@@ -14,7 +14,7 @@ Use this guide after [SDK Integration Testing](/testing/integration-testing). It
 | A user action with no authoritative transaction | `trackEvent` | `POST /capture-event` |
 | A payment with an amount and unique transaction ID | `trackPayment` (`eventName`, `paymentId`, `userId`, `amount`, `currency`) | `POST /capture-event` with `amount`, `payment_id`, and `currency` |
 
-When you attach a payment, the event name becomes the payment type in reports. See [Payment fields](/api-reference/event-capture#payment-fields) for the rules.
+When you attach a payment, the event name becomes the payment type in reports. See [Payment fields](/api-reference/event-capture#payment-fields) for the rules. For SDK examples, payment status, and how payments reach ad networks, see [Track payments](/sdk/track-payments).
 
 <Warning>
 The event name alone is not enough. If `purchase_completed` represents a real transaction, send it as a payment. If it only represents a funnel step with no authoritative transaction, send it as a custom event.
@@ -175,7 +175,7 @@ See [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understandi
   </Accordion>
 
   <Accordion title="The payment shows more than one status">
-    `status` is part of the deduplication key, so sending `PAYMENT_INITIATED` and then `PAYMENT_COMPLETED` with the same `payment_id` creates two records. Send the final payment state once. Only `PAYMENT_COMPLETED` payments are sent to ad networks.
+    `status` is part of the deduplication key, so sending `PAYMENT_INITIATED` and then `PAYMENT_COMPLETED` with the same `payment_id` creates two records. This is expected when you track the payment lifecycle. Only the `PAYMENT_COMPLETED` record counts as revenue and is sent to ad networks. If you do not need the lifecycle, send only the final state. See [Payment status](/sdk/track-payments#payment-status).
   </Accordion>
 
   <Accordion title="Meta does not show the Purchase event">

@@ -10,6 +10,8 @@ icon: "money-bill"
 
 Use [Test Custom Events and Payments](/testing/event-and-revenue-testing) to verify event classification, payment fields, and deduplication.
 
+To track payments from your app, and for how each status affects revenue and ad networks, see [Track payments](/sdk/track-payments).
+
 ## Base URL
 
 ```
@@ -71,7 +73,7 @@ Send `amount`, `payment_id`, and `currency` together. If you send only one or tw
 - **PAYMENT_FAILED**: Payment attempt failed
 - **PAYMENT_CANCELLED**: Payment was cancelled
 
-If `status` is omitted, it defaults to **PAYMENT_COMPLETED**. Only `PAYMENT_COMPLETED` payments are sent to ad networks.
+If `status` is omitted, it defaults to **PAYMENT_COMPLETED**. Only `PAYMENT_COMPLETED` payments are sent to ad networks. See [Payment status](/sdk/track-payments#payment-status) for what each status does in reports and how to track a payment lifecycle.
 
 ### End-user IP address
 

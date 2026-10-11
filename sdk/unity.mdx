@@ -1396,7 +1396,7 @@ An `amount` inside the event data is not sent to ad networks as revenue. To shar
 
 ### Track Payments
 
-Use `TrackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `subscription_renewed`. Requires the bridges above, built on Android SDK 5.0.0 and LinkrunnerKit 5.0.0 or later.
+Use `TrackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `subscription_renewed`. Requires the bridges above, built on Android SDK 5.0.0 and LinkrunnerKit 5.0.0 or later. For payment status, examples for every case, and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
 
 ```csharp
 LinkrunnerSDK.TrackPayment(

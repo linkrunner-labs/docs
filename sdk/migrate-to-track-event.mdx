@@ -20,6 +20,8 @@ icon: "arrow-right-arrow-left"
 | Cordova | `cordova-linkrunner` | 1.x | 2.0.0 |
 | Unity | [Unity bridges](/sdk/unity#track-payments) | Bridges built on Android SDK 4.x or LinkrunnerKit 4.x | Bridges built on Android SDK 5.0.0 and LinkrunnerKit 5.0.0 |
 
+This page covers the code change. For how payments work, what each status does, and examples for every case, see [Track payments](/sdk/track-payments).
+
 ## What changes
 
 - **`trackPayment` replaces `capturePayment`.** It takes the same fields, so the change is small.
@@ -50,7 +52,11 @@ A payment with the same `paymentId`, name, and status counts as one payment, so 
 
 ## Update your code
 
-The examples are fragments. Replace your `capturePayment` call with the `trackPayment` call in the same function, with the same coroutine or async context. They keep the old `FIRST_PAYMENT` type, so no mapping changes. Use your own amount, payment ID, user ID, and currency.
+The examples are fragments. Replace your `capturePayment` call with the `trackPayment` call in the same function, with the same coroutine or async context. They keep the old `FIRST_PAYMENT` type, so no mapping changes. Use your own amount, payment ID, user ID, currency, and products.
+
+The **After** examples send product details in `eventData`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`, and Google receives `content_ids` as item IDs. `amount` stays the order total. If you do not use [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager) or [Google Commerce Manager](/ecommerce-manager/google-commerce-manager), you can leave `eventData` out.
+
+In React Native, Expo, Capacitor, and Cordova, `PaymentStatus` is exported by the package. Plain strings such as `"PAYMENT_COMPLETED"` also work.
 
 <Tabs>
   <Tab title="Android">
@@ -58,11 +64,11 @@ The examples are fragments. Replace your `capturePayment` call with the `trackPa
 
     ```kotlin
     val paymentData = CapturePaymentRequest(
-        paymentId = "payment_123",
-        userId = "user123",
-        amount = 99.99,
-        type = PaymentType.FIRST_PAYMENT,
-        status = PaymentStatus.PAYMENT_COMPLETED
+        paymentId = "payment_123", // your order ID
+        userId = "user123", // your user ID
+        amount = 99.99, // total the user paid
+        type = PaymentType.FIRST_PAYMENT, // becomes eventName in trackPayment
+        status = PaymentStatus.PAYMENT_COMPLETED // same values in trackPayment
     )
     LinkRunner.getInstance().capturePayment(paymentData)
     ```
@@ -73,15 +79,36 @@ The examples are fragments. Replace your `capturePayment` call with the `trackPa
     import io.linkrunner.sdk.models.PaymentStatus
 
     LinkRunner.getInstance().trackPayment(
-        eventName = "FIRST_PAYMENT",
-        paymentId = "payment_123",
-        userId = "user123",
-        amount = 99.99,
-        currency = "USD",
-        status = PaymentStatus.PAYMENT_COMPLETED
+        eventName = "FIRST_PAYMENT", // was "type"; becomes the payment type in reports and mappings
+        paymentId = "payment_123", // your order ID, used to deduplicate
+        userId = "user123", // required, links the payment to your user
+        amount = 99.99, // order total the user paid
+        currency = "USD", // new, required: 3-letter ISO 4217 code
+        status = PaymentStatus.PAYMENT_COMPLETED, // optional, default; only completed payments go to ad networks
+        // Product details: Meta receives these fields, Google receives content_ids as item IDs
+        eventData = mapOf(
+            "content_ids" to listOf("sku_123"),
+            "contents" to listOf(mapOf("id" to "sku_123", "quantity" to 1, "item_price" to 99.99)),
+            "content_type" to "product",
+            "num_items" to 1,
+            "order_id" to "payment_123"
+        )
     ).onFailure { error ->
         println("Error tracking payment: ${error.message}")
     }
+    ```
+
+    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
+
+    ```kotlin
+    LinkRunner.getInstance().trackPayment(
+        eventName = "FIRST_PAYMENT", // same name as the rest of this payment
+        paymentId = "payment_123", // same order ID as the rest of this payment
+        userId = "user123", // required, links the payment to your user
+        amount = 99.99, // order total the user tried to pay
+        currency = "USD", // required, 3-letter ISO 4217 code
+        status = PaymentStatus.PAYMENT_FAILED // stored, not revenue, not sent to ad networks
+    )
     ```
 
     An invalid value returns a failed `Result` instead of throwing. See [Tracking Payments](/sdk/android#tracking-payments) for the full reference.
@@ -91,11 +118,11 @@ The examples are fragments. Replace your `capturePayment` call with the `trackPa
 
     ```swift
     await LinkrunnerSDK.shared.capturePayment(
-        amount: 99.99,
-        userId: "user123",
-        paymentId: "payment456",
-        type: .firstPayment,
-        status: .completed
+        amount: 99.99, // total the user paid
+        userId: "user123", // your user ID
+        paymentId: "payment456", // your order ID
+        type: .firstPayment, // becomes eventName in trackPayment
+        status: .completed // same values in trackPayment
     )
     ```
 
@@ -103,12 +130,33 @@ The examples are fragments. Replace your `capturePayment` call with the `trackPa
 
     ```swift
     await LinkrunnerSDK.shared.trackPayment(
-        eventName: "FIRST_PAYMENT",
-        paymentId: "payment456",
-        userId: "user123",
-        amount: 99.99,
-        currency: "USD",
-        status: .completed
+        eventName: "FIRST_PAYMENT", // was "type"; becomes the payment type in reports and mappings
+        paymentId: "payment456", // your order ID, used to deduplicate
+        userId: "user123", // required, links the payment to your user
+        amount: 99.99, // order total the user paid
+        currency: "USD", // new, required: 3-letter ISO 4217 code
+        status: .completed, // optional, default; only completed payments go to ad networks
+        // Product details: Meta receives these fields, Google receives content_ids as item IDs
+        eventData: [
+            "content_ids": ["sku_123"],
+            "contents": [["id": "sku_123", "quantity": 1, "item_price": 99.99]],
+            "content_type": "product",
+            "num_items": 1,
+            "order_id": "payment456"
+        ]
+    )
+    ```
+
+    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
+
+    ```swift
+    await LinkrunnerSDK.shared.trackPayment(
+        eventName: "FIRST_PAYMENT", // same name as the rest of this payment
+        paymentId: "payment456", // same order ID as the rest of this payment
+        userId: "user123", // required, links the payment to your user
+        amount: 99.99, // order total the user tried to pay
+        currency: "USD", // required, 3-letter ISO 4217 code
+        status: .failed // stored, not revenue, not sent to ad networks
     )
     ```
 
@@ -119,24 +167,47 @@ The examples are fragments. Replace your `capturePayment` call with the `trackPa
 
     ```javascript
     await linkrunner.capturePayment({
-      amount: 100,
-      userId: "user123",
-      paymentId: "payment456",
-      type: "FIRST_PAYMENT",
-      status: "PAYMENT_COMPLETED",
+      amount: 100, // total the user paid
+      userId: "user123", // your user ID
+      paymentId: "payment456", // your order ID
+      type: "FIRST_PAYMENT", // becomes eventName in trackPayment
+      status: "PAYMENT_COMPLETED", // same values in trackPayment
     });
     ```
 
     After (`rn-linkrunner` 4.0.0):
 
     ```javascript
+    import linkrunner, { PaymentStatus } from "rn-linkrunner";
+
     await linkrunner.trackPayment({
-      eventName: "FIRST_PAYMENT",
-      amount: 100,
-      userId: "user123",
-      paymentId: "payment456",
-      currency: "USD",
-      status: "PAYMENT_COMPLETED",
+      eventName: "FIRST_PAYMENT", // was "type"; becomes the payment type in reports and mappings
+      paymentId: "payment456", // your order ID, used to deduplicate
+      userId: "user123", // required, links the payment to your user
+      amount: 100, // order total the user paid
+      currency: "USD", // new, required: 3-letter ISO 4217 code
+      status: PaymentStatus.PAYMENT_COMPLETED, // optional, default; only completed payments go to ad networks
+      // Product details: Meta receives these fields, Google receives content_ids as item IDs
+      eventData: {
+        content_ids: ["sku_123"],
+        contents: [{ id: "sku_123", quantity: 1, item_price: 100 }],
+        content_type: "product",
+        num_items: 1,
+        order_id: "payment456",
+      },
+    });
+    ```
+
+    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
+
+    ```javascript
+    await linkrunner.trackPayment({
+      eventName: "FIRST_PAYMENT", // same name as the rest of this payment
+      paymentId: "payment456", // same order ID as the rest of this payment
+      userId: "user123", // required, links the payment to your user
+      amount: 100, // order total the user tried to pay
+      currency: "USD", // required, 3-letter ISO 4217 code
+      status: PaymentStatus.PAYMENT_FAILED, // stored, not revenue, not sent to ad networks
     });
     ```
 
@@ -148,11 +219,11 @@ The examples are fragments. Replace your `capturePayment` call with the `trackPa
     ```dart
     await LinkRunner().capturePayment(
       capturePayment: LRCapturePayment(
-        amount: 99.99,
-        userId: 'user123',
-        paymentId: 'payment456',
-        type: PaymentType.FIRST_PAYMENT,
-        status: PaymentStatus.PAYMENT_COMPLETED,
+        amount: 99.99, // total the user paid
+        userId: 'user123', // your user ID
+        paymentId: 'payment456', // your order ID
+        type: PaymentType.FIRST_PAYMENT, // becomes eventName in trackPayment
+        status: PaymentStatus.PAYMENT_COMPLETED, // same values in trackPayment
       ),
     );
     ```
@@ -161,19 +232,90 @@ The examples are fragments. Replace your `capturePayment` call with the `trackPa
 
     ```dart
     await LinkRunner().trackPayment(
-      eventName: 'FIRST_PAYMENT',
-      amount: 99.99,
-      userId: 'user123',
-      paymentId: 'payment456',
-      currency: 'USD',
-      status: PaymentStatus.PAYMENT_COMPLETED,
+      eventName: 'FIRST_PAYMENT', // was "type"; becomes the payment type in reports and mappings
+      paymentId: 'payment456', // your order ID, used to deduplicate
+      userId: 'user123', // required, links the payment to your user
+      amount: 99.99, // order total the user paid
+      currency: 'USD', // new, required: 3-letter ISO 4217 code
+      status: PaymentStatus.PAYMENT_COMPLETED, // optional, default; only completed payments go to ad networks
+      // Product details: Meta receives these fields, Google receives content_ids as item IDs
+      eventData: {
+        'content_ids': ['sku_123'],
+        'contents': [
+          {'id': 'sku_123', 'quantity': 1, 'item_price': 99.99},
+        ],
+        'content_type': 'product',
+        'num_items': 1,
+        'order_id': 'payment456',
+      },
+    );
+    ```
+
+    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
+
+    ```dart
+    await LinkRunner().trackPayment(
+      eventName: 'FIRST_PAYMENT', // same name as the rest of this payment
+      paymentId: 'payment456', // same order ID as the rest of this payment
+      userId: 'user123', // required, links the payment to your user
+      amount: 99.99, // order total the user tried to pay
+      currency: 'USD', // required, 3-letter ISO 4217 code
+      status: PaymentStatus.PAYMENT_FAILED, // stored, not revenue, not sent to ad networks
     );
     ```
 
     See [Tracking Payments](/sdk/flutter#tracking-payments) for the full reference.
   </Tab>
   <Tab title="Expo">
-    Expo apps call `rn-linkrunner`, so the code change is the same as React Native. Upgrade `expo-linkrunner` to 4.0.0 and `rn-linkrunner` to 4.0.0 or later together, then follow the React Native tab.
+    Expo apps call `rn-linkrunner`, so the code change is the same as React Native. Upgrade `expo-linkrunner` to 4.0.0 and `rn-linkrunner` to 4.0.0 or later together.
+
+    Before (`rn-linkrunner` 3.x):
+
+    ```javascript
+    await linkrunner.capturePayment({
+      amount: 100, // total the user paid
+      userId: "user123", // your user ID
+      paymentId: "payment456", // your order ID
+      type: "FIRST_PAYMENT", // becomes eventName in trackPayment
+      status: "PAYMENT_COMPLETED", // same values in trackPayment
+    });
+    ```
+
+    After (`rn-linkrunner` 4.0.0):
+
+    ```javascript
+    import linkrunner, { PaymentStatus } from "rn-linkrunner";
+
+    await linkrunner.trackPayment({
+      eventName: "FIRST_PAYMENT", // was "type"; becomes the payment type in reports and mappings
+      paymentId: "payment456", // your order ID, used to deduplicate
+      userId: "user123", // required, links the payment to your user
+      amount: 100, // order total the user paid
+      currency: "USD", // new, required: 3-letter ISO 4217 code
+      status: PaymentStatus.PAYMENT_COMPLETED, // optional, default; only completed payments go to ad networks
+      // Product details: Meta receives these fields, Google receives content_ids as item IDs
+      eventData: {
+        content_ids: ["sku_123"],
+        contents: [{ id: "sku_123", quantity: 1, item_price: 100 }],
+        content_type: "product",
+        num_items: 1,
+        order_id: "payment456",
+      },
+    });
+    ```
+
+    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
+
+    ```javascript
+    await linkrunner.trackPayment({
+      eventName: "FIRST_PAYMENT", // same name as the rest of this payment
+      paymentId: "payment456", // same order ID as the rest of this payment
+      userId: "user123", // required, links the payment to your user
+      amount: 100, // order total the user tried to pay
+      currency: "USD", // required, 3-letter ISO 4217 code
+      status: PaymentStatus.PAYMENT_FAILED, // stored, not revenue, not sent to ad networks
+    });
+    ```
 
     See [Tracking Payments](/sdk/react-native#tracking-payments) for the full reference.
   </Tab>
@@ -182,24 +324,47 @@ The examples are fragments. Replace your `capturePayment` call with the `trackPa
 
     ```typescript
     await linkrunner.capturePayment({
-        amount: 100,
-        userId: "user123",
-        paymentId: "payment456",
-        type: "FIRST_PAYMENT",
-        status: "PAYMENT_COMPLETED",
+        amount: 100, // total the user paid
+        userId: "user123", // your user ID
+        paymentId: "payment456", // your order ID
+        type: "FIRST_PAYMENT", // becomes eventName in trackPayment
+        status: "PAYMENT_COMPLETED", // same values in trackPayment
     });
     ```
 
     After (`capacitor-linkrunner` 3.0.0):
 
     ```typescript
+    import linkrunner, { PaymentStatus } from "capacitor-linkrunner";
+
     await linkrunner.trackPayment({
-        eventName: "FIRST_PAYMENT",
-        amount: 100,
-        userId: "user123",
-        paymentId: "payment456",
-        currency: "USD",
-        status: "PAYMENT_COMPLETED",
+        eventName: "FIRST_PAYMENT", // was "type"; becomes the payment type in reports and mappings
+        paymentId: "payment456", // your order ID, used to deduplicate
+        userId: "user123", // required, links the payment to your user
+        amount: 100, // order total the user paid
+        currency: "USD", // new, required: 3-letter ISO 4217 code
+        status: PaymentStatus.PAYMENT_COMPLETED, // optional, default; only completed payments go to ad networks
+        // Product details: Meta receives these fields, Google receives content_ids as item IDs
+        eventData: {
+            content_ids: ["sku_123"],
+            contents: [{ id: "sku_123", quantity: 1, item_price: 100 }],
+            content_type: "product",
+            num_items: 1,
+            order_id: "payment456",
+        },
+    });
+    ```
+
+    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
+
+    ```typescript
+    await linkrunner.trackPayment({
+        eventName: "FIRST_PAYMENT", // same name as the rest of this payment
+        paymentId: "payment456", // same order ID as the rest of this payment
+        userId: "user123", // required, links the payment to your user
+        amount: 100, // order total the user tried to pay
+        currency: "USD", // required, 3-letter ISO 4217 code
+        status: PaymentStatus.PAYMENT_FAILED, // stored, not revenue, not sent to ad networks
     });
     ```
 
@@ -210,11 +375,11 @@ The examples are fragments. Replace your `capturePayment` call with the `trackPa
 
     ```javascript
     linkrunner.capturePayment({
-        amount: 100,
-        userId: "user123",
-        paymentId: "payment456",
-        type: "FIRST_PAYMENT",
-        status: "PAYMENT_COMPLETED"
+        amount: 100, // total the user paid
+        userId: "user123", // your user ID
+        paymentId: "payment456", // your order ID
+        type: "FIRST_PAYMENT", // becomes eventName in trackPayment
+        status: "PAYMENT_COMPLETED" // same values in trackPayment
     });
     ```
 
@@ -222,12 +387,35 @@ The examples are fragments. Replace your `capturePayment` call with the `trackPa
 
     ```javascript
     linkrunner.trackPayment({
-        eventName: "FIRST_PAYMENT",
-        amount: 100,
-        userId: "user123",
-        paymentId: "payment456",
-        currency: "USD",
-        status: "PAYMENT_COMPLETED"
+        eventName: "FIRST_PAYMENT", // was "type"; becomes the payment type in reports and mappings
+        paymentId: "payment456", // your order ID, used to deduplicate
+        userId: "user123", // required, links the payment to your user
+        amount: 100, // order total the user paid
+        currency: "USD", // new, required: 3-letter ISO 4217 code
+        status: linkrunner.PaymentStatus.PAYMENT_COMPLETED, // optional, default; only completed payments go to ad networks
+        // Product details: Meta receives these fields, Google receives content_ids as item IDs
+        eventData: {
+            content_ids: ["sku_123"],
+            contents: [{ id: "sku_123", quantity: 1, item_price: 100 }],
+            content_type: "product",
+            num_items: 1,
+            order_id: "payment456"
+        }
+    }).catch(function (error) {
+        console.error("Error tracking payment:", error);
+    });
+    ```
+
+    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
+
+    ```javascript
+    linkrunner.trackPayment({
+        eventName: "FIRST_PAYMENT", // same name as the rest of this payment
+        paymentId: "payment456", // same order ID as the rest of this payment
+        userId: "user123", // required, links the payment to your user
+        amount: 100, // order total the user tried to pay
+        currency: "USD", // required, 3-letter ISO 4217 code
+        status: linkrunner.PaymentStatus.PAYMENT_FAILED // stored, not revenue, not sent to ad networks
     }).catch(function (error) {
         console.error("Error tracking payment:", error);
     });
@@ -240,24 +428,44 @@ The examples are fragments. Replace your `capturePayment` call with the `trackPa
 
     ```csharp
     LinkrunnerSDK.CapturePayment(
-        userId: "user_123",
-        amount: 9.99,
-        paymentId: "pay_abc123",
-        type: "FIRST_PAYMENT",
-        status: "PAYMENT_COMPLETED"
+        userId: "user_123", // your user ID
+        amount: 9.99, // total the user paid
+        paymentId: "pay_abc123", // your order ID
+        type: "FIRST_PAYMENT", // becomes eventName in TrackPayment
+        status: "PAYMENT_COMPLETED" // same values in TrackPayment
     );
     ```
 
     After (bridges built on native 5.0.0):
 
     ```csharp
+    // Product details: Meta receives these fields, Google receives content_ids as item IDs
+    string eventDataJson =
+        "{\"content_ids\":[\"sku_123\"]," +
+        "\"contents\":[{\"id\":\"sku_123\",\"quantity\":1,\"item_price\":9.99}]," +
+        "\"content_type\":\"product\",\"num_items\":1,\"order_id\":\"pay_abc123\"}";
+
     LinkrunnerSDK.TrackPayment(
-        eventName: "FIRST_PAYMENT",
-        userId: "user_123",
-        amount: 9.99,
-        paymentId: "pay_abc123",
-        currency: "USD",
-        status: PaymentStatus.PAYMENT_COMPLETED
+        eventName: "FIRST_PAYMENT", // was "type"; becomes the payment type in reports and mappings
+        paymentId: "pay_abc123", // your order ID, used to deduplicate
+        userId: "user_123", // required, links the payment to your user
+        amount: 9.99, // order total the user paid
+        currency: "USD", // new, required: 3-letter ISO 4217 code
+        status: PaymentStatus.PAYMENT_COMPLETED, // optional, default; only completed payments go to ad networks
+        eventDataJson: eventDataJson
+    );
+    ```
+
+    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
+
+    ```csharp
+    LinkrunnerSDK.TrackPayment(
+        eventName: "FIRST_PAYMENT", // same name as the rest of this payment
+        paymentId: "pay_abc123", // same order ID as the rest of this payment
+        userId: "user_123", // required, links the payment to your user
+        amount: 9.99, // order total the user tried to pay
+        currency: "USD", // required, 3-letter ISO 4217 code
+        status: PaymentStatus.PAYMENT_FAILED // stored, not revenue, not sent to ad networks
     );
     ```
 
@@ -283,10 +491,15 @@ If you already call `trackEvent` for the same action, you can attach the payment
 
 ## Payment rules
 
-- **Required fields.** `eventName`, `paymentId`, `userId`, `amount`, and `currency` are all required. `amount` must be 0 or greater, `paymentId` must not be blank, and `currency` must be a 3-letter ISO 4217 code such as `USD` or `INR`. `userId` can be an empty string, in which case the SDK uses the user saved by `signup` or `setUserData`.
-- **Validation.** The SDK rejects an invalid payment before sending it, so nothing reaches Linkrunner. Each SDK page explains how the failure is reported to your code.
-- **Status.** `status` is optional and defaults to `PAYMENT_COMPLETED`. The values are `PAYMENT_INITIATED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, and `PAYMENT_CANCELLED`.
-- **Postbacks.** Only `PAYMENT_COMPLETED` payments are sent to ad networks, and only for event names that have a mapping.
+Every field has a job. Leaving one out or getting it wrong breaks a specific part of your reporting.
+
+- **`eventName`** is required because it is the payment type in reports and the key Linkrunner matches against your ad network and affiliate mappings.
+- **`paymentId`** is required because Linkrunner uses it to recognize a retried payment, so it must not be blank. Use your order or transaction ID.
+- **`userId`** is required because it links the payment to your user for paying users, cohorts, and user-level reports. An empty string uses the user saved by `signup` or `setUserData`.
+- **`amount`** is required because it is the revenue in reports and the value ad networks receive. It must be a finite number, 0 or greater. Send the order total.
+- **`currency`** is required because Linkrunner stores the payment in it and ad networks receive it with the value. It must be a 3-letter ISO 4217 code such as `USD` or `INR`.
+- **`status`** is optional and defaults to `PAYMENT_COMPLETED`. The values are `PAYMENT_INITIATED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, and `PAYMENT_CANCELLED`. Only `PAYMENT_COMPLETED` counts as revenue and is sent to ad networks, and only for event names that have a mapping. See [Payment status](/sdk/track-payments#payment-status).
+- **Validation.** The SDK rejects an invalid payment before sending it, so nothing reaches Linkrunner. See [Handle invalid payments](/sdk/track-payments#handle-invalid-payments) for how each SDK reports it.
 
 ## Revenue sent to ad networks
 
@@ -314,6 +527,7 @@ If you send payments from your backend, use `POST /api/v1/capture-event`. It acc
 2. For every new name, add a mapping in the dashboard for each ad network or affiliate that should receive it, and turn on **Send Revenue** where you share revenue.
 3. Send `currency` with every payment, and send the order total as `amount`.
 4. Remove `removePayment` calls.
-5. Test with a debug build, then confirm the payment on the [Events](https://dashboard.linkrunner.io/dashboard/events) page under the expected name. Use [Test Custom Events and Payments](/testing/event-and-revenue-testing) for the full check.
+5. Decide which statuses you send. Leave `status` out for a one-step purchase, or follow the lifecycle in [Payment status](/sdk/track-payments#payment-status).
+6. Test with a debug build, then confirm the payment on the [Events](https://dashboard.linkrunner.io/dashboard/events) page under the expected name. Use [Verify it works](/sdk/track-payments#verify-it-works) and [Test Custom Events and Payments](/testing/event-and-revenue-testing) for the full check.
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).
