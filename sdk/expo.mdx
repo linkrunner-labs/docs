@@ -186,6 +186,42 @@ Since `expo-linkrunner` is a config plugin that prepares your project, the actua
     `capturePayment` and `removePayment` are deprecated and removed in `rn-linkrunner` 4.0.0. With `expo-linkrunner` 4.0.0, track payments with `trackPayment`. It takes the same fields as `capturePayment`, including `userId`, with `type` renamed to `eventName` and a new required `currency`. If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, your existing mappings keep working. Any other name needs a new mapping in the dashboard. See [Migrate from capturePayment to trackPayment](/sdk/migrate-to-track-event). For status, examples, and how payments reach ad networks, see [Track payments](/sdk/track-payments).
 </Note>
 
+### Tracking Payments
+
+Expo apps call `trackPayment` from `rn-linkrunner`. This example sets every parameter. Only the first five are required. For the status values and the full parameter table, see [Tracking Payments](/sdk/react-native#tracking-payments) in the React Native guide.
+
+```javascript
+import linkrunner, { PaymentStatus } from "rn-linkrunner";
+
+const trackPurchase = async () => {
+  try {
+    await linkrunner.trackPayment({
+      eventName: "purchase",                   // Required: payment name, stored as the payment type in reports and mappings
+      paymentId: "order_123",                  // Required: your order or transaction ID, used to deduplicate
+      userId: "user_123",                      // Required: your user ID. "" uses the user saved by signup or setUserData
+      amount: 1499,                            // Required: total the user paid, a finite number >= 0
+      currency: "INR",                         // Required: 3-letter ISO 4217 code
+      status: PaymentStatus.PAYMENT_COMPLETED, // Optional: PAYMENT_INITIATED, PAYMENT_COMPLETED (default), PAYMENT_FAILED, or PAYMENT_CANCELLED
+      eventData: {                             // Optional: extra details. Meta and Google read these product fields
+        content_ids: ["sku_1", "sku_2"],
+        contents: [
+          { id: "sku_1", quantity: 1, item_price: 999 },
+          { id: "sku_2", quantity: 1, item_price: 500 },
+        ],
+        content_type: "product",
+        num_items: 2,
+        order_id: "order_123",
+      },
+    });
+  } catch (error) {
+    // An invalid value throws here, and nothing is sent
+    console.error("Error tracking payment:", error);
+  }
+};
+```
+
+Only `PAYMENT_COMPLETED` counts as revenue and is sent to ad networks. Plain strings such as `"PAYMENT_COMPLETED"` also work for `status`.
+
 ## Function Placement Guide
 
 Expo uses the `rn-linkrunner` runtime. The function links below open the implementation details in the React Native guide.

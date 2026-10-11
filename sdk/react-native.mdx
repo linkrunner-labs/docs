@@ -436,50 +436,77 @@ This method allows you to connect user identities across different analytics and
 
 ### Tracking Payments
 
-Use `trackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `subscription_renewed`. Requires `rn-linkrunner` 4.0.0 or later. For payment status, examples for every case, and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
+Use `trackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `subscription_renewed`. Requires `rn-linkrunner` 4.0.0 or later. For examples for every case and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
+
+This example sets every parameter. Only the first five are required.
 
 ```javascript
-import linkrunner from "rn-linkrunner";
+import linkrunner, { PaymentStatus } from "rn-linkrunner";
 
 const trackPurchase = async () => {
   try {
     await linkrunner.trackPayment({
-      eventName: "purchase",
-      paymentId: "order_123",
-      userId: "user_123",
-      amount: 499,
-      currency: "INR",
+      eventName: "purchase",                   // Required: payment name, stored as the payment type in reports and mappings
+      paymentId: "order_123",                  // Required: your order or transaction ID, used to deduplicate
+      userId: "user_123",                      // Required: your user ID. "" uses the user saved by signup or setUserData
+      amount: 1499,                            // Required: total the user paid, a finite number >= 0
+      currency: "INR",                         // Required: 3-letter ISO 4217 code
+      status: PaymentStatus.PAYMENT_COMPLETED, // Optional: defaults to PAYMENT_COMPLETED (see statuses below)
+      eventData: {                             // Optional: extra details. Meta and Google read these product fields
+        content_ids: ["sku_1", "sku_2"],
+        contents: [
+          { id: "sku_1", quantity: 1, item_price: 999 },
+          { id: "sku_2", quantity: 1, item_price: 500 },
+        ],
+        content_type: "product",
+        num_items: 2,
+        order_id: "order_123",
+      },
     });
   } catch (error) {
+    // An invalid value throws here, and nothing is sent
     console.error("Error tracking payment:", error);
   }
 };
 ```
 
+#### `PaymentStatus`
+
+`rn-linkrunner` exports `PaymentStatus` as an object of string values, and as a TypeScript type:
+
+```javascript
+import { PaymentStatus } from "rn-linkrunner";
+
+PaymentStatus.PAYMENT_INITIATED // "PAYMENT_INITIATED"
+PaymentStatus.PAYMENT_COMPLETED // "PAYMENT_COMPLETED" (default)
+PaymentStatus.PAYMENT_FAILED    // "PAYMENT_FAILED"
+PaymentStatus.PAYMENT_CANCELLED // "PAYMENT_CANCELLED"
+```
+
+Plain strings such as `"PAYMENT_COMPLETED"` also work.
+
+| Status | Use it when | Effect |
+| ------ | ----------- | ------ |
+| `PAYMENT_INITIATED` | The user started paying, such as opening the checkout or payment sheet. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_COMPLETED` (default) | The charge succeeded. | Added to revenue and paying users. Sent to ad networks when the event name is mapped. |
+| `PAYMENT_FAILED` | The charge was declined or errored. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_CANCELLED` | The user backed out before paying. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+
+Linkrunner keeps one payment per `paymentId`, event name, and status, so a retry with the same values is recorded once. See [Payment status](/sdk/track-payments#payment-status) for a full lifecycle example.
+
 #### `trackPayment` Parameters
 
-| Parameter   | Type     | Required | Description |
-| ----------- | -------- | -------- | ----------- |
-| `eventName` | `string` | Yes      | Payment name, shown as the payment type in reports and matched against your event mappings. |
-| `paymentId` | `string` | Yes      | Unique identifier for this payment, such as your order or transaction ID. Must not be blank. |
-| `userId`    | `string` | Yes      | Your ID for the user who paid. If you pass an empty string, the SDK uses the user saved by `signup` or `setUserData`. |
-| `amount`    | `number` | Yes      | Payment amount. Must be a finite number, 0 or greater. |
-| `currency`  | `string` | Yes      | 3-letter ISO 4217 currency code, such as `INR` or `USD`. Case-insensitive, sent in uppercase. |
-| `status`    | `string` | No       | Payment status. Defaults to `PAYMENT_COMPLETED`. |
-| `eventData` | `object` | No       | Additional data, such as product details for [ecommerce events](#ecommerce-events). |
+| Parameter | Type | Required | Default | Description |
+| --------- | ---- | -------- | ------- | ----------- |
+| `eventName` | `string` | Yes |  | Payment name, shown as the payment type in reports and matched against your event mappings. |
+| `paymentId` | `string` | Yes |  | Your order or transaction ID. Must not be blank. Used to recognize the same payment when it arrives again. |
+| `userId` | `string` | Yes |  | Your ID for the user who paid. If you pass an empty string, the SDK uses the user saved by `signup` or `setUserData`. |
+| `amount` | `number` | Yes |  | Total the user paid. Must be a finite number, 0 or greater. This is the revenue value. |
+| `currency` | `string` | Yes |  | 3-letter ISO 4217 currency code, such as `INR` or `USD`. Case-insensitive, sent in uppercase. |
+| `status` | `PaymentStatus` | No | `PAYMENT_COMPLETED` | Where the payment is in its lifecycle. See the statuses above. |
+| `eventData` | `object` | No | None | Extra details, such as product details for [ecommerce events](#ecommerce-events). An `amount` inside it is not revenue. |
 
-`trackPayment` throws when a value breaks these rules, and nothing is sent.
-
-#### Available Payment Statuses
-
-| Status              | Description                    |
-| ------------------- | ------------------------------ |
-| `PAYMENT_INITIATED` | Payment process started        |
-| `PAYMENT_COMPLETED` | Payment successfully completed |
-| `PAYMENT_FAILED`    | Payment failed                 |
-| `PAYMENT_CANCELLED` | Payment was cancelled          |
-
-Only `PAYMENT_COMPLETED` payments are sent to ad network postbacks. In TypeScript, you can import the `TrackPaymentParams`, `EventPayment`, and `PaymentStatus` types from `rn-linkrunner`.
+`trackPayment` throws when a value breaks these rules, and nothing is sent. In TypeScript, you can import the `TrackPaymentParams`, `EventPayment`, and `PaymentStatus` types from `rn-linkrunner`.
 
 <Note>
     If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so your existing mappings and reports keep working. Any other name, such as `purchase`, is stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
