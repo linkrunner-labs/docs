@@ -31,7 +31,7 @@ These fields appear on most requests. Send them on every call once your install 
 - **Call from the device** so Linkrunner sees the device IP.
 
 <Note>
-  This reference uses Android examples. On iOS, send `"platform": "IOS"` and a different `device_data` shape (IDFA, IDFV, and `adservices_attribution_token` instead of GAID and the install referrer). The `init`, `trigger`, `capture-event`, and `capture-payment` responses may also include SKAdNetwork values (`fine_conversion_value`, `coarse_conversion_value`, `lock_postback`). See [iOS device data](/sdk-less/ios-device-data).
+  This reference uses Android examples. On iOS, send `"platform": "IOS"` and a different `device_data` shape (IDFA, IDFV, and `adservices_attribution_token` instead of GAID and the install referrer). The `init`, `trigger`, and `capture-event` responses may also include SKAdNetwork values (`fine_conversion_value`, `coarse_conversion_value`, `lock_postback`). See [iOS device data](/sdk-less/ios-device-data).
 </Note>
 
 ---
@@ -175,64 +175,45 @@ Updates user details after signup, for example when the user adds a phone number
 POST /api/client/capture-event
 ```
 
-Tracks a custom event. Events are stored for all users, including organic ones. Identify the user with `user_id` or `install_instance_id`.
+Tracks a custom event or a payment. Events are stored for all users, including organic ones. Identify the user with `user_id` or `install_instance_id`.
 
 | Field | Type | Description |
 | --- | --- | --- |
 | `token` | string | **Required**. |
-| `event_name` | string | **Required**. |
-| `event_data` | object | Optional. Custom attributes. Add `amount` as a number to share revenue with ad networks. |
+| `event_name` | string | **Required**. For a payment, this is the payment type shown in reports. |
+| `event_data` | object | Optional. Custom attributes. Must be a JSON object. An `amount` here is not sent to ad networks as revenue. Send the payment fields instead. |
 | `install_instance_id` | string | The persisted UUID. |
 | `user_id` | string | Optional. |
 | `platform` | string | `"ANDROID"`. |
+| `amount` | number | Payment only. Zero or greater. |
+| `payment_id` | string | Payment only. Your unique transaction ID. |
+| `currency` | string | Payment only. 3-letter ISO 4217 code, for example `"USD"`. |
+| `status` | string | Optional, payment only. Defaults to `PAYMENT_COMPLETED`. |
 
-```json
-{ "msg": "Event capture request received!", "status": 200, "data": { "message": "Event capture request received!" } }
-```
+To record a payment, send `amount`, `payment_id`, and `currency` together at the top level. Sending only one or two of them returns `400` with `amount, payment_id and currency must be sent together`. Without them, the request is a custom event. An `amount` inside `event_data` does not make the request a payment.
 
-## capture-payment
-
-```
-POST /api/client/capture-payment
-```
-
-Tracks revenue. Like events, the user must be attributed via `signup`.
-
-| Field | Type | Description |
-| --- | --- | --- |
-| `token` | string | **Required**. |
-| `amount` | number | Payment amount. Must be zero or greater. |
-| `user_id` | string | The paying user. |
-| `payment_id` | string | **Required**. Used to deduplicate. Sending the same `payment_id` twice is ignored. |
-| `type` | string | Optional. Defaults to `DEFAULT`. |
-| `status` | string | Optional. Defaults to `PAYMENT_COMPLETED`. |
-| `event_data` | object | Optional. Ecommerce attributes. |
-| `install_instance_id` | string | The persisted UUID. |
-| `platform` | string | `"ANDROID"`. |
-
-`type` values: `FIRST_PAYMENT`, `SECOND_PAYMENT`, `ONE_TIME`, `RECURRING`, `WALLET_TOPUP`, `FUNDS_WITHDRAWAL`, `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED`, `SUBSCRIPTION_REFUNDED`, `SUBSCRIPTION_BILLING_ISSUE`, `DEFAULT`.
+Retrying with the same `payment_id`, `event_name`, and `status` does not create a second payment and still returns `200`. Only `PAYMENT_COMPLETED` payments are sent to ad networks.
 
 `status` values: `PAYMENT_INITIATED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, `PAYMENT_CANCELLED`.
 
 ```json
-{ "msg": "Payment capture request received!", "status": 201, "data": { "message": "Payment capture request received!" } }
+{
+  "token": "YOUR_PROJECT_TOKEN",
+  "platform": "ANDROID",
+  "install_instance_id": "f1e2...c9",
+  "user_id": "user_123",
+  "event_name": "purchase_completed",
+  "amount": 99.99,
+  "payment_id": "payment_123",
+  "currency": "USD"
+}
 ```
 
-## remove-captured-payment
+The response is the same for a custom event and a payment:
 
+```json
+{ "msg": "Event capture request received!", "status": 200, "data": { "message": "Event capture request received!" } }
 ```
-POST /api/client/remove-captured-payment
-```
-
-Removes a captured payment, for a refund. Provide `payment_id` or `user_id`.
-
-| Field | Type | Description |
-| --- | --- | --- |
-| `token` | string | **Required**. |
-| `payment_id` | string | The payment to remove. |
-| `user_id` | string | Remove payments for this user. |
-| `install_instance_id` | string | The persisted UUID. |
-| `platform` | string | `"ANDROID"`. |
 
 ## update-push-token
 
@@ -289,7 +270,7 @@ Reports a deeplink open for remarketing and reattribution. Call when your app op
 
 | Code | Meaning |
 | --- | --- |
-| `400` | Missing required field or invalid token. |
+| `400` | Missing required field, invalid token, or incomplete payment fields. |
 | `401` | Invalid token (on `attribution-data`). |
 | `429` | Rate limit exceeded (25 req/s per token). |
 | `500` | Server error. Retry with backoff. |

@@ -345,81 +345,106 @@ This method allows you to connect user identities across different analytics and
 ## Revenue Tracking
 
 <Note>
-    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
+    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Pass your user ID as `userId` so each payment is linked to the user who paid. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 </Note>
 
-### Capture Payment
+### Tracking Payments
 
-Use this method to capture payment information:
+Use `trackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `subscription_renewed`. Requires `cordova-linkrunner` 2.0.0 or later. For examples for every case and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
+
+This example sets every parameter. Only the first five are required. `linkrunner` is a global after the `deviceready` event, so no import is needed.
 
 ```javascript
-linkrunner.capturePayment({
-    amount: 100, // Payment amount
-    userId: "user123", // User identifier
-    paymentId: "payment456", // Required: Unique payment identifier
-    type: "FIRST_PAYMENT", // Optional: Payment type
-    status: "PAYMENT_COMPLETED", // Optional: Payment status
-    eventData: { // Optional: Ecommerce/custom event data
-        content_ids: ["product_123"],
-        content_type: "product",
-        currency: "USD",
-        value: 99.99,
-        num_items: 1,
-        order_id: "order_12345",
+linkrunner.trackPayment({
+    eventName: "purchase",                              // Required: payment name, stored as the payment type in reports and mappings
+    paymentId: "order_123",                             // Required: your order or transaction ID, used to deduplicate
+    userId: "user_123",                                 // Required: your user ID. "" uses the user saved by signup or setUserData
+    amount: 1499,                                       // Required: total the user paid, a finite number >= 0
+    currency: "INR",                                    // Required: 3-letter ISO 4217 code
+    status: linkrunner.PaymentStatus.PAYMENT_COMPLETED, // Optional: defaults to PAYMENT_COMPLETED (see statuses below)
+    eventData: {                                        // Optional: extra details. Meta and Google read these product fields
+        content_ids: ["sku_1", "sku_2"],
         contents: [
-            {
-                id: "product_123",
-                quantity: 1,
-                item_price: 99.99
-            }
-        ]
+            { id: "sku_1", quantity: 1, item_price: 999 },
+            { id: "sku_2", quantity: 1, item_price: 500 }
+        ],
+        content_type: "product",
+        num_items: 2,
+        order_id: "order_123"
     }
 }).then(function () {
-    console.log("Payment captured");
+    console.log("Payment tracked");
+}).catch(function (error) {
+    // An invalid value rejects here, and nothing is sent
+    console.error("Error tracking payment:", error);
 });
 ```
 
-#### Parameters for `linkrunner.capturePayment`
+#### `PaymentStatus`
 
--   `amount`: number (required) - The payment amount
--   `userId`: string (required) - Identifier for the user making the payment
--   `paymentId`: string (required) - Unique identifier for the payment, used to deduplicate transactions
--   `type`: string (optional) - Type of payment. Available options:
-    -   `FIRST_PAYMENT` - First payment made by the user
-    -   `SECOND_PAYMENT` - Second payment made by the user
-    -   `WALLET_TOPUP` - Adding funds to a wallet
-    -   `FUNDS_WITHDRAWAL` - Withdrawing funds
-    -   `SUBSCRIPTION_CREATED` - New subscription created
-    -   `SUBSCRIPTION_RENEWED` - Subscription renewal
-    -   `ONE_TIME` - One-time payment
-    -   `RECURRING` - Recurring payment
-    -   `DEFAULT` - Default type (used if not specified)
--   `status`: string (optional) - Status of the payment. Available options:
-    -   `PAYMENT_INITIATED` - Payment has been initiated
-    -   `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
-    -   `PAYMENT_FAILED` - Payment attempt failed
-    -   `PAYMENT_CANCELLED` - Payment was cancelled
--   `eventData`: object (optional) - Key-value pairs for additional event data, including Meta ecommerce properties.
-
-### Removing Payments
-
-Remove payment records (for refunds or cancellations):
+The plugin exposes `PaymentStatus` on the `linkrunner` global as a frozen object of string values:
 
 ```javascript
-linkrunner.removePayment({
-    userId: "user123", // User identifier
-    paymentId: "payment456" // Optional: Unique payment identifier
-}).then(function () {
-    console.log("Payment removed");
+// No import needed, linkrunner is a global
+
+linkrunner.PaymentStatus.PAYMENT_INITIATED // "PAYMENT_INITIATED"
+linkrunner.PaymentStatus.PAYMENT_COMPLETED // "PAYMENT_COMPLETED" (default)
+linkrunner.PaymentStatus.PAYMENT_FAILED    // "PAYMENT_FAILED"
+linkrunner.PaymentStatus.PAYMENT_CANCELLED // "PAYMENT_CANCELLED"
+```
+
+Plain strings such as `"PAYMENT_COMPLETED"` also work.
+
+| Status | Use it when | Effect |
+| ------ | ----------- | ------ |
+| `PAYMENT_INITIATED` | The user started paying, such as opening the checkout or payment sheet. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_COMPLETED` (default) | The charge succeeded. | Added to revenue and paying users. Sent to ad networks when the event name is mapped. |
+| `PAYMENT_FAILED` | The charge was declined or errored. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_CANCELLED` | The user backed out before paying. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+
+Linkrunner keeps one payment per `paymentId`, event name, and status, so a retry with the same values is recorded once. See [Payment status](/sdk/track-payments#payment-status) for a full lifecycle example.
+
+#### `trackPayment` Parameters
+
+| Parameter | Type | Required | Default | Description |
+| --------- | ---- | -------- | ------- | ----------- |
+| `eventName` | `string` | Yes |  | Payment name, shown as the payment type in reports and matched against your event mappings. |
+| `paymentId` | `string` | Yes |  | Your order or transaction ID. Must not be blank. Used to recognize the same payment when it arrives again. |
+| `userId` | `string` | Yes |  | Your ID for the user who paid. If you pass an empty string, the SDK uses the user saved by `signup` or `setUserData`. |
+| `amount` | `number` | Yes |  | Total the user paid. Must be a finite number, 0 or greater. This is the revenue value. |
+| `currency` | `string` | Yes |  | 3-letter ISO 4217 currency code, such as `INR` or `USD`. Case-insensitive, sent in uppercase. |
+| `status` | `string` | No | `PAYMENT_COMPLETED` | Where the payment is in its lifecycle. See the statuses above. |
+| `eventData` | `object` | No | None | Extra details, such as product details for [ecommerce events](#ecommerce-events). An `amount` inside it is not revenue. |
+
+The promise returned by `trackPayment` rejects when a value breaks these rules, and nothing is sent.
+
+<Note>
+    If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so your existing mappings and reports keep working. Any other name, such as `purchase`, is stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
+</Note>
+
+#### Track a payment with `trackEvent`
+
+You can also pass a `payment` as the fourth argument to `trackEvent`. It takes the same `amount`, `paymentId`, `currency`, `userId`, and `status` fields, follows the same rules, and records the same payment.
+
+```javascript
+linkrunner.trackEvent(
+    "purchase", // Event name, used as the payment type
+    null, // Optional: Event data
+    null, // Optional: Event ID
+    {
+        amount: 499,
+        paymentId: "order_123",
+        currency: "INR",
+        userId: "user_123"
+    }
+).catch(function (error) {
+    console.error("Error tracking payment:", error);
 });
 ```
 
-#### Parameters for `linkrunner.removePayment`
-
--   `userId`: string (optional) - Identifier for the user whose payment is being removed. If only `userId` is provided, all payments for that user will be removed.
--   `paymentId`: string (optional) - Unique identifier for the payment to be removed
-
-Note: At least one of `paymentId` or `userId` must be provided when calling `removePayment`.
+<Note>
+    `capturePayment` is deprecated. Apps on `cordova-linkrunner` 1.x keep using it and continue to work unchanged. To move to 2.0.0, see [Migrate from capturePayment to trackPayment](/sdk/migrate-to-track-event).
+</Note>
 
 ## Ecommerce Events
 
@@ -485,16 +510,12 @@ linkrunner.trackEvent(
 
 ### Payment / Purchase Example
 
-Use the `capturePayment` method to send a `Purchase` event containing the ecommerce payload:
+Use `trackEvent` with a [`payment`](#tracking-payments) to send a `Purchase` event containing the ecommerce payload:
 
 ```javascript
-linkrunner.capturePayment({
-    amount: 49.99,
-    userId: "user123",
-    paymentId: "payment_456",
-    type: "FIRST_PAYMENT", // Map this payment type to "Purchase" in the Linkrunner Dashboard
-    status: "PAYMENT_COMPLETED",
-    eventData: {
+linkrunner.trackEvent(
+    "purchase", // Map this event to "Purchase" in the Linkrunner Dashboard
+    {
         content_ids: ["product_123"],
         contents: [
             {
@@ -508,11 +529,19 @@ linkrunner.capturePayment({
         value: 49.99,
         num_items: 1,
         order_id: "order_abc123" // Required for Purchase events
+    },
+    null,
+    {
+        amount: 49.99,
+        paymentId: "payment_456",
+        currency: "USD",
+        userId: "user_123",
+        status: "PAYMENT_COMPLETED"
     }
-}).then(function () {
-    console.log("Purchase captured successfully");
+).then(function () {
+    console.log("Purchase tracked successfully");
 }).catch(function (error) {
-    console.error("Error capturing purchase:", error);
+    console.error("Error tracking purchase:", error);
 });
 ```
 
@@ -525,7 +554,7 @@ linkrunner.capturePayment({
 </Note>
 
 <Note>
-    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-identification-required) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, use [`trackPayment`](#tracking-payments).
 </Note>
 
 Track custom events in your app:
@@ -533,7 +562,7 @@ Track custom events in your app:
 ```javascript
 linkrunner.trackEvent(
     "purchase_initiated", // Event name
-    { product_id: "12345", category: "electronics", amount: 99.99 }, // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
+    { product_id: "12345", category: "electronics" }, // Optional: Event data
     "order_12345" // Optional: Your own unique event identifier (string or number)
 ).then(function () {
     console.log("Event tracked");
@@ -545,25 +574,35 @@ linkrunner.trackEvent(
 - `eventName`: string (required) - Name of the event to track
 - `eventData`: object (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
 - `eventId`: string | number (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
+- `payment`: object (optional). Records revenue with the event. See [Tracking Payments](#tracking-payments).
 
 ### Revenue Sharing with Ad Networks
 
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+Send revenue to ad networks such as Google Ads and Meta as a [payment](#tracking-payments). Meta and Google receive the value and currency from the payment `amount` and `currency`, so send the order total as `amount`. Linkrunner does not add up item prices.
+
+Put product details in `eventData`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`. Google receives `content_ids` as item IDs.
 
 ```javascript
-linkrunner.trackEvent("purchase_completed", {
-    product_id: "12345",
-    category: "electronics",
-    amount: 149.99 // Revenue amount as a number
-}).then(function () {
-    console.log("Purchase event tracked");
+linkrunner.trackEvent(
+    "purchase",
+    {
+        content_ids: ["product_123"],
+        num_items: 1,
+        order_id: "order_12345"
+    },
+    null, // Optional: Event ID
+    {
+        amount: 149.99, // Order total, sent to ad networks as the value
+        paymentId: "order_12345",
+        currency: "USD",
+        userId: "user_123"
+    }
+).catch(function (error) {
+    console.error("Error tracking payment:", error);
 });
 ```
 
-<Note>
-    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number, not as a
-    string.
-</Note>
+An `amount` inside `eventData` is not sent to ad networks as revenue. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
 
 ## Enhanced Privacy Controls
 
@@ -750,8 +789,7 @@ Connect APNs with Linkrunner
 | [`linkrunner.setAdditionalData`](/sdk/cordova#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
 | [`linkrunner.setUserData`](/sdk/cordova#setting-user-data) | Optional | Profile update flow after `signup` | When additional user details become available |
 | [`linkrunner.trackEvent`](/sdk/cordova#tracking-custom-events) | Optional | Throughout app, including ecommerce flows | When specific user actions occur, including AddToCart or ViewContent events |
-| [`linkrunner.capturePayment`](/sdk/cordova#capture-payment) | Optional | Payment processing, including ecommerce purchases | When user makes a payment, including Purchase events with ecommerce data |
-| [`linkrunner.removePayment`](/sdk/cordova#removing-payments) | Optional | Refund flow | When payment needs to be removed |
+| [`linkrunner.trackPayment`](/sdk/cordova#tracking-payments) | Optional | Payment processing, including ecommerce purchases | When user makes a payment, including Purchase events with ecommerce data |
 | [`linkrunner.setPushToken`](/sdk/cordova#uninstall-tracking) | Optional | Push notification setup | When push token is available |
 | [`linkrunner.enablePIIHashing`](/sdk/cordova#enhanced-privacy-controls) | Optional | Privacy configuration | When enabling PII hashing |
 

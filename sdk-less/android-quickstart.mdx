@@ -283,6 +283,14 @@ import java.io.IOException
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
+/** Send with trackEvent to record the event as a payment. status defaults to PAYMENT_COMPLETED on the server. */
+data class LinkrunnerPayment(
+    val amount: Double,
+    val paymentId: String,
+    val currency: String,
+    val status: String? = null,
+)
+
 /**
  * Linkrunner REST client. Mirrors the SDK's API over plain HTTP.
  * Call configure() once, then use the suspend methods from a background coroutine.
@@ -353,38 +361,20 @@ object LinkrunnerClient {
     suspend fun setUserData(userData: Map<String, Any?>): JSONObject =
         post("/api/client/set-user-data", base().put("user_data", jsonOf(userData)))
 
-    suspend fun trackEvent(eventName: String, eventData: Map<String, Any?>? = null): JSONObject {
+    suspend fun trackEvent(
+        eventName: String,
+        eventData: Map<String, Any?>? = null,
+        payment: LinkrunnerPayment? = null,
+    ): JSONObject {
         val body = base().put("event_name", eventName)
         if (eventData != null) body.put("event_data", jsonOf(eventData))
+        if (payment != null) {
+            body.put("amount", payment.amount)
+            body.put("payment_id", payment.paymentId)
+            body.put("currency", payment.currency)
+            if (payment.status != null) body.put("status", payment.status)
+        }
         return post("/api/client/capture-event", body)
-    }
-
-    suspend fun capturePayment(
-        amount: Double,
-        paymentId: String,
-        userId: String? = null,
-        type: String = "DEFAULT",
-        status: String = "PAYMENT_COMPLETED",
-        eventData: Map<String, Any?>? = null,
-    ): JSONObject {
-        val body = base().apply {
-            put("amount", amount)
-            put("type", type)
-            put("status", status)
-            put("payment_id", paymentId)
-            if (userId != null) put("user_id", userId)
-            if (eventData != null) put("event_data", jsonOf(eventData))
-        }
-        return post("/api/client/capture-payment", body)
-    }
-
-    suspend fun removePayment(paymentId: String? = null, userId: String? = null): JSONObject {
-        require(paymentId != null || userId != null) { "Provide paymentId or userId" }
-        val body = base().apply {
-            if (paymentId != null) put("payment_id", paymentId)
-            if (userId != null) put("user_id", userId)
-        }
-        return post("/api/client/remove-captured-payment", body)
     }
 
     suspend fun setPushToken(pushToken: String): JSONObject =
@@ -495,25 +485,28 @@ CoroutineScope(Dispatchers.IO).launch {
 
 ## 7. Track events and payments
 
+Use `trackEvent` for both. Pass a `LinkrunnerPayment` when the event is a payment, so Linkrunner records it as revenue. The event name becomes the payment type in reports.
+
 ```kotlin
 // Custom event
 LinkrunnerClient.trackEvent(
     "purchase_initiated",
-    mapOf("product_id" to "12345", "amount" to 99.99)
+    mapOf("product_id" to "12345")
 )
 
 // Payment
-LinkrunnerClient.capturePayment(
-    amount = 99.99,
-    userId = "user_123",
-    paymentId = "payment_123",
-    type = "FIRST_PAYMENT"
+LinkrunnerClient.trackEvent(
+    "purchase_completed",
+    mapOf("product_id" to "12345"),
+    payment = LinkrunnerPayment(
+        amount = 99.99,
+        paymentId = "payment_123",
+        currency = "USD"
+    )
 )
 ```
 
-<Note>
-  Add `amount` as a number in event or payment data to enable revenue sharing with Google and Meta.
-</Note>
+`currency` is a 3-letter ISO 4217 code. Only completed payments are sent to ad networks. See [capture-event](/sdk-less/api-reference#capture-event) for the field rules and `status` values.
 
 ## Other endpoints
 
@@ -524,7 +517,6 @@ LinkrunnerClient.setUserData(mapOf("id" to "user_123", "phone" to "9876543210"))
 LinkrunnerClient.setPushToken(fcmToken)
 LinkrunnerClient.setIntegrationData(clevertapId = "YOUR_CLEVERTAP_ID")
 LinkrunnerClient.handleDeeplink("https://app.example.com/product/123")
-LinkrunnerClient.removePayment(paymentId = "payment_123")
 ```
 
 ## Retries and idempotency
@@ -536,11 +528,11 @@ A retry can send the same request twice if the first attempt reached the server 
 | Endpoint | Safe to retry? | Why |
 | --- | --- | --- |
 | `init` | Yes | The server deduplicates on `install_instance_id`. |
-| `capture-payment` | Yes, with `payment_id` | The server deduplicates on `payment_id`. Always send one. |
-| `capture-event` | Not deduplicated | A retried event can be counted twice. |
+| `capture-event` with a payment | Yes | The server deduplicates on `payment_id` for the same event name and status. |
+| `capture-event` without a payment | Not deduplicated | A retried event can be counted twice. |
 
 <Tip>
-  `payment_id` is required for `capturePayment`, and a unique value ensures retries cannot double count revenue. Events have no server-side deduplication, so if exact event counts matter, disable retries for those calls.
+  A unique `paymentId` for each transaction ensures retries cannot double count revenue. Custom events have no server-side deduplication, so if exact event counts matter, disable retries for those calls.
 </Tip>
 
 ## Troubleshooting

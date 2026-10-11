@@ -34,7 +34,9 @@
                             "sdk/appbrew",
                             "sdk/web",
                             "sdk/unity",
-                            "sdk/shopify"
+                            "sdk/shopify",
+                            "sdk/track-payments",
+                            "sdk/migrate-to-track-event"
                         ]
                     },
                     {

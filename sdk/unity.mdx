@@ -59,7 +59,7 @@ In your Unity project, create or edit the file `Assets/Plugins/Android/mainTempl
 
 ```gradle
 dependencies {
-    implementation 'io.linkrunner:android-sdk:4.2.0'
+    implementation 'io.linkrunner:android-sdk:5.0.0'
 }
 ```
 
@@ -117,10 +117,8 @@ import io.linkrunner.sdk.LinkRunnerCallback;
 import io.linkrunner.sdk.models.ConsentStatus;
 import io.linkrunner.sdk.models.LinkrunnerConsent;
 import io.linkrunner.sdk.models.request.UserDataRequest;
-import io.linkrunner.sdk.models.request.CapturePaymentRequest;
-import io.linkrunner.sdk.models.request.RemovePaymentRequest;
+import io.linkrunner.sdk.models.EventPayment;
 import io.linkrunner.sdk.models.IntegrationData;
-import io.linkrunner.sdk.models.PaymentType;
 import io.linkrunner.sdk.models.PaymentStatus;
 import io.linkrunner.sdk.models.response.AttributionData;
 
@@ -157,26 +155,11 @@ public class LinkrunnerBridge {
         return map;
     }
 
-    private static PaymentType parsePaymentType(String type) {
-        if (type == null) return PaymentType.DEFAULT;
-        switch (type) {
-            case "FIRST_PAYMENT": return PaymentType.FIRST_PAYMENT;
-            case "SECOND_PAYMENT": return PaymentType.SECOND_PAYMENT;
-            case "WALLET_TOPUP": return PaymentType.WALLET_TOPUP;
-            case "FUNDS_WITHDRAWAL": return PaymentType.FUNDS_WITHDRAWAL;
-            case "SUBSCRIPTION_CREATED": return PaymentType.SUBSCRIPTION_CREATED;
-            case "SUBSCRIPTION_RENEWED": return PaymentType.SUBSCRIPTION_RENEWED;
-            case "ONE_TIME": return PaymentType.ONE_TIME;
-            case "RECURRING": return PaymentType.RECURRING;
-            default: return PaymentType.DEFAULT;
-        }
-    }
-
+    // Falls back to PAYMENT_COMPLETED for an empty or unknown status
     private static PaymentStatus parsePaymentStatus(String status) {
         if (status == null) return PaymentStatus.PAYMENT_COMPLETED;
         switch (status) {
             case "PAYMENT_INITIATED": return PaymentStatus.PAYMENT_INITIATED;
-            case "PAYMENT_COMPLETED": return PaymentStatus.PAYMENT_COMPLETED;
             case "PAYMENT_FAILED": return PaymentStatus.PAYMENT_FAILED;
             case "PAYMENT_CANCELLED": return PaymentStatus.PAYMENT_CANCELLED;
             default: return PaymentStatus.PAYMENT_COMPLETED;
@@ -326,47 +309,33 @@ public class LinkrunnerBridge {
         );
     }
 
-    public static void capturePayment(String userId, double amount, String paymentId,
-                                       String type, String status, String eventDataJson) {
-        Map<String, Object> eventData = jsonToMap(eventDataJson);
-        CapturePaymentRequest request = new CapturePaymentRequest(
-            paymentId.isEmpty() ? null : paymentId,
-            userId,
-            amount,
-            parsePaymentType(type),
-            parsePaymentStatus(status),
-            eventData.isEmpty() ? null : eventData
-        );
-        LinkrunnerJava lr = LinkrunnerJava.getInstance();
-        lr.capturePayment(
-            request,
-            new LinkRunnerCallback<Void>() {
-                public void onSuccess(Void result) {
-                    sendToUnity("OnCapturePaymentComplete", "success");
-                }
-                public void onError(String error) {
-                    Log.e(TAG, "CapturePayment failed: " + error);
-                    sendToUnity("OnCapturePaymentComplete", "error:" + error);
-                }
-            }
-        );
-    }
+    public static void trackEventWithPayment(String eventName, String eventDataJson, String eventId,
+                                             double amount, String paymentId, String currency,
+                                             String userId, String status) {
+        EventPayment payment;
+        try {
+            payment = new EventPayment(amount, paymentId, currency,
+                userId == null ? "" : userId, parsePaymentStatus(status));
+        } catch (IllegalArgumentException e) {
+            Log.e(TAG, "Invalid payment: " + e.getMessage());
+            sendToUnity("OnTrackEventComplete", "error:" + e.getMessage());
+            return;
+        }
 
-    public static void removePayment(String userId, String paymentId) {
-        RemovePaymentRequest request = new RemovePaymentRequest(
-            paymentId.isEmpty() ? null : paymentId,
-            userId.isEmpty() ? null : userId
-        );
+        Map<String, Object> eventData = jsonToMap(eventDataJson);
         LinkrunnerJava lr = LinkrunnerJava.getInstance();
-        lr.removePayment(
-            request,
+        lr.trackEvent(
+            eventName,
+            eventData.isEmpty() ? null : eventData,
+            eventId.isEmpty() ? null : eventId,
+            payment,
             new LinkRunnerCallback<Void>() {
                 public void onSuccess(Void result) {
-                    sendToUnity("OnRemovePaymentComplete", "success");
+                    sendToUnity("OnTrackEventComplete", "success");
                 }
                 public void onError(String error) {
-                    Log.e(TAG, "RemovePayment failed: " + error);
-                    sendToUnity("OnRemovePaymentComplete", "error:" + error);
+                    Log.e(TAG, "TrackEvent with payment failed: " + error);
+                    sendToUnity("OnTrackEventComplete", "error:" + error);
                 }
             }
         );
@@ -464,7 +433,7 @@ After building your Unity project for iOS and opening the generated Xcode projec
    ```
    https://github.com/linkrunner-labs/linkrunner-ios.git
    ```
-3. Select the latest version (4.1.0+)
+3. Select the latest version (5.0.0+)
 4. Click **Add Package** and choose the **LinkrunnerKitStatic** library
 
 <Tip>
@@ -551,28 +520,10 @@ private func parseUserData(_ dict: [String: Any]) -> UserData {
     )
 }
 
-private func parsePaymentType(_ str: String?) -> PaymentType {
-    switch str {
-    case "FIRST_PAYMENT": return .firstPayment
-    case "SECOND_PAYMENT": return .secondPayment
-    case "WALLET_TOPUP": return .walletTopup
-    case "FUNDS_WITHDRAWAL": return .fundsWithdrawal
-    case "SUBSCRIPTION_CREATED": return .subscriptionCreated
-    case "SUBSCRIPTION_RENEWED": return .subscriptionRenewed
-    case "ONE_TIME": return .oneTime
-    case "RECURRING": return .recurring
-    default: return .default
-    }
-}
-
+// Falls back to PAYMENT_COMPLETED for an empty or unknown status
 private func parsePaymentStatus(_ str: String?) -> PaymentStatus {
-    switch str {
-    case "PAYMENT_INITIATED": return .initiated
-    case "PAYMENT_COMPLETED": return .completed
-    case "PAYMENT_FAILED": return .failed
-    case "PAYMENT_CANCELLED": return .cancelled
-    default: return .completed
-    }
+    guard let str = str else { return .completed }
+    return PaymentStatus(rawValue: str) ?? .completed
 }
 
 // MARK: - C-callable functions exposed to Unity
@@ -673,42 +624,41 @@ func linkrunnerTrackEvent(_ eventName: UnsafePointer<CChar>,
     }
 }
 
-@_cdecl("_LinkrunnerCapturePayment")
-func linkrunnerCapturePayment(_ userId: UnsafePointer<CChar>,
-                              _ amount: Double,
-                              _ paymentId: UnsafePointer<CChar>?,
-                              _ type: UnsafePointer<CChar>?,
-                              _ status: UnsafePointer<CChar>?,
-                              _ eventDataJson: UnsafePointer<CChar>?) {
-    let uid = String(cString: userId)
-    let pid = toOptionalString(paymentId)
-    let paymentType = parsePaymentType(toOptionalString(type))
-    let paymentStatus = parsePaymentStatus(toOptionalString(status))
+@_cdecl("_LinkrunnerTrackEventWithPayment")
+func linkrunnerTrackEventWithPayment(_ eventName: UnsafePointer<CChar>,
+                                     _ eventDataJson: UnsafePointer<CChar>?,
+                                     _ eventId: UnsafePointer<CChar>?,
+                                     _ amount: Double,
+                                     _ paymentId: UnsafePointer<CChar>?,
+                                     _ currency: UnsafePointer<CChar>?,
+                                     _ userId: UnsafePointer<CChar>?,
+                                     _ status: UnsafePointer<CChar>?) {
+    let name = String(cString: eventName)
     let eventData = toDict(eventDataJson)
+    let eid = toOptionalString(eventId)
 
-    Task {
-        await LinkrunnerSDK.shared.capturePayment(
+    let payment: EventPayment
+    do {
+        payment = try EventPayment(
             amount: amount,
-            userId: uid,
-            // LinkrunnerKit 4.x requires a payment id. An empty value is rejected by the SDK.
-            paymentId: pid ?? "",
-            type: paymentType,
-            status: paymentStatus,
-            eventData: eventData.isEmpty ? nil : eventData
+            paymentId: toOptionalString(paymentId) ?? "",
+            currency: toOptionalString(currency) ?? "",
+            userId: toOptionalString(userId) ?? "",
+            status: parsePaymentStatus(toOptionalString(status))
         )
-        sendToUnity("OnCapturePaymentComplete", "success")
+    } catch {
+        sendToUnity("OnTrackEventComplete", "error:\(error)")
+        return
     }
-}
-
-@_cdecl("_LinkrunnerRemovePayment")
-func linkrunnerRemovePayment(_ userId: UnsafePointer<CChar>,
-                             _ paymentId: UnsafePointer<CChar>?) {
-    let uid = String(cString: userId)
-    let pid = toOptionalString(paymentId)
 
     Task {
-        await LinkrunnerSDK.shared.removePayment(userId: uid, paymentId: pid)
-        sendToUnity("OnRemovePaymentComplete", "success")
+        await LinkrunnerSDK.shared.trackEvent(
+            eventName: name,
+            eventData: eventData.isEmpty ? nil : eventData,
+            eventId: eid,
+            payment: payment
+        )
+        sendToUnity("OnTrackEventComplete", "success")
     }
 }
 
@@ -885,8 +835,6 @@ public class LinkrunnerSDK : MonoBehaviour
     public static event Action<bool, string> OnUserDataSet;
     public static event Action<string> OnAttributionData;
     public static event Action<bool, string> OnEventTracked;
-    public static event Action<bool, string> OnPaymentCaptured;
-    public static event Action<bool, string> OnPaymentRemoved;
     public static event Action<string> OnDeeplinkHandled;
 
 #if UNITY_IOS && !UNITY_EDITOR
@@ -903,10 +851,9 @@ public class LinkrunnerSDK : MonoBehaviour
     private static extern void _LinkrunnerTrackEvent(string eventName, string eventDataJson,
         string eventId);
     [DllImport("__Internal")]
-    private static extern void _LinkrunnerCapturePayment(string userId, double amount,
-        string paymentId, string type, string status, string eventDataJson);
-    [DllImport("__Internal")]
-    private static extern void _LinkrunnerRemovePayment(string userId, string paymentId);
+    private static extern void _LinkrunnerTrackEventWithPayment(string eventName,
+        string eventDataJson, string eventId, double amount, string paymentId,
+        string currency, string userId, string status);
     [DllImport("__Internal")]
     private static extern void _LinkrunnerSetPushToken(string pushToken);
     [DllImport("__Internal")]
@@ -1009,10 +956,26 @@ public class LinkrunnerSDK : MonoBehaviour
     }
 
     /// <summary>
-    /// Track a custom event.
+    /// Track a custom event. Pass a payment to store the event as revenue under the event name.
     /// </summary>
-    public static void TrackEvent(string eventName, string eventDataJson = "", string eventId = "")
+    public static void TrackEvent(string eventName, string eventDataJson = "", string eventId = "",
+        EventPayment payment = null)
     {
+        if (payment != null)
+        {
+            string status = payment.status.ToString();
+#if UNITY_ANDROID && !UNITY_EDITOR
+            Bridge.CallStatic("trackEventWithPayment", eventName, eventDataJson ?? "", eventId ?? "",
+                payment.amount, payment.paymentId ?? "", payment.currency ?? "", payment.userId ?? "", status);
+#elif UNITY_IOS && !UNITY_EDITOR
+            _LinkrunnerTrackEventWithPayment(eventName, eventDataJson, eventId,
+                payment.amount, payment.paymentId, payment.currency, payment.userId ?? "", status);
+#else
+            Debug.Log($"[Linkrunner] TrackEvent with payment: {eventName}, {payment.amount} {payment.currency}");
+#endif
+            return;
+        }
+
 #if UNITY_ANDROID && !UNITY_EDITOR
         Bridge.CallStatic("trackEvent", eventName, eventDataJson ?? "", eventId ?? "");
 #elif UNITY_IOS && !UNITY_EDITOR
@@ -1023,32 +986,13 @@ public class LinkrunnerSDK : MonoBehaviour
     }
 
     /// <summary>
-    /// Track a payment/revenue event.
+    /// Track a payment. The event name becomes the payment type in reports and mappings.
+    /// An empty userId falls back to the user saved by Signup or SetUserData.
     /// </summary>
-    public static void CapturePayment(string userId, double amount, string paymentId,
-        string type = "DEFAULT", string status = "PAYMENT_COMPLETED", string eventDataJson = "")
+    public static void TrackPayment(string eventName, string paymentId, string userId, double amount,
+        string currency, PaymentStatus status = PaymentStatus.PAYMENT_COMPLETED, string eventDataJson = "")
     {
-#if UNITY_ANDROID && !UNITY_EDITOR
-        Bridge.CallStatic("capturePayment", userId, amount, paymentId ?? "", type, status, eventDataJson ?? "");
-#elif UNITY_IOS && !UNITY_EDITOR
-        _LinkrunnerCapturePayment(userId, amount, paymentId, type, status, eventDataJson);
-#else
-        Debug.Log($"[Linkrunner] CapturePayment: {userId}, {amount}");
-#endif
-    }
-
-    /// <summary>
-    /// Remove a previously tracked payment (e.g. refund).
-    /// </summary>
-    public static void RemovePayment(string userId, string paymentId = "")
-    {
-#if UNITY_ANDROID && !UNITY_EDITOR
-        Bridge.CallStatic("removePayment", userId, paymentId ?? "");
-#elif UNITY_IOS && !UNITY_EDITOR
-        _LinkrunnerRemovePayment(userId, paymentId);
-#else
-        Debug.Log($"[Linkrunner] RemovePayment: {userId}");
-#endif
+        TrackEvent(eventName, eventDataJson, "", new EventPayment(amount, paymentId, currency, userId, status));
     }
 
     /// <summary>
@@ -1172,18 +1116,6 @@ public class LinkrunnerSDK : MonoBehaviour
         OnEventTracked?.Invoke(success, message);
     }
 
-    void OnCapturePaymentComplete(string message)
-    {
-        bool success = message == "success";
-        OnPaymentCaptured?.Invoke(success, message);
-    }
-
-    void OnRemovePaymentComplete(string message)
-    {
-        bool success = message == "success";
-        OnPaymentRemoved?.Invoke(success, message);
-    }
-
     void OnHandleDeeplinkComplete(string message)
     {
         OnDeeplinkHandled?.Invoke(message);
@@ -1218,6 +1150,39 @@ public class LinkrunnerUserData
     public string gaSessionId;
     public string userCreatedAt;
     public bool isFirstTimeUser;
+}
+
+/// <summary>
+/// Payment status. Defaults to PAYMENT_COMPLETED.
+/// </summary>
+public enum PaymentStatus
+{
+    PAYMENT_INITIATED,
+    PAYMENT_COMPLETED,
+    PAYMENT_FAILED,
+    PAYMENT_CANCELLED
+}
+
+/// <summary>
+/// Revenue attached to a tracked event. The event name becomes the payment type.
+/// </summary>
+public class EventPayment
+{
+    public double amount;
+    public string paymentId;
+    public string currency;
+    public string userId;
+    public PaymentStatus status;
+
+    public EventPayment(double amount, string paymentId, string currency, string userId,
+        PaymentStatus status = PaymentStatus.PAYMENT_COMPLETED)
+    {
+        this.amount = amount;
+        this.paymentId = paymentId;
+        this.currency = currency;
+        this.userId = userId;
+        this.status = status;
+    }
 }
 ```
 
@@ -1426,43 +1391,94 @@ LinkrunnerSDK.TrackEvent("purchase", eventData, eventId: "purchase_abc123");
 ```
 
 <Note>
-When tracking revenue-related events, the `amount` field must be a number (not a string) for ad network revenue optimization to work correctly.
+An `amount` inside the event data is not sent to ad networks as revenue. To share revenue, send it as a payment. See [Track Payments](#track-payments).
 </Note>
 
-### Capture Payment
+### Track Payments
+
+Use `TrackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `subscription_renewed`. Requires the bridges above, built on Android SDK 5.0.0 and LinkrunnerKit 5.0.0 or later. For examples for every case and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
+
+This example sets every parameter. Only the first five are required.
 
 ```csharp
-LinkrunnerSDK.CapturePayment(
-    userId: "user_123",
-    amount: 9.99,
-    paymentId: "pay_abc123",
-    type: "FIRST_PAYMENT",
-    status: "PAYMENT_COMPLETED"
-);
+// Product details: Meta and Google read these fields
+string eventDataJson =
+    "{\"content_ids\":[\"sku_1\",\"sku_2\"]," +
+    "\"contents\":[{\"id\":\"sku_1\",\"quantity\":1,\"item_price\":999}," +
+    "{\"id\":\"sku_2\",\"quantity\":1,\"item_price\":500}]," +
+    "\"content_type\":\"product\",\"num_items\":2,\"order_id\":\"order_123\"}";
 
-// With event data
-string eventData = "{\"product_id\": \"prod_456\", \"currency\": \"USD\"}";
-LinkrunnerSDK.CapturePayment(
-    userId: "user_123",
-    amount: 49.99,
-    paymentId: "pay_xyz789",
-    type: "ONE_TIME",
-    status: "PAYMENT_COMPLETED",
-    eventDataJson: eventData
+// Reports the result of every TrackEvent and TrackPayment call. Subscribe once, for example in Awake
+LinkrunnerSDK.OnEventTracked += (success, message) =>
+{
+    // An invalid value arrives here as success == false, and nothing is sent
+    if (!success) Debug.LogError($"Error tracking payment: {message}");
+};
+
+LinkrunnerSDK.TrackPayment(
+    eventName: "purchase",                   // Required: payment name, stored as the payment type in reports and mappings
+    paymentId: "order_123",                  // Required: your order or transaction ID, used to deduplicate
+    userId: "user_123",                      // Required: your user ID. "" uses the user saved by Signup or SetUserData
+    amount: 1499.0,                          // Required: total the user paid, a finite number >= 0
+    currency: "INR",                         // Required: 3-letter ISO 4217 code
+    status: PaymentStatus.PAYMENT_COMPLETED, // Optional: defaults to PAYMENT_COMPLETED (see statuses below)
+    eventDataJson: eventDataJson             // Optional: extra details as a JSON string, defaults to ""
 );
 ```
 
-**`paymentId`** is required and must be unique for each payment. It is used for idempotent deduplication, so retries cannot double count revenue.
+#### `PaymentStatus`
 
-**Payment types:** `FIRST_PAYMENT`, `SECOND_PAYMENT`, `WALLET_TOPUP`, `FUNDS_WITHDRAWAL`, `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `ONE_TIME`, `RECURRING`, `DEFAULT`
-
-**Payment statuses:** `PAYMENT_INITIATED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, `PAYMENT_CANCELLED`
-
-### Remove Payment (Refunds)
+`PaymentStatus` is the C# enum defined in the `LinkrunnerSDK` wrapper above. The bridges pass its name to the native SDK:
 
 ```csharp
-LinkrunnerSDK.RemovePayment(userId: "user_123", paymentId: "pay_abc123");
+public enum PaymentStatus
+{
+    PAYMENT_INITIATED,
+    PAYMENT_COMPLETED, // default
+    PAYMENT_FAILED,
+    PAYMENT_CANCELLED
+}
 ```
+
+| Status | Use it when | Effect |
+| ------ | ----------- | ------ |
+| `PAYMENT_INITIATED` | The user started paying, such as opening the checkout or payment sheet. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_COMPLETED` (default) | The charge succeeded. | Added to revenue and paying users. Sent to ad networks when the event name is mapped. |
+| `PAYMENT_FAILED` | The charge was declined or errored. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_CANCELLED` | The user backed out before paying. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+
+Linkrunner keeps one payment per `paymentId`, event name, and status, so a retry with the same values is recorded once. See [Payment status](/sdk/track-payments#payment-status) for a full lifecycle example.
+
+#### `TrackPayment` Parameters
+
+| Parameter | Type | Required | Default | Description |
+| --------- | ---- | -------- | ------- | ----------- |
+| `eventName` | `string` | Yes |  | Payment name, shown as the payment type in reports and matched against your event mappings. |
+| `paymentId` | `string` | Yes |  | Your order or transaction ID. Must not be blank. Used to recognize the same payment when it arrives again. |
+| `userId` | `string` | Yes |  | Your ID for the user who paid. If you pass an empty string, the SDK uses the user saved by `Signup` or `SetUserData`. |
+| `amount` | `double` | Yes |  | Total the user paid. Must be a finite number, 0 or greater. This is the revenue value. |
+| `currency` | `string` | Yes |  | 3-letter ISO 4217 currency code, such as `INR` or `USD`. Case-insensitive, sent in uppercase. |
+| `status` | `PaymentStatus` | No | `PAYMENT_COMPLETED` | Where the payment is in its lifecycle. See the statuses above. |
+| `eventDataJson` | `string` | No | `""` | Extra details as a JSON string, such as product details. An `amount` inside it is not revenue. |
+
+If a value breaks these rules, the native SDK rejects the payment, nothing is sent, and `OnEventTracked` reports `false` with the error.
+
+<Note>
+If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so your existing mappings and reports keep working. Any other name, such as `purchase`, is stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
+</Note>
+
+#### Track a payment with `TrackEvent`
+
+You can also pass an `EventPayment` to `TrackEvent`. It takes the same `amount`, `paymentId`, `currency`, `userId`, and `status` fields and records the same payment. Use it when you also need an `eventId`.
+
+```csharp
+var payment = new EventPayment(amount: 9.99, paymentId: "pay_abc123", currency: "USD", userId: "user_123");
+LinkrunnerSDK.TrackEvent("purchase", payment: payment);
+```
+
+<Note>
+`capturePayment` is deprecated. Bridges built against Android SDK 4.x or LinkrunnerKit 4.x keep using it and continue to work unchanged. To move to 5.0.0, see [Migrate from capturePayment to trackPayment](/sdk/migrate-to-track-event).
+</Note>
 
 ### Push Token
 
@@ -1501,8 +1517,7 @@ LinkrunnerSDK.SetDisableAaidCollection(true);
 | [`GetAttributionData`](/sdk/unity#get-attribution-data) | Optional | After init completes | When you need campaign/deeplink info |
 | [`SetUserData`](/sdk/unity#set-user-data-on-app-open) | Optional | Profile update flow after `Signup` | When additional user details become available |
 | [`TrackEvent`](/sdk/unity#track-events) | Optional | Throughout the app | On user actions |
-| [`CapturePayment`](/sdk/unity#capture-payment) | Optional | Payment flow | When payment succeeds |
-| [`RemovePayment`](/sdk/unity#remove-payment-refunds) | Optional | Refund flow | When payment is reversed |
+| [`TrackPayment`](/sdk/unity#track-payments) | Optional | Payment flow | When payment succeeds |
 | [`SetPushToken`](/sdk/unity#push-token) | Optional | After token refresh | When push token changes |
 | [`SetConsent`](/sdk/unity#set-consent) | Optional | Before `Initialize` | At launch and whenever consent changes |
 | [`SetAdditionalData`](/sdk/unity#set-additional-data) | Optional | Integration setup | When the CleverTap ID is available |

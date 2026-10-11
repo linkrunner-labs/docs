@@ -28,7 +28,7 @@ Add the Linkrunner SDK to your app's `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation 'io.linkrunner:android-sdk:4.2.0'
+    implementation 'io.linkrunner:android-sdk:5.0.0'
 }
 ```
 
@@ -461,105 +461,122 @@ private fun setIntegrationData() {
 ## Revenue Tracking
 
 <Note>
-    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
+    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Pass your user ID as `userId` so each payment is linked to the user who paid. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 </Note>
 
-### Capturing Payments
+### Tracking Payments
 
-Track payment information with the following details:
+Use `trackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `subscription_renewed`. Requires Android SDK 5.0.0 or later. For examples for every case and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
+
+This example sets every parameter. Only the first five are required.
 
 ```kotlin
-private fun capturePayment() {
+import io.linkrunner.sdk.LinkRunner
+import io.linkrunner.sdk.models.PaymentStatus
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+private fun trackPurchase() {
     CoroutineScope(Dispatchers.IO).launch {
-        try {
-            val paymentData = CapturePaymentRequest(
-                paymentId = "payment_123",  // Required: Unique payment identifier
-                userId = "user123",         // Required: User identifier
-                amount = 99.99,             // Required: Payment amount
-                type = PaymentType.FIRST_PAYMENT,  // Optional: Defaults to DEFAULT
-                // type = PaymentType.SECOND_PAYMENT,  // Optional: Defaults to DEFAULT
-                status = PaymentStatus.PAYMENT_COMPLETED,  // Optional: Defaults to PAYMENT_COMPLETED
-                eventData = mapOf(          // Optional: Ecommerce/custom event data
-                    "content_ids" to listOf("product_123"),
-                    "content_type" to "product",
-                    "currency" to "USD",
-                    "value" to 99.99,
-                    "num_items" to 1,
-                    "order_id" to "order_12345",
-                    "contents" to listOf(
-                        mapOf(
-                            "id" to "product_123",
-                            "quantity" to 1,
-                            "item_price" to 99.99
-                        )
-                    )
-                )
-            )
+        val result = LinkRunner.getInstance().trackPayment(
+            eventName = "purchase",                   // Required: payment name, stored as the payment type in reports and mappings
+            paymentId = "order_123",                  // Required: your order or transaction ID, used to deduplicate
+            userId = "user_123",                      // Required: your user ID. "" uses the user saved by signup or setUserData
+            amount = 1499.0,                          // Required: total the user paid, a finite number >= 0
+            currency = "INR",                         // Required: 3-letter ISO 4217 code
+            status = PaymentStatus.PAYMENT_COMPLETED, // Optional: defaults to PAYMENT_COMPLETED (see statuses below)
+            eventData = mapOf(                        // Optional: extra details. Meta and Google read these product fields
+                "content_ids" to listOf("sku_1", "sku_2"),
+                "contents" to listOf(
+                    mapOf("id" to "sku_1", "quantity" to 1, "item_price" to 999),
+                    mapOf("id" to "sku_2", "quantity" to 1, "item_price" to 500)
+                ),
+                "content_type" to "product",
+                "num_items" to 2,
+                "order_id" to "order_123"
+            ),
+            eventId = "evt_order_123"                 // Optional: your own ID for this event, defaults to null
+        )
 
-            val result = LinkRunner.getInstance().capturePayment(paymentData)
-
-            result.onSuccess {
-                println("Payment captured successfully")
-            }.onFailure { error ->
-                println("Error capturing payment: ${error.message}")
-            }
-        } catch (e: Exception) {
-            println("Exception capturing payment: ${e.message}")
+        result.onSuccess {
+            println("Payment event queued")
+        }.onFailure { error ->
+            // An invalid value returns IllegalArgumentException here, and nothing is sent
+            println("Error tracking payment: ${error.message}")
         }
     }
 }
 ```
 
-#### Available Payment Types
+#### `PaymentStatus`
 
-| Type                   | Description              |
-| ---------------------- | ------------------------ |
-| `FIRST_PAYMENT`        | User's first payment     |
-| `SECOND_PAYMENT`       | User's second payment    |
-| `WALLET_TOPUP`         | Adding funds to wallet   |
-| `FUNDS_WITHDRAWAL`     | Withdrawing funds        |
-| `SUBSCRIPTION_CREATED` | New subscription created |
-| `SUBSCRIPTION_RENEWED` | Subscription renewal     |
-| `ONE_TIME`             | One-time payment         |
-| `RECURRING`            | Recurring payment        |
-| `DEFAULT`              | Default payment type     |
-
-#### Available Payment Statuses
-
-| Status              | Description                    |
-| ------------------- | ------------------------------ |
-| `PAYMENT_INITIATED` | Payment process started        |
-| `PAYMENT_COMPLETED` | Payment successfully completed |
-| `PAYMENT_FAILED`    | Payment failed                 |
-| `PAYMENT_CANCELLED` | Payment was cancelled          |
-
-### Removing Payments
-
-To remove or refund a payment:
+`PaymentStatus` is an enum in `io.linkrunner.sdk.models`:
 
 ```kotlin
-private fun removePayment() {
-    CoroutineScope(Dispatchers.IO).launch {
-        try {
-            // Either paymentId or userId must be provided
-            val removeRequest = RemovePaymentRequest(
-                paymentId = "payment_123",  // Optional: Payment ID to remove
-                userId = "user123"           // Optional: User ID to remove payments for
+import io.linkrunner.sdk.models.PaymentStatus
+
+PaymentStatus.PAYMENT_INITIATED
+PaymentStatus.PAYMENT_COMPLETED // default
+PaymentStatus.PAYMENT_FAILED
+PaymentStatus.PAYMENT_CANCELLED
+```
+
+| Status | Use it when | Effect |
+| ------ | ----------- | ------ |
+| `PAYMENT_INITIATED` | The user started paying, such as opening the checkout or payment sheet. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_COMPLETED` (default) | The charge succeeded. | Added to revenue and paying users. Sent to ad networks when the event name is mapped. |
+| `PAYMENT_FAILED` | The charge was declined or errored. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_CANCELLED` | The user backed out before paying. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+
+Linkrunner keeps one payment per `paymentId`, event name, and status, so a retry with the same values is recorded once. See [Payment status](/sdk/track-payments#payment-status) for a full lifecycle example.
+
+#### `trackPayment` Parameters
+
+| Parameter | Type | Required | Default | Description |
+| --------- | ---- | -------- | ------- | ----------- |
+| `eventName` | `String` | Yes |  | Payment name, shown as the payment type in reports and matched against your event mappings. |
+| `paymentId` | `String` | Yes |  | Your order or transaction ID. Must not be blank. Used to recognize the same payment when it arrives again. |
+| `userId` | `String` | Yes |  | Your ID for the user who paid. If you pass an empty string, the SDK uses the user saved by `signup` or `setUserData`. |
+| `amount` | `Double` | Yes |  | Total the user paid. Must be a finite number, 0 or greater. This is the revenue value. |
+| `currency` | `String` | Yes |  | 3-letter ISO 4217 currency code, such as `INR` or `USD`. Case-insensitive, sent in uppercase. |
+| `status` | `PaymentStatus` | No | `PAYMENT_COMPLETED` | Where the payment is in its lifecycle. See the statuses above. |
+| `eventData` | `Map<String, Any>?` | No | None | Extra details, such as product details for [ecommerce events](#ecommerce-events). An `amount` inside it is not revenue. |
+| `eventId` | `String?` | No | None | Your own identifier for this event. |
+
+When a value breaks these rules, `trackPayment` returns a failed `Result` with an `IllegalArgumentException`, and nothing is sent.
+
+<Note>
+    If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so your existing mappings and reports keep working. Any other name, such as `purchase`, is stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
+</Note>
+
+#### Track a payment with `trackEvent`
+
+You can also pass an `EventPayment` to `trackEvent`. It takes the same `amount`, `paymentId`, `currency`, `userId`, and `status` fields and records the same payment. The `EventPayment` constructor throws `IllegalArgumentException` for an invalid value.
+
+```kotlin
+import io.linkrunner.sdk.models.EventPayment
+
+CoroutineScope(Dispatchers.IO).launch {
+    try {
+        LinkRunner.getInstance().trackEvent(
+            eventName = "purchase",
+            payment = EventPayment(
+                amount = 99.99,
+                paymentId = "payment_123",
+                currency = "USD",
+                userId = "user_123"
             )
-
-            val result = LinkRunner.getInstance().removePayment(removeRequest)
-
-            result.onSuccess {
-                println("Payment removed successfully")
-            }.onFailure { error ->
-                println("Error removing payment: ${error.message}")
-            }
-        } catch (e: Exception) {
-            println("Exception removing payment: ${e.message}")
-        }
+        )
+    } catch (e: IllegalArgumentException) {
+        println("Invalid payment: ${e.message}")
     }
 }
 ```
+
+<Note>
+    `capturePayment` is deprecated. Apps on Android SDK 4.x keep using it and continue to work unchanged. To move to 5.0.0, see [Migrate from capturePayment to trackPayment](/sdk/migrate-to-track-event).
+</Note>
 
 ## Tracking Custom Events
 
@@ -568,7 +585,7 @@ private fun removePayment() {
 </Note>
 
 <Note>
-    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, use [`trackPayment`](#tracking-payments).
 </Note>
 
 Track custom events in your app:
@@ -581,8 +598,7 @@ private fun trackEvent() {
                 eventName = "purchase_initiated", // Event name
                 eventData = mapOf( // Optional: Event data
                     "product_id" to "12345",
-                    "category" to "electronics",
-                    "amount" to 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
+                    "category" to "electronics"
                 ),
                 eventId = "order_12345" // Optional: Your own unique event identifier
             )
@@ -607,37 +623,36 @@ private fun trackEvent() {
 
 ### Revenue Sharing with Ad Networks
 
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+Send revenue to ad networks such as Google Ads and Meta as a [payment](#tracking-payments). Meta and Google receive the value and currency from the payment `amount` and `currency`, so send the order total as `amount`. Linkrunner does not add up item prices.
+
+Put product details in `eventData`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`. Google receives `content_ids` as item IDs.
 
 ```kotlin
-private fun trackPurchaseEvent() {
+private fun trackPurchase() {
     CoroutineScope(Dispatchers.IO).launch {
         try {
-            val result = LinkRunner.getInstance().trackEvent(
-                eventName = "purchase_completed",
+            LinkRunner.getInstance().trackEvent(
+                eventName = "purchase",
                 eventData = mapOf(
-                    "product_id" to "12345",
-                    "category" to "electronics",
-                    "amount" to 149.99 // Revenue amount as a number
+                    "content_ids" to listOf("product_123"),
+                    "num_items" to 1,
+                    "order_id" to "order_12345"
+                ),
+                payment = EventPayment(
+                    amount = 149.99, // Order total, sent to ad networks as the value
+                    paymentId = "order_12345",
+                    currency = "USD",
+                    userId = "user_123"
                 )
             )
-
-            result.onSuccess {
-                println("Purchase event with revenue tracked successfully")
-            }.onFailure { error ->
-                println("Error tracking purchase event: ${error.message}")
-            }
-        } catch (e: Exception) {
-            println("Exception tracking purchase event: ${e.message}")
+        } catch (e: IllegalArgumentException) {
+            println("Invalid payment: ${e.message}")
         }
     }
 }
 ```
 
-<Note>
-    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number (Double
-    or Int), not as a string.
-</Note>
+An `amount` inside `eventData` is not sent to ad networks as revenue. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
 
 ## Ecommerce Events
 
@@ -705,18 +720,14 @@ private fun trackViewContent() {
 
 ### Payment / Purchase Example
 
-Use the `capturePayment` method to send a `Purchase` event containing the ecommerce payload:
+Use `trackEvent` with an `EventPayment` to send a `Purchase` event containing the ecommerce payload:
 
 ```kotlin
-private fun capturePurchase() {
+private fun trackPurchase() {
     CoroutineScope(Dispatchers.IO).launch {
         try {
-            val paymentData = CapturePaymentRequest(
-                paymentId = "payment_456",
-                userId = "user123",
-                amount = 49.99,
-                type = PaymentType.FIRST_PAYMENT, // Map this payment type to "Purchase" (Meta) or "ecommerce_purchase" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
-                status = PaymentStatus.PAYMENT_COMPLETED,
+            LinkRunner.getInstance().trackEvent(
+                eventName = "purchase", // Map this event to "Purchase" (Meta) or "ecommerce_purchase" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
                 eventData = mapOf(
                     "content_ids" to listOf("product_123"),
                     "contents" to listOf(
@@ -731,11 +742,16 @@ private fun capturePurchase() {
                     "value" to 49.99,
                     "num_items" to 1,
                     "order_id" to "order_abc123" // Required for Purchase events
+                ),
+                payment = EventPayment(
+                    amount = 49.99,
+                    paymentId = "payment_456",
+                    currency = "USD",
+                    userId = "user_123"
                 )
             )
-            LinkRunner.getInstance().capturePayment(paymentData)
-        } catch (e: Exception) {
-            println("Exception capturing purchase: ${e.message}")
+        } catch (e: IllegalArgumentException) {
+            println("Invalid payment: ${e.message}")
         }
     }
 }
@@ -983,8 +999,7 @@ Connect Firebase Cloud Messaging (FCM) with Linkrunner
 | [`LinkRunner.getInstance().setAdditionalData`](/sdk/android#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
 | [`LinkRunner.getInstance().setUserData`](/sdk/android#setting-user-data) | Optional | Authentication or profile update logic | After `signup`, when additional user details become available |
 | [`LinkRunner.getInstance().trackEvent`](/sdk/android#tracking-custom-events) | Optional | Throughout app | When specific user actions occur, including [ecommerce events](/sdk/android#ecommerce-events) |
-| [`LinkRunner.getInstance().capturePayment`](/sdk/android#capturing-payments) | Optional | Payment processing | When user makes a payment, including [ecommerce purchases](/sdk/android#ecommerce-events) |
-| [`LinkRunner.getInstance().removePayment`](/sdk/android#removing-payments) | Optional | Refund flow | When payment needs to be removed |
+| [`LinkRunner.getInstance().trackPayment`](/sdk/android#tracking-payments) | Optional | Payment processing | When user makes a payment, including [ecommerce purchases](/sdk/android#ecommerce-events) |
 | [`LinkRunner.getInstance().setPushToken`](/sdk/android#uninstall-tracking) | Optional | Push notification setup | When FCM token is available |
 | [`LinkRunner.getInstance().setConsent`](/sdk/android#google-ads-consent) | Optional | App initialization or consent flow | Before `init`, and again when consent changes |
 | [`LinkRunner.getInstance().enablePIIHashing`](/sdk/android#enhanced-privacy-controls) | Optional | Privacy settings | When you want to enable PII hashing |

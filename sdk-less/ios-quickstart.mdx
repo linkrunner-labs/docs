@@ -109,48 +109,30 @@ final class LinkrunnerClient {
         return try await post("/api/client/set-user-data", body)
     }
 
+    /// Pass a payment to record the event as revenue. A nil status defaults to PAYMENT_COMPLETED on the server.
+    struct Payment {
+        let amount: Double
+        let paymentId: String
+        let currency: String
+        var status: String? = nil
+    }
+
     @discardableResult
-    func trackEvent(_ name: String, data eventData: [String: Any]? = nil) async throws -> [String: Any] {
+    func trackEvent(_ name: String, data eventData: [String: Any]? = nil, payment: Payment? = nil) async throws -> [String: Any] {
         var body = base()
         body["event_name"] = name
         if let eventData { body["event_data"] = eventData }
+        if let payment {
+            body["amount"] = payment.amount
+            body["payment_id"] = payment.paymentId
+            body["currency"] = payment.currency
+            if let status = payment.status { body["status"] = status }
+        }
         body["device_data"] = await deviceData()
         body["time_since_app_install"] = timeSinceInstall()
         let res = try await post("/api/client/capture-event", body)
         applySKAN(res)
         return res
-    }
-
-    @discardableResult
-    func capturePayment(
-        amount: Double,
-        userId: String,
-        paymentId: String,
-        type: String = "DEFAULT",
-        status: String = "PAYMENT_COMPLETED",
-        eventData: [String: Any]? = nil
-    ) async throws -> [String: Any] {
-        var body = base()
-        body["amount"] = amount
-        body["user_id"] = userId
-        body["type"] = type
-        body["status"] = status
-        body["payment_id"] = paymentId
-        if let eventData { body["event_data"] = eventData }
-        body["time_since_app_install"] = timeSinceInstall()
-        body["data"] = ["device_data": await deviceData()]
-        let res = try await post("/api/client/capture-payment", body)
-        applySKAN(res)
-        return res
-    }
-
-    @discardableResult
-    func removePayment(userId: String, paymentId: String? = nil) async throws -> [String: Any] {
-        var body = base()
-        body["user_id"] = userId
-        if let paymentId { body["payment_id"] = paymentId }
-        body["data"] = ["device_data": await deviceData()]
-        return try await post("/api/client/remove-captured-payment", body)
     }
 
     @discardableResult
@@ -345,29 +327,28 @@ Task {
 
 ## 5. Track events and payments
 
+Use `trackEvent` for both. Pass a `Payment` when the event is a payment, so Linkrunner records it as revenue. The event name becomes the payment type in reports.
+
 ```swift
 // Custom event
 Task {
     try? await LinkrunnerClient.shared.trackEvent(
         "purchase_initiated",
-        data: ["product_id": "12345", "amount": 99.99]
+        data: ["product_id": "12345"]
     )
 }
 
 // Payment
 Task {
-    try? await LinkrunnerClient.shared.capturePayment(
-        amount: 99.99,
-        userId: "user_123",
-        paymentId: "payment_123",
-        type: "FIRST_PAYMENT"
+    try? await LinkrunnerClient.shared.trackEvent(
+        "purchase_completed",
+        data: ["product_id": "12345"],
+        payment: .init(amount: 99.99, paymentId: "payment_123", currency: "USD")
     )
 }
 ```
 
-<Note>
-  Add `amount` as a number in event or payment data to enable revenue sharing with Google and Meta.
-</Note>
+`currency` is a 3-letter ISO 4217 code. Only completed payments are sent to ad networks. See [capture-event](/sdk-less/api-reference#capture-event) for the field rules and `status` values.
 
 ## Other endpoints
 
@@ -376,12 +357,11 @@ try? await LinkrunnerClient.shared.setUserData(["id": "user_123", "phone": "9876
 try? await LinkrunnerClient.shared.setPushToken(apnsOrFcmToken)
 try? await LinkrunnerClient.shared.setIntegrationData(clevertapId: "YOUR_CLEVERTAP_ID")
 try? await LinkrunnerClient.shared.handleDeeplink("https://app.example.com/product/123")
-try? await LinkrunnerClient.shared.removePayment(userId: "user_123", paymentId: "payment_123")
 ```
 
 ## SKAdNetwork
 
-`init`, `signup`, `capture-event`, and `capture-payment` responses can include a conversion value (`fine_conversion_value`, `coarse_conversion_value`, `lock_postback`). The client applies it automatically through `applySKAN`, which calls `SKAdNetwork.updatePostbackConversionValue`. You do not need to manage conversion values yourself. See [Collecting device data](/sdk-less/ios-device-data#skadnetwork) for how this fits with Apple's attribution.
+`init`, `signup`, and `capture-event` responses can include a conversion value (`fine_conversion_value`, `coarse_conversion_value`, `lock_postback`). The client applies it automatically through `applySKAN`, which calls `SKAdNetwork.updatePostbackConversionValue`. You do not need to manage conversion values yourself. See [Collecting device data](/sdk-less/ios-device-data#skadnetwork) for how this fits with Apple's attribution.
 
 ## Retries and idempotency
 
@@ -392,11 +372,11 @@ A retry can send the same request twice if the first attempt reached the server 
 | Endpoint | Safe to retry? | Why |
 | --- | --- | --- |
 | `init` | Yes | The server deduplicates on `install_instance_id`. |
-| `capture-payment` | Yes, with `payment_id` | The server deduplicates on `payment_id`. Always send one. |
-| `capture-event` | Not deduplicated | A retried event can be counted twice. |
+| `capture-event` with a payment | Yes | The server deduplicates on `payment_id` for the same event name and status. |
+| `capture-event` without a payment | Not deduplicated | A retried event can be counted twice. |
 
 <Tip>
-  `paymentId` is required for `capturePayment`, and a unique value ensures retries cannot double count revenue. Events have no server-side deduplication, so if exact event counts matter, disable retries for those calls.
+  A unique `paymentId` for each transaction ensures retries cannot double count revenue. Custom events have no server-side deduplication, so if exact event counts matter, disable retries for those calls.
 </Tip>
 
 ## Troubleshooting
