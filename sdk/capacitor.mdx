@@ -349,69 +349,61 @@ This method allows you to connect user identities across different analytics and
 ## Revenue Tracking
 
 <Note>
-    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
+    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-identification-required) or [`.setUserData`](#setting-user-data) first so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 </Note>
 
-### Capture Payment
+### Tracking Payments
 
-Use this method to capture payment information:
-
-```typescript
-import linkrunner from "capacitor-linkrunner";
-
-const capturePayment = async () => {
-    await linkrunner.capturePayment({
-        amount: 100, // Payment amount
-        userId: "user123", // User identifier
-        paymentId: "payment456", // Required: Unique payment identifier
-        type: "FIRST_PAYMENT", // Optional: Payment type
-        // type: "SECOND_PAYMENT", // Optional: Payment type
-        status: "PAYMENT_COMPLETED", // Optional: Payment status
-    });
-};
-```
-
-#### Parameters for `linkrunner.capturePayment`
-
--   `amount`: number (required) - The payment amount
--   `userId`: string (required) - Identifier for the user making the payment
--   `paymentId`: string (required) - Unique identifier for the payment, used to deduplicate transactions
--   `type`: string (optional) - Type of payment. Available options:
-    -   `FIRST_PAYMENT` - First payment made by the user
-    -   `WALLET_TOPUP` - Adding funds to a wallet
-    -   `FUNDS_WITHDRAWAL` - Withdrawing funds
-    -   `SUBSCRIPTION_CREATED` - New subscription created
-    -   `SUBSCRIPTION_RENEWED` - Subscription renewal
-    -   `ONE_TIME` - One-time payment
-    -   `RECURRING` - Recurring payment
-    -   `DEFAULT` - Default type (used if not specified)
--   `status`: string (optional) - Status of the payment. Available options:
-    -   `PAYMENT_INITIATED` - Payment has been initiated
-    -   `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
-    -   `PAYMENT_FAILED` - Payment attempt failed
-    -   `PAYMENT_CANCELLED` - Payment was cancelled
-
-### Removing Payments
-
-Remove payment records (for refunds or cancellations):
+To record revenue, pass a `payment` as the fourth argument to `trackEvent`. Linkrunner stores the event as a payment and uses the event name as its payment type, so you can use any name, such as `purchase` or `subscription_renewed`. Requires `capacitor-linkrunner` 3.0.0 or later.
 
 ```typescript
 import linkrunner from "capacitor-linkrunner";
 
-const removePayment = async () => {
-    await linkrunner.removePayment({
-        userId: "user123", // User identifier
-        paymentId: "payment456", // Optional: Unique payment identifier
-    });
+const trackPurchase = async () => {
+    try {
+        await linkrunner.trackEvent(
+            "purchase", // Event name, used as the payment type
+            { plan: "pro" }, // Optional: Event data
+            undefined, // Optional: Event ID
+            {
+                amount: 499,
+                paymentId: "order_123",
+                currency: "INR",
+            }
+        );
+    } catch (error) {
+        console.error("Error tracking payment:", error);
+    }
 };
 ```
 
-#### Parameters for `linkrunner.removePayment`
+You can pass `eventData` and `eventId` in the same call, as with any other [custom event](#tracking-custom-events).
 
--   `userId`: string (optional) - Identifier for the user whose payment is being removed. If only `userId` is provided, all payments for that user will be removed.
--   `paymentId`: string (optional) - Unique identifier for the payment to be removed
+#### `payment` Parameters
 
-Note: At least one of `paymentId` or `userId` must be provided when calling `removePayment`.
+| Parameter   | Type     | Required | Description |
+| ----------- | -------- | -------- | ----------- |
+| `amount`    | `number` | Yes      | Payment amount. Must be a finite number, 0 or greater. |
+| `paymentId` | `string` | Yes      | Unique identifier for this payment, such as your order or transaction ID. Must not be blank. |
+| `currency`  | `string` | Yes      | 3-letter ISO 4217 currency code, such as `INR` or `USD`. Case-insensitive, sent in uppercase. |
+| `status`    | `string` | No       | Payment status. Defaults to `PAYMENT_COMPLETED` when you leave it out. |
+
+The promise returned by `trackEvent` rejects when a value breaks these rules, and nothing is sent.
+
+#### Available Payment Statuses
+
+| Status              | Description                    |
+| ------------------- | ------------------------------ |
+| `PAYMENT_INITIATED` | Payment process started        |
+| `PAYMENT_COMPLETED` | Payment successfully completed |
+| `PAYMENT_FAILED`    | Payment failed                 |
+| `PAYMENT_CANCELLED` | Payment was cancelled          |
+
+Only `PAYMENT_COMPLETED` payments are sent to ad network postbacks. In TypeScript, you can import the `EventPayment` and `PaymentStatus` types from `capacitor-linkrunner`.
+
+<Note>
+    Apps on `capacitor-linkrunner` 2.x keep using `capturePayment` and continue to work unchanged. To move to 3.0.0, see the migration steps in the [capacitor-linkrunner changelog](https://github.com/linkrunner-labs/capacitor-linkrunner/blob/main/CHANGELOG.md).
+</Note>
 
 ## Tracking Custom Events
 
@@ -420,7 +412,7 @@ Note: At least one of `paymentId` or `userId` must be provided when calling `rem
 </Note>
 
 <Note>
-    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-identification-required) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, pass a [`payment`](#tracking-payments) to `.trackEvent`.
 </Note>
 
 Track custom events in your app:
@@ -442,6 +434,7 @@ const trackEvent = async () => {
 - `eventName`: string (required) - Name of the event to track
 - `eventData`: object (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
 - `eventId`: string | number (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
+- `payment`: object (optional). Records revenue with the event. See [Tracking Payments](#tracking-payments).
 
 ### Revenue Sharing with Ad Networks
 
@@ -644,8 +637,7 @@ Connect APNs with Linkrunner
 | [`linkrunner.setAdditionalData`](/sdk/capacitor#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
 | [`linkrunner.setUserData`](/sdk/capacitor#setting-user-data) | Optional | Profile update flow after `signup` | When additional user details become available |
 | [`linkrunner.trackEvent`](/sdk/capacitor#tracking-custom-events) | Optional | Throughout app | When specific user actions occur |
-| [`linkrunner.capturePayment`](/sdk/capacitor#capture-payment) | Optional | Payment processing | When user makes a payment |
-| [`linkrunner.removePayment`](/sdk/capacitor#removing-payments) | Optional | Refund flow | When payment needs to be removed |
+| [`linkrunner.trackEvent` with `payment`](/sdk/capacitor#tracking-payments) | Optional | Payment processing | When user makes a payment |
 | [`linkrunner.setPushToken`](/sdk/capacitor#uninstall-tracking) | Optional | Push notification setup | When push token is available |
 | [`linkrunner.enablePIIHashing`](/sdk/capacitor#enhanced-privacy-controls) | Optional | Privacy configuration | When enabling PII hashing |
 

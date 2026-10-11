@@ -83,13 +83,13 @@ There are **3 essential events** to map:
 
 - Your view item event (e.g., `view_item`, `item_viewed`) → maps to **`view_item`**
 - Your add to cart event (e.g., `add_to_cart`) → maps to **`add_to_cart`**
-- Your purchase event (e.g., `FIRST_PAYMENT`, `DEFAULT`) → maps to **`ecommerce_purchase`**
+- Your purchase event (e.g., `purchase_completed`) → maps to **`ecommerce_purchase`**
 
 _In the Linkrunner Dashboard, go to your Google Ads integration settings and map each of your custom event names to the corresponding standard Google event._
 
 ## Understanding `event_data` for Google
 
-When sending events via the [Capture Event API](/api-reference/event-capture), [Capture Payment API](/api-reference/revenue-tracking), or the Linkrunner SDK (`trackEvent` and `capturePayment` methods), you need to include specific fields in `event_data` so Google can correctly attribute conversions and match products in your Merchant Center catalog.
+When sending events via the [Capture Event API](/api-reference/event-capture) or the Linkrunner SDK `trackEvent` method, you need to include specific fields in `event_data` so Google can correctly attribute conversions and match products in your Merchant Center catalog.
 
 ### Required Fields
 
@@ -169,36 +169,38 @@ await linkrunner.trackEvent(
 
 ### ecommerce_purchase
 
-Fired when a user completes a purchase.
+Fired when a user completes a purchase. Send it as a payment: pass `amount`, `paymentId`, and `currency` with the event so Linkrunner records the revenue.
 
 <CodeGroup>
 
 ```javascript SDK
-await linkrunner.capturePayment({
-  amount: 2298.00,
-  userId: "user_456",
-  paymentId: "order_98765",
-  type: "FIRST_PAYMENT",       // Map this payment type to "ecommerce_purchase" in the Linkrunner Dashboard
-  status: "PAYMENT_COMPLETED",
-  eventData: {
+await linkrunner.trackEvent(
+  "purchase_completed", // Map this event to "ecommerce_purchase" in the Linkrunner Dashboard
+  {
     content_ids: ["sku_blue_tshirt", "sku_red_shoes"], // Must match Merchant Center ID (offer_id)
     value: 2298,               // Required
     currency: "INR",           // Required
     num_items: 2,              // Required
     order_id: "order_98765",   // Required for purchase events
   },
-});
+  undefined, // eventId
+  {
+    amount: 2298.0,
+    paymentId: "order_98765",
+    currency: "INR",
+  },
+);
 ```
 
 ```json API
-// POST /capture-payment
+// POST /capture-event
 {
   "token": "your_project_token",
+  "event_name": "purchase_completed",
   "payment_id": "order_98765",
   "user_id": "user_456",
   "amount": 2298.00,
-  "type": "FIRST_PAYMENT",
-  "status": "PAYMENT_COMPLETED",
+  "currency": "INR",
   "install_instance_id": "abc-123",
   "event_data": {
     "content_ids": ["sku_blue_tshirt", "sku_red_shoes"], // Must match Merchant Center ID (offer_id)
@@ -219,7 +221,7 @@ The `content_ids` you send must exactly match the **ID (`offer_id`)** of the pro
 </Warning>
 
 <Tip>
-The `amount` field in `capturePayment` and the `value` field in `event_data` should be consistent. Both represent the total order value. Google reads `value` from `event_data` for conversion reporting.
+The payment `amount` and the `value` field in `event_data` should be consistent. Both represent the total order value. Google reads `value` from `event_data` for conversion reporting.
 </Tip>
 
 ## Verifying Events in Google Ads
@@ -235,4 +237,6 @@ It can take up to **24 hours** for conversion data to appear after your first ev
 
 ---
 
-> **Note:** The `event_data` fields above can be sent via the Linkrunner SDK (`trackEvent` and `capturePayment` methods) or directly via the APIs. For full request schemas, refer to the [Capture Event API](/api-reference/event-capture) and [Capture Payment API](/api-reference/revenue-tracking) documentation.
+> **Note:** The `event_data` fields above can be sent via the Linkrunner SDK `trackEvent` method or directly via the API. For full request schemas, refer to the [Capture Event API](/api-reference/event-capture) and [Revenue Tracking API](/api-reference/revenue-tracking) documentation.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

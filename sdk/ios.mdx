@@ -39,7 +39,7 @@ Alternatively, you can add the package dependency to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "4.2.0")
+    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "5.0.0")
 ]
 ```
 
@@ -514,56 +514,46 @@ func setAdditionalData() async {
 ## Revenue Tracking
 
 <Note>
-    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
+    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-identification-required) or [`.setUserData`](#setting-user-data) first so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 </Note>
 
-### Capturing Payments
+### Tracking Payments
 
-Track payment information:
+To record revenue, pass an `EventPayment` to `trackEvent`. Linkrunner stores the event as a payment and uses the event name as its payment type, so you can use any name, such as `purchase` or `subscription_renewed`. Requires LinkrunnerKit 5.0.0 or later.
 
 ```swift
-func capturePayment() async {
-    await LinkrunnerSDK.shared.capturePayment(
-        amount: 99.99, // Payment amount
-        userId: "user123", // User identifier
-        paymentId: "payment456", // Required: Unique payment identifier
-        type: .firstPayment, // optional
-        status: .completed, // optional
-        eventData: [        // Optional: Ecommerce/custom event data
-            "content_ids": ["product_123"],
-            "content_type": "product",
-            "currency": "USD",
-            "value": 99.99,
-            "num_items": 1,
-            "order_id": "order_12345",
-            "contents": [
-                [
-                    "id": "product_123",
-                    "quantity": 1,
-                    "item_price": 99.99
-                ]
-            ]
-        ]
-    )
-    print("Payment captured successfully")
+import LinkrunnerKit
+
+func trackPurchase() async {
+    do {
+        let payment = try EventPayment(
+            amount: 99.99,
+            paymentId: "payment_123",
+            currency: "USD"
+        )
+
+        await LinkrunnerSDK.shared.trackEvent(
+            eventName: "purchase",
+            payment: payment
+        )
+    } catch {
+        print("Invalid payment: \(error)")
+    }
 }
 ```
 
-#### Available Payment Types
+You can pass `eventData` and `eventId` in the same call, as with any other [custom event](#tracking-custom-events).
 
-```swift
-public enum PaymentType: String, Sendable {
-    case firstPayment = "FIRST_PAYMENT"
-    case secondPayment = "SECOND_PAYMENT"
-    case walletTopup = "WALLET_TOPUP"
-    case fundsWithdrawal = "FUNDS_WITHDRAWAL"
-    case subscriptionCreated = "SUBSCRIPTION_CREATED"
-    case subscriptionRenewed = "SUBSCRIPTION_RENEWED"
-    case oneTime = "ONE_TIME"
-    case recurring = "RECURRING"
-    case `default` = "DEFAULT"
-}
-```
+#### `EventPayment` Parameters
+
+| Parameter   | Type            | Required | Description |
+| ----------- | --------------- | -------- | ----------- |
+| `amount`    | `Double`        | Yes      | Payment amount. Must be a finite number, 0 or greater. |
+| `paymentId` | `String`        | Yes      | Unique identifier for this payment, such as your order or transaction ID. Must not be blank. |
+| `currency`  | `String`        | Yes      | 3-letter ISO 4217 currency code, such as `INR` or `USD`. Case-insensitive, sent in uppercase. |
+| `status`    | `PaymentStatus` | No       | Payment status. Defaults to `PAYMENT_COMPLETED` when you leave it out. |
+
+The `EventPayment` initializer throws `EventPaymentError.invalidAmount`, `.invalidPaymentId`, or `.invalidCurrency` when a value breaks these rules, and nothing is sent.
 
 #### Available Payment Statuses
 
@@ -576,19 +566,11 @@ public enum PaymentStatus: String, Sendable {
 }
 ```
 
-### Removing Payments
+To set a status, pass it to the initializer, for example `status: .initiated`. Only `PAYMENT_COMPLETED` payments are sent to ad network postbacks.
 
-Remove payment records (for refunds or cancellations):
-
-```swift
-func removePayment() async {
-    await LinkrunnerSDK.shared.removePayment(
-        userId: "user123", // User identifier
-        paymentId: "payment456" // Optional: Unique payment identifier
-    )
-    print("Payment removed successfully")
-}
-```
+<Note>
+    Apps on LinkrunnerKit 4.x keep using `capturePayment` and continue to work unchanged. To move to 5.0.0, see the migration steps in the [iOS SDK changelog](https://github.com/linkrunner-labs/linkrunner-ios/blob/main/CHANGELOG.md).
+</Note>
 
 ## Tracking Custom Events
 
@@ -597,7 +579,7 @@ func removePayment() async {
 </Note>
 
 <Note>
-    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. For capturing revenue, it is recommended to use the [`.capturePayment`](#revenue-tracking) method instead of `.trackEvent`.
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-registration) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, pass a payment to `.trackEvent`. See [Revenue Tracking](#revenue-tracking).
 </Note>
 
 Track custom events in your app:
@@ -710,33 +692,39 @@ func trackViewContent() async {
 
 ### Payment / Purchase Example
 
-Use the `capturePayment` method to send a `Purchase` event containing the ecommerce payload:
+Use `trackEvent` with an `EventPayment` to send a `Purchase` event containing the ecommerce payload:
 
 ```swift
-func capturePurchase() async {
-    await LinkrunnerSDK.shared.capturePayment(
-        amount: 49.99,
-        userId: "user123",
-        paymentId: "payment_456",
-        type: .firstPayment, // Map this payment type to "Purchase" (Meta) or "ecommerce_purchase" (Google) in the Linkrunner Dashboard
-        status: .completed,
-        eventData: [
-            "content_ids": ["product_123"],
-            "contents": [
-                [
-                    "id": "product_123", // Matches content_ids
-                    "quantity": 1,
-                    "item_price": 49.99
-                ]
+func trackPurchase() async {
+    do {
+        let payment = try EventPayment(
+            amount: 49.99,
+            paymentId: "payment_456",
+            currency: "USD"
+        )
+
+        await LinkrunnerSDK.shared.trackEvent(
+            eventName: "purchase", // Map this event to "Purchase" (Meta) or "ecommerce_purchase" (Google) in the Linkrunner Dashboard
+            eventData: [
+                "content_ids": ["product_123"],
+                "contents": [
+                    [
+                        "id": "product_123", // Matches content_ids
+                        "quantity": 1,
+                        "item_price": 49.99
+                    ]
+                ],
+                "content_type": "product",
+                "currency": "USD",
+                "value": 49.99,
+                "num_items": 1,
+                "order_id": "order_abc123" // Required for Purchase events
             ],
-            "content_type": "product",
-            "currency": "USD",
-            "value": 49.99,
-            "num_items": 1,
-            "order_id": "order_abc123" // Required for Purchase events
-        ]
-    )
-    print("Purchase captured successfully")
+            payment: payment
+        )
+    } catch {
+        print("Invalid payment: \(error)")
+    }
 }
 ```
 
@@ -886,8 +874,7 @@ Connect APNs with Linkrunner
 | [`LinkrunnerSDK.shared.setAdditionalData`](/sdk/ios#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
 | [`LinkrunnerSDK.shared.setUserData`](/sdk/ios#setting-user-data) | Optional | Authentication or profile update logic | After `signup`, when additional user details become available |
 | [`LinkrunnerSDK.shared.trackEvent`](/sdk/ios#tracking-custom-events) | Optional | Throughout app | When specific user actions occur, including [ecommerce events](/sdk/ios#ecommerce-events) |
-| [`LinkrunnerSDK.shared.capturePayment`](/sdk/ios#capturing-payments) | Optional | Payment processing | When user makes a payment, including [ecommerce purchases](/sdk/ios#ecommerce-events) |
-| [`LinkrunnerSDK.shared.removePayment`](/sdk/ios#removing-payments) | Optional | Refund flow | When payment needs to be removed |
+| [`LinkrunnerSDK.shared.trackEvent` with `payment`](/sdk/ios#tracking-payments) | Optional | Payment processing | When user makes a payment, including [ecommerce purchases](/sdk/ios#ecommerce-events) |
 | [`LinkrunnerSDK.shared.setPushToken`](/sdk/ios#uninstall-tracking) | Optional | Push notification setup | When APNs token is available |
 | [`LinkrunnerSDK.shared.setConsent`](/sdk/ios#consent) | Optional | App initialization or consent flow | Before `initialize`, and again when consent changes |
 | [`LinkrunnerSDK.shared.enablePIIHashing`](/sdk/ios#enhanced-privacy-controls) | Optional | Privacy settings | When you want to enable PII hashing |

@@ -26,42 +26,41 @@ In the request header add the below attribute:
 linkrunner-key: YOUR-SERVER-KEY
 ```
 
-## Capture payment
+## Capture a payment
+
+Send the payment to the [capture-event](/api-reference/event-capture) endpoint with `amount`, `payment_id`, and `currency` at the top level. `event_name` becomes the payment type you see in reports, so use a name that describes the payment, such as `purchase_completed` or `subscription_renewed`.
 
 ```
-POST: /capture-payment
+POST: /capture-event
 ```
 
 ### Request Body
 
 ```json
 {
-  "user_id": "666",
-  "payment_id": "ABC", // required, must be unique for each transaction
-  "amount": 25096, // Send amount in one currency only
-  "type": "FIRST_PAYMENT", // optional
-  // "type": "SECOND_PAYMENT", // optional
-  "status": "PAYMENT_COMPLETED" // optional
+  "event_name": "purchase_completed",
+  "amount": 250.96,
+  "payment_id": "ORD-12345",
+  "currency": "USD",
+  "user_id": "user_12345"
 }
 ```
 
-**NOTE:** If you accept payments in multiple currencies convert them to one currency before calling the API.
+| Parameter  | Type   | Description |
+| ---------- | ------ | ----------- |
+| event_name | string | **Required**. Name of the payment, stored as the payment type |
+| amount | number | **Required** for a payment. Zero or more. A numeric string is also accepted |
+| payment_id | string | **Required** for a payment. Your unique transaction ID |
+| currency | string | **Required** for a payment. 3-letter ISO 4217 code, for example `USD` or `INR` |
+| status | string | **Optional**. Defaults to `PAYMENT_COMPLETED` |
+| user_id | string | **Required** unless `install_instance_id` is sent |
+| install_instance_id | string | **Required** unless `user_id` is sent. Linkrunner's ID for the install |
+| event_data | object | **Optional**. Additional data, such as ecommerce fields |
+| client_ip_address | string | **Optional**. See [End-user IP address](#end-user-ip-address) |
 
-**Deduplication:** We perform idempotent deduplication using a combination of `type` and `payment_id`. For each unique combination of payment type and payment ID, only one record will be created. If you send multiple requests with the same `type` and `payment_id` combination, only the first will be recorded and subsequent ones will be ignored. To ensure proper deduplication, always provide a unique `payment_id` for each transaction of a given type.
+Send `amount`, `payment_id`, and `currency` together. If you send only one or two of them, the request fails with `400` and the message `amount, payment_id and currency must be sent together`. If you send none of them, the request is stored as a custom event, not a payment. An `amount` inside `event_data` does not make the event a payment.
 
-### Payment types
-
-- **FIRST_PAYMENT**: User's first payment
-- **SECOND_PAYMENT**: User's second payment
-- **WALLET_TOPUP**: Adding funds to a wallet
-- **FUNDS_WITHDRAWAL**: Withdrawing funds
-- **SUBSCRIPTION_CREATED**: Subscription started
-- **SUBSCRIPTION_RENEWED**: Subscription renewed
-- **ONE_TIME**: One-time payment
-- **RECURRING**: Recurring payment
-- **DEFAULT**: Generic/unspecified payment type
-
-If `type` is omitted, it defaults to **DEFAULT**.
+**Deduplication:** Use a unique `payment_id` for each transaction. Retrying a request with the same `payment_id`, `event_name`, and `status` does not create a second payment, and the API still returns `200`.
 
 ### Payment status
 
@@ -70,7 +69,7 @@ If `type` is omitted, it defaults to **DEFAULT**.
 - **PAYMENT_FAILED**: Payment attempt failed
 - **PAYMENT_CANCELLED**: Payment was cancelled
 
-If `status` is omitted, it defaults to **PAYMENT_COMPLETED**.
+If `status` is omitted, it defaults to **PAYMENT_COMPLETED**. Only `PAYMENT_COMPLETED` payments are sent to ad networks.
 
 ### End-user IP address
 
@@ -81,37 +80,19 @@ These calls come from your server, so Linkrunner never sends your server's IP to
 
 ### Responses
 
-1. **201** Payment captured
-2. **401** Invalid server key
-
-## Remove captured payment
-
-```
-POST: /remove-payment
-```
-
-### Request Body
-
-```json
-{
-  "user_id": "666",
-  "payment_id": "ABC"
-}
-```
-
-**NOTE:** `user_id` or `payment_id` is required in order to remove a payment entry. If you pass `user_id`, all the payments attributed to that user will be removed!
-
-### Responses
-
-1. **200** Payment entry/entries deleted
-2. **400** No payment found with the given payment id or user id
+1. **200** Payment captured. The response is the same as for a [custom event](/api-reference/event-capture#sample-response)
+2. **400** Missing or invalid fields, or the payment fields were not sent together
 3. **401** Invalid server key
+
+<Note>
+  The older `POST /capture-payment` endpoint still works for existing integrations. New integrations should send payments through `/capture-event`.
+</Note>
 
 ## Meta Ecommerce Events
 
 If you are tracking `Purchase` events to sync with Meta Catalog Sales, **you must first map the purchase event with the standard commerce event in the Linkrunner Dashboard** before sending it.
 
-_Note: Any Payment event you send should be mapped with **Purchase** for Commerce Event Manager. For example, map **FIRST_PAYMENT** with **Purchase** or **DEFAULT** with **Purchase**._
+_Note: Any payment you send should be mapped with **Purchase** for Commerce Event Manager. For example, map **purchase_completed** with **Purchase**._
 
 While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events to correctly attribute catalog sales. Your `event_data` object should include the following fields:
 
@@ -119,11 +100,11 @@ For comprehensive details on each field requirement, refer to our [Meta Commerce
 
 ```json
 {
-  "user_id": "666",
-  "payment_id": "ABC",
-  "amount": 25096,
-  "type": "DEFAULT", // Event is mapped with the Purchase in the Linkrunner Meta Integration Settings
-  "status": "PAYMENT_COMPLETED",
+  "event_name": "purchase_completed",
+  "user_id": "user_12345",
+  "payment_id": "ORD-12345",
+  "amount": 2000.0,
+  "currency": "INR",
   "event_data": {
     "content_ids": ["whshct4mwc"],
     "contents": [
@@ -142,6 +123,8 @@ For comprehensive details on each field requirement, refer to our [Meta Commerce
 }
 ```
 
-_Note: In the example above, the `type` field is omitted from the request body, which means it defaults to **DEFAULT**. Ensure this default payment type is properly mapped with **Purchase** in your Linkrunner dashboard._
+_Note: In the example above, map **purchase_completed** with **Purchase** in your Linkrunner dashboard before sending it._
 
 To verify your events are being correctly received by Meta, please follow our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

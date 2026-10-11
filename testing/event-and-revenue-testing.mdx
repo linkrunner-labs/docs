@@ -12,8 +12,9 @@ Use this guide after [SDK Integration Testing](/testing/integration-testing). It
 | What happened | App SDK | Server-side API |
 | --- | --- | --- |
 | A user action with no authoritative transaction | `trackEvent` | `POST /capture-event` |
-| A payment with an amount and unique transaction ID | `capturePayment` | `POST /capture-payment` |
-| A captured payment must be removed | `removePayment` | `POST /remove-payment` |
+| A payment with an amount and unique transaction ID | `trackEvent` with a payment (`amount`, `paymentId`, `currency`) | `POST /capture-event` with `amount`, `payment_id`, and `currency` |
+
+When you attach a payment, the event name becomes the payment type in reports. See [Payment fields](/api-reference/event-capture#payment-fields) for the rules.
 
 <Warning>
 The event name alone is not enough. If `purchase_completed` represents a real transaction, send it as a payment. If it only represents a funnel step with no authoritative transaction, send it as a custom event.
@@ -28,7 +29,7 @@ Do not send the same transaction as both a revenue-bearing custom event and a pa
 - Purchase initiated when it only marks the start of checkout
 - Payment failure shown for product analytics when you do not need a payment record
 
-### Usually send with `capturePayment`
+### Usually send as a payment
 
 - Completed purchase
 - First or second payment
@@ -38,7 +39,7 @@ Do not send the same transaction as both a revenue-bearing custom event and a pa
 - A failed or cancelled transaction when you need it recorded with `PAYMENT_FAILED` or `PAYMENT_CANCELLED`
 
 <Tip>
-If you record a failed or cancelled payment, send its final state once. Linkrunner deduplicates payments by the combination of `type` and `payment_id`, so a later call with the same combination is ignored.
+If you record a failed or cancelled payment, send its final state once. Linkrunner deduplicates payments by the combination of event name, `payment_id`, and `status`, so a later call with the same combination is ignored.
 </Tip>
 
 ## Before you test
@@ -46,7 +47,7 @@ If you record a failed or cancelled payment, send its final state once. Linkrunn
 - Complete the [click → install → signup flow](/testing/integration-testing) so the test user is attributed.
 - Use the same `user_id` that your app registered through `signup`.
 - Generate a fresh `payment_id` for each real transaction.
-- Send `amount` as a number in one reporting currency.
+- Send `amount` as a number, with its 3-letter ISO 4217 `currency`, such as `USD`.
 - Pick one source for each payment, either the app SDK or your backend.
 - For server-side tests, generate a server key from [**Settings → Data APIs**](https://dashboard.linkrunner.io/settings?p_id=4&s=data-apis).
 
@@ -58,10 +59,10 @@ If you record a failed or cancelled payment, send its final state once. Linkrunn
 
     ```text
     user_id: your attributed test user
+    event_name: purchase_completed
     payment_id: lr_test_payment_001
     amount: a small test amount
-    type: DEFAULT
-    status: PAYMENT_COMPLETED
+    currency: USD
     ```
 
     Use a new `payment_id` every time you test a new transaction.
@@ -86,22 +87,22 @@ If you record a failed or cancelled payment, send its final state once. Linkrunn
   </Step>
 
   <Step title="Send a completed payment">
-    Send the actual transaction through your SDK's `capturePayment` method or the [Revenue Tracking API](/api-reference/revenue-tracking).
+    Send the actual transaction through your SDK's `trackEvent` method with a payment, or the [Revenue Tracking API](/api-reference/revenue-tracking). Leaving out `status` records the payment as `PAYMENT_COMPLETED`.
 
     ```bash
-    curl -X POST https://api.linkrunner.io/api/v1/capture-payment \
+    curl -X POST https://api.linkrunner.io/api/v1/capture-event \
       -H "Content-Type: application/json" \
       -H "linkrunner-key: YOUR-SERVER-KEY" \
       -d '{
+        "event_name": "purchase_completed",
         "user_id": "YOUR_ATTRIBUTED_USER_ID",
         "payment_id": "lr_test_payment_001",
         "amount": 1,
-        "type": "DEFAULT",
-        "status": "PAYMENT_COMPLETED"
+        "currency": "USD"
       }'
     ```
 
-    A successful API request returns HTTP `201`.
+    A successful API request returns HTTP `200` with `Event capture request received!`. A `400` with `amount, payment_id and currency must be sent together` means one of the three payment fields is missing.
   </Step>
 
   <Step title="Verify both records in Linkrunner">
@@ -115,7 +116,7 @@ If you record a failed or cancelled payment, send its final state once. Linkrunn
   </Step>
 
   <Step title="Verify payment deduplication">
-    Send the same payment again with the same `type` and `payment_id`.
+    Send the same payment again with the same event name, `payment_id`, and `status`.
 
     Expected result: the Events Log still contains one payment for that combination. Linkrunner records the first request and ignores later duplicates.
   </Step>
@@ -135,18 +136,17 @@ If you record a failed or cancelled payment, send its final state once. Linkrunn
 | `add_to_cart` | Custom event | `event_name`, `user_id`, product data |
 | `checkout_started` | Custom event | `event_name`, `user_id` |
 | `purchase_initiated` as a funnel step | Custom event | `event_name`, `user_id` |
-| Completed purchase | Payment | `user_id`, `payment_id`, `amount`, `type`, `status` |
-| Subscription renewal with a charge | Payment | `type: SUBSCRIPTION_RENEWED` |
-| Wallet top-up | Payment | `type: WALLET_TOPUP` |
+| Completed purchase | Payment | `event_name`, `user_id`, `payment_id`, `amount`, `currency` |
+| Subscription renewal with a charge | Payment | `event_name: subscription_renewed` |
+| Wallet top-up | Payment | `event_name: wallet_topup` |
 | Failed payment that must be recorded | Payment | `status: PAYMENT_FAILED` |
 | Cancelled payment that must be recorded | Payment | `status: PAYMENT_CANCELLED` |
-| Refund or void of a captured payment | Remove payment | The original `payment_id` |
 
 ## Test Meta Purchase forwarding
 
 Use this section only when the payment must reach Meta Commerce Manager.
 
-1. In Linkrunner, map the payment type you send, such as `DEFAULT` or `FIRST_PAYMENT`, to Meta's standard `Purchase` event.
+1. In Linkrunner, map the payment event name you send, such as `purchase_completed`, to Meta's standard `Purchase` event.
 2. Include the required `event_data` fields for `Purchase`, including product IDs, `contents`, `content_type`, `value`, `currency`, `num_items`, and `order_id`.
 3. Send a new payment with a new `payment_id`.
 4. Check **Meta Commerce Manager → Events**. The real-time hit should appear within about 15 minutes. Full reporting can take a few days.
@@ -154,25 +154,6 @@ Use this section only when the payment must reach Meta Commerce Manager.
 <img src="/images/meta/event-mapping.png" alt="Linkrunner Meta event mapping screen" />
 
 See [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event_data) for the full ecommerce payload.
-
-## Test payment removal
-
-Remove one test payment using its `payment_id`:
-
-```bash
-curl -X POST https://api.linkrunner.io/api/v1/remove-payment \
-  -H "Content-Type: application/json" \
-  -H "linkrunner-key: YOUR-SERVER-KEY" \
-  -d '{ "payment_id": "lr_test_payment_001" }'
-```
-
-<Note>
-The API does not define a partial-refund adjustment flow. Contact support before using `removePayment` for a partial refund.
-</Note>
-
-<Warning>
-Do not test removal with only `user_id` unless you intend to remove every payment attributed to that user.
-</Warning>
 
 ## Troubleshooting
 
@@ -182,23 +163,23 @@ Do not test removal with only `user_id` unless you intend to remove every paymen
   </Accordion>
 
   <Accordion title="The purchase appears as a custom event">
-    The app or backend sent it through `trackEvent` or `/capture-event`. Send authoritative transactions through `capturePayment` or `/capture-payment` instead.
+    The app or backend sent it without the payment fields. Send `amount`, `payment_id`, and `currency` together with the event. An `amount` inside `event_data` does not make the event a payment.
   </Accordion>
 
   <Accordion title="A new payment is missing">
-    Check whether it reused the same `type` and `payment_id` as an earlier transaction. Linkrunner treats that combination as a duplicate.
+    Check whether it reused the same event name, `payment_id`, and `status` as an earlier transaction. Linkrunner treats that combination as a duplicate.
   </Accordion>
 
   <Accordion title="The same payment appears more than once">
     Confirm the app and backend are not both sending the transaction with different payment IDs. Choose one source, or use the same stable payment ID for safe retries.
   </Accordion>
 
-  <Accordion title="The payment status did not change">
-    Linkrunner keeps the first record for a `type` and `payment_id` combination. Send the final payment state once instead of sending initiated and completed states with the same combination.
+  <Accordion title="The payment shows more than one status">
+    `status` is part of the deduplication key, so sending `PAYMENT_INITIATED` and then `PAYMENT_COMPLETED` with the same `payment_id` creates two records. Send the final payment state once. Only `PAYMENT_COMPLETED` payments are sent to ad networks.
   </Accordion>
 
   <Accordion title="Meta does not show the Purchase event">
-    Confirm the payment type is mapped to `Purchase`, the ecommerce payload includes every required field, and the test has had at least 15 minutes to reach Meta Events Manager.
+    Confirm the payment event name is mapped to `Purchase`, the payment `status` is `PAYMENT_COMPLETED`, the ecommerce payload includes every required field, and the test has had at least 15 minutes to reach Meta Events Manager.
   </Accordion>
 </AccordionGroup>
 
