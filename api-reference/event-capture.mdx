@@ -78,6 +78,8 @@ POST: /capture-event
 
 Send `amount`, `payment_id`, and `currency` at the top level of the request, next to `event_name`, when the event is a payment. Linkrunner then stores the event as revenue, and `event_name` becomes the payment type you see in reports. Without these fields, the request is a custom event.
 
+If `event_name` is one of the old payment types, such as `FIRST_PAYMENT`, `SUBSCRIPTION_RENEWED`, or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so existing event mappings, reports, and affiliate templates keep working. Any other name is stored exactly as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks. See [Choose the event name](/sdk/migrate-to-track-event#choose-the-event-name) for the full list.
+
 ```json
 {
   "event_name": "purchase_completed",
@@ -144,25 +146,14 @@ Here are some common event names you might want to track:
 
 ## Revenue Sharing with Ad Networks
 
-For a payment, send the [payment fields](#payment-fields). Linkrunner records the revenue and shares completed payments with ad networks.
+Send revenue as a payment with the [payment fields](#payment-fields). Meta and Google receive the value and currency from the top-level `amount` and `currency`, so send the order total as `amount`. Linkrunner does not add up item prices.
 
-For a custom event that is not a payment, you can still pass a value to ad networks like Google Ads and Meta by including an `amount` parameter as a number in `event_data`. This lets ad networks optimize campaigns on the value of the conversion, but Linkrunner does not record it as revenue:
+Put product details in `event_data`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`. Google receives `content_ids` as item IDs.
 
-```json
-{
-  "event_name": "purchase_completed",
-  "event_data": {
-    "product_id": "ABC123",
-    "category": "electronics",
-    "amount": 149.99
-  },
-  "user_id": "user_12345"
-}
-```
+An `amount` inside `event_data` is not sent to ad networks as revenue. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
 
 <Note>
-  For revenue sharing with ad networks to work properly, ensure the `amount`
-  parameter is passed as a number, not as a string.
+  `POST /capture-payment` is deprecated. It keeps working for existing integrations, but new integrations should send payments through `/capture-event`. See [Migrate from capturePayment to trackEvent](/sdk/migrate-to-track-event).
 </Note>
 
 ## Best Practices

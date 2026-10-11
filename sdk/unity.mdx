@@ -1376,7 +1376,7 @@ LinkrunnerSDK.TrackEvent("purchase", eventData, eventId: "purchase_abc123");
 ```
 
 <Note>
-When tracking revenue-related events, the `amount` field must be a number (not a string) for ad network revenue optimization to work correctly.
+An `amount` inside the event data is not sent to ad networks as revenue. To share revenue, send it as a payment. See [Track Payments](#track-payments).
 </Note>
 
 ### Track Payments
@@ -1402,7 +1402,11 @@ If a value breaks these rules, the native SDK rejects the payment, nothing is se
 The payment is linked to the user you set with `Signup` or `SetUserData`, so call one of them first.
 
 <Note>
-Bridges built against Android SDK 4.x or LinkrunnerKit 4.x keep using `capturePayment` and continue to work unchanged. See the [Android](https://github.com/linkrunner-labs/linkrunner-android/blob/main/CHANGELOG.md) and [iOS](https://github.com/linkrunner-labs/linkrunner-ios/blob/main/CHANGELOG.md) changelogs for the 5.0.0 migration.
+If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so your existing mappings and reports keep working. Any other name, such as `purchase`, is stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
+</Note>
+
+<Note>
+`capturePayment` is deprecated. Bridges built against Android SDK 4.x or LinkrunnerKit 4.x keep using it and continue to work unchanged. To move to 5.0.0, see [Migrate from capturePayment to trackEvent](/sdk/migrate-to-track-event).
 </Note>
 
 ### Push Token

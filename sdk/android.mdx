@@ -526,7 +526,11 @@ The `EventPayment` constructor throws `IllegalArgumentException` when a value br
 To set a status, import `io.linkrunner.sdk.models.PaymentStatus` and pass it, for example `status = PaymentStatus.PAYMENT_INITIATED`. Only `PAYMENT_COMPLETED` payments are sent to ad network postbacks.
 
 <Note>
-    Apps on Android SDK 4.x keep using `capturePayment` and continue to work unchanged. To move to 5.0.0, see the migration steps in the [Android SDK changelog](https://github.com/linkrunner-labs/linkrunner-android/blob/main/CHANGELOG.md).
+    If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so your existing mappings and reports keep working. Any other name, such as `purchase`, is stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
+</Note>
+
+<Note>
+    `capturePayment` is deprecated. Apps on Android SDK 4.x keep using it and continue to work unchanged. To move to 5.0.0, see [Migrate from capturePayment to trackEvent](/sdk/migrate-to-track-event).
 </Note>
 
 ## Tracking Custom Events
@@ -549,8 +553,7 @@ private fun trackEvent() {
                 eventName = "purchase_initiated", // Event name
                 eventData = mapOf( // Optional: Event data
                     "product_id" to "12345",
-                    "category" to "electronics",
-                    "amount" to 99.99 // Include amount as a number for revenue sharing with ad networks like Google and Meta
+                    "category" to "electronics"
                 ),
                 eventId = "order_12345" // Optional: Your own unique event identifier
             )
@@ -575,37 +578,35 @@ private fun trackEvent() {
 
 ### Revenue Sharing with Ad Networks
 
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+Send revenue to ad networks such as Google Ads and Meta as a [payment](#tracking-payments). Meta and Google receive the value and currency from the payment `amount` and `currency`, so send the order total as `amount`. Linkrunner does not add up item prices.
+
+Put product details in `eventData`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`. Google receives `content_ids` as item IDs.
 
 ```kotlin
-private fun trackPurchaseEvent() {
+private fun trackPurchase() {
     CoroutineScope(Dispatchers.IO).launch {
         try {
-            val result = LinkRunner.getInstance().trackEvent(
-                eventName = "purchase_completed",
+            LinkRunner.getInstance().trackEvent(
+                eventName = "purchase",
                 eventData = mapOf(
-                    "product_id" to "12345",
-                    "category" to "electronics",
-                    "amount" to 149.99 // Revenue amount as a number
+                    "content_ids" to listOf("product_123"),
+                    "num_items" to 1,
+                    "order_id" to "order_12345"
+                ),
+                payment = EventPayment(
+                    amount = 149.99, // Order total, sent to ad networks as the value
+                    paymentId = "order_12345",
+                    currency = "USD"
                 )
             )
-
-            result.onSuccess {
-                println("Purchase event with revenue tracked successfully")
-            }.onFailure { error ->
-                println("Error tracking purchase event: ${error.message}")
-            }
-        } catch (e: Exception) {
-            println("Exception tracking purchase event: ${e.message}")
+        } catch (e: IllegalArgumentException) {
+            println("Invalid payment: ${e.message}")
         }
     }
 }
 ```
 
-<Note>
-    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number (Double
-    or Int), not as a string.
-</Note>
+An `amount` inside `eventData` is not sent to ad networks as revenue. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
 
 ## Ecommerce Events
 

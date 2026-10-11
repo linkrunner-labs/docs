@@ -182,6 +182,10 @@ Since `expo-linkrunner` is a config plugin that prepares your project, the actua
 - Ecommerce Events
 - Enhanced privacy controls
 
+<Note>
+    `capturePayment` and `removePayment` are deprecated and removed in `rn-linkrunner` 4.0.0. With `expo-linkrunner` 4.0.0, track payments with `trackEvent` and a `payment`. If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, your existing mappings keep working. Any other name needs a new mapping in the dashboard. See [Migrate from capturePayment to trackEvent](/sdk/migrate-to-track-event).
+</Note>
+
 ## Function Placement Guide
 
 Expo uses the `rn-linkrunner` runtime. The function links below open the implementation details in the React Native guide.

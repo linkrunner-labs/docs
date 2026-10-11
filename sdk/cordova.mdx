@@ -394,7 +394,11 @@ The promise returned by `trackEvent` rejects when a value breaks these rules, an
 Only `PAYMENT_COMPLETED` payments are sent to ad network postbacks.
 
 <Note>
-    Apps on `cordova-linkrunner` 1.x keep using `capturePayment` and continue to work unchanged. To move to 2.0.0, see the migration steps in the [cordova-linkrunner changelog](https://github.com/linkrunner-labs/cordova-linkrunner-sdk/blob/main/CHANGELOG.md).
+    If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so your existing mappings and reports keep working. Any other name, such as `purchase`, is stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
+</Note>
+
+<Note>
+    `capturePayment` is deprecated. Apps on `cordova-linkrunner` 1.x keep using it and continue to work unchanged. To move to 2.0.0, see [Migrate from capturePayment to trackEvent](/sdk/migrate-to-track-event).
 </Note>
 
 ## Ecommerce Events
@@ -512,7 +516,7 @@ Track custom events in your app:
 ```javascript
 linkrunner.trackEvent(
     "purchase_initiated", // Event name
-    { product_id: "12345", category: "electronics", amount: 99.99 }, // Optional: Event data, include amount as a number for revenue sharing with ad networks like Google and Meta
+    { product_id: "12345", category: "electronics" }, // Optional: Event data
     "order_12345" // Optional: Your own unique event identifier (string or number)
 ).then(function () {
     console.log("Event tracked");
@@ -528,22 +532,30 @@ linkrunner.trackEvent(
 
 ### Revenue Sharing with Ad Networks
 
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+Send revenue to ad networks such as Google Ads and Meta as a [payment](#tracking-payments). Meta and Google receive the value and currency from the payment `amount` and `currency`, so send the order total as `amount`. Linkrunner does not add up item prices.
+
+Put product details in `eventData`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`. Google receives `content_ids` as item IDs.
 
 ```javascript
-linkrunner.trackEvent("purchase_completed", {
-    product_id: "12345",
-    category: "electronics",
-    amount: 149.99 // Revenue amount as a number
-}).then(function () {
-    console.log("Purchase event tracked");
+linkrunner.trackEvent(
+    "purchase",
+    {
+        content_ids: ["product_123"],
+        num_items: 1,
+        order_id: "order_12345"
+    },
+    null, // Optional: Event ID
+    {
+        amount: 149.99, // Order total, sent to ad networks as the value
+        paymentId: "order_12345",
+        currency: "USD"
+    }
+).catch(function (error) {
+    console.error("Error tracking payment:", error);
 });
 ```
 
-<Note>
-    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number, not as a
-    string.
-</Note>
+An `amount` inside `eventData` is not sent to ad networks as revenue. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
 
 ## Enhanced Privacy Controls
 

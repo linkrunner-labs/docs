@@ -221,7 +221,7 @@ The `content_ids` you send must exactly match the **ID (`offer_id`)** of the pro
 </Warning>
 
 <Tip>
-The payment `amount` and the `value` field in `event_data` should be consistent. Both represent the total order value. Google reads `value` from `event_data` for conversion reporting.
+The payment `amount` and the `value` field in `event_data` should be consistent. Both represent the total order value. For a purchase, Google receives the conversion value and currency from the payment `amount` and `currency`.
 </Tip>
 
 ## Verifying Events in Google Ads

@@ -34,7 +34,8 @@
                             "sdk/appbrew",
                             "sdk/web",
                             "sdk/unity",
-                            "sdk/shopify"
+                            "sdk/shopify",
+                            "sdk/migrate-to-track-event"
                         ]
                     },
                     {

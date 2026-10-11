@@ -624,7 +624,11 @@ The `EventPayment` constructor throws `ArgumentError` when a value breaks these 
 Only `PAYMENT_COMPLETED` payments are sent to ad network postbacks.
 
 <Note>
-    Apps on `linkrunner` 4.x keep using `capturePayment` and continue to work unchanged. To move to 5.0.0, see the migration steps in the [linkrunner changelog](https://pub.dev/packages/linkrunner/changelog).
+    If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so your existing mappings and reports keep working. Any other name, such as `purchase`, is stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
+</Note>
+
+<Note>
+    `capturePayment` is deprecated. Apps on `linkrunner` 4.x keep using it and continue to work unchanged. To move to 5.0.0, see [Migrate from capturePayment to trackEvent](/sdk/migrate-to-track-event).
 </Note>
 
 ## Ecommerce Events
@@ -759,7 +763,6 @@ Future<void> trackEvent() async {
       eventData: { // Optional: Event data
         'product_id': '12345',
         'category': 'electronics',
-        'amount': 99.99, // Include amount as a number for revenue sharing with ad networks like Google and Meta
       },
       eventId: 'order_12345', // Optional: Your own unique event identifier (String or num)
     );
@@ -779,30 +782,33 @@ Future<void> trackEvent() async {
 
 ### Revenue Sharing with Ad Networks
 
-To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+Send revenue to ad networks such as Google Ads and Meta as a [payment](#tracking-payments). Meta and Google receive the value and currency from the payment `amount` and `currency`, so send the order total as `amount`. Linkrunner does not add up item prices.
+
+Put product details in `eventData`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`. Google receives `content_ids` as item IDs.
 
 ```dart
-Future<void> trackPurchaseEvent() async {
+Future<void> trackPurchase() async {
   try {
     await LinkRunner().trackEvent(
-      eventName: 'purchase_completed',
+      eventName: 'purchase',
       eventData: {
-        'product_id': '12345',
-        'category': 'electronics',
-        'amount': 149.99, // Revenue amount as a number
+        'content_ids': ['product_123'],
+        'num_items': 1,
+        'order_id': 'order_12345',
       },
+      payment: EventPayment(
+        amount: 149.99, // Order total, sent to ad networks as the value
+        paymentId: 'order_12345',
+        currency: 'USD',
+      ),
     );
-    print('Purchase event with revenue tracked successfully');
   } catch (e) {
-    print('Error tracking purchase event: $e');
+    print('Error tracking payment: $e');
   }
 }
 ```
 
-<Note>
-    For revenue sharing with ad networks to work properly, ensure the `amount` parameter is passed as a number (double
-    or int), not as a string.
-</Note>
+An `amount` inside `eventData` is not sent to ad networks as revenue. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
 
 ## Enhanced Privacy Controls
 

@@ -181,7 +181,7 @@ Tracks a custom event or a payment. Events are stored for all users, including o
 | --- | --- | --- |
 | `token` | string | **Required**. |
 | `event_name` | string | **Required**. For a payment, this is the payment type shown in reports. |
-| `event_data` | object | Optional. Custom attributes. Must be a JSON object. On a custom event, add `amount` as a number to share a value with ad networks. |
+| `event_data` | object | Optional. Custom attributes. Must be a JSON object. An `amount` here is not sent to ad networks as revenue. Send the payment fields instead. |
 | `install_instance_id` | string | The persisted UUID. |
 | `user_id` | string | Optional. |
 | `platform` | string | `"ANDROID"`. |
