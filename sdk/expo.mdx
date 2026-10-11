@@ -183,7 +183,7 @@ Since `expo-linkrunner` is a config plugin that prepares your project, the actua
 - Enhanced privacy controls
 
 <Note>
-    `capturePayment` and `removePayment` are deprecated and removed in `rn-linkrunner` 4.0.0. With `expo-linkrunner` 4.0.0, track payments with `trackEvent` and a `payment`. If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, your existing mappings keep working. Any other name needs a new mapping in the dashboard. See [Migrate from capturePayment to trackEvent](/sdk/migrate-to-track-event).
+    `capturePayment` and `removePayment` are deprecated and removed in `rn-linkrunner` 4.0.0. With `expo-linkrunner` 4.0.0, track payments with `trackPayment`. It takes the same fields as `capturePayment`, including `userId`, with `type` renamed to `eventName` and a new required `currency`. If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, your existing mappings keep working. Any other name needs a new mapping in the dashboard. See [Migrate from capturePayment to trackPayment](/sdk/migrate-to-track-event).
 </Note>
 
 ## Function Placement Guide
@@ -200,7 +200,7 @@ Expo uses the `rn-linkrunner` runtime. The function links below open the impleme
 | [`linkrunner.setAdditionalData`](/sdk/react-native#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
 | [`linkrunner.setUserData`](/sdk/react-native#setting-user-data) | Optional | Profile update flow after `signup` | When additional user details become available |
 | [`linkrunner.trackEvent`](/sdk/react-native#tracking-custom-events) | Optional | Throughout app, including ecommerce flows | When specific user actions occur, including AddToCart or ViewContent events |
-| [`linkrunner.trackEvent` with `payment`](/sdk/react-native#tracking-payments) | Optional | Payment processing, including ecommerce purchases | When user makes a payment, including Purchase events with ecommerce data |
+| [`linkrunner.trackPayment`](/sdk/react-native#tracking-payments) | Optional | Payment processing, including ecommerce purchases | When user makes a payment, including Purchase events with ecommerce data |
 | [`linkrunner.setPushToken`](/sdk/react-native#uninstall-tracking) | Optional | Push notification setup | When FCM/APNs token is available |
 | [`linkrunner.setConsent`](/sdk/react-native#google-integrated-conversion-measurement-optional) | Optional | App initialization or consent flow | Before `init`, and again when consent changes |
 | [`linkrunner.enablePIIHashing`](/sdk/react-native#enhanced-privacy-controls) | Optional | Privacy configuration | When enabling PII hashing |

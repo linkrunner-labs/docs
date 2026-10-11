@@ -55,7 +55,7 @@ POST: /capture-event
 | payment_id | string | **Required** for a payment. Your unique transaction ID |
 | currency | string | **Required** for a payment. 3-letter ISO 4217 code, for example `USD` or `INR` |
 | status | string | **Optional**. Defaults to `PAYMENT_COMPLETED` |
-| user_id | string | **Required** unless `install_instance_id` is sent |
+| user_id | string | **Required** unless `install_instance_id` is sent. Links the payment to your user. The SDKs always send it with a payment, so send it whenever you have it |
 | install_instance_id | string | **Required** unless `user_id` is sent. Linkrunner's ID for the install |
 | event_data | object | **Optional**. Additional data, such as ecommerce fields |
 | client_ip_address | string | **Optional**. See [End-user IP address](#end-user-ip-address) |
@@ -87,7 +87,7 @@ These calls come from your server, so Linkrunner never sends your server's IP to
 3. **401** Invalid server key
 
 <Note>
-  `POST /capture-payment` is deprecated. It keeps working for existing integrations, but new integrations should send payments through `/capture-event`. See [Migrate from capturePayment to trackEvent](/sdk/migrate-to-track-event).
+  `POST /capture-payment` is deprecated. It keeps working for existing integrations, but new integrations should send payments through `/capture-event`. See [Migrate from capturePayment to trackPayment](/sdk/migrate-to-track-event).
 </Note>
 
 ## Meta Ecommerce Events

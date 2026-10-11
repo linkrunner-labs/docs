@@ -349,46 +349,45 @@ This method allows you to connect user identities across different analytics and
 ## Revenue Tracking
 
 <Note>
-    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-identification-required) or [`.setUserData`](#setting-user-data) first so payments are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
+    Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Pass your user ID as `userId` so each payment is linked to the user who paid. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 </Note>
 
 ### Tracking Payments
 
-To record revenue, pass a `payment` as the fourth argument to `trackEvent`. Linkrunner stores the event as a payment and uses the event name as its payment type, so you can use any name, such as `purchase` or `subscription_renewed`. Requires `capacitor-linkrunner` 3.0.0 or later.
+Use `trackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `subscription_renewed`. Requires `capacitor-linkrunner` 3.0.0 or later.
 
-```typescript
+```javascript
 import linkrunner from "capacitor-linkrunner";
 
 const trackPurchase = async () => {
     try {
-        await linkrunner.trackEvent(
-            "purchase", // Event name, used as the payment type
-            { plan: "pro" }, // Optional: Event data
-            undefined, // Optional: Event ID
-            {
-                amount: 499,
-                paymentId: "order_123",
-                currency: "INR",
-            }
-        );
+        await linkrunner.trackPayment({
+            eventName: "purchase",
+            paymentId: "order_123",
+            userId: "user_123",
+            amount: 499,
+            currency: "INR",
+        });
     } catch (error) {
         console.error("Error tracking payment:", error);
     }
 };
 ```
 
-You can pass `eventData` and `eventId` in the same call, as with any other [custom event](#tracking-custom-events).
-
-#### `payment` Parameters
+#### `trackPayment` Parameters
 
 | Parameter   | Type     | Required | Description |
 | ----------- | -------- | -------- | ----------- |
-| `amount`    | `number` | Yes      | Payment amount. Must be a finite number, 0 or greater. |
+| `eventName` | `string` | Yes      | Payment name, shown as the payment type in reports and matched against your event mappings. |
 | `paymentId` | `string` | Yes      | Unique identifier for this payment, such as your order or transaction ID. Must not be blank. |
+| `userId`    | `string` | Yes      | Your ID for the user who paid. If you pass an empty string, the SDK uses the user saved by `signup` or `setUserData`. |
+| `amount`    | `number` | Yes      | Payment amount. Must be a finite number, 0 or greater. |
 | `currency`  | `string` | Yes      | 3-letter ISO 4217 currency code, such as `INR` or `USD`. Case-insensitive, sent in uppercase. |
-| `status`    | `string` | No       | Payment status. Defaults to `PAYMENT_COMPLETED` when you leave it out. |
+| `status`    | `string` | No       | Payment status. Defaults to `PAYMENT_COMPLETED`. |
+| `eventData` | `object` | No       | Additional data, such as product details. |
+| `eventId`   | `string` | No       | Your own unique identifier for the event. |
 
-The promise returned by `trackEvent` rejects when a value breaks these rules, and nothing is sent.
+The promise returned by `trackPayment` rejects when a value breaks these rules, and nothing is sent.
 
 #### Available Payment Statuses
 
@@ -399,14 +398,32 @@ The promise returned by `trackEvent` rejects when a value breaks these rules, an
 | `PAYMENT_FAILED`    | Payment failed                 |
 | `PAYMENT_CANCELLED` | Payment was cancelled          |
 
-Only `PAYMENT_COMPLETED` payments are sent to ad network postbacks. In TypeScript, you can import the `EventPayment` and `PaymentStatus` types from `capacitor-linkrunner`.
+Only `PAYMENT_COMPLETED` payments are sent to ad network postbacks. In TypeScript, you can import the `TrackPaymentOptions`, `EventPayment`, and `PaymentStatus` types from `capacitor-linkrunner`.
 
 <Note>
     If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so your existing mappings and reports keep working. Any other name, such as `purchase`, is stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
 </Note>
 
+#### Track a payment with `trackEvent`
+
+You can also pass a `payment` as the fourth argument to `trackEvent`. It takes the same `amount`, `paymentId`, `currency`, `userId`, and `status` fields, follows the same rules, and records the same payment.
+
+```javascript
+await linkrunner.trackEvent(
+    "purchase", // Event name, used as the payment type
+    undefined, // Optional: Event data
+    undefined, // Optional: Event ID
+    {
+        amount: 499,
+        paymentId: "order_123",
+        currency: "INR",
+        userId: "user_123",
+    }
+);
+```
+
 <Note>
-    `capturePayment` is deprecated. Apps on `capacitor-linkrunner` 2.x keep using it and continue to work unchanged. To move to 3.0.0, see [Migrate from capturePayment to trackEvent](/sdk/migrate-to-track-event).
+    `capturePayment` is deprecated. Apps on `capacitor-linkrunner` 2.x keep using it and continue to work unchanged. To move to 3.0.0, see [Migrate from capturePayment to trackPayment](/sdk/migrate-to-track-event).
 </Note>
 
 ## Tracking Custom Events
@@ -416,7 +433,7 @@ Only `PAYMENT_COMPLETED` payments are sent to ad network postbacks. In TypeScrip
 </Note>
 
 <Note>
-    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-identification-required) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, pass a [`payment`](#tracking-payments) to `.trackEvent`.
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-identification-required) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, use [`trackPayment`](#tracking-payments).
 </Note>
 
 Track custom events in your app:
@@ -461,6 +478,7 @@ const trackPurchase = async () => {
                 amount: 149.99, // Order total, sent to ad networks as the value
                 paymentId: "order_12345",
                 currency: "USD",
+                userId: "user_123",
             }
         );
     } catch (error) {
@@ -653,7 +671,7 @@ Connect APNs with Linkrunner
 | [`linkrunner.setAdditionalData`](/sdk/capacitor#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
 | [`linkrunner.setUserData`](/sdk/capacitor#setting-user-data) | Optional | Profile update flow after `signup` | When additional user details become available |
 | [`linkrunner.trackEvent`](/sdk/capacitor#tracking-custom-events) | Optional | Throughout app | When specific user actions occur |
-| [`linkrunner.trackEvent` with `payment`](/sdk/capacitor#tracking-payments) | Optional | Payment processing | When user makes a payment |
+| [`linkrunner.trackPayment`](/sdk/capacitor#tracking-payments) | Optional | Payment processing | When user makes a payment |
 | [`linkrunner.setPushToken`](/sdk/capacitor#uninstall-tracking) | Optional | Push notification setup | When push token is available |
 | [`linkrunner.enablePIIHashing`](/sdk/capacitor#enhanced-privacy-controls) | Optional | Privacy configuration | When enabling PII hashing |
 

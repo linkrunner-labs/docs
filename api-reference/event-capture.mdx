@@ -99,6 +99,7 @@ If `event_name` is one of the old payment types, such as `FIRST_PAYMENT`, `SUBSC
 - **`currency`** must be a 3-letter ISO 4217 code. Lowercase is accepted and stored in uppercase.
 - **`status`** accepts `PAYMENT_INITIATED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, or `PAYMENT_CANCELLED`. If you leave it out, the payment is `PAYMENT_COMPLETED`.
 - **`event_data`**, if sent, must be a JSON object.
+- **`user_id`** links the payment to your user. The SDKs always send it with a payment, so send it from your backend too. A payment identified only by `install_instance_id` is still accepted.
 
 Only `PAYMENT_COMPLETED` payments are sent to ad networks as revenue. An `amount` inside `event_data` does not make the event a payment.
 
@@ -153,7 +154,7 @@ Put product details in `event_data`. Meta receives `content_ids`, `contents`, `c
 An `amount` inside `event_data` is not sent to ad networks as revenue. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
 
 <Note>
-  `POST /capture-payment` is deprecated. It keeps working for existing integrations, but new integrations should send payments through `/capture-event`. See [Migrate from capturePayment to trackEvent](/sdk/migrate-to-track-event).
+  `POST /capture-payment` is deprecated. It keeps working for existing integrations, but new integrations should send payments through `/capture-event`. See [Migrate from capturePayment to trackPayment](/sdk/migrate-to-track-event).
 </Note>
 
 ## Best Practices

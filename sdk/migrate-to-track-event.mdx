@@ -1,7 +1,7 @@
 ---
-title: "Migrate from capturePayment to trackEvent"
-sidebarTitle: "Migrate to trackEvent"
-description: "Move payment tracking from capturePayment to trackEvent with a payment, and keep your reports and postback mappings working"
+title: "Migrate from capturePayment to trackPayment"
+sidebarTitle: "Migrate to trackPayment"
+description: "Move payment tracking from capturePayment to trackPayment, and keep your reports and postback mappings working"
 icon: "arrow-right-arrow-left"
 ---
 
@@ -9,7 +9,7 @@ icon: "arrow-right-arrow-left"
     `capturePayment` and `removePayment` are deprecated and removed in the SDK versions below. Apps on older versions keep working unchanged. `removePayment` has no replacement: removing a payment is not supported in the new versions.
 </Warning>
 
-| Platform | Package | Last versions with `capturePayment` | `trackEvent` with a payment from |
+| Platform | Package | Last versions with `capturePayment` | `trackPayment` from |
 | --- | --- | --- | --- |
 | Android | `io.linkrunner:android-sdk` | 4.x | 5.0.0 |
 | iOS | LinkrunnerKit | 4.x | 5.0.0 |
@@ -22,10 +22,10 @@ icon: "arrow-right-arrow-left"
 
 ## What changes
 
-- **One API for events and payments.** You record a payment by passing a `payment` to `trackEvent`. Without a `payment`, `trackEvent` records a custom event as before.
-- **Any event name.** The event name becomes the payment type. You are no longer limited to a fixed list of types.
+- **`trackPayment` replaces `capturePayment`.** It takes the same fields, so the change is small.
+- **`type` becomes `eventName`.** The event name becomes the payment type. You are no longer limited to a fixed list of types.
 - **Currency is sent.** `currency` is now required with every payment. Older SDKs never sent a currency.
-- **The user comes from the SDK.** You no longer pass `userId`. The SDK uses the user you set with `signup`, `setUserData`, or `setCustomerUserId`.
+- **`userId` stays.** Pass the same user ID you passed to `capturePayment`. If you pass an empty string, the SDK uses the user saved by `signup` or `setUserData`, as before.
 
 ## Choose the event name
 
@@ -50,7 +50,7 @@ A payment with the same `paymentId`, name, and status counts as one payment, so 
 
 ## Update your code
 
-The examples are fragments. Replace your `capturePayment` call with the `trackEvent` call in the same function, with the same coroutine or async context. They keep the old `FIRST_PAYMENT` type, so no mapping changes. Use your own amount, payment ID, and currency.
+The examples are fragments. Replace your `capturePayment` call with the `trackPayment` call in the same function, with the same coroutine or async context. They keep the old `FIRST_PAYMENT` type, so no mapping changes. Use your own amount, payment ID, user ID, and currency.
 
 <Tabs>
   <Tab title="Android">
@@ -70,25 +70,21 @@ The examples are fragments. Replace your `capturePayment` call with the `trackEv
     After (Android SDK 5.0.0):
 
     ```kotlin
-    import io.linkrunner.sdk.models.EventPayment
     import io.linkrunner.sdk.models.PaymentStatus
 
-    try {
-        LinkRunner.getInstance().trackEvent(
-            eventName = "FIRST_PAYMENT",
-            payment = EventPayment(
-                amount = 99.99,
-                paymentId = "payment_123",
-                currency = "USD",
-                status = PaymentStatus.PAYMENT_COMPLETED
-            )
-        )
-    } catch (e: IllegalArgumentException) {
-        println("Invalid payment: ${e.message}")
+    LinkRunner.getInstance().trackPayment(
+        eventName = "FIRST_PAYMENT",
+        paymentId = "payment_123",
+        userId = "user123",
+        amount = 99.99,
+        currency = "USD",
+        status = PaymentStatus.PAYMENT_COMPLETED
+    ).onFailure { error ->
+        println("Error tracking payment: ${error.message}")
     }
     ```
 
-    See [Tracking Payments](/sdk/android#tracking-payments) for the full reference.
+    An invalid value returns a failed `Result` instead of throwing. See [Tracking Payments](/sdk/android#tracking-payments) for the full reference.
   </Tab>
   <Tab title="iOS">
     Before (LinkrunnerKit 4.x):
@@ -106,20 +102,14 @@ The examples are fragments. Replace your `capturePayment` call with the `trackEv
     After (LinkrunnerKit 5.0.0):
 
     ```swift
-    do {
-        let payment = try EventPayment(
-            amount: 99.99,
-            paymentId: "payment456",
-            currency: "USD",
-            status: .completed
-        )
-        await LinkrunnerSDK.shared.trackEvent(
-            eventName: "FIRST_PAYMENT",
-            payment: payment
-        )
-    } catch {
-        print("Invalid payment: \(error)")
-    }
+    await LinkrunnerSDK.shared.trackPayment(
+        eventName: "FIRST_PAYMENT",
+        paymentId: "payment456",
+        userId: "user123",
+        amount: 99.99,
+        currency: "USD",
+        status: .completed
+    )
     ```
 
     See [Tracking Payments](/sdk/ios#tracking-payments) for the full reference.
@@ -140,17 +130,14 @@ The examples are fragments. Replace your `capturePayment` call with the `trackEv
     After (`rn-linkrunner` 4.0.0):
 
     ```javascript
-    await linkrunner.trackEvent(
-      "FIRST_PAYMENT", // Event name, used as the payment type
-      undefined, // Optional: Event data
-      undefined, // Optional: Event ID
-      {
-        amount: 100,
-        paymentId: "payment456",
-        currency: "USD",
-        status: "PAYMENT_COMPLETED",
-      },
-    );
+    await linkrunner.trackPayment({
+      eventName: "FIRST_PAYMENT",
+      amount: 100,
+      userId: "user123",
+      paymentId: "payment456",
+      currency: "USD",
+      status: "PAYMENT_COMPLETED",
+    });
     ```
 
     See [Tracking Payments](/sdk/react-native#tracking-payments) for the full reference.
@@ -173,14 +160,13 @@ The examples are fragments. Replace your `capturePayment` call with the `trackEv
     After (`linkrunner` 5.0.0):
 
     ```dart
-    await LinkRunner().trackEvent(
-      eventName: 'FIRST_PAYMENT', // Event name, used as the payment type
-      payment: EventPayment(
-        amount: 99.99,
-        paymentId: 'payment456',
-        currency: 'USD',
-        status: PaymentStatus.PAYMENT_COMPLETED,
-      ),
+    await LinkRunner().trackPayment(
+      eventName: 'FIRST_PAYMENT',
+      amount: 99.99,
+      userId: 'user123',
+      paymentId: 'payment456',
+      currency: 'USD',
+      status: PaymentStatus.PAYMENT_COMPLETED,
     );
     ```
 
@@ -207,17 +193,14 @@ The examples are fragments. Replace your `capturePayment` call with the `trackEv
     After (`capacitor-linkrunner` 3.0.0):
 
     ```typescript
-    await linkrunner.trackEvent(
-        "FIRST_PAYMENT", // Event name, used as the payment type
-        undefined, // Optional: Event data
-        undefined, // Optional: Event ID
-        {
-            amount: 100,
-            paymentId: "payment456",
-            currency: "USD",
-            status: "PAYMENT_COMPLETED",
-        }
-    );
+    await linkrunner.trackPayment({
+        eventName: "FIRST_PAYMENT",
+        amount: 100,
+        userId: "user123",
+        paymentId: "payment456",
+        currency: "USD",
+        status: "PAYMENT_COMPLETED",
+    });
     ```
 
     See [Tracking Payments](/sdk/capacitor#tracking-payments) for the full reference.
@@ -238,17 +221,14 @@ The examples are fragments. Replace your `capturePayment` call with the `trackEv
     After (`cordova-linkrunner` 2.0.0):
 
     ```javascript
-    linkrunner.trackEvent(
-        "FIRST_PAYMENT", // Event name, used as the payment type
-        null, // Optional: Event data
-        null, // Optional: Event ID
-        {
-            amount: 100,
-            paymentId: "payment456",
-            currency: "USD",
-            status: "PAYMENT_COMPLETED"
-        }
-    ).catch(function (error) {
+    linkrunner.trackPayment({
+        eventName: "FIRST_PAYMENT",
+        amount: 100,
+        userId: "user123",
+        paymentId: "payment456",
+        currency: "USD",
+        status: "PAYMENT_COMPLETED"
+    }).catch(function (error) {
         console.error("Error tracking payment:", error);
     });
     ```
@@ -271,35 +251,40 @@ The examples are fragments. Replace your `capturePayment` call with the `trackEv
     After (bridges built on native 5.0.0):
 
     ```csharp
-    var payment = new EventPayment(
+    LinkrunnerSDK.TrackPayment(
+        eventName: "FIRST_PAYMENT",
+        userId: "user_123",
         amount: 9.99,
         paymentId: "pay_abc123",
         currency: "USD",
         status: PaymentStatus.PAYMENT_COMPLETED
     );
-    LinkrunnerSDK.TrackEvent("FIRST_PAYMENT", payment: payment);
     ```
 
-    Update your Android and iOS bridge code as shown in [Track Payments](/sdk/unity#track-payments).
+    Update your Android and iOS bridge code and C# wrapper as shown in [Track Payments](/sdk/unity#track-payments).
   </Tab>
 </Tabs>
 
 ### Field mapping
 
-| `capturePayment` field | `trackEvent` field |
+| `capturePayment` field | `trackPayment` field |
 | --- | --- |
-| `paymentId` | `payment.paymentId` |
-| `amount` | `payment.amount` |
 | `type` | `eventName`. See [Choose the event name](#choose-the-event-name) |
-| `status` | `payment.status` |
-| `userId` | Removed. The SDK uses the user from `signup`, `setUserData`, or `setCustomerUserId` |
+| `paymentId` | `paymentId` |
+| `userId` | `userId`, still required. An empty string falls back to the user saved by `signup` or `setUserData` |
+| `amount` | `amount` |
+| `status` | `status`, optional. Defaults to `PAYMENT_COMPLETED` |
 | `eventData` | `eventData` |
-| Not available | `payment.currency`, new and required |
+| Not available | `currency`, new and required |
+
+### Alternative: `trackEvent` with a payment
+
+If you already call `trackEvent` for the same action, you can attach the payment to it instead. Pass a payment object (`EventPayment` on Android, iOS, Flutter, and Unity) with `amount`, `paymentId`, `currency`, `userId`, and an optional `status`. It records the same payment as `trackPayment`. Each SDK page shows the call under **Tracking Payments**.
 
 ## Payment rules
 
-- **Required fields.** `amount`, `paymentId`, and `currency` are all required. `amount` must be 0 or greater, `paymentId` must not be blank, and `currency` must be a 3-letter ISO 4217 code such as `USD` or `INR`.
-- **Validation.** The SDK rejects an invalid payment before sending it, so nothing reaches Linkrunner. Each SDK page lists the error your code receives.
+- **Required fields.** `eventName`, `paymentId`, `userId`, `amount`, and `currency` are all required. `amount` must be 0 or greater, `paymentId` must not be blank, and `currency` must be a 3-letter ISO 4217 code such as `USD` or `INR`. `userId` can be an empty string, in which case the SDK uses the user saved by `signup` or `setUserData`.
+- **Validation.** The SDK rejects an invalid payment before sending it, so nothing reaches Linkrunner. Each SDK page explains how the failure is reported to your code.
 - **Status.** `status` is optional and defaults to `PAYMENT_COMPLETED`. The values are `PAYMENT_INITIATED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, and `PAYMENT_CANCELLED`.
 - **Postbacks.** Only `PAYMENT_COMPLETED` payments are sent to ad networks, and only for event names that have a mapping.
 
@@ -319,7 +304,7 @@ Revenue is shared only when **Send Revenue** is turned on for the event's mappin
 
 ## Server-side API
 
-If you send payments from your backend, use `POST /api/v1/capture-event`. It accepts `amount`, `payment_id`, `currency`, and `status` next to `event_name`, and the same naming rule applies. See [Events Capture API](/api-reference/event-capture#payment-fields).
+If you send payments from your backend, use `POST /api/v1/capture-event`. It accepts `amount`, `payment_id`, `currency`, and `status` next to `event_name` and `user_id`, and the same naming rule applies. See [Events Capture API](/api-reference/event-capture#payment-fields).
 
 `POST /api/v1/capture-payment` is deprecated. It keeps working for existing integrations, but new integrations should use `/capture-event`.
 
