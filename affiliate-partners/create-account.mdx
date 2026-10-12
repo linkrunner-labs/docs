@@ -53,7 +53,7 @@ Use complete HTTPS URLs, including any credentials that Linkrunner should use. Y
 Click **Complete setup**.
 
 <Note>
-  Linkrunner configures your postbacks after your application is approved. Installs, and signups once set up, are sent automatically. In-app events are sent only after they are mapped. See [Postbacks and Macros](/affiliate-partners/postbacks) for event mapping, supported macros, and IP allowlisting.
+  Linkrunner sets up your postbacks when your application is approved. They go live on their own if every macro in your URLs is supported. If a URL uses an unsupported macro, setup fails, and you fix the URL in **Settings → Postback URLs**. Saving it sets up your postbacks again. Installs, and signups once set up, are sent automatically. In-app events are sent only after they are mapped. See [Postbacks and Macros](/affiliate-partners/postbacks) for event mapping, supported macros, and IP allowlisting.
 </Note>
 
 ## 4. Wait for approval
@@ -62,7 +62,16 @@ The **Pending verification** page confirms that Linkrunner received your applica
 
 ![Affiliate application pending verification](/images/affiliate-partners/create-account-pending.webp)
 
-Linkrunner emails you when the workspace is approved. After approval, you can sign in and work with connected Linkrunner customers.
+Linkrunner emails you when the workspace is approved.
+
+### What happens after approval
+
+- **Your postbacks are set up** from the URLs you submitted. They go live automatically if the URLs only use [supported macros](/affiliate-partners/postbacks).
+- **You can sign in**, but you will not see a customer's project yet. A customer has to connect you first. You cannot connect yourself.
+- **Share your partner code** with the customer so they can find you. Copy it from **Settings → Affiliate Details**. They connect you from **Integrations → Affiliate Partners**. See [Connect an affiliate partner](/affiliate-partners/connect-an-affiliate).
+- **Once connected**, create a campaign link, choose your in-app events, and send a test click.
+
+See [Getting started as an affiliate partner](/affiliate-partners/getting-started) for the full checklist.
 
 ## Troubleshooting
 
@@ -74,6 +83,9 @@ Upload a supported logo, enter an affiliate name, and add a description.
 
 **Complete setup is disabled.**
 Enter a valid HTTPS post-install event URL. The install postback URL can remain blank.
+
+**You are approved but see no project.**
+No customer has connected you yet. Ask the customer to connect you from their Integrations page, and send them your partner code. See [Connect an affiliate partner](/affiliate-partners/connect-an-affiliate).
 
 **Your workspace still shows Pending verification.**
 Your application is waiting for Linkrunner approval. You receive an email after the review is complete.

@@ -1,0 +1,108 @@
+---
+title: "Connect an Affiliate Partner"
+sidebarTitle: "Connect an affiliate (for customers)"
+description: "For Linkrunner customers: connect an approved affiliate partner to your project so they can create links and receive postbacks"
+icon: "plug"
+---
+
+An affiliate partner cannot create tracking links or receive postbacks for your app until you connect them. Linkrunner approving the partner is not enough. The connection is your decision, and only you can make it.
+
+This page is for the customer (the advertiser) who owns the app. If you are the affiliate partner, see [Getting started as an affiliate partner](/affiliate-partners/getting-started).
+
+<Info>
+  You need to be a project admin, owner, or manager to connect or disconnect a partner. Project members cannot connect or disconnect partners.
+</Info>
+
+## 1. Find the partner
+
+<Steps>
+  <Step title="Open Integrations">
+    In your [Linkrunner dashboard](https://dashboard.linkrunner.io), open **Integrations** and pick the project the partner will run traffic for.
+  </Step>
+  <Step title="Go to Affiliate Partners">
+    Scroll to the **Affiliate Partners** section. It lists every partner Linkrunner has approved. Use the search box to find the partner by name.
+  </Step>
+</Steps>
+
+Cannot find the partner? Ask them for their **partner code**. They can copy it from **Settings → Affiliate Details** in their dashboard once they are approved. Send it to [support@linkrunner.io](mailto:support@linkrunner.io) if the partner is still missing from the list. A partner who has not been approved yet does not appear.
+
+## 2. Connect the partner
+
+<Steps>
+  <Step title="Click Connect">
+    On the partner's card, click **Connect**. A **Connect &lt;partner&gt;?** dialog opens.
+  </Step>
+  <Step title="Read what you are sharing">
+    The dialog shows the partner's website, so you can check you picked the right company. It also states what connecting does: everyone at the partner, including anyone they add later, gets access to your project. They can see campaign performance for their own network. They cannot see your spend or revenue.
+  </Step>
+  <Step title="Confirm">
+    Click **Connect**. The card now shows **Connected**.
+  </Step>
+</Steps>
+
+When you connect, everyone in the partner's workspace gets an email saying you connected them. Your project then appears in their project selector, and they can create campaign links and receive postbacks.
+
+<Note>
+  The card shows **Not configured** next to **Connected** when no events are mapped for the partner yet. Installs are still sent. In-app events reach the partner only after they are mapped. See step 3.
+</Note>
+
+## 3. Choose what the partner can see and receive
+
+Click **Configure** on the connected partner's card. The partner's page has two things for you to set.
+
+### Share events
+
+Click **Share events** (it reads **Shared events (n)** once you have chosen some). The **Events &lt;partner&gt; can see** dialog opens.
+
+1. Under **Choose events**, pick the events the partner may see.
+2. Click **Save**.
+
+The partner sees how many times each chosen event happened on their own campaigns. They never see revenue, other partners' campaigns, or your users.
+
+### Event mapping
+
+Below the buttons, **Event Mapping** controls which in-app events Linkrunner sends to the partner as postbacks, and what they are called. Installs are sent automatically, and signups once the partner has a signup postback. In-app events such as a purchase are sent only after they are mapped. The partner can add mappings too. See [Event mapping](/affiliate-partners/event-mapping).
+
+## 4. Turn on S2S clicks or view-through (optional)
+
+Most partners only need the connection above. Two options are off until you ask for them:
+
+- **S2S clicks**, for placements that send users straight to the store, such as preloads. See [S2S clicks](/affiliate-partners/s2s-clicks).
+- **View-through**, to credit installs from users who saw an ad but did not tap it. See [S2S impressions](/affiliate-partners/s2s-impressions).
+
+These are not switches on the Integrations page yet. Email [support@linkrunner.io](mailto:support@linkrunner.io) with the partner name and the app, and Linkrunner turns them on for you. Changes take up to 5 minutes to apply.
+
+## What the partner can and cannot do
+
+| The partner can | The partner cannot |
+|---|---|
+| Create campaign links in your project | See your spend or revenue |
+| See performance of their own campaigns | See other partners' campaigns |
+| See counts for the events you shared | See your users or user-level data |
+| Receive postbacks for conversions credited to them | Receive in-app events you have not mapped |
+
+## Not ready to connect?
+
+Click **Request intro** on the partner's card instead. The button shows when Linkrunner has a contact address for the partner. Linkrunner emails the partner and copies you, so replies come straight to you. It shares your name, work email, company, and app name. It never shares campaign performance, spend, or revenue. An intro can be sent once per partner.
+
+## Disconnect a partner
+
+Open the partner with **Configure**, then click **Disconnect** and confirm in the **Disconnect &lt;partner&gt;?** dialog.
+
+Everyone at the partner loses access to your project, and postbacks to the partner stop. Their campaigns stay in place, so connecting again restores everything.
+
+## Troubleshooting
+
+**The partner says they are approved but see no project.**
+You have not connected them yet. Follow steps 1 and 2 above.
+
+**The partner is not in the Affiliate Partners list.**
+They may not be approved yet. Ask them for their partner code and email it to [support@linkrunner.io](mailto:support@linkrunner.io).
+
+**The Connect button is greyed out or missing.**
+You need to be an admin, owner, or manager on the project.
+
+**The partner is connected but gets no in-app events.**
+Check **Event Mapping** on the partner's page. In-app events are sent only when mapped.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
