@@ -146,6 +146,12 @@ The numbers in the screenshot match the steps above.
     Switching between SKAdNetwork 4.0 and 3.0 can take at least 24 hours to apply. Avoid switching back and forth.
 </Note>
 
+<Note>
+    **Edit events** reopens your current setup, where **Priority** can show as text such as **High** instead of a
+    number you can type. To get the number field, click **Edit**, then **Back** until you reach **Choose an app event
+    connection**, click **Change Method**, and continue from Step 2.
+</Note>
+
 ### Step 2: Choose Custom Integration
 
 1. On **Choose how to configure events**, select **Customise**. Linkrunner does not provide a schema URL for **Import from partner app**.
@@ -153,19 +159,21 @@ The numbers in the screenshot match the steps above.
 
 ![Choose how to configure events step with Customise selected as 1 and the Next button as 2](/images/meta/skan/choose-customise.webp)
 
-3. On **Choose an app event connection**, select **Custom integration for SKAdNetwork**. The **Use Facebook SDK to manage SKAdNetwork** option only accepts events sent by the Facebook SDK.
-4. Click **Next** and confirm that you meet Meta's requirements
+3. On **Choose an app event connection**, select **Custom integration for SKAdNetwork**
+4. Check that your app meets the requirements listed on the card, then click **Next**
 
 ![Choose an app event connection step with Custom integration for SKAdNetwork selected as 3 and the Next button as 4](/images/meta/skan/custom-integration.webp)
 
 ### Step 3: Add the Fine Conversion Values
 
-Recreate the **Fine Conversion Values** table from Linkrunner, highest priority first.
+Recreate every row of Linkrunner's **Fine Conversion Values** table. Your app reports the **Priority** number, and Meta credits the event you assign to that number, so the numbers must match Linkrunner's exactly.
 
-1. For each row, select the Meta event from the dropdown. If a Linkrunner row lists more than one event, add them together as one bundled event.
-2. Click **Add Event** for each additional row, then click **Next**
+1. In **Priority**, type the row's **Priority** number from Linkrunner
+2. In **Event name**, select the Meta event for that row
+3. If the Linkrunner row lists more than one event, click **+** under the event and add each one to the same row
+4. Click **Add Event** to add the next row. When every Linkrunner row is added, click **Next**
 
-![Choose fine conversion values step with the event dropdown open as 1 and the Add Event button as 2](/images/meta/skan/fine-conversion-values.webp)
+![Choose fine conversion values step with the Priority field set to 1 as 1, the event dropdown as 2, the add bundled event button as 3, and the Add Event button as 4](/images/meta/skan/fine-conversion-values.webp)
 
 <Note>
     The dropdown only lists events Meta has received from your app in the past 90 days. If an event is missing, see
@@ -176,9 +184,9 @@ Recreate the **Fine Conversion Values** table from Linkrunner, highest priority 
 
 1. Keep **Apply this setup to all three windows** checked. Linkrunner uses the same coarse mapping for all three postbacks.
 2. Select the event for **High**, matching Linkrunner's **Coarse Conversion Values** tab
-3. Click **Add Event** to add the **Medium** and **Low** events, then click **Review**
+3. Click **+** next to **Medium** and **Low** and select their events, then click **Review**
 
-![Choose coarse conversion values step with an arrow to the Apply this setup to all three windows checkbox as 1, the High priority event as 2, and the Add Event button as 3](/images/meta/skan/coarse-conversion-values.webp)
+![Choose coarse conversion values step with an arrow to the Apply this setup to all three windows checkbox as 1, the High event as 2, and the add buttons for Medium and Low as 3 and 4](/images/meta/skan/coarse-conversion-values.webp)
 
 ### Step 5: Review and Apply
 
