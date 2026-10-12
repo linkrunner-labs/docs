@@ -201,7 +201,8 @@
                             "api-reference/campaign-apis",
                             "api-reference/s2s-clicks",
                             "api-reference/s2s-impressions",
-                            "api-reference/reporting-campaigns"
+                            "api-reference/reporting-campaigns",
+                            "api-reference/reporting-web-campaigns"
                         ]
                     },
                     {
