@@ -518,30 +518,51 @@ class CampaignData {
 
 ## Setting User Data
 
-Call `setUserData` each time the app opens and the user is logged in:
+Call `setUserData` to send user details and the IDs your product analytics tools use for this user. You can call it right after `init`, before the user logs in: `id` is optional for `setUserData`. Pass `id` once the user is logged in.
+
+When you pass a tool's ID and that integration is configured in Linkrunner, Linkrunner sends this install's attribution to that tool for this user, the same attribution it sends after `signup` (for example, `lr_campaign` and `lr_ad_network` on the Mixpanel profile). This applies to installs attributed to a campaign. If the install is not attributed yet, Linkrunner sends the properties once attribution completes. Supported IDs:
+
+| Tool | Field |
+|------|-------|
+| Mixpanel | `mixpanelDistinctId` |
+| Amplitude | `amplitudeDeviceId` |
+| PostHog | `posthogDistinctId` |
+| MoEngage | `moengageUserId` |
+| Braze | `brazeDeviceId` |
+| Google Analytics 4 | `gaAppInstanceId` and `gaSessionId` |
+| Netcore | `netcoreDeviceGuid` |
 
 <Note>
-**`setUserData` is optional and is not a replacement for `signup`.** Always call `signup` first as soon as the user is identified (signup or login). Use `setUserData` afterwards only when additional user details become available later — for example, when the user adds a phone number, email, or completes their profile after identification.
+**`setUserData` is not a replacement for `signup`.** Call `signup` as soon as the user is identified (signup or login). `signup` still requires `id`.
 </Note>
+
+<Note>
+Calling `setUserData` without `id` requires Flutter SDK 4.3.0 or later. On earlier versions `id` is required.
+</Note>
+
+Right after `init`, before the user logs in:
+
+```dart
+Future<void> setAnalyticsIds(String mixpanelDistinctId) async {
+  await LinkRunner().setUserData(
+    userData: LRUserData(mixpanelDistinctId: mixpanelDistinctId),
+  );
+}
+```
+
+After the user logs in:
 
 ```dart
 Future<void> setUserData() async {
-  try {
-    await LinkRunner().setUserData(
-      userData: LRUserData(
-        id: '123', // Required: User ID
-        name: 'John Doe', // Optional
-        phone: '9876543210', // Optional
-        email: 'user@example.com', // Optional
-        mixpanelDistinctId: 'mixpanelDistinctId', // Optional - Mixpanel Distinct ID
-        amplitudeDeviceId: 'amplitudeDeviceId', // Optional - Amplitude User ID
-        posthogDistinctId: 'posthogDistinctId', // Optional - PostHog Distinct ID
-      ),
-    );
-    print('User data set successfully');
-  } catch (e) {
-    print('Error setting user data: $e');
-  }
+  await LinkRunner().setUserData(
+    userData: LRUserData(
+      id: '123', // Your customer user ID
+      name: 'John Doe', // Optional
+      phone: '9876543210', // Optional
+      email: 'user@example.com', // Optional
+      mixpanelDistinctId: 'mixpanel_distinct_id', // Optional
+    ),
+  );
 }
 ```
 
@@ -1054,7 +1075,7 @@ Connect APNs with Linkrunner
 | [`LinkRunner().handleDeeplink`](/sdk/flutter#handle-deeplink) | Required | Deep link entry points | When app is opened via a deep link |
 | [`LinkRunner().getAttributionData`](/sdk/flutter#getting-attribution-data) | Optional | Attribution data handling flow | Whenever the attribution data is needed |
 | [`LinkRunner().setAdditionalData`](/sdk/flutter#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
-| [`LinkRunner().setUserData`](/sdk/flutter#setting-user-data) | Optional | Authentication or profile update logic | After `signup`, when additional user details become available |
+| [`LinkRunner().setUserData`](/sdk/flutter#setting-user-data) | Optional | App start, authentication or profile update logic | Right after `init` with your analytics IDs, and when user details become available |
 | [`LinkRunner().trackEvent`](/sdk/flutter#tracking-custom-events) | Optional | Throughout app | When specific user actions occur, including [ecommerce events](/sdk/flutter#ecommerce-events) |
 | [`LinkRunner().capturePayment`](/sdk/flutter#capturing-payments) | Optional | Payment processing | When user makes a payment, including [ecommerce purchases](/sdk/flutter#ecommerce-events) |
 | [`LinkRunner().removePayment`](/sdk/flutter#removing-payments) | Optional | Refund flow | When payment needs to be removed |

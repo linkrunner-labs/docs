@@ -122,6 +122,9 @@ The data will be visible in the **Custom Attributes** section of the user profil
     <Tip>
       You can get the `brazeDeviceId` from the Braze SDK in your app.
     </Tip>
+    <Tip>
+      You can also send the Braze device ID with `setUserData` right after `init`, before the user signs up. `id` is optional there, and Linkrunner sends the attribution once it has the ID instead of waiting for `signup`. See [Setting user data](/sdk/android#setting-user-data) and the matching section of your SDK's page.
+    </Tip>
   </Step>
 
   <Step title="Sync with Braze (Optional)">
