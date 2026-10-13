@@ -228,7 +228,8 @@
                             "affiliate-partners/s2s-impressions",
                             "affiliate-partners/postbacks",
                             "affiliate-partners/event-mapping",
-                            "affiliate-partners/postback-logs"
+                            "affiliate-partners/postback-logs",
+                            "affiliate-partners/fraud-data"
                         ]
                     },
                     {
