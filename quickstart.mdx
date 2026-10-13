@@ -192,7 +192,7 @@ LinkRunner.getInstance().signup(
 </Tabs>
 
 <Note>
-**`signup` is required.** `setUserData` is optional and is **not** a replacement for `signup` — call it later only when additional user details become available (e.g., the user adds a phone or completes their profile after the initial signup).
+**`signup` is required.** `setUserData` is optional and is **not** a replacement for `signup`. Use it to send your product analytics IDs (you can call it right after `init`, without `id`) or user details that become available later, such as a phone number.
 </Note>
 
 ## 5. Handle Deep Links

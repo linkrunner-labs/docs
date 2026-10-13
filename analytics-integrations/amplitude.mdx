@@ -8,6 +8,7 @@ Choose your setup based on which events need campaign attribution:
 
 - **Events after signup:** configure the automatic integration below. Linkrunner sends attribution properties asynchronously after you call `signup`.
 - **Install, first-open, or pre-login onboarding events:** also [send attribution from your app](#send-attribution-before-login), before tracking the events you want to segment by campaign.
+- **Pre-login profile, without app-side code:** pass your Amplitude device ID as `amplitude_device_id` (`amplitudeDeviceId` on Android, iOS and Flutter) with `setUserData` right after `init`. `id` is optional there. Linkrunner sets the properties once on that device's Amplitude profile when the install is attributed to a campaign. Events tracked before the properties arrive still do not get them, as described below. See [Setting user data](/sdk/android#setting-user-data) and the matching section of your SDK's page.
 
 <Warning>
 Amplitude does not add newly received user properties to earlier events. A user profile can show the correct campaign while an earlier event still shows `(none)` when grouped by that property. This applies to user properties as well as event properties. Awaiting Linkrunner `signup` does not guarantee that the Amplitude update has finished.
