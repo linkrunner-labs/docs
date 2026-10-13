@@ -250,7 +250,8 @@
                             "agency-partners/accept-invitation",
                             "agency-partners/manage-workspace",
                             "agency-partners/create-campaign-link",
-                            "agency-partners/invite-an-agency"
+                            "agency-partners/invite-an-agency",
+                            "agency-partners/control-agency-access"
                         ]
                     }
                 ]
