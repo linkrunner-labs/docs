@@ -81,9 +81,8 @@ These calls come from your server, so Linkrunner never sends your server's IP to
 
 ### Responses
 
-1. **201** Payment captured
-2. **200** A payment with this `payment_id` was already captured, so this one is ignored
-3. **401** Invalid server key
+1. **201** Payment captured. Sending the same `payment_id` again also returns `201`, and Linkrunner counts that payment once.
+2. **401** Invalid server key
 
 #### Sample Response
 
