@@ -82,7 +82,23 @@ These calls come from your server, so Linkrunner never sends your server's IP to
 ### Responses
 
 1. **201** Payment captured
-2. **401** Invalid server key
+2. **200** A payment with this `payment_id` was already captured, so this one is ignored
+3. **401** Invalid server key
+
+#### Sample Response
+
+```json
+{
+  "msg": "Payment capture request received!",
+  "status": 201,
+  "processing_id": "0b7e4d2c-81a5-4f3e-9c6d-5a2f1e8b3d47",
+  "data": {
+    "message": "Payment capture request received!"
+  }
+}
+```
+
+`processing_id` identifies this request. Log it on your side and share it with Linkrunner support if a payment does not show up.
 
 ## Remove captured payment
 
