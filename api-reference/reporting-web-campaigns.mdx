@@ -1,0 +1,284 @@
+---
+title: "Web Campaigns Reporting API"
+description: "Programmatic access to web campaign analytics: visitors, sessions, signups, purchases, revenue, spend and ROAS, by campaign, channel, source or ad network hierarchy."
+icon: "globe"
+---
+
+This API returns the numbers shown on the **Web Campaigns** page of the Linkrunner dashboard. For app campaigns (clicks, installs), use the [Reporting API](/api-reference/reporting-campaigns).
+
+Your project needs **Web Campaigns** turned on. Otherwise every request returns `403`.
+
+## Base URL
+
+```
+https://api.linkrunner.io/api/v1
+```
+
+## Authentication
+
+Pass your project's server key in the `linkrunner-key` header. This is the same key the [Reporting API](/api-reference/reporting-campaigns) and other `/api/v1` endpoints use. Find it under [Settings → Data APIs](https://dashboard.linkrunner.io/settings?s=data-apis):
+
+```
+linkrunner-key: YOUR_API_KEY
+```
+
+## Postman collection
+
+[Download the Postman collection](https://docs.linkrunner.io/api-reference/reporting-web-campaigns.postman_collection.json). Import it into Postman, set the `linkrunner_key` collection variable to your key, and run any request.
+
+## Rate limit and freshness
+
+- **1 request per minute per API key** (`429` with `Retry-After: 60` when exceeded). This limit is separate from `/reporting/campaigns`, so you can pull app and web numbers in the same minute.
+- 30 req/sec per source IP (shared across all `/api/v1` endpoints).
+- Cache responses for at least 60 seconds. Polling faster returns the same data.
+
+## Endpoint
+
+```
+GET https://api.linkrunner.io/api/v1/reporting/web-campaigns
+```
+
+<Warning>
+  Do not call the docs page URL (`/api-reference/reporting-web-campaigns`) as the API endpoint. The API path is `/api/v1/reporting/web-campaigns`.
+</Warning>
+
+### Example request
+
+<Tabs>
+<Tab title="cURL">
+```bash
+curl 'https://api.linkrunner.io/api/v1/reporting/web-campaigns?from=2026-10-01&to=2026-10-07&sort_field=revenue&limit=20' \
+  -H 'linkrunner-key: YOUR_API_KEY'
+```
+</Tab>
+<Tab title="Google Apps Script">
+```js
+const response = UrlFetchApp.fetch(
+    "https://api.linkrunner.io/api/v1/reporting/web-campaigns?from=2026-10-01&to=2026-10-07&limit=20",
+    {
+        method: "get",
+        headers: {
+            "linkrunner-key": "YOUR_API_KEY",
+        },
+    }
+);
+
+const data = JSON.parse(response.getContentText());
+```
+</Tab>
+</Tabs>
+
+### Response
+
+```json
+{
+    "msg": "Web campaigns fetched successfully",
+    "status": 200,
+    "data": {
+        "campaigns": [
+            {
+                "id": "summer_sale_fb",
+                "name": "Summer Sale",
+                "channel": null,
+                "source": "facebook",
+                "tracking_link": "https://example.com/?utm_id=summer_sale_fb&utm_source=facebook",
+                "paused": false,
+                "merged": false,
+                "visitors": 3120,
+                "sessions": 3980,
+                "page_views": 10450,
+                "signups": 241,
+                "unique_signup_users": 228,
+                "conversion": 7.31,
+                "purchases": 58,
+                "revenue": 48210.5,
+                "spend": 12000,
+                "roas": 4.02,
+                "cost_per_visitor": 3.85,
+                "custom_events": { "add_to_cart": { "count": 412 } }
+            }
+        ],
+        "totals": { "visitors": 48210, "signups": 3120, "revenue": 612340, "...": "same metric fields as a row" },
+        "pagination": { "total": 14, "pages": 1, "page": 1, "limit": 20, "truncated": false },
+        "attribution": "last_touch",
+        "group_by": "campaign",
+        "network": null,
+        "from": "2026-10-01",
+        "to": "2026-10-07"
+    }
+}
+```
+
+Numbers are plain JSON numbers, not formatted strings. `from` and `to` in the response are the dates the numbers cover, including the defaults when you sent none.
+
+`pagination.total` is the number of rows matching your filters, and `pages` is `total / limit` rounded up. `totals` covers every matching row, not only the current page. Unique counts such as `visitors` are deduplicated across the whole range, so `totals.visitors` is not the sum of the rows.
+
+### Query parameters
+
+| Parameter                    | Type   | Default          | Notes |
+| ---------------------------- | ------ | ---------------- | ----- |
+| `from`, `to`                 | string | all time         | `YYYY-MM-DD`, inclusive. `start_date` / `end_date` are accepted aliases. Without `from`, the range starts on the day your project was created. Without `to`, it ends today. An explicit range can span at most 366 days. |
+| `group_by`                   | string | `campaign`       | What one row is. See [Grouping](#grouping). |
+| `network`                    | string | (none)           | `meta` or `google`. Required with `group_by=network_campaign`, `ad_set` or `ad`, and refused with the others. |
+| `network_campaign_id`        | string | (none)           | With the network groupings only: keep rows under this ad network campaign. |
+| `ad_set_id`                  | string | (none)           | With the network groupings only: keep rows under this ad set or ad group. |
+| `attribution`                | string | `last_touch`     | `last_touch` or `first_touch`. |
+| `channel`                    | string | (all)            | A value returned in `channel` when `group_by=channel`, for example `meta`, `google`, `paid_social`, `organic_search` or `direct`. |
+| `source`                     | string | (all)            | A traffic source, for example `facebook` or `google`. |
+| `utm_source`, `utm_medium`, `utm_campaign`, `utm_id`, `utm_content`, `utm_term` | string | (all) | Exact match on the UTM value. |
+| `search`                     | string | (none)           | Partial match on the row `id`. |
+| `events`                     | string | (none)           | Comma-separated custom event names to count. See [Custom events](#custom-events). |
+| `sort_field`                 | string | `visitors`       | `visitors`, `page_views`, `sessions`, `signups`, `unique_signup_users`, `purchases`, `revenue` or `name`. |
+| `sort_order`                 | string | `descending`     | `ascending` or `descending`. |
+| `page`                       | number | `1`              | 1-indexed. **Max 10000.** |
+| `limit`                      | number | `10`             | **Max 100.** |
+
+Send each parameter once. A repeated parameter, such as `limit=5&limit=50`, returns `400`.
+
+### Grouping
+
+| `group_by`         | One row is                                        | `id` is |
+| ------------------ | ------------------------------------------------- | ------- |
+| `campaign`         | A web campaign (one `utm_id`)                      | The `utm_id`. Without one, the `utm_campaign` value, which is where Google Ads puts its campaign ID. |
+| `channel`          | A traffic channel                                  | The channel key, for example `meta` or `organic_search`. |
+| `source`           | A traffic source                                   | The source, for example `facebook`. |
+| `network_campaign` | A Meta or Google Ads campaign                      | The ad network campaign ID. |
+| `ad_set`           | A Meta ad set or Google Ads ad group               | The ad set or ad group ID. |
+| `ad`               | A Meta or Google Ads ad                            | The ad ID. |
+
+`network_campaign`, `ad_set` and `ad` answer for one network at a time, so `network` is required with them. A `channel` or `source` from a different network, such as `network=meta&source=google`, returns `400`.
+
+Some rows collect traffic that has no key, such as visits without a `utm_id`. Their `id` is `null` and their `name` describes the bucket, for example `(no campaign ID)`.
+
+### Row fields
+
+| Field                | Meaning |
+| -------------------- | ------- |
+| `id`, `name`         | See [Grouping](#grouping). `name` is the campaign name when Linkrunner knows it, otherwise the same as `id`. |
+| `channel`, `source`  | Filled where the grouping knows them. On `group_by=campaign`, `channel` is `null` and `source` is the campaign's traffic source. On the other groupings, `source` is `null` and the value is in `id`. |
+| `tracking_link`      | The tracking link created in Linkrunner for this `utm_id`. `null` when there is none. |
+| `paused`             | `true` when the campaign is paused in Linkrunner. Paused campaigns stop counting from the time they were paused. `null` outside `group_by=campaign`. |
+| `merged`             | `true` when several `utm_id` values are reported as this one Meta campaign row. `null` outside `group_by=campaign`. |
+| `visitors`, `sessions`, `page_views` | Unique visitors, unique sessions, and page views. |
+| `signups`, `unique_signup_users` | Signup events, and distinct signed-up users. Signups are counted from a fixed set of event names, such as `signup` and `sign_up`. |
+| `conversion`         | Visitors who signed up, as a percentage of visitors. |
+| `purchases`, `revenue` | Purchase events, and the sum of the revenue sent with them. Purchases are counted from a fixed set of event names, such as `purchase` and `order_completed`. |
+| `spend`, `roas`, `cost_per_visitor` | Ad spend matched from your connected ad accounts, revenue divided by spend, and spend divided by visitors. `null` where spend cannot be matched to the row, including every `ad_set` and `ad` row, because ad networks report spend per campaign. |
+| `custom_events`      | Counts for the names you sent in `events`. `{}` when you sent none. |
+
+<Note>
+  Revenue is summed as the amounts your website sent, without currency conversion. Spend keeps the currency of each ad account. Compare `revenue`, `spend` and `roas` only when your site and your ad accounts use one currency.
+</Note>
+
+<Note>
+  Days are counted in India Standard Time (`Asia/Kolkata`), whatever your project timezone. If your project uses another timezone, numbers for a single day can differ from your own day boundaries near midnight.
+</Note>
+
+### Custom events
+
+Custom event columns are opt-in. Name the events you want in `events`, and each row carries their counts in `custom_events`:
+
+```bash
+curl -G 'https://api.linkrunner.io/api/v1/reporting/web-campaigns' \
+  -H 'linkrunner-key: YOUR_API_KEY' \
+  --data-urlencode 'from=2026-10-01' \
+  --data-urlencode 'to=2026-10-07' \
+  --data-urlencode 'events=add_to_cart,checkout_started'
+```
+
+```json
+{
+    "custom_events": {
+        "add_to_cart": { "count": 412 },
+        "checkout_started": { "count": 96 }
+    }
+}
+```
+
+`count` is the number of times the event happened. An event with no occurrences returns `0`. You can name up to 50 events, each up to 120 characters. Longer lists return `422`.
+
+### Ad network hierarchy
+
+To list the ad sets of one Meta campaign, group by `ad_set` and pass the campaign ID from a `group_by=network_campaign` row:
+
+```bash
+curl 'https://api.linkrunner.io/api/v1/reporting/web-campaigns?group_by=ad_set&network=meta&network_campaign_id=120200000000000001&from=2026-10-01&to=2026-10-07' \
+  -H 'linkrunner-key: YOUR_API_KEY'
+```
+
+Use `ad_set_id` the same way with `group_by=ad`.
+
+### Errors
+
+| Status | When |
+| ------ | ---- |
+| `400`  | An unknown value for `group_by`, `network`, `attribution`, `sort_field` or `sort_order`; `network` missing with a network grouping, or sent with another grouping; a `channel` or `source` from a different network; a repeated parameter. |
+| `401`  | Missing or invalid `linkrunner-key`. |
+| `402`  | Billing account suspended. Body includes `payment_link`. |
+| `403`  | Web Campaigns is not enabled for this project. |
+| `422`  | `limit` is not between 1 and 100; `page` is not between 1 and 10000; a date is not `YYYY-MM-DD`; `from` is after `to`; the range is longer than 366 days; `to` is before your project was created; more than 50 `events` names or a name longer than 120 characters. |
+| `429`  | Rate limit exceeded. |
+| `500`  | Unexpected server error. Retry after a short backoff. |
+
+## Troubleshooting
+
+<AccordionGroup>
+<Accordion title="403 Web Campaigns not enabled for this project">
+A project admin turns on **Web Campaigns** in **Settings → Project Details**. See [Track your website in an app project](/features/website-projects#track-your-website-in-an-app-project). Website projects have it on already.
+</Accordion>
+<Accordion title="429 Too Many Requests on the second call">
+The limit is 1 request per minute per API key. Honor the `Retry-After: 60` header and cache responses for at least 60 seconds.
+</Accordion>
+<Accordion title="pagination.truncated is true">
+With `group_by=campaign&channel=google`, Linkrunner can list up to 1,000 Google Ads campaigns. When a project has more, `truncated` is `true` and the remaining campaigns are not in the response. Request a shorter date range.
+</Accordion>
+<Accordion title="Numbers don't match the dashboard">
+Compare the same date range, the same attribution model and the same grouping. Both the dashboard Web Campaigns page and this API default to one row per campaign.
+</Accordion>
+</AccordionGroup>
+
+## TypeScript types
+
+```ts
+export interface ReportingWebCampaignsResponse {
+    msg: string;
+    status: number;
+    data: {
+        campaigns: WebCampaignRow[];
+        totals: WebCampaignMetrics;
+        pagination: { total: number; pages: number; page: number; limit: number; truncated: boolean };
+        attribution: "last_touch" | "first_touch";
+        group_by: "campaign" | "channel" | "source" | "network_campaign" | "ad_set" | "ad";
+        network: "meta" | "google" | null;
+        from: string;
+        to: string;
+    };
+}
+
+export interface WebCampaignMetrics {
+    visitors: number;
+    sessions: number;
+    page_views: number;
+    signups: number;
+    unique_signup_users: number | null;
+    conversion: number;
+    purchases: number;
+    revenue: number;
+    spend: number | null;
+    roas: number | null;
+    cost_per_visitor: number | null;
+    custom_events: { [name: string]: { count: number } };
+}
+
+export interface WebCampaignRow extends WebCampaignMetrics {
+    id: string | null;
+    name: string;
+    channel: string | null;
+    source: string | null;
+    tracking_link: string | null;
+    paused: boolean | null;
+    merged: boolean | null;
+}
+```
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
