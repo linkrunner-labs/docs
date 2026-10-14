@@ -42,11 +42,11 @@ A CTV match is probabilistic: the same IP address suggests the same household, b
 | **Everything else wins** | Any click that can be credited, from any source, and any [S2S impression](/affiliate-partners/s2s-impressions) matched on the device ID win over every CTV impression. |
 | **Inside the window** | The install happens within the view-through window after the impression. The advertiser sets it for you, from 1 to 24 hours (24 by default). Your `vt_lookback` can shorten it, never lengthen it. |
 | **Latest impression** | If several impressions match, the most recent one inside its own window is credited. Each impression is credited to at most one install. |
-| **Not a shared address** | When more than four installs of the app come from the same IP address within a day, Linkrunner treats it as a shared network, such as an office or a public hotspot, and stops crediting CTV impressions to its installs. |
+| **Not a shared address** | When more than four Android installs of the app that no click or device-ID impression was credited for come from the same IP address within a day, Linkrunner treats it as a shared network, such as an office or a public hotspot, and stops crediting CTV impressions to its installs. |
 
 Postbacks work as for clicks. Your [postback templates](/affiliate-partners/postbacks), [event mapping](/affiliate-partners/event-mapping) and [postback logs](/affiliate-partners/postback-logs) apply unchanged, and `{touch_type}` is `impression` for CTV installs.
 
-In the campaign table, CTV installs count as **View Through Attribution** installs and as **Modeled Installs**, because the match rests on the IP address rather than a device ID. Accepted impressions appear in the **Impressions** column.
+In the campaign table, CTV installs count as installs and as **View Through Attribution** installs. Accepted impressions appear in the **Impressions** column.
 
 ## Set it up
 
