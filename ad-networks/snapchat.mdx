@@ -131,20 +131,33 @@ This section is optional. Skip it if you only want events sent to your Pixel.
 
 Snapchat records app events, such as installs and purchases, on a Snap App ID. Linkrunner does not import Snap App IDs from Snapchat, so you copy yours from Snapchat Ads Manager.
 
-### Step 1: Create your Snap App
+### Step 1: Open Apps
 
-1. In [Snapchat Ads Manager](https://ads.snapchat.com/), create a Snap App for your app by following Snapchat's guide [Generate Your Snap App ID](https://businesshelp.snapchat.com/s/article/generate-snap-app-id?language=en_US). You enter your App Store ID and Android package name there.
-2. One Snap App can cover both your iOS and Android apps, or you can create one for each store.
+1. In [Snapchat Ads Manager](https://ads.snapchat.com/), click the menu in the top left corner and select **Apps** under **Assets**
 
-### Step 2: Copy the Snap App ID
+![Snapchat Ads Manager menu with Apps under Assets](/images/snapchat-ss/snapchat-ads-manager-menu-apps.webp)
 
-1. Copy the Snap App ID of each app. It looks like `9b5b83ec-c593-4a64-9c6d-a0eb9da0edb9`. Snapchat's guide [Manage Snap App ID Information in Business Manager](https://businesshelp.snapchat.com/s/article/manage-snap-app-id?language=en_US) shows where to find it.
+### Step 2: Create your Snap App
+
+1. Click **Add an App**
+2. Keep **Create a new Snap App ID** selected, enter an **App Name**, and fill in **iOS App ID** (your App Store ID), **Android App URL** (your Android package name), or both
+3. Click **Continue**
+
+One Snap App can cover both your iOS and Android apps, or you can create one for each store. Snapchat's guide [Generate Your Snap App ID](https://businesshelp.snapchat.com/s/article/generate-snap-app-id?language=en_US) has more detail.
+
+![The Create a Snap App ID window in Snapchat Business Manager](/images/snapchat-ss/snapchat-create-snap-app-id.webp)
+
+### Step 3: Copy the Snap App ID
+
+1. The **Apps** page lists each Snap App with its **App ID** under the app name. Copy it for each app. It looks like `9b5b83ec-c593-4a64-9c6d-a0eb9da0edb9`.
+
+![The Apps page in Snapchat Business Manager showing the App ID under the app name](/images/snapchat-ss/snapchat-apps-list-snap-app-id.webp)
 
 <Warning>
     A Snap App ID is not your App Store ID (such as `1234567890`) or your Android package name (such as `com.example.app`). Linkrunner rejects those values in the Snap App ID fields.
 </Warning>
 
-### Step 3: Check your store links in Linkrunner
+### Step 4: Check your store links in Linkrunner
 
 Linkrunner includes your app's store ID in every app event it sends to Snapchat. Open [Settings → Project Details](https://dashboard.linkrunner.io/dashboard/settings/project-details) and check that:
 
@@ -180,11 +193,13 @@ To add a Snap App ID to an account you already configured, open **Configure Pixe
 
 1. Open the **Event Mapping** tab of the [Snapchat integration on Linkrunner](https://dashboard.linkrunner.io/dashboard/integrations/snapchat-ads)
 2. Click the send icon on a mapping row. Linkrunner sends the test as an app event to each Snap App ID you added. If you added no Snap App ID, or Snapchat accepts none of the app events, Linkrunner tests your Pixel instead.
-3. In [Snapchat Ads Manager](https://ads.snapchat.com/), open **Events Manager** and check that **Last Received** for your Snap App shows the test event
+3. In [Snapchat Ads Manager](https://ads.snapchat.com/), open **Events Manager** from the top left menu, select your Snap App under **Event Sources**, and check that **Last Event Received** shows the test event
 
 ![The Snapchat Event Mapping tab in Linkrunner with a send icon on each mapping row](/images/snapchat-ss/linkrunner-snapchat-send-test-event.webp)
 
-If no test event reaches Snapchat, the error message says why. For example, an iOS Snap App ID needs your App Store URL (section 2, step 3). A success message can still mean one platform was skipped, so check **Last Received** for each Snap App.
+![A Snap App in Snapchat Events Manager showing Total Events and Last Event Received](/images/snapchat-ss/snapchat-events-manager-snap-app.webp)
+
+If no test event reaches Snapchat, the error message says why. For example, an iOS Snap App ID needs your App Store URL (section 2, step 4). A success message can still mean one platform was skipped, so check **Last Event Received** for each Snap App.
 
 <Note>
     **At this point your Snapchat setup is complete.** Linkrunner sends events from users who clicked a Snapchat ad through your Linkrunner campaign link to your Pixel, and events from other users to the Snap App for their platform. See [which installs go to your Snap App](#which-installs-go-to-your-snap-app).
