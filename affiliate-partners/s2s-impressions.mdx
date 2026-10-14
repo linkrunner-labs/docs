@@ -37,7 +37,7 @@ Linkrunner credits an impression only when all of these hold:
 
 | Rule | Detail |
 |---|---|
-| **Device ID match** | The impression carries the same `gaid` (Android) or `idfa` (iOS) as the installing device. IP is never used for view-through. |
+| **Device ID match** | The impression carries the same `gaid` (Android) or `idfa` (iOS) as the installing device. The IP address is never used for matching on this endpoint. For connected TV ads, see [CTV impressions](/affiliate-partners/ctv-impressions). |
 | **No click wins** | Any click from any source that can be credited, including an IP match, wins over every impression. |
 | **Inside the window** | The install happens within the view-through window after the impression. The advertiser sets it for you, from 1 to 24 hours (24 by default). Your `vt_lookback` can shorten it, never lengthen it. |
 | **Latest impression** | If several impressions match, the most recent one inside its own window is credited. Each impression is credited to at most one install. |
@@ -171,7 +171,7 @@ The request has no `X-Linkrunner-Token` header and no `lr_token` parameter. Chec
 The token is wrong, was revoked, or was replaced more than 24 hours ago. You also get this while your partner account is suspended. Copy the current token from your server's secret store, not from an old template. If you no longer have it, rotate it in **Settings → S2S Credentials**.
 
 **Requests return `missing_device_id`.**
-Impressions need a `gaid` or `idfa`. Unlike S2S clicks, an IP address alone is not enough. An all-zero ID counts as missing.
+Impressions need a `gaid` or `idfa`. Unlike S2S clicks, an IP address alone is not enough. An all-zero ID counts as missing. If your impressions play on connected TVs and only carry an IP address, use [CTV impressions](/affiliate-partners/ctv-impressions).
 
 **Requests return `partner_not_enabled` or `view_through_disabled`.**
 The advertiser hasn't turned on S2S traffic, or view-through, for your partner account on this app. Changes take up to 5 minutes to apply.

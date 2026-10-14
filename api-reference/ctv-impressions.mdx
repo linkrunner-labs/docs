@@ -1,0 +1,174 @@
+---
+title: "CTV Impression API"
+description: "Report affiliate connected TV ad impressions server-to-server for household view-through attribution"
+icon: "tv"
+---
+
+Affiliate partners use this endpoint to report an ad impression shown on a connected TV, so Linkrunner can credit an Android install from the same household IP address. For the setup guide and the attribution rules, see [Connected TV (CTV) Impressions](/affiliate-partners/ctv-impressions).
+
+## Endpoint
+
+```
+GET https://s2s.linkrunner.io/v1/ctv/impression/{app_id}
+GET https://s2s.linkrunner.io/v1/ctv/impression?app_id={app_id}
+GET https://s2s.linkrunner.io/v1/ctv/impression?d={domain}
+```
+
+The advertiser is identified by the app ID (or the tracking link's domain) and the campaign by `c`. The campaign must belong to your partner account. S2S traffic, view-through and CTV must all be on for you on this app.
+
+## Authentication
+
+Every request must carry your partner token, the same one you use for [S2S clicks](/api-reference/s2s-clicks) and [S2S impressions](/api-reference/s2s-impressions). Send it in a header:
+
+```
+X-Linkrunner-Token: <your_token>
+```
+
+If your ad server can only fire URLs, send it as the `lr_token` query parameter instead: `&lr_token=<your_token>`. Linkrunner removes `lr_token` before it stores the impression, so it never appears in reports or postbacks. A request without a valid token is rejected with `401`.
+
+## Parameters
+
+Send all parameters as URL-encoded query parameters. Each value is limited to 256 characters.
+
+| Parameter | Alias | Required | Description |
+|---|---|---|---|
+| `app_id` | path | One of `app_id` or `d` | The app's Android package name (`com.example.app`). Can also be sent in the path: `/v1/ctv/impression/{app_id}`. |
+| `d` | | One of `app_id` or `d` | Domain of your Linkrunner tracking link, for example `app.example.com`. Wins over `app_id` when both are sent. |
+| `c` | | Yes | Campaign code, the `c` value of your tracking link. Must match a campaign of that app or domain exactly. |
+| `lr_token` | | Only without the header | Your partner token, for ad servers that can't set the `X-Linkrunner-Token` header. Removed before the request is stored. |
+| `tid` | `clickid` | Yes | Your unique impression ID. Returned in the `{click_id}` and `{tid}` postback macros. |
+| `ip` | `af_ip` | Yes | The TV's public IP address. This is the value installs are matched on. With server-side ad insertion, use the `X-Device-IP` value your ad server received. |
+| `ua` | `af_ua` | Yes | The TV's user agent. With server-side ad insertion, use the `X-Device-User-Agent` value. |
+| `impression_time` | | No | Unix timestamp of the impression, in milliseconds or seconds. Defaults to the time of the request. |
+| `vt_lookback` | `af_xplatform_vt_lookback`, `af_viewthrough_lookback` | No | Your view-through window for this impression: `1h` to `24h`, a bare number of hours (`6`), or `1d`. Longer values are capped at 24 hours. It can only shorten the window the advertiser set for you. |
+| `partner_campaign_id` | `af_c_id` | No | Your own campaign ID. Stored with the impression. |
+| `adset_id` | `af_adset_id` | No | Your ad set ID. Stored with the impression. |
+| `ad_id` | `af_ad_id` | No | Your ad ID. Stored with the impression. |
+| `site_id` | `af_siteid` | No | The publisher, channel or app the ad played in. Stored with the impression. |
+| `source_platform` | `af_source_platform` | No | The TV platform, for example `tizen`, `webos`, `roku`, `androidtv`, `firetv` or `vidaa`. Stored with the impression. |
+| `device_category` | `af_source_device_category` | No | The device type, for example `tv`, `set_top_box`, `games_console` or `media_player`. Stored with the impression. |
+| `tv_ifa` | | No | The TV's advertising ID. Stored with the impression, never used for matching. |
+| `ifa_type` | | No | The type of `tv_ifa`, for example `rida`, `tifa`, `lgudid`, `vida`, `afai` or `msai`. Stored with the impression. |
+| `s2` | `af_sub1` | No | Passthrough value, returned in `{s2}`. |
+| `s3` | `af_sub2` | No | Passthrough value, returned in `{s3}`. |
+| `s4` | `af_sub3` | No | Passthrough value, returned in `{s4}`. |
+
+`gaid` and `idfa` are not read on this endpoint. If your impressions carry the phone's advertising ID, send them to the [S2S Impression API](/api-reference/s2s-impressions) instead.
+
+If both a name and its alias are sent, the name wins. `pid`, `af_xplatform` and `redirect` are ignored.
+
+## Responses
+
+The response is always JSON.
+
+<CodeGroup>
+
+```json 200 Accepted
+{
+  "status": "accepted",
+  "impression_id": "4c1f0e1a-52b7-5d0e-9a43-7f8e2c6b1d90"
+}
+```
+
+```json 400 Rejected
+{
+  "status": "rejected",
+  "reason": "missing_ip"
+}
+```
+
+```json 403 Forbidden
+{
+  "status": "rejected",
+  "reason": "ctv_not_enabled"
+}
+```
+
+</CodeGroup>
+
+`impression_id` is Linkrunner's ID for the impression. It is the same for every retry of the same `tid` on the same campaign.
+
+### Status codes
+
+| Status | Reason | Meaning | Retry |
+|---|---|---|---|
+| 200 | | Impression recorded. | |
+| 400 | `missing_app` | Neither `app_id` nor `d` was sent. | No |
+| 400 | `missing_c`, `missing_tid` | A required parameter is missing or empty. | No |
+| 400 | `missing_ip` | No `ip` was sent. | No |
+| 400 | `invalid_ip` | `ip` is not a public IP address: a private, loopback, link-local or carrier-grade NAT (`100.64.0.0/10`) address, or not an IP address at all. | No |
+| 400 | `datacenter_ip` | `ip` belongs to a cloud or hosting provider. Send the TV's address, not your ad server's. | No |
+| 400 | `missing_ua` | No `ua` was sent. | No |
+| 400 | `unreplaced_macro` | A value still contains a macro, such as `{ip}` or `%7Bip%7D`. | No |
+| 400 | `value_too_long` | A value is longer than 256 characters. | No |
+| 400 | `invalid_impression_time` | `impression_time` is not a Unix timestamp. | No |
+| 400 | `impression_too_old` | `impression_time` is more than 24 hours ago. A time in the future is treated as now. | No |
+| 400 | `invalid_viewthrough_lookback` | `vt_lookback` is `0`, negative, fractional, or not in hours or days. | No |
+| 400 | `unknown_app` | No Linkrunner project has this app ID. | No |
+| 400 | `ambiguous_app` | More than one of the advertiser's projects with S2S on for you has this app ID and campaign code (for example test and live). Send `d` instead. | No |
+| 400 | `unknown_domain` | `d` is not a Linkrunner click domain. | No |
+| 400 | `unknown_campaign` | `c` does not match a campaign of that app or domain. | No |
+| 401 | `missing_token` | No `X-Linkrunner-Token` header and no `lr_token` parameter. | No |
+| 401 | `invalid_token` | The token is wrong, revoked, or was rotated more than 24 hours ago, or your partner account is suspended. | No |
+| 403 | `partner_not_enabled` | The advertiser hasn't turned on S2S traffic for the partner that owns campaign `c`. | No |
+| 403 | `view_through_disabled` | S2S traffic is on, but the advertiser hasn't turned on view-through for this partner. | No |
+| 403 | `ctv_not_enabled` | S2S traffic and view-through are on, but CTV is not on for this partner on this app. | No |
+| 404 | `s2s_disabled` | The S2S impression APIs are turned off. | No |
+| 429 | `rate_limited` | Too many impressions for this campaign. | Yes, after `Retry-After` |
+| 503 | `unavailable` | A temporary error. | Yes, after `Retry-After` |
+
+## Examples
+
+The examples read your token from the `LINKRUNNER_S2S_TOKEN` environment variable.
+
+<CodeGroup>
+
+```bash cURL
+curl -G "https://s2s.linkrunner.io/v1/ctv/impression/com.example.app" \
+  -H "X-Linkrunner-Token: $LINKRUNNER_S2S_TOKEN" \
+  --data-urlencode "c=OgWmhiSXhG" \
+  --data-urlencode "tid=ctv-imp-7f3a91" \
+  --data-urlencode "ip=203.0.113.24" \
+  --data-urlencode "ua=Mozilla/5.0 (SMART-TV; Linux; Tizen 7.0) AppleWebKit/537.36 (KHTML, like Gecko) Version/7.0 TV Safari/537.36" \
+  --data-urlencode "impression_time=1790585271181" \
+  --data-urlencode "source_platform=tizen" \
+  --data-urlencode "device_category=tv"
+```
+
+```javascript Node.js
+const params = new URLSearchParams({
+  c: "OgWmhiSXhG",
+  tid: impressionId,
+  ip: deviceIp,
+  ua: deviceUserAgent,
+  impression_time: String(Date.now()),
+  source_platform: "tizen",
+  device_category: "tv",
+});
+
+const res = await fetch(`https://s2s.linkrunner.io/v1/ctv/impression/com.example.app?${params}`, {
+  headers: { "X-Linkrunner-Token": process.env.LINKRUNNER_S2S_TOKEN },
+});
+const body = await res.json(); // { status: "accepted", impression_id: "..." }
+```
+
+```python Python
+import os, time, requests
+
+res = requests.get("https://s2s.linkrunner.io/v1/ctv/impression/com.example.app", params={
+    "c": "OgWmhiSXhG",
+    "tid": impression_id,
+    "ip": device_ip,
+    "ua": device_user_agent,
+    "impression_time": int(time.time() * 1000),
+    "source_platform": "tizen",
+    "device_category": "tv",
+}, headers={"X-Linkrunner-Token": os.environ["LINKRUNNER_S2S_TOKEN"]}, timeout=5)
+body = res.json()  # {"status": "accepted", "impression_id": "..."}
+```
+
+</CodeGroup>
+
+## Retries and deduplication
+
+The same `tid` on the same campaign always maps to the same `impression_id`, and the impression is stored once, so it is safe to retry. CTV impression IDs are separate from `/v1/impression` ones, so the same `tid` on both endpoints does not collide. Retry only `429` and `503`, after the delay in the `Retry-After` header. Keep `tid` unique per impression: a reused `tid` is treated as a retry of the earlier impression, so the new one is not recorded.
