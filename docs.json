@@ -223,6 +223,7 @@
                             "affiliate-partners/getting-started",
                             "affiliate-partners/overview",
                             "affiliate-partners/create-account",
+                            "affiliate-partners/add-agency-account",
                             "affiliate-partners/create-campaign-link",
                             "affiliate-partners/tracking-links",
                             "affiliate-partners/s2s-clicks",
@@ -250,6 +251,7 @@
                         "pages": [
                             "agency-partners/overview",
                             "agency-partners/accept-invitation",
+                            "agency-partners/add-affiliate-account",
                             "agency-partners/manage-workspace",
                             "agency-partners/create-campaign-link",
                             "agency-partners/invite-an-agency",
