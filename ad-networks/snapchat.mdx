@@ -6,23 +6,25 @@ icon: "/images/logos/snapchat.png"
 
 ## Overview
 
-Linkrunner sends your app's installs and in-app events to Snapchat through Snapchat's Conversions API. Where they go depends on what you add to your Snapchat account in Linkrunner:
+Linkrunner sends your app's installs and in-app events to Snapchat through Snapchat's Conversions API. Where they go depends on what you add to your Snapchat account in Linkrunner, and on how each user reached your app:
 
 | You add | Snapchat receives | Linkrunner sends | Use it for |
 | --- | --- | --- | --- |
-| A **Snap App ID** for Android, iOS, or both | App events on your Snap App | Installs, sign ups, and mapped in-app events from that platform, including users who did not come from a Snapchat ad. See [which installs go to your Snap App](#which-installs-go-to-your-snap-app). | App Promotion campaigns |
-| A **Pixel ID** | Web events on your Pixel | Installs and mapped in-app events from users who clicked a Snapchat ad through your Linkrunner campaign link | Web-to-app campaigns |
+| A **Snap App ID** for Android, iOS, or both | App events on your Snap App | Installs, sign ups, and mapped in-app events from that platform, from users who did not come through your Linkrunner campaign link. See [which installs go to your Snap App](#which-installs-go-to-your-snap-app). | App Promotion campaigns |
+| A **Pixel ID** | Web events on your Pixel | Installs, sign ups, and mapped in-app events from users who clicked a Snapchat ad through your Linkrunner campaign link | Web-to-app campaigns |
 
-You can add both. A platform with a Snap App ID sends its events to the Snap App instead of the Pixel.
+You can add both. Linkrunner decides for each user: users who clicked a Snapchat ad through your Linkrunner campaign link go to your Pixel, and other users go to your Snap App. Adding a Snap App ID does not move those users off your Pixel.
 
 ### Which installs go to your Snap App
 
 Linkrunner sends an install, its sign up, and its mapped in-app events to your Snap App ID when both of these are true:
 
 -   Linkrunner reports the install as organic or attributes it to Snapchat. Installs that Linkrunner attributes to another ad network are not sent, so Snapchat cannot also count them as its own.
--   Snapchat can match the event to its ads: the device shared its advertising ID (GAID on Android, IDFA on iOS), or the user came from a Snapchat ad through your Linkrunner campaign link.
+-   Snapchat can match the event to its ads: the device shared its advertising ID (GAID on Android, IDFA on iOS).
 
-Each event also tells Snapchat whether the user allowed ad tracking. On iOS, users who did not allow tracking have no IDFA, so their installs reach your Snap App only when they came through your Linkrunner campaign link.
+Users who clicked a Snapchat ad through your Linkrunner campaign link go to your Pixel instead. If Linkrunner cannot send them to your Pixel, for example because you added no Pixel ID, it sends them to your Snap App, where the Snapchat click lets Snapchat match them even without an advertising ID.
+
+Each app event also tells Snapchat whether the user allowed ad tracking. On iOS, users who did not allow tracking have no IDFA, so Linkrunner sends their installs only when they came through your Linkrunner campaign link: to your Pixel, or to your Snap App if you added no Pixel ID.
 
 <Note>
     Linkrunner attributes an install to Snapchat only when the user came through your Linkrunner campaign link. When an App Promotion ad sends users straight to the app store, Linkrunner reports those installs as organic and sends them to your Snap App ID, where Snapchat matches them to its ads. Snapchat's install count can differ from Linkrunner's because Snapchat also credits users who only viewed an ad. To compare the two, choose an attribution window without view-through in Snapchat Ads Manager reporting.
@@ -164,7 +166,7 @@ If Linkrunner finds no App Store ID for your iOS app, it does not send iOS app e
 ### Step 2: Enter your IDs and Access Token
 
 1. In **Snap App ID (Android)** and **Snap App ID (iOS)**, paste the Snap App ID for each platform from section 2. If one Snap App covers both stores, enter it in both fields. Leave a field empty for a platform you do not run App Promotion campaigns for.
-2. In **Pixel ID**, paste the Pixel ID from section 1. You need a Pixel ID, a Snap App ID, or both.
+2. In **Pixel ID**, paste the Pixel ID from section 1. You need a Pixel ID, a Snap App ID, or both. If you run web-to-app campaigns, keep the Pixel ID after you add a Snap App ID: users who clicked a Snapchat ad through your Linkrunner campaign link still go to your Pixel.
 3. In **Access Token**, paste the Access Token from section 1. Linkrunner uses this one token for your Pixel and your Snap App IDs.
 4. Click **Save Configuration**
 
@@ -185,7 +187,7 @@ To add a Snap App ID to an account you already configured, open **Configure Pixe
 If no test event reaches Snapchat, the error message says why. For example, an iOS Snap App ID needs your App Store URL (section 2, step 3). A success message can still mean one platform was skipped, so check **Last Received** for each Snap App.
 
 <Note>
-    **At this point your Snapchat setup is complete.** Linkrunner sends events from each platform with a Snap App ID to that Snap App, and Snapchat-attributed events from other platforms to your Pixel.
+    **At this point your Snapchat setup is complete.** Linkrunner sends events from users who clicked a Snapchat ad through your Linkrunner campaign link to your Pixel, and events from other users to the Snap App for their platform. See [which installs go to your Snap App](#which-installs-go-to-your-snap-app).
 </Note>
 
 ## 5. Setting up your first Snapchat campaign
