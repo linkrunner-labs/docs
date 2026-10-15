@@ -187,40 +187,13 @@ If no test event reaches Snapchat, the error message says why. For example, an i
 
 ## 5. Setting up your first Snapchat campaign
 
-These steps create a web-to-app campaign that sends users through your Linkrunner campaign link.
+Run a web-to-app campaign: the ad opens your Linkrunner campaign link, so Linkrunner records the click, credits the install to your campaign, and sends the install and in-app events to your Pixel for Snapchat to optimize on.
 
-### Step 1: Navigate to Manage Ads
+<Warning>
+    Do not use the **App Promotion** objective, and do not set the ad set's conversion location to **App**. Those ads send users straight to the app store, so Linkrunner never sees the click and the installs show as organic in Linkrunner.
+</Warning>
 
-1. Go to [Snapchat Ads Manager](https://ads.snapchat.com/)
-2. Click the menu from the top left corner and select **Manage Ads**
-
-![Snapchat Ads Manager - Manage Ads](/images/snapchat-ss/image_14.png)
-
-### Step 2: Choose Campaign Objective
-
-1. Choose the objective for your campaign
-
-![Snapchat Campaign - Choose Objective](/images/snapchat-ss/image_15.png)
-
-### Step 3: Select Manual Build
-
-1. Choose **Manual Build**
-
-![Snapchat Campaign - Manual Build](/images/snapchat-ss/image_16.png)
-
-### Step 4: Add Campaign Info
-
-1. Add info for your Campaign
-
-![Snapchat Campaign - Campaign Info](/images/snapchat-ss/image_17.png)
-
-### Step 5: Add Ad Set Details
-
-1. Add ad set details
-
-![Snapchat Campaign - Ad Set Details](/images/snapchat-ss/image_18.png)
-
-### Step 6: Create Linkrunner Campaign Links
+### Step 1: Create Linkrunner campaign links
 
 1. Go to [Linkrunner Dashboard](https://dashboard.linkrunner.io)
 2. Create a new campaign for each ad creative you plan to run
@@ -229,14 +202,56 @@ These steps create a web-to-app campaign that sends users through your Linkrunne
 
 ![Linkrunner - Create Snapchat Campaign](/images/snapchat-ss/image_19.png)
 
-### Step 7: Add Website URL for the Creative
+### Step 2: Choose the Sales objective
 
-1. For every ad you create, add a different **Linkrunner Campaign Link** in the **Website URL** field
-2. This allows you to track performance for each ad creative separately
+1. In [Snapchat Ads Manager](https://ads.snapchat.com/), click the menu in the top left corner and select **Create Ads**
+2. Under **Objective**, select **Sales** and click **Next**
 
-![Snapchat Campaign - Website URL](/images/snapchat-ss/image_20.png)
+![The Choose Objective window in Snapchat Ads Manager with Sales selected](/images/snapchat-ss/snapchat-campaign-objective-sales.webp)
 
-### Step 8: Publish the Campaign
+### Step 3: Select Manual Build
+
+1. Select **Manual Build** and click **Next**
+
+![Snapchat campaign creation with Manual Build selected](/images/snapchat-ss/snapchat-campaign-manual-build.webp)
+
+### Step 4: Name your campaign
+
+1. Enter a **Campaign Name**, set the schedule, and click **Next**
+
+![The Campaign Setup step in Snapchat Ads Manager](/images/snapchat-ss/snapchat-campaign-setup.webp)
+
+### Step 5: Set the conversion location to Web
+
+1. In **Ad Set Details**, keep **Conversion Location** set to **Web**
+
+![Ad Set Details in Snapchat Ads Manager with Conversion Location set to Web](/images/snapchat-ss/snapchat-adset-conversion-location-web.webp)
+
+### Step 6: Attach your Pixel
+
+1. Under **Tracking**, check that **Snap Pixel** is **Attached** and shows the Pixel you added to Linkrunner in section 3
+
+![The Tracking section of a Snapchat ad set with the Snap Pixel attached](/images/snapchat-ss/snapchat-adset-pixel-and-goal.webp)
+
+### Step 7: Choose the performance goal
+
+1. Under **Goal & Bid**, open **Performance Goal** and select **Maximize number of website conversions**, then choose the event to optimize for, such as `APP_INSTALL`
+2. Set your budget and schedule, then click **Next**
+
+Snapchat offers **Maximize number of website conversions** only after your Pixel has received enough events. Until then it is greyed out ("You do not have enough pixel events to optimize for this goal"): start with **Maximize Number of Landing Page Views**, and switch the goal once Linkrunner has sent installs to your Pixel.
+
+![The Performance Goal list in a Snapchat ad set, with Maximize number of website conversions greyed out until the Pixel has enough events](/images/snapchat-ss/snapchat-adset-website-conversions-goal.webp)
+
+### Step 8: Add your Linkrunner campaign link as the Website URL
+
+1. Under **Destination**, paste the **Linkrunner campaign link** from step 1 in **Website URL**
+2. Use a different Linkrunner campaign link for each ad, so you can see each creative's performance separately in Linkrunner
+
+Snapchat adds its click ID to the link when a user taps the ad. Linkrunner reads it to credit the install to your campaign and to send the install to your Pixel, so do not change or remove URL parameters Snapchat adds.
+
+![The Destination section of a Snapchat ad with the Website URL field](/images/snapchat-ss/snapchat-ad-destination-website-url.webp)
+
+### Step 9: Publish the campaign
 
 1. Review your campaign settings and publish
 
