@@ -1,30 +1,149 @@
 ---
-title: "Connect Linkrunner to AI assistants"
-sidebarTitle: "MCP"
-description: "Connect Linkrunner to Claude, ChatGPT, Claude Code, or Codex with MCP."
-icon: "sparkles"
+title: "Set up and use Linkrunner from Claude and other AI assistants"
+sidebarTitle: "AI assistants (MCP)"
+description: "Connect the Linkrunner MCP server to Claude to set up mobile attribution for your app and ask about your installs and campaigns from a chat."
+icon: "plug"
 ---
 
-## Overview
+Add the Linkrunner connector to Claude and you can create your Linkrunner project, get your SDK token, and ask how your campaigns perform, all from a chat. You sign in to Linkrunner in a popup, so there is no token to copy. If you don't have a Linkrunner account yet, you create one in the same popup.
 
-Linkrunner ships a remote Model Context Protocol (MCP) server. Connect it to a
-supported AI assistant, then ask questions about your project's data directly
-from chat:
+The connector address is:
 
+```text
+https://mcp.linkrunner.io/mcp
+```
+
+<Warning>
+Editing tools act on your live project, not a sandbox. The connector can create
+projects, and create and edit campaigns, funnels, domains, store listings,
+webhooks, and postback event mappings. A few of these send real traffic to
+third parties or cannot be undone. Read
+[What the connector can change](#what-the-connector-can-change) before you
+share the connector with a team.
+</Warning>
+
+## Connect
+
+Add the connector once. Your assistant asks you to sign in the first time it needs your Linkrunner account.
+
+<Tabs>
+  <Tab title="Claude">
+    These steps are the same in Claude on the web, desktop, and mobile.
+
+    1. Open **Customize → Connectors**.
+    2. Select **Add custom connector** and name it `Linkrunner`.
+    3. Enter `https://mcp.linkrunner.io/mcp` as the URL.
+    4. Under **Authentication**, choose **Sign in when needed**.
+    5. Under **OAuth client**, choose **Use Claude's published identity**.
+
+    In a chat, select **+ → Connectors** and enable Linkrunner for that
+    conversation.
+
+    The Claude Free plan allows one custom connector.
+
+    On Team or Enterprise, an Owner adds the connector under
+    **Organization settings → Connectors → Add → Custom**. Members then click
+    **Connect** next to Linkrunner.
+  </Tab>
+
+  <Tab title="Claude Code">
+    Run this in a terminal:
+
+    ```bash
+    claude mcp add --transport http linkrunner https://mcp.linkrunner.io/mcp
+    ```
+
+    Then run `/mcp` in Claude Code to sign in. You can also skip this and ask
+    for something that needs your account. Claude Code asks you to sign in at
+    that point.
+  </Tab>
+
+  <Tab title="Other MCP clients">
+    Any MCP client that supports OAuth sign-in can connect. Add
+    `https://mcp.linkrunner.io/mcp` as a remote MCP server. The server supports
+    Client ID Metadata Documents and Dynamic Client Registration.
+
+    For ChatGPT, use [Connect with a token](#connect-with-a-token-existing-setups-and-chatgpt).
+  </Tab>
+</Tabs>
+
+### What happens when you sign in
+
+You can ask what Linkrunner is, or search the documentation, before you sign in. Any other request needs your account. Claude then shows a **Connect** button in the chat.
+
+1. Click **Connect**. A window opens at `auth.linkrunner.io`.
+2. Sign in, or sign up if you are new, with Google or an email link.
+3. Review the consent page. It reads "claude.ai wants to access your Linkrunner account", shows the email you signed in with, and lists what the connector can do: see your projects and reports, and create projects and make changes.
+4. Approve. The chat continues with your request.
+
+Claude keeps you signed in and refreshes the session automatically. To end the session, disconnect or remove the connector.
+
+## Set up a new app from a chat
+
+Start with a message such as:
+
+> Set up Linkrunner attribution for my app Acme Shop
+
+Your assistant then works through these steps. It asks you to confirm before it creates anything.
+
+<Steps>
+  <Step title="Check your account">
+    The assistant calls `get_my_account` to see which email you signed in with
+    and whether your account can create projects. It then calls
+    `list_projects` to show any projects you already have.
+  </Step>
+  <Step title="Find your app in the store">
+    The assistant calls `find_app_in_store` to search the App Store or Play
+    Store by name, or to look up a store link you paste. Confirm which listing
+    is your app.
+  </Step>
+  <Step title="Create the project">
+    The assistant calls `create_project` with the project name, company, project
+    type (app or website), store links, report timezone, and optionally the
+    billing currency (USD or INR). Check these details before you approve. The
+    tool returns the new project ID and your SDK token.
+  </Step>
+  <Step title="Install the SDK">
+    Add the SDK to your app with that token. The assistant can find the guide
+    for your platform with `search_documentation`. In a code editor, the
+    [Linkrunner agent skills](/ai-agent-skills) can make the code changes for
+    you.
+
+    To see the SDK token again later, ask for it. The assistant calls
+    `get_sdk_configuration`.
+  </Step>
+  <Step title="Test the integration">
+    Follow [Integration testing](/testing/integration-testing) to confirm that
+    Linkrunner receives installs from your app.
+  </Step>
+</Steps>
+
+After the project exists, every other tool works with it. If you have more than one project, name the project in your question.
+
+### Rules for new projects
+
+These are the same rules the dashboard applies.
+
+- **You need a company email to create a project.** Gmail accounts can sign up and be invited to existing projects, but cannot create one. For help, contact [support@linkrunner.io](mailto:support@linkrunner.io).
+- **An app project needs a live App Store or Play Store listing.** You cannot set up an app that is not published yet. Come back once its listing is live. A website-only project needs the website URL instead.
+- **You can create up to 3 projects per day from an AI assistant.**
+- **To use an existing project, you must be its Admin, Owner, or Manager.**
+- New projects get the same free allowance and billing setup as projects you create in the dashboard. See [Billing](/billing/overview).
+
+## What you can ask
+
+Your assistant picks the right tool for your question. Some examples:
+
+- "What is Linkrunner, and does it work with Flutter?"
+- "What is my SDK token for Acme Shop?"
 - "How did my campaigns perform last week?"
 - "Compare my Meta vs Google performance for the last 7 days."
 - "Which campaigns should I cut based on ROAS?"
 - "Why did installs drop yesterday?"
 - "How much of my growth is organic?"
 - "Where do users drop off between install and checkout?"
-
-With the ad-accounts capability, the assistant can also read from the Meta and
-Google accounts you have connected:
-
-- "How much did we spend on Meta last week, by campaign?"
-- "Which Google ad groups are paused right now?"
-- "What targeting does our retargeting ad set use?"
-- "Compare Meta's reported spend with Linkrunner's installs for yesterday."
+- "Is my iOS link setup right? The link opens the App Store instead of my app."
+- "Is Meta receiving my purchase events?"
 
 The assistant can also make a defined set of changes for you:
 
@@ -32,26 +151,290 @@ The assistant can also make a defined set of changes for you:
 - "Pause every campaign with no installs in the last 30 days."
 - "Save a funnel for install, sign up, then purchase."
 
+### Built-in prompts
+
+The connector includes three starter prompts. Clients that support MCP prompts
+show them in their prompt picker:
+
+- **Daily briefing:** yesterday's performance summary in 1-2 paragraphs.
+- **Weekly review:** this week vs last week, with anomalies and a
+  keep/cut/scale recommendation list.
+- **Cut list:** the worst-performing active campaigns, with reasoning.
+
+These are shortcuts. You can always ask the same questions in your own words.
+
+## Tool reference
+
+Your assistant reads each tool's description and decides which to call. You
+don't need to call tools yourself. Tools that change your project are listed
+separately under [What the connector can change](#what-the-connector-can-change).
+
+On a sign-in connection, every project tool takes the project ID, and the
+assistant gets it from `list_projects` or `create_project`. On a
+[token connection](#connect-with-a-token-existing-setups-and-chatgpt), the
+token decides the project, and the overview and account tools are not offered.
+
+### Before you sign in
+
+| Tool | Use it for |
+|------|------------|
+| `get_linkrunner_overview` | What Linkrunner is, which SDKs it supports, how setup works through the connector, and what a new project needs. |
+| `search_documentation` | Searches docs.linkrunner.io and returns links and the relevant content. |
+
+### Account and setup
+
+| Tool | Use it for |
+|------|------------|
+| `get_my_account` | The email you signed in with, and whether your account can create projects. |
+| `list_projects` | Your existing projects, with their IDs, store links, and timezones. |
+| `find_app_in_store` | Search the App Store or Play Store by app name, or look up a store link. |
+| `get_sdk_configuration` | The project's SDK token, with links to the dashboard and the SDK docs. |
+
+`create_project` also belongs to setup. It is listed under [Projects](#projects) because it creates something.
+
+### Project data
+
+| Tool | Use it for |
+|------|------------|
+| `get_project_info` | Project name, timezone, display currency. |
+| `get_project_stats` | Headline KPIs (clicks, installs, sign-ups, revenue) as lifetime and current-month totals. |
+| `get_metrics_trend` | Day-by-day trend for clicks, organic installs, sign-ups, and revenue. Current calendar month only. |
+| `list_campaigns` | One row per campaign, with filters (date range, network, platform, search) and selectable metrics. |
+| `find_campaign` | Resolve a campaign name to its `display_id`, with no metrics computed. |
+| `get_campaign_details` | One named campaign day by day, over any date range. |
+| `get_channel_performance` | One row per acquisition channel (Meta, Google, TikTok, Snapchat, Apple Search Ads, Linkrunner Links, Organic). |
+| `get_organic_performance` | Installs, sign-ups, and revenue carrying no campaign, as a single organic total. |
+| `list_event_names` | Custom and revenue event names you've defined. |
+| `search_event_log` | Individual event rows with timestamp, user, campaign, platform, and device. |
+| `list_funnels` | Names and step definitions of the funnels saved in your dashboard. |
+| `run_funnel` | Step-to-step conversion and drop-off, for a saved funnel or an ad-hoc one you describe in chat. |
+| `lookup_attribution` | Attribution result for a single user or device: campaign, ad network, ad set, creative, keyword (Apple Search Ads), organic vs inorganic flag, device IDs (gaid/idfa), and click/install timestamps. |
+| `get_billing_usage` | Free-install allowance and current-month usage. Only fetched when you explicitly ask about billing. |
+| `list_domains` | Tracking domains on the project, and which one is primary. |
+| `list_store_listings` | Custom App Store and Play Store listings you can attach to a campaign. |
+| `list_ad_accounts` | Ad-network accounts connected to the project. |
+| `list_postback_event_maps` | Event mappings sent to each ad network, and which are network defaults. |
+| `get_webhook` | Whether a webhook is configured, its host, and its organic setting. |
+
+<Note>
+`list_campaigns`, `get_channel_performance`, and `get_organic_performance`
+return only the metric groups your assistant asks for (installs, spend,
+retention, custom events, and so on). A group that wasn't requested is absent
+from the response rather than reported as zero, so the assistant never
+mistakes "not fetched" for "measured zero". Ask for a metric by name and it
+will fetch it.
+</Note>
+
+### Setup and delivery checks
+
+| Tool | Use it for |
+|------|------------|
+| `check_link_setup` | Checks your iOS and Android link setup: the app details saved in Linkrunner, what your link domains serve at `/.well-known/apple-app-site-association` and `/.well-known/assetlinks.json`, and where a campaign link lands on iOS, Android, and the Facebook in-app browser. |
+| `get_postback_delivery_log` | Conversions sent to ad networks and affiliates over the last 7 days by default (up to 30 days): delivered, failed, and not sent, by network and by event, with the network's error messages. |
+
+## What the connector can read from your ad accounts
+
+Ad-account tools are not available on a sign-in connection yet. To use them,
+[connect with a token](#connect-with-a-token-existing-setups-and-chatgpt) and
+turn on **Read connected ad accounts** when you generate it.
+
+These tools read from the Meta Marketing API and the Google Ads API using the
+ad accounts already connected to the project under Settings, and nothing else.
+They cannot change anything on Meta or Google.
+
+| Tool | Use it for |
+|------|------------|
+| `enrich_campaigns_from_ad_network` | Adds the network's delivery figures (spend, impressions, clicks, reach, frequency, CPM) and its own reported outcomes beside your Linkrunner campaigns, with a note explaining any gap between the two. |
+| `get_ad_insights` | Spend, impressions, clicks, CTR, CPC, CPM, reach and frequency as the ad network reports them, at account, campaign, ad set or ad group, or ad level, with the network's own conversions under `network_reported`. Optional breakdown by date, device, platform, country, age or gender. |
+| `list_ad_entities` | Campaigns, ad sets or ad groups, ads, creatives, audiences, conversion actions and keywords, with status, budget and objective. |
+| `get_ad_entity` | Every readable field of one object, such as an ad set's targeting or a campaign's bidding strategy. |
+| `get_ad_recommendations` | The recommendations Meta shows for one connected Meta ad account, such as creative fatigue or limited budget, plus the account's opportunity score. |
+| `query_ad_network` | Anything the tools above cannot express, using the network's own field names: video metrics, impression share, quality rankings, placements, hourly and search-term reports, country, age and gender on Google, attribution-window comparisons on Meta, filters on any field, sorting, and object types such as pixels, labels, saved audiences and asset groups. |
+| `ad_network_reference` | Searches the field catalogs of both networks. Your assistant uses it to find exact names before a `query_ad_network` call, and to explain what a metric means. |
+
+The catalogs behind these tools come from the networks themselves: Google's
+own field schema and Meta's official Marketing API field lists. Every name the
+assistant passes is checked against them before a request is made, so it cannot
+ask for a field that does not exist. A wrong name comes back with suggestions
+instead of a failed call. Almost everything the two reporting APIs expose for
+reading is reachable this way.
+
+### Which source answers which question
+
+Linkrunner stays the source of truth, and connecting an ad account does not
+change any answer you already get. It adds to them.
+
+| Question | Source | Why |
+|----------|--------|-----|
+| Installs, reinstalls, sign-ups, events, purchases, revenue | Linkrunner | Attributed per device and per user, deduplicated across networks, and the same numbers as the dashboard. |
+| Retention, active users, funnels, attribution detail | Linkrunner only | Only Linkrunner has the user-level history. |
+| Cost per install, cost per sign-up, ROAS | Linkrunner | Synced ad spend divided by Linkrunner outcomes, the same as the dashboard. |
+| Spend, impressions, clicks, reach, frequency, CTR, CPC, CPM | Ad network | The network bills it, and its live figure is the latest. |
+| Status, budgets, bids, targeting, placements, creatives, audiences, keywords | Ad network only | Only the network knows. |
+
+The network's own conversion counts are still available, but always under a
+`network_reported` label. Your assistant quotes them as the network's claim
+("Meta reports 12 purchases") rather than as the count. When the two sides
+disagree, it explains why (attribution window, view-through, SKAN delay,
+cross-network deduplication, or a campaign that is not linked) instead of
+picking one.
+
+A few things to know when you read network numbers:
+
+- **They are the ad network's numbers.** Meta and Google count conversions
+  with their own attribution windows and view-through rules. Linkrunner's
+  installs and sign-ups are measured differently. Your assistant reports the
+  two side by side and will not merge them.
+- **Currency and timezone come from the ad account**, which may differ from
+  your project's display currency.
+- **The last three days are provisional.** Networks keep adjusting spend and
+  conversions for a few days, so recent numbers can move.
+- **Meta has no single "conversions" number.** Your assistant reads the actions
+  Meta reports (app installs, purchases, leads and so on) and names the one it
+  is quoting.
+- **Google's "Conversions" column is not installs.** It adds up every
+  conversion action the account bids on (installs, trials, purchases). When
+  comparing installs, the assistant uses only Google's install conversion
+  actions (the DOWNLOAD category, such as Android first open) and names the
+  action it used.
+- **Answers may come from a short cache.** Closed date ranges are cached for a
+  day, open ranges for ten minutes, and object lists for five minutes. The
+  assistant mentions the age when it matters.
+- **Reads are budgeted.** Each token gets a daily allowance of live reads, and
+  Linkrunner reserves part of its Google Ads quota for attribution. When a
+  limit is hit, the assistant gets a wait time and a cached copy if one exists,
+  instead of an error loop.
+- **Meta connections expire** roughly every 60 days. If your assistant reports that
+  the connection has expired, reconnect Meta under Settings.
+
+Only Meta and Google are covered. Accounts on other networks still appear in
+`list_ad_accounts` for campaign setup but cannot be queried.
+
+A few Google reports need a specific resource rather than a breakdown. Country
+uses `geographic_view`, age and gender use `age_range_view` and `gender_view`,
+and search queries use `search_term_view`. The assistant picks these through
+`query_ad_network` when you ask.
+
+## What the connector can change
+
+Ask in plain language ("create a campaign for the Diwali sale") and your
+assistant picks the right tool. Describe what you want changed, and confirm the
+summary it gives you before it writes.
+
 <Warning>
-Editing tools act on your live project, not a sandbox. The connector can create
-and edit campaigns, funnels, domains, store listings, webhooks, and postback
-event mappings. A few of these send real traffic to third parties or cannot be
-undone. Read [What the connector can change](#what-the-connector-can-change)
-before you share the connector with a team.
+Every tool below writes to your live account or project. Your assistant asks
+before making an ambiguous change, but it is worth being specific about what you
+want, especially for the tools marked as sending live traffic or being
+irreversible.
 </Warning>
 
-## Prerequisites
+### Projects
+
+| Tool | Use it for |
+|------|------------|
+| `create_project` | Create a new project in your account and get its project ID and SDK token. Sign-in connections only. See [Rules for new projects](#rules-for-new-projects). |
+
+### Campaigns
+
+| Tool | Use it for |
+|------|------------|
+| `create_campaign` | A new tracking link for an ad creative, an influencer, an organic channel, or a web-to-app flow. |
+| `edit_campaign` | Rename, pause or resume, change the deep link, swap the store listing, or reassign the ad account. |
+| `create_deeplink` | A per-ad-set or per-creative deep link under a Meta or Google campaign. |
+| `update_custom_channel` | Rename a custom channel label. See the troubleshooting note on [renaming a custom channel](#troubleshooting). |
+| `delete_custom_channel` | Remove a custom channel label. The campaign itself is not deleted. |
+
+A deep link has to be a full URL on one of your own tracking domains, for
+example `https://links.yourbrand.com/product/sneakers`. An external URL is
+rejected. Ask your assistant to list your domains if you are not sure which to
+use.
+
+<Note>
+Campaigns cannot be deleted through the connector. Pause them with
+`edit_campaign` instead.
+</Note>
+
+### Funnels
+
+| Tool | Use it for |
+|------|------------|
+| `create_funnel` | Save a funnel so it appears in your dashboard and in `list_funnels`. |
+| `update_funnel` | Rename a saved funnel or change its steps. |
+
+### Domains and store listings
+
+| Tool | Use it for |
+|------|------------|
+| `create_domain` | Register a tracking domain or subdomain. |
+| `create_store_listing` | Add a custom Play Store or App Store listing. |
+| `update_store_listing` | Change a listing's name or its platform listing id. |
+| `delete_store_listing` | Remove a listing no campaign is using. |
+
+<Warning>
+`create_domain` does not check DNS, so it will save a domain that is not pointed
+at Linkrunner yet, and there is no way to delete a domain through the connector.
+Check the spelling before you confirm. Adding a domain also creates a permanent
+`MAIN_DOMAIN` campaign that backs root-domain links and counts toward your
+campaign limit, and making the new domain primary changes which domain later
+campaigns use by default.
+</Warning>
+
+`delete_store_listing` is refused while any campaign still points at the
+listing, and the error names the campaigns. Remove it from those campaigns
+first.
+
+### Webhooks
+
+| Tool | Use it for |
+|------|------------|
+| `update_webhook` | Set the endpoint that receives install and event payloads, or change the organic setting. |
+| `test_webhook` | Send a sample payload to the configured endpoint. |
+
+<Warning>
+Both tools deliver a real payload to your endpoint. Saving a webhook sends one
+by itself, because Linkrunner only stores an endpoint that answers `200` or
+`201`, so configuring a Slack webhook posts a real message to that channel. Ask
+your assistant to test afterwards only if you want a second message.
+
+Replacing the URL cannot be undone. A project has one webhook, the new URL
+overwrites the old one, and the assistant cannot read the old value back to
+restore it (`get_webhook` hides the path, because a Slack webhook path is
+itself a credential). Keep a copy of the current URL before you replace it.
+</Warning>
+
+### Postback event mappings
+
+| Tool | Use it for |
+|------|------------|
+| `create_postback_event_map` | Map one of your events to the name an ad network expects. |
+| `update_postback_event_map` | Change an existing mapping. |
+| `delete_postback_event_map` | Remove a mapping you added. |
+
+<Warning>
+Creating or updating a mapping immediately sends a test postback to every
+connected account on that network (Meta, Google, TikTok, Snapchat, LinkedIn,
+Reddit). That puts a synthetic conversion in your real ad account, so avoid
+repeated edits.
+</Warning>
+
+An ad network's built-in defaults also appear in `list_postback_event_maps`.
+They are always active and cannot be changed or removed. To override one, add
+your own mapping for the same event.
+
+## Connect with a token (existing setups and ChatGPT)
+
+Connections made with a dashboard token keep working. Use a token for ChatGPT,
+for Codex CLI, or when you need the ad-account tools. A token connection is
+fixed to one project.
+
+### Prerequisites
 
 - A project on Linkrunner that you have access to.
 - The **Admin** or **Member** role on that project. **Influencers** cannot mint
   MCP tokens.
-- A supported client: Claude Code, Claude on Desktop or web, Codex CLI, or
-  ChatGPT web.
 - Editing tools run as the person who created the token, using that person's
   project permissions. A role that cannot edit in the dashboard cannot edit
   through the connector either.
-
-## Setup
 
 ### 1. Generate a token
 
@@ -168,240 +551,10 @@ Linkrunner projects, generate a token for each project and add a separate
 connection with a clear name. Tokens are scoped to a single project.
 </Note>
 
-### 3. Try it
-
 Open a new chat or CLI session, make sure Linkrunner is enabled, and ask one of
-the starter prompts above. The assistant fetches data through the connector
-and answers in plain language.
+the questions under [What you can ask](#what-you-can-ask).
 
-## What you can ask
-
-The connector exposes the following tools. Your assistant picks them
-automatically based on your question.
-
-| Tool | Use it for |
-|------|------------|
-| `get_project_info` | Project name, timezone, display currency. |
-| `get_project_stats` | Headline KPIs (clicks, installs, sign-ups, revenue) as lifetime and current-month totals. |
-| `get_metrics_trend` | Day-by-day trend for clicks, organic installs, sign-ups, and revenue. Current calendar month only. |
-| `list_campaigns` | One row per campaign, with filters (date range, network, platform, search) and selectable metrics. |
-| `find_campaign` | Resolve a campaign name to its `display_id`, with no metrics computed. |
-| `get_campaign_details` | One named campaign day by day, over any date range. |
-| `get_channel_performance` | One row per acquisition channel (Meta, Google, TikTok, Snapchat, Apple Search Ads, Linkrunner Links, Organic). |
-| `get_organic_performance` | Installs, sign-ups, and revenue carrying no campaign, as a single organic total. |
-| `list_event_names` | Custom and revenue event names you've defined. |
-| `search_event_log` | Individual event rows with timestamp, user, campaign, platform, and device. |
-| `list_funnels` | Names and step definitions of the funnels saved in your dashboard. |
-| `run_funnel` | Step-to-step conversion and drop-off, for a saved funnel or an ad-hoc one you describe in chat. |
-| `lookup_attribution` | Attribution result for a single user or device: campaign, ad network, ad set, creative, keyword (Apple Search Ads), organic vs inorganic flag, device IDs (gaid/idfa), and click/install timestamps. |
-| `get_billing_usage` | Free-install allowance and current-month usage. Only fetched when you explicitly ask about billing. |
-| `list_domains` | Tracking domains on the project, and which one is primary. |
-| `list_store_listings` | Custom App Store and Play Store listings you can attach to a campaign. |
-| `list_ad_accounts` | Ad-network accounts connected to the project. |
-| `list_postback_event_maps` | Event mappings sent to each ad network, and which are network defaults. |
-| `get_webhook` | Whether a webhook is configured, its host, and its organic setting. |
-
-Your assistant reads these tools' descriptions and decides which to call. You
-don't need to invoke them manually.
-
-<Note>
-`list_campaigns`, `get_channel_performance`, and `get_organic_performance`
-return only the metric groups your assistant asks for (installs, spend,
-retention, custom events, and so on). A group that wasn't requested is absent
-from the response rather than reported as zero, so the assistant never
-mistakes "not fetched" for "measured zero". Ask for a metric by name and it
-will fetch it.
-</Note>
-
-## What the connector can read from your ad accounts
-
-Tokens created with **Read connected ad accounts** get six more tools. They
-read from the Meta Marketing API and the Google Ads API using the ad accounts
-already connected to the project under Settings, and nothing else. They cannot
-change anything on Meta or Google.
-
-| Tool | Use it for |
-|------|------------|
-| `enrich_campaigns_from_ad_network` | Adds the network's delivery figures (spend, impressions, clicks, reach, frequency, CPM) and its own reported outcomes beside your Linkrunner campaigns, with a note explaining any gap between the two. |
-| `get_ad_insights` | Spend, impressions, clicks, CTR, CPC, CPM, reach and frequency as the ad network reports them, at account, campaign, ad set or ad group, or ad level, with the network's own conversions under `network_reported`. Optional breakdown by date, device, platform, country, age or gender. |
-| `list_ad_entities` | Campaigns, ad sets or ad groups, ads, creatives, audiences, conversion actions and keywords, with status, budget and objective. |
-| `get_ad_entity` | Every readable field of one object, such as an ad set's targeting or a campaign's bidding strategy. |
-| `query_ad_network` | Anything the three tools above cannot express, using the network's own field names: video metrics, impression share, quality rankings, placements, hourly and search-term reports, country, age and gender on Google, attribution-window comparisons on Meta, filters on any field, sorting, and object types such as pixels, labels, saved audiences and asset groups. |
-| `ad_network_reference` | Searches the field catalogs of both networks. Your assistant uses it to find exact names before a `query_ad_network` call, and to explain what a metric means. |
-
-The catalogs behind these tools come from the networks themselves: Google's
-own field schema and Meta's official Marketing API field lists. Every name the
-assistant passes is checked against them before a request is made, so it cannot
-ask for a field that does not exist. A wrong name comes back with suggestions
-instead of a failed call. Almost everything the two reporting APIs expose for
-reading is reachable this way.
-
-### Which source answers which question
-
-Linkrunner stays the source of truth, and connecting an ad account does not
-change any answer you already get. It adds to them.
-
-| Question | Source | Why |
-|----------|--------|-----|
-| Installs, reinstalls, sign-ups, events, purchases, revenue | Linkrunner | Attributed per device and per user, deduplicated across networks, and the same numbers as the dashboard. |
-| Retention, active users, funnels, attribution detail | Linkrunner only | Only Linkrunner has the user-level history. |
-| Cost per install, cost per sign-up, ROAS | Linkrunner | Synced ad spend divided by Linkrunner outcomes, the same as the dashboard. |
-| Spend, impressions, clicks, reach, frequency, CTR, CPC, CPM | Ad network | The network bills it, and its live figure is the latest. |
-| Status, budgets, bids, targeting, placements, creatives, audiences, keywords | Ad network only | Only the network knows. |
-
-The network's own conversion counts are still available, but always under a
-`network_reported` label. Your assistant quotes them as the network's claim
-("Meta reports 12 purchases") rather than as the count. When the two sides
-disagree, it explains why (attribution window, view-through, SKAN delay,
-cross-network deduplication, or a campaign that is not linked) instead of
-picking one.
-
-A few things to know when you read network numbers:
-
-- **They are the ad network's numbers.** Meta and Google count conversions
-  with their own attribution windows and view-through rules. Linkrunner's
-  installs and sign-ups are measured differently. Your assistant reports the
-  two side by side and will not merge them.
-- **Currency and timezone come from the ad account**, which may differ from
-  your project's display currency.
-- **The last three days are provisional.** Networks keep adjusting spend and
-  conversions for a few days, so recent numbers can move.
-- **Meta has no single "conversions" number.** Your assistant reads the actions
-  Meta reports (app installs, purchases, leads and so on) and names the one it
-  is quoting.
-- **Google's "Conversions" column is not installs.** It adds up every
-  conversion action the account bids on (installs, trials, purchases). When
-  comparing installs, the assistant uses only Google's install conversion
-  actions (the DOWNLOAD category, such as Android first open) and names the
-  action it used.
-- **Answers may come from a short cache.** Closed date ranges are cached for a
-  day, open ranges for ten minutes, and object lists for five minutes. The
-  assistant mentions the age when it matters.
-- **Reads are budgeted.** Each token gets a daily allowance of live reads, and
-  Linkrunner reserves part of its Google Ads quota for attribution. When a
-  limit is hit, the assistant gets a wait time and a cached copy if one exists,
-  instead of an error loop.
-- **Meta connections expire** roughly every 60 days. If your assistant reports that
-  the connection has expired, reconnect Meta under Settings.
-
-Only Meta and Google are covered. Accounts on other networks still appear in
-`list_ad_accounts` for campaign setup but cannot be queried.
-
-A few Google reports need a specific resource rather than a breakdown. Country
-uses `geographic_view`, age and gender use `age_range_view` and `gender_view`,
-and search queries use `search_term_view`. The assistant picks these through
-`query_ad_network` when you ask.
-
-## What the connector can change
-
-Ask in plain language ("create a campaign for the Diwali sale") and your
-assistant picks the right tool. Describe what you want changed, and confirm the
-summary it gives you before it writes.
-
-<Warning>
-Every tool below writes to your live project. Your assistant asks before making
-an ambiguous change, but it is worth being specific about what you want,
-especially for the tools marked as sending live traffic or being irreversible.
-</Warning>
-
-### Campaigns
-
-| Tool | Use it for |
-|------|------------|
-| `create_campaign` | A new tracking link for an ad creative, an influencer, an organic channel, or a web-to-app flow. |
-| `edit_campaign` | Rename, pause or resume, change the deep link, swap the store listing, or reassign the ad account. |
-| `create_deeplink` | A per-ad-set or per-creative deep link under a Meta or Google campaign. |
-
-A deep link has to be a full URL on one of your own tracking domains, for
-example `https://links.yourbrand.com/product/sneakers`. An external URL is
-rejected. Ask your assistant to list your domains if you are not sure which to
-use.
-
-<Note>
-Campaigns cannot be deleted through the connector. Pause them with
-`edit_campaign` instead.
-</Note>
-
-### Funnels
-
-| Tool | Use it for |
-|------|------------|
-| `create_funnel` | Save a funnel so it appears in your dashboard and in `list_funnels`. |
-| `update_funnel` | Rename a saved funnel or change its steps. |
-
-### Domains and store listings
-
-| Tool | Use it for |
-|------|------------|
-| `create_domain` | Register a tracking domain or subdomain. |
-| `create_store_listing` | Add a custom Play Store or App Store listing. |
-| `update_store_listing` | Change a listing's name or its platform listing id. |
-| `delete_store_listing` | Remove a listing no campaign is using. |
-
-<Warning>
-`create_domain` does not check DNS, so it will save a domain that is not pointed
-at Linkrunner yet, and there is no way to delete a domain through the connector.
-Check the spelling before you confirm. Adding a domain also creates a permanent
-`MAIN_DOMAIN` campaign that backs root-domain links and counts toward your
-campaign limit, and making the new domain primary changes which domain later
-campaigns use by default.
-</Warning>
-
-`delete_store_listing` is refused while any campaign still points at the
-listing, and the error names the campaigns. Remove it from those campaigns
-first.
-
-### Webhooks
-
-| Tool | Use it for |
-|------|------------|
-| `update_webhook` | Set the endpoint that receives install and event payloads, or change the organic setting. |
-| `test_webhook` | Send a sample payload to the configured endpoint. |
-
-<Warning>
-Both tools deliver a real payload to your endpoint. Saving a webhook sends one
-by itself, because Linkrunner only stores an endpoint that answers `200` or
-`201`, so configuring a Slack webhook posts a real message to that channel. Ask
-your assistant to test afterwards only if you want a second message.
-
-Replacing the URL cannot be undone. A project has one webhook, the new URL
-overwrites the old one, and the assistant cannot read the old value back to
-restore it (`get_webhook` hides the path, because a Slack webhook path is
-itself a credential). Keep a copy of the current URL before you replace it.
-</Warning>
-
-### Postback event mappings
-
-| Tool | Use it for |
-|------|------------|
-| `create_postback_event_map` | Map one of your events to the name an ad network expects. |
-| `update_postback_event_map` | Change an existing mapping. |
-| `delete_postback_event_map` | Remove a mapping you added. |
-
-<Warning>
-Creating or updating a mapping immediately sends a test postback to every
-connected account on that network (Meta, Google, TikTok, Snapchat, LinkedIn,
-Reddit). That puts a synthetic conversion in your real ad account, so avoid
-repeated edits.
-</Warning>
-
-An ad network's built-in defaults also appear in `list_postback_event_maps`.
-They are always active and cannot be changed or removed. To override one, add
-your own mapping for the same event.
-
-## Built-in prompts
-
-The connector includes three starter prompts. Clients that support MCP prompts
-show them in their prompt picker:
-
-- **Daily briefing:** yesterday's performance summary in 1-2 paragraphs.
-- **Weekly review:** this week vs last week, with anomalies and a
-  keep/cut/scale recommendation list.
-- **Cut list:** the worst-performing active campaigns, with reasoning.
-
-These are shortcuts. You can always ask the same questions in your own words.
-
-## Managing tokens
+### Manage tokens
 
 Click **MCP** in the sidebar to see all active tokens for the
 project. For each token you can see:
@@ -423,6 +576,21 @@ revoke an unused token before creating a new one.
 
 ## Security
 
+### Sign-in connections
+
+- You sign in on `auth.linkrunner.io`. Before the connector gets access, a
+  consent page shows which app is asking, the email you signed in with, and
+  what the connector can do.
+- The connection acts as you. It can use the projects where you are an Admin,
+  Owner, or Manager, and it can create new projects in your account.
+- It can make the changes listed under
+  [What the connector can change](#what-the-connector-can-change). It cannot
+  read your ad accounts.
+- To revoke access, disconnect or remove the Linkrunner connector in your
+  assistant. That ends the session.
+
+### Token connections
+
 - Tokens are scoped to a single project. They cannot read or change other
   projects you are a member of, even when the same person created the token.
 - Editing tools run as the person who created the token and apply that person's
@@ -437,13 +605,23 @@ revoke an unused token before creating a new one.
   and they are removed from every response and log.
 - An ad-account token can only reach accounts connected to its own project.
   Passing another project's account is refused.
-- The connector cannot delete campaigns, funnels, domains, or projects, cannot manage
-  members, and cannot disconnect an ad-network account. Those stay in the
+- Tokens are revocable from the dashboard at any time. The per-project cap of
+  10 tokens limits the blast radius if one leaks.
+
+<Note>
+If you only want someone to read, turn off **Make changes in Linkrunner** when
+you generate their token. A read-only token does not even list the editing
+tools, so the assistant cannot attempt a change with it.
+</Note>
+
+### Both connection types
+
+- The connector cannot delete campaigns, funnels, domains, or projects, cannot
+  manage members, and cannot disconnect an ad-network account. Those stay in the
   dashboard.
 - The webhook URL is never fully readable. `get_webhook` returns the host but
   hides the path, because a Slack webhook path is a credential in itself.
 - SDK private keys, billing settings, and admin actions are not exposed.
-- Tokens are revocable from the dashboard at any time.
 - To improve the connector, Linkrunner records basic usage for each call: the
   tool used, whether it worked, how long it took, the names of the arguments
   (not their values), the AI app you use, and the token, project, and person it
@@ -453,19 +631,38 @@ revoke an unused token before creating a new one.
   long IDs hidden. Names and other plain text are kept as written, so avoid
   putting personal or confidential details in your prompts.
 - Usage records are kept for one year.
-- Per-project token cap of 10 limits the blast radius if one leaks.
-
-<Note>
-If you only want someone to read, turn off **Make changes in Linkrunner** when
-you generate their token. A read-only token does not even list the editing
-tools, so the assistant cannot attempt a change with it.
-</Note>
 
 ## Troubleshooting
 
+**The assistant says a Gmail account cannot create a project.**
+You need a company email to create a project. Gmail accounts can still sign up
+and be invited to existing projects. Disconnect Linkrunner, connect again, and
+sign in with your company email. If you only have a personal email, contact
+[support@linkrunner.io](mailto:support@linkrunner.io).
+
+**The assistant says your app needs a live store listing.**
+An app project needs a published App Store or Play Store listing, and the
+assistant will not create a website project in its place. If your app is not
+published yet, come back once the listing is live. If the app is published,
+paste its store link into the chat so the assistant can look it up directly.
+
+**The assistant says you reached the project limit.**
+You can create up to 3 projects per day from an AI assistant. Try again the next
+day, or create the project in the [dashboard](https://dashboard.linkrunner.io).
+
+**The assistant says you do not have access to a project.**
+A sign-in connection can only use projects where you are an Admin, Owner, or
+Manager. Ask an Admin of that project to change your role, then ask again.
+
+**Claude shows Connect again, or Claude Code asks you to sign in.**
+The session ended, for example because the connector was disconnected. In
+Claude, click **Connect** and sign in. In Claude Code, run `/mcp` and sign in.
+
 **The client says "Couldn't reach the MCP server."**
-The token may have been revoked, or the URL may be malformed. Generate a new
-token, copy the full URL exactly, and reconnect Linkrunner.
+On a token connection, the token may have been revoked or the URL may be
+malformed. Generate a new token, copy the full URL exactly, and reconnect
+Linkrunner. On a sign-in connection, check that the URL is
+`https://mcp.linkrunner.io/mcp`.
 
 **The client does not show Linkrunner tools.**
 Make sure Linkrunner is enabled in the current chat or session. Open the
@@ -474,9 +671,9 @@ inherit connector state from previous chats.
 
 **Numbers don't match the dashboard.**
 The connector reads the same data the dashboard does. If you see a mismatch,
-check that you and the assistant are using the same date range and timezone,
-and that any filters (network, platform) match. Linkrunner's ingestion is
-real-time, so there's no lag to account for.
+check that you and the assistant are using the same project, date range, and
+timezone, and that any filters (network, platform) match. Linkrunner's ingestion
+is real-time, so there's no lag to account for.
 
 **Generating a token returns "Maximum of 10 active tokens reached."**
 You're at the per-project cap. Revoke an unused token from the same settings
@@ -493,10 +690,11 @@ Linkrunner only stores an endpoint that answers `200` or `201` to the sample
 payload, and it must answer directly rather than redirecting. An endpoint that
 returns `202` or `204` cannot be saved.
 
-**The assistant says the token does not have the ad-accounts capability.**
-The token was generated without **Read connected ad accounts**. Generate a new
-token with it turned on and re-add the connector. Capabilities cannot be added
-to an existing token.
+**The assistant says it cannot read your ad accounts.**
+Ad-account tools need a token generated with **Read connected ad accounts**.
+Sign-in connections do not offer them yet. Generate a token with that option
+turned on and add it as a separate connection. Capabilities cannot be added to
+an existing token.
 
 **The assistant says the Meta or Google connection has expired.**
 The stored ad-network credential is no longer valid. Open Settings, reconnect

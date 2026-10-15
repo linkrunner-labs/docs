@@ -56,6 +56,14 @@ Cross-cutting skills that are not tied to one platform:
 
 The **deep link troubleshooter** diagnoses why Universal Links / App Links open the browser instead of the app. The **events** skill wires up the correct event taxonomy, revenue tracking, and server-side APIs. The **webhooks** skill writes a receiver in your backend that verifies the `linkrunner-key` header and handles install/signup payloads.
 
+## Create the project from a chat
+
+The skills change your app's code. They do not create your Linkrunner project.
+To create the project and get the SDK token without opening the dashboard, add
+the [Linkrunner connector](/features/mcp) to Claude or Claude Code and ask it to
+set up Linkrunner for your app. Then use the skill to add the SDK with that
+token.
+
 ## Options
 
 ```bash
