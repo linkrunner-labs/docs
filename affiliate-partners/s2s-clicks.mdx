@@ -15,7 +15,7 @@ For this traffic, your **server** reports each click to Linkrunner, and the user
 Every S2S request must carry your partner token. See [Authenticate your requests](#authenticate-your-requests).
 
 <Note>
-The advertiser turns on S2S clicks for each partner separately. Ask them, or [Linkrunner support](mailto:support@linkrunner.io), to turn them on for your partner account before you send traffic. Until then, requests are rejected with `partner_not_enabled`. S2S clicks stop if the advertiser disconnects your account.
+The advertiser turns on S2S clicks for each partner separately, in **Integrations → Affiliate Partners → Configure**. Send them [these steps](/affiliate-partners/turn-on-s2s-clicks) and ask them to turn it on for your partner account before you send traffic. Until then, requests are rejected with `partner_not_enabled`. S2S clicks stop if the advertiser disconnects your account.
 </Note>
 
 ## How it works
@@ -183,7 +183,7 @@ The token is wrong, was revoked, or was replaced more than 24 hours ago. You als
 `c` must be the campaign code from your Linkrunner tracking link. An AppsFlyer campaign name in `c` doesn't match.
 
 **Requests return `partner_not_enabled`.**
-The advertiser hasn't turned on S2S clicks for your partner account on this app, or `c` is a campaign that isn't yours. Changes take up to 5 minutes to apply.
+The advertiser hasn't turned on S2S clicks for your partner account on this app, or `c` is a campaign that isn't yours. Send the advertiser [these steps](/affiliate-partners/turn-on-s2s-clicks). Changes take up to 5 minutes to apply.
 
 **Requests return `unknown_app`.**
 Check the app ID against the store listing: the package name for Android, `id` plus the number for iOS. An app newly set up in Linkrunner can take a few minutes to be recognised.

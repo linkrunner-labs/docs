@@ -230,6 +230,7 @@
                             "affiliate-partners/s2s-clicks",
                             "affiliate-partners/s2s-impressions",
                             "affiliate-partners/ctv-impressions",
+                            "affiliate-partners/turn-on-s2s-clicks",
                             "affiliate-partners/postbacks",
                             "affiliate-partners/event-mapping",
                             "affiliate-partners/postback-logs",
@@ -256,6 +257,7 @@
                             "agency-partners/add-affiliate-account",
                             "agency-partners/manage-workspace",
                             "agency-partners/create-campaign-link",
+                            "agency-partners/campaigns-for-affiliates",
                             "agency-partners/invite-an-agency",
                             "agency-partners/control-agency-access"
                         ]
