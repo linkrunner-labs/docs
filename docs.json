@@ -228,6 +228,7 @@
                             "affiliate-partners/tracking-links",
                             "affiliate-partners/s2s-clicks",
                             "affiliate-partners/s2s-impressions",
+                            "affiliate-partners/turn-on-s2s-clicks",
                             "affiliate-partners/postbacks",
                             "affiliate-partners/event-mapping",
                             "affiliate-partners/postback-logs",
