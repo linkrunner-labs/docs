@@ -323,6 +323,22 @@ https://partner.example.com/postback?tid={click_id}&source=linkrunner
 
 Do not use `{secret.postbackKey}`. If your endpoint requires a secret key, configure it privately with Linkrunner so it is not shown in dashboard tracking links or public examples.
 
+## Common mistakes
+
+Linkrunner fills only the macros listed above. Anything else is sent unchanged as literal text, so your endpoint receives the placeholder instead of a value. When your account is approved, an unsupported macro also stops your postbacks from being set up. Fix the URL in **Settings → Postback URLs**. Saving it sets up your postbacks again.
+
+| What you wrote | What happens | Use instead |
+|---|---|---|
+| `{eventname}` | Not a macro. Sent as the text `{eventname}`. | `{event_name}`, with an underscore |
+| `{siteid}` | Not a macro. Sent as the text `{siteid}`. | Send your site ID on the click as `s3`, then use `{s3}` in the postback |
+| `{device_id}` | Not a macro. Sent as the text `{device_id}`. | `{gaid}` on Android, `{idfa}` on iOS. Include both if you take both platforms |
+| `(advertiserId)`, `(bundle-id)` or other AppsFlyer-style placeholders in round brackets | Linkrunner only reads curly braces, so they are sent as text. | `{bundle_id}` for the app. Use `{macro_name}` for everything else |
+| `sub5reinstall~{is_reinstall}` | Missing `=`. Your endpoint reads it as one odd parameter name, not as `sub5reinstall` with a value. | `sub5reinstall={is_reinstall}` |
+| `sub2=install` on an event postback | A hardcoded value. Every event, including purchases, arrives as `install`. | `sub2={event_name}` |
+| `{Click_ID}` or `{CLICK_ID}` | Macros are lowercase only, so these are sent as text. | `{click_id}` |
+
+Check your URL against the [macro reference](#macro-reference) and save it. If you set up one URL per conversion type, make sure each one uses the right macros. A value that is fixed in the URL stays fixed for every conversion that URL covers.
+
 ## Not available
 
 - **Country code.** There is no country macro. Derive it from `{ip}` if you need one.
