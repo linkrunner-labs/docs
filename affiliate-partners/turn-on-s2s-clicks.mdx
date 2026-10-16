@@ -1,0 +1,70 @@
+---
+title: "Turn On S2S Clicks for a Partner"
+description: "Let a connected affiliate partner report clicks and impressions from its own server"
+icon: "toggle-on"
+---
+
+Some partners send users straight to the Play Store or App Store without opening a tracking link, for example OEM app-store placements on Xiaomi, OPPO and vivo. Linkrunner never sees those clicks. These partners report each click from their own server instead, using [S2S clicks](/affiliate-partners/s2s-clicks).
+
+S2S clicks are off for every partner until you turn them on. Until then, Linkrunner rejects the partner's server requests with `partner_not_enabled`.
+
+<Info>
+Only project admins and managers can change this setting.
+</Info>
+
+## Before you start
+
+- The partner is connected to your project in **Integrations → Affiliate Partners**. See [Connect your affiliate partners](/agency-partners/campaigns-for-affiliates#1-connect-your-affiliate-partners).
+- The partner has asked for S2S clicks. Partners that use normal tracking links don't need it.
+
+## Turn it on
+
+<Steps>
+  <Step title="Open the partner">
+    Go to **Integrations → Affiliate Partners** and click **Configure** on the partner's card.
+  </Step>
+  <Step title="Switch on S2S clicks and impressions">
+    Turn on the **S2S clicks and impressions** switch at the top of the page.
+
+    ![The S2S clicks and impressions switch, turned on, at the top of the partner's page](/images/affiliate-partners/s2s-clicks-switch-on.webp)
+  </Step>
+  <Step title="Confirm">
+    Click **Turn on**.
+
+    ![Confirmation dialog: Turn on S2S clicks for Orbit Ads?](/images/affiliate-partners/s2s-clicks-confirm.webp)
+  </Step>
+</Steps>
+
+The change reaches Linkrunner's click servers within 5 minutes. Tell the partner they can start sending traffic after that.
+
+## What the partner can do
+
+| With S2S clicks on, the partner can | They still can't |
+|---|---|
+| Report clicks from their server for **their own** campaigns on this project | Report clicks for campaigns that belong to another partner or to you |
+| Report impressions, if view-through is also on (see below) | See your spend or revenue |
+
+Each request must carry the partner's own secret token, so another company can't send clicks in their name. Linkrunner attributes installs to S2S clicks the same way as to clicks on a tracking link, within your [attribution window](/features/attribution-windows).
+
+<Note>
+**Impressions need view-through as well.** This switch lets the partner send impressions, but Linkrunner only credits installs to them once view-through attribution is on for the partner. To turn on view-through or change its window, contact [support@linkrunner.io](mailto:support@linkrunner.io).
+</Note>
+
+## Turn it off
+
+Turn the same switch off. There is no confirmation. The partner's server clicks and impressions are rejected within 5 minutes. Their tracking links keep working.
+
+Disconnecting the partner also turns S2S clicks off. If you reconnect them later, turn it on again.
+
+## Troubleshooting
+
+**The switch is greyed out.**
+You are not an admin or manager on this project. Ask an admin to change it.
+
+**The partner still gets `partner_not_enabled`.**
+Wait 5 minutes after turning it on. If it persists, check that the campaign code `c` in their request belongs to that partner. A campaign created under another network doesn't count.
+
+**Turning it on fails with "Affiliate partner not connected".**
+The partner was disconnected, or their account is suspended. Reload the page and check the partner's card.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).
