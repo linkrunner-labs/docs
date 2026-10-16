@@ -1,0 +1,132 @@
+---
+title: "Meta Ads FAQ and Discrepancies"
+description: "Troubleshoot common issues and understand expected discrepancies between Meta Ads Manager and Linkrunner"
+icon: "circle-question"
+---
+
+Meta Ads Manager and Linkrunner will rarely show identical numbers. Most of the gap is expected. This page explains what's normal, what's fixable, and how to compare the two dashboards correctly.
+
+For setup instructions, see the [Meta Ads integration guide](/ad-networks/meta-ads). For Web-to-App campaigns, see [Meta Web to App](/ad-networks/meta-web-to-app).
+
+<Note>
+    Meta publishes its own explanation of how it attributes and reports conversions: [About Meta attribution](https://www.facebook.com/business/help/458681590974355).
+</Note>
+
+## Meta Ads FAQ
+
+<AccordionGroup>
+
+<Accordion title="Events aren't showing up in Meta Events Manager">
+Walk through this checklist.
+
+<Steps>
+<Step title="Verify the Meta app integration in Linkrunner">
+Open [Integrations → Meta Ads](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=integration) and confirm the **App ID** and **Install Referrer Decryption Key** are saved.
+</Step>
+<Step title="Verify CAPI credentials">
+On the [Ad Account tab](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=ad_account), confirm the ad account is connected and CAPI is configured with the **Dataset ID** and **CAPI Access Token** from Meta Events Manager.
+</Step>
+<Step title="Check the event mapping">
+On the [Event Mapping tab](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=event_mapping), confirm the event is mapped, then click the paper plane **Send event to ad network** icon to fire a test event.
+</Step>
+<Step title="Wait for processing">
+Events can take up to **1 hour** to appear in Meta Events Manager after Linkrunner sends them.
+</Step>
+</Steps>
+</Accordion>
+
+<Accordion title="Installs show in Linkrunner but not in Meta">
+Linkrunner sends `MobileAppInstall` to Meta only for installs it attributes to a Meta campaign. Organic installs and installs attributed to other networks are never sent, so they can't appear in Meta's numbers.
+
+Two more common causes:
+
+- **The 7-day event window.** Meta accepts conversion events up to 7 days old. An install processed or attributed more than 7 days after it happened is not sent to Meta at all.
+- **Missing CAPI credentials.** Postbacks require the Dataset ID and access token on the ad account connected to that campaign. Without them, Linkrunner tracks the install but sends nothing to Meta.
+</Accordion>
+
+<Accordion title="Meta reports more installs than Linkrunner">
+This is the most common direction of discrepancy, and most of it is by design:
+
+- **Meta self-attributes.** Meta claims every install with a Meta ad engagement inside its window, even when the user's last touch was another network. Linkrunner uses last-touch attribution across all networks and credits one source per install.
+- **View-through conversions.** Meta counts installs after an ad view (1-day view window) by default. Linkrunner measures view-through only on Android, and only when [Meta Install Referrer](/features/meta-install-referrer) is set up. Meta also shares view-through data only for App promotion campaigns with broad targeting; see the [Meta View-Through Attribution FAQ](/ad-networks/meta-view-through-attribution). iOS view-through installs land as organic in Linkrunner.
+- **Cross-device attribution.** Meta can credit an ad click on one device for an install on another. Linkrunner matches signals on the same device only.
+- **Modeled results on iOS.** Meta's iOS reporting (Aggregated Event Measurement and SKAdNetwork) includes modeled and aggregated conversions. Linkrunner's SDK attribution on iOS is deterministic, and users who deny App Tracking Transparency often can't be matched, so those installs show as organic.
+</Accordion>
+
+<Accordion title="Linkrunner reports more Meta installs than Meta">
+- **Window differences.** Linkrunner matches clicks up to 30 days before the install. Meta's default click window is 7 days, so a click 8 to 30 days before first open counts in Linkrunner but not in Meta.
+- **Ads Manager attribution settings.** The install count in Ads Manager depends on the ad set's attribution setting and the columns you compare. Use Meta's [Compare Attribution Settings](https://www.facebook.com/business/help/654970342692714) view before treating the gap as real.
+- **Events older than 7 days.** Installs that Linkrunner attributes late are kept in Linkrunner but dropped by Meta (see the previous question).
+</Accordion>
+
+<Accordion title="Do I need the Facebook SDK?">
+No. Linkrunner attributes Meta installs without it.
+
+If you do integrate the Facebook SDK alongside Linkrunner, disable its automatic event logging (`AutoLogAppEventsEnabled = false`). Otherwise Meta receives the same in-app events twice, once from the Facebook SDK and once from Linkrunner CAPI, and its event and revenue counts inflate. Meta deduplicates install events automatically, but not in-app events sent from two sources.
+</Accordion>
+
+<Accordion title="How Android and iOS attribution differs">
+- **Android:** Deterministic. Linkrunner decrypts the Meta campaign metadata in the Google Play install referrer using your Referrer Decryption Key. With [Meta Install Referrer](/features/meta-install-referrer) enabled, it also reads campaign metadata from the Facebook or Instagram app on the device, which adds view-through measurement.
+- **iOS:** There is no install referrer. Linkrunner attributes deterministically by matching the install to a Meta click (deep-link click, or IDFA when the user grants App Tracking Transparency). Meta itself measures iOS through Aggregated Event Measurement and SKAdNetwork, which are aggregated, modeled, and delayed by 24+ hours.
+
+For iOS Meta App campaigns where Linkrunner has no SDK-attributed installs, the dashboard shows the install counts Meta reports through its Marketing API, so those figures follow Meta's SKAN reporting and timing. See [iOS Campaign Data Limitations](/features/ios-campaign-data-limitations).
+</Accordion>
+
+<Accordion title="How Web-to-App campaigns are attributed">
+Web-to-App attribution comes from the click, not from Meta's API. When a click arrives with the `campaign_id`, `adset_id`, and `ad_id` macros on your Linkrunner destination URL, Linkrunner auto-creates a campaign named `Meta W2A - <campaign id>` and attributes the install to it by click matching.
+
+Linkrunner sends the website `Download` conversion to Meta only when the install matches a click. If no click match is found (more common on iOS, where there is no install referrer), the install is still tracked in Linkrunner but no conversion is sent to Meta for it.
+
+Meta reports the same conversions under your Sales campaign in Ads Manager. See [Meta Web to App](/ad-networks/meta-web-to-app) for setup.
+</Accordion>
+
+</AccordionGroup>
+
+## What causes discrepancies
+
+The differences fall into three groups.
+
+<CardGroup cols={3}>
+<Card title="Timing" icon="clock">
+Meta dates conversions to the **ad click or view**. Linkrunner dates installs to the **first app open**. A Jan 5 install in Linkrunner can show on Jan 1 in Meta if the ad interaction happened then.
+</Card>
+<Card title="Counting" icon="calculator">
+Meta is a self-attributing network: it claims every install with a Meta engagement in its window, including view-through and cross-device. Linkrunner uses **last-touch attribution**, deduplicates across networks, and counts one install per user.
+</Card>
+<Card title="iOS (AEM / SKAN)" icon="apple">
+Meta measures iOS through Aggregated Event Measurement and SKAdNetwork: aggregated, partly modeled, and delayed 24+ hours. Linkrunner's iOS attribution is deterministic and depends on ATT consent or a deep-link click.
+</Card>
+</CardGroup>
+
+### Row-by-row comparison
+
+| Area                     | Meta Ads Manager                                                              | Linkrunner                                                                          |
+| ------------------------ | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Install record time      | Date of the ad click or view                                                  | First app open                                                                      |
+| In-app event record time | Date of the ad interaction                                                    | Dashboard views: install time. Raw data: actual event time                          |
+| Attribution windows      | 7-day click, 1-day view by default (set per ad set)                           | Android: install referrer read at first open. iOS and Web-to-App: clicks matched up to 30 days |
+| View-through conversions | Counted by default                                                            | Android only, requires Meta Install Referrer; not measured on iOS                   |
+| Attribution scope        | Meta engagements only; claims installs regardless of other networks           | Last-touch across all networks; one source per install                              |
+| Cross-device             | Credits installs on a different device from the ad interaction                | Same-device signals only                                                            |
+| Reinstalls               | Install events deduplicated within a 90-day window                            | One install per user; re-attribution possible only 90+ days after the original install |
+| Time zones               | Ad account time zone                                                          | Project time zone (synced Meta spend and clicks stay on Meta's calendar day)        |
+| Events sent to Meta      | Only mapped events, and only when under 7 days old                            | All SDK events appear in Linkrunner                                                 |
+| iOS installs             | AEM and SKAN, includes modeled results, delayed 24+ hours                     | SDK-attributed installs; Meta-reported counts shown for iOS App campaigns without SDK attribution |
+| Processing delay         | CAPI events appear within ~1 hour; SKAN adds 24+ hours                        | Near real time                                                                      |
+
+## Troubleshooting checklist
+
+If the gap is much bigger than expected:
+
+- **App ID** and **Install Referrer Decryption Key** are saved in the [integration tab](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=integration).
+- **CAPI Dataset ID and access token** are configured for the connected ad account.
+- Events are **mapped** and a test event (paper plane icon) reaches Meta Events Manager.
+- If the Facebook SDK is also integrated, its **automatic event logging is disabled**.
+- Android: [Meta Install Referrer](/features/meta-install-referrer) is configured if you expect view-through installs.
+- iOS: SKAdNetwork is configured and you compare against Meta's SKAN reporting. See [SKAdNetwork integration](/features/skadnetwork-integration).
+- Web-to-App: the ad's destination URL includes the `campaign_id={{campaign.id}}`, `adset_id={{adset.id}}`, and `ad_id={{ad.id}}` macros.
+- You compare the same date range in the same time zone, remembering Meta reports on the ad-interaction date.
+
+---
+
+For any questions or assistance, please contact us at [support@linkrunner.io](mailto:support@linkrunner.io).

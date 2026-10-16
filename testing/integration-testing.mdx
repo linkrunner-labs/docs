@@ -1,0 +1,240 @@
+---
+title: "SDK Integration Testing"
+description: "Validate your Linkrunner setup end-to-end: click → install → signup"
+icon: "flask"
+---
+
+## Overview
+
+This guide helps you verify your Linkrunner integration end-to-end using a real test campaign link. **This testing process applies to all Linkrunner SDKs** (React Native, Flutter, iOS, Android, Expo, and Web).
+
+For mobile SDKs, [Open SDK Console](https://dashboard.linkrunner.io/dashboard/sdk-console/register-test-device) in the dashboard. It lets you register a test device and verify SDK initialization, attribution data, signup, custom events, and revenue events from one place.
+
+You'll confirm that:
+
+-   A **click** is tracked when you open the campaign link on a device
+-   An **install** is tracked when you install and open the app after clicking
+-   A **signup** is tracked when you call the SDK signup method (recommended)
+
+<Note>
+    **Attribution is not required for event tracking.** Linkrunner stores events for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Complete the flow in this guide (click → install → open app) to see events attributed to a campaign.
+</Note>
+
+## Video walkthrough
+
+<iframe
+    width="100%"
+    height="420"
+    src="https://www.youtube.com/embed/tX05ioHJ6bc?start=315"
+    title="Linkrunner SDK Integration Testing"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+/>
+
+<Note>The testing flow walkthrough starts at **5:16** in the video.</Note>
+
+## Prerequisites
+
+### 1) Domain setup (required)
+
+Before you start testing, make sure your Linkrunner domain setup is completed in the dashboard:
+
+-   [Domain settings](https://dashboard.linkrunner.io/settings?s=domains)
+
+If you are setting up Universal Links (iOS) or App Links (Android), also complete deep link verification:
+
+-   [Setup Deep Linking](https://docs.linkrunner.io/sdk/deep-linking/setup)
+-   [Configure verification objects](https://docs.linkrunner.io/sdk/deep-linking/verification)
+
+### 2) SDK integrated in your app
+
+Complete integration for any supported SDK:
+
+-   [React Native Installation](https://docs.linkrunner.io/sdk/react-native/installation) and [React Native Usage](https://docs.linkrunner.io/sdk/react-native/usage)
+-   [Flutter Installation](https://docs.linkrunner.io/sdk/flutter/installation) and [Flutter Usage](https://docs.linkrunner.io/sdk/flutter/usage)
+-   [iOS Installation](https://docs.linkrunner.io/sdk/ios/installation) and [iOS Usage](https://docs.linkrunner.io/sdk/ios/usage)
+-   [Android Installation](https://docs.linkrunner.io/sdk/android/installation) and [Android Usage](https://docs.linkrunner.io/sdk/android/usage)
+-   [Expo Installation](https://docs.linkrunner.io/sdk/expo/installation)
+
+### 3) Register a test device in SDK Console
+
+Open SDK Console in the dashboard and register your testing device.
+
+You can register the device by opening your app while SDK Console listens, or by entering the device identifier manually.
+
+<Note>
+    For normal testing, you do not need `debug = true`. Registering the device in SDK Console is enough.
+</Note>
+
+<Warning>
+    Set `debug = true` in SDK init only when SDK Console cannot use the normal device identifier:
+    GAID (Android device identifier) collection is disabled, or the iOS ATT prompt is disabled so IDFA
+    (iOS device identifier) is unavailable. Remove `debug = true` before production.
+</Warning>
+
+## Test with SDK Console (beta)
+
+Use this flow for most mobile SDK tests:
+
+1. Open SDK Console.
+2. Register your test device.
+3. Go to **SDK Initialization** and open the generated test link on that device.
+4. Install and open your app on the same device.
+5. Continue through **Sign-up Tracking**, **Attribution Data Testing**, **Custom Events Tracking**, and **Revenue Event Tracking** as needed.
+
+If your app cannot collect GAID on Android or IDFA on iOS, set `debug = true` in SDK init before you use SDK Console.
+
+## Test flow (click → install → signup)
+
+Use this manual flow when you want to verify campaign counts directly in the dashboard.
+
+### Step 1) Get a test device
+
+Use a physical device or emulator/simulator.
+
+Important setup:
+
+-   Make sure the app is **uninstalled** before starting the test.
+-   If you are retesting, uninstall again before each run to keep results clean.
+
+### Step 2) Create a test campaign in Linkrunner
+
+Create a campaign from the dashboard:
+
+-   [Create Campaign](https://dashboard.linkrunner.io/dashboard?m=create-campaign)
+
+Tip: If you prefer creating campaigns via API, see [Campaign APIs](https://docs.linkrunner.io/api-reference/campaign-apis).
+
+### Step 3) Test the click
+
+1. Copy the campaign link from the dashboard.
+2. Open the campaign link **on the testing device** (browser or in-app browser).
+
+Expected result:
+
+-   The campaign **click count should increase** in the Linkrunner dashboard.
+
+### Step 4) Test the install
+
+1. After clicking the link, install the app **locally from your computer** (the build that contains the Linkrunner SDK).
+2. Open the app on the device.
+
+Important ordering rule:
+
+-   **Click the link before the app opens for the first time.** A click that lands after the install is never matched
+    to it.
+-   The click stays eligible for the campaign's full attribution window — **7 days by default**, and 30 days for
+    Google and Meta campaigns.
+
+<Note>
+    **Alternative flow for slow builds:** If building and installing the app locally takes a while, use this approach
+    instead: 1. First install the app on your device 2. Then open the campaign link in a browser (Chrome/Safari) on the
+    same device 3. Open the app after clicking the link. This works because a locally installed build has no Play Store
+    install timestamp, so the click still lands before the first app open.
+</Note>
+
+Expected result:
+
+-   The campaign **install count should increase** in the Linkrunner dashboard.
+
+Optional but recommended:
+
+-   Fetch attribution inside the app after first open using `getAttributionData()` (supported in all SDKs).
+    See your SDK usage guide:
+
+    -   [React Native Usage](https://docs.linkrunner.io/sdk/react-native/usage)
+    -   [Flutter Usage](https://docs.linkrunner.io/sdk/flutter/usage)
+    -   [iOS Usage](https://docs.linkrunner.io/sdk/ios/usage)
+    -   [Android Usage](https://docs.linkrunner.io/sdk/android/usage)
+
+### Step 5) Test the signup event (recommended)
+
+If you have implemented the SDK signup method:
+
+1. Complete onboarding or login in your app.
+2. Call the SDK `signup` method once the user is registered.
+
+Expected result:
+
+-   The campaign **signup count should increase** in the Linkrunner dashboard.
+
+Implementation references:
+
+-   [React Native Usage (signup)](https://docs.linkrunner.io/sdk/react-native/usage)
+-   [Flutter Usage (signup)](https://docs.linkrunner.io/sdk/flutter/usage)
+-   [iOS Usage (signup)](https://docs.linkrunner.io/sdk/ios/usage)
+-   [Android Usage (signup)](https://docs.linkrunner.io/sdk/android/usage)
+
+## Testing Remarketing
+
+After verifying basic attribution (click → install → signup), you can test remarketing to confirm reengagement and install reattribution are working.
+
+### Prerequisites
+
+- Complete the [basic test flow](#test-flow-click--install--signup) above first (click → install → signup).
+- [Deep linking](/features/deep-linking-setup) is configured in your app.
+- The `handleDeepLink` function from the Linkrunner SDK is implemented. Refer to your SDK guide ([React Native](/sdk/react-native#handle-deeplink), [Flutter](/sdk/flutter#handle-deeplink), [Android](/sdk/android#handle-deeplink), [iOS](/sdk/ios#handle-deeplink)) for details.
+- Android backup configuration is set up for reinstall detection on Android. Refer to your SDK guide ([React Native](/sdk/react-native#step-4%3A-android-backup-configuration), [Flutter](/sdk/flutter#backup-configuration), [Android](/sdk/android#step-3%3A-backup-configuration)) for details.
+
+### Test 1: Reengagement (Deep Link Open)
+
+This test verifies that a returning user opening the app via a deep link is attributed to a reengagement campaign.
+
+1. **Create a campaign and install the app:** Follow the [basic test flow](#test-flow-click--install--signup) above to create a campaign, click the link, and install the app.
+
+2. **Create a reengagement campaign:** Create a new campaign in the dashboard. This will be your reengagement campaign.
+   - [Create Campaign](https://dashboard.linkrunner.io/dashboard?m=create-campaign)
+
+3. **Click the reengagement campaign link:** Open the reengagement campaign link on the same device. The app should open via the deep link.
+
+**Expected result:**
+- In the **Retargeting view** on the dashboard, the reengagement campaign should show **Reengagements: 1**.
+
+### Test 2: Install Reattribution
+
+This test verifies that a user who uninstalls and reinstalls the app is attributed as a reattribution.
+
+1. **Create a campaign and install the app:** Follow the [basic test flow](#test-flow-click--install--signup) above to create a campaign, click the link, and install the app.
+
+2. **Create a reengagement campaign:** Create a new campaign in the dashboard.
+   - [Create Campaign](https://dashboard.linkrunner.io/dashboard?m=create-campaign)
+
+3. **Uninstall the app:** Remove the app from the test device.
+
+4. **Click the reengagement campaign link:** Open the reengagement campaign link on the same device.
+
+5. **Reinstall the app:** Install and open the app again on the device.
+
+**Expected result:**
+- In the **Retargeting view** on the dashboard, the reengagement campaign should show the **Reinstalls** count incremented by 1.
+
+## Troubleshooting
+
+### Click count not increasing
+
+-   Confirm you opened the **campaign link on the same device** you plan to install on.
+-   Confirm domain setup is complete: [Domain settings](https://dashboard.linkrunner.io/settings?s=domains)
+-   If using Universal Links/App Links, verify deep link verification:
+
+    -   [Configure verification objects](https://docs.linkrunner.io/sdk/deep-linking/verification)
+
+### Install count not increasing
+
+-   Confirm the app was **uninstalled before the test**.
+-   Confirm you **clicked the link before opening the app**. A click that lands after the install is never matched to
+    it. The click stays eligible for the campaign's full attribution window (7 days by default, 30 for Google and
+    Meta).
+-   If you are using SDK Console, confirm the device is registered as a test device.
+-   If GAID collection is disabled on Android or the ATT prompt is disabled on iOS, set `debug = true` in SDK init and reopen the app.
+
+### Signup count not increasing
+
+-   Confirm your app calls `signup` as soon as the user is identified (signup or login), and not before.
+-   Confirm you are passing the required user identifier fields per your SDK usage guide.
+
+### Test device not showing in SDK Console
+
+-   Confirm the app with the Linkrunner SDK was opened on the test device.
+-   If GAID collection is disabled on Android, set `debug = true` in SDK init and reopen the app.
+-   If the ATT prompt is disabled on iOS, set `debug = true` in SDK init and reopen the app.

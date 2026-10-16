@@ -1,0 +1,648 @@
+---
+title: "Data APIs"
+description: "Documentation for Linkrunner Data APIs"
+icon: "database"
+---
+
+## Base URL
+
+```
+https://api.linkrunner.io/api/v1
+```
+
+## Authentication
+
+All API requests require authentication. Include your server key in the request headers.
+
+### Error Responses
+
+-   **401 Unauthorized**
+    -   `"Unauthorized access."` - Missing or invalid API key
+-   **429 Too Many Requests**
+    -   Message: `"Rate limit exceeded. Please try again later."`
+    -   Cause: You've exceeded the rate limit of 30 requests per second.
+
+### Rate Limit Details
+
+-   Rate: 30 requests per second
+-   Status code on limit exceeded: 429 (Too Many Requests)
+
+## Authentication
+
+All API requests require authentication using an API key. You must include this key in the header of every request.
+
+### API Key Header
+
+Include the following header in all API requests:
+
+```
+linkrunner-key: YOUR_API_KEY
+```
+
+Replace `YOUR_API_KEY` with your actual API key. (Refer instructions below)
+
+### Obtaining Your API Key
+
+You can find your API key on the Linkrunner settings page:
+
+1. Go to https://dashboard.linkrunner.io/settings?s=data-apis
+2. Locate your Server key on this page
+3. Use this key in the `linkrunner-key` header for all API requests
+
+Keep your API key confidential. Do not share it or expose it in client-side code. Always make API requests from a secure server-side environment.
+
+## Endpoints
+
+### 1. List Campaigns
+
+Retrieve a paginated list of campaigns with optional filtering by status or specific link.
+
+#### Request
+
+```
+GET /campaigns
+```
+
+#### Query Parameters
+
+| Parameter | Type   | Required | Description                                                                                             |
+| --------- | ------ | -------- | ------------------------------------------------------------------------------------------------------- |
+| filter    | string | No       | Filter campaigns by status. Options: `ACTIVE`, `INACTIVE`, `ALL` (default: `ALL`)                       |
+| channel   | string | No       | Filter campaigns by advertising channel/network. Options: `GOOGLE`, `META`, `TIKTOK`, `APPLE_SEARCH_ADS`, or any affiliate name (case-insensitive). For affiliates, use underscores for spaces (e.g., `AFFILIATE_EXAMPLE` for "affiliate example") |
+| domain    | string | No       | Filter campaigns by domain name (e.g., `app.example.com`). Only returns campaigns associated with the specified domain. |
+| link      | string | No       | Filter campaigns by a specific link URL. The system will extract the campaign from the provided link.   |
+| page      | number | No       | The page number to retrieve. Must be a positive integer. (default: `1`)                                 |
+| limit     | number | No       | The number of campaigns to return per page. Must be between 1 and 1000. (default: `100`, max: `1000`)   |
+
+#### Channel Filter Behavior
+
+| Value               | Behavior                                         |
+| ------------------- | ------------------------------------------------ |
+| `GOOGLE`            | Returns campaigns where `google = true`          |
+| `META`              | Returns campaigns where `meta = true`            |
+| `TIKTOK`            | Returns campaigns linked to a TikTok ad network  |
+| `APPLE_SEARCH_ADS`  | Returns campaigns linked to Apple Search Ads ad network |
+| `AFFILIATE_EXAMPLE` | Returns campaigns linked to an affiliate named "affiliate example". Replace spaces with underscores. |
+| _(empty/invalid)_   | No channel filter applied (returns all channels) |
+
+**Affiliate Channel Naming**:
+- Affiliate names should use underscores instead of spaces
+- Example: If the affiliate is named "affiliate example", use `channel=AFFILIATE_EXAMPLE`
+- Channel names are case-insensitive
+
+#### Pagination
+
+Pagination is automatically applied to all requests with the following defaults:
+
+-   **Default page**: 1
+-   **Default limit**: 100 campaigns per page
+-   **Maximum limit**: 1000 campaigns per page
+
+#### Example Requests
+
+1. **Basic Request** (returns first 100 campaigns):
+
+```
+GET /campaigns
+```
+
+2. **Filter Active Campaigns with Pagination**:
+
+```
+GET /campaigns?filter=ACTIVE&page=2&limit=50
+```
+
+3. **Get Campaign by Link**:
+
+```
+GET /campaigns?link=https://yourdomain.com?c=XYZ123
+```
+
+4. **All Campaigns with Custom Limit**:
+
+```
+GET /campaigns?filter=ALL&limit=200
+```
+
+5. **Filter by Channel (Google)**:
+
+```
+GET /campaigns?channel=GOOGLE
+```
+
+6. **Filter by Channel (Meta)**:
+
+```
+GET /campaigns?channel=META
+```
+
+7. **Filter by Channel (TikTok)**:
+
+```
+GET /campaigns?channel=TIKTOK
+```
+
+8. **Combine Channel with Other Filters**:
+
+```
+GET /campaigns?channel=google&filter=ACTIVE&page=1&limit=50
+```
+
+#### Response
+
+**Standard Response (no channel filter):**
+
+```json
+{
+    "msg": "Successfully retrieved 10 campaigns (all campaigns). Showing page 1 of 4.",
+    "status": 200,
+    "data": {
+        "total_campaigns": 10,
+        "campaigns": [
+            {
+                "display_id": "XYZ123",
+                "name": "Summer_Promo_2024",
+                "created_at": "2024-09-30T09:37:06.989Z",
+                "update_at": "2024-09-30T09:37:06.989Z",
+                "google": false,
+                "meta": true,
+                "meta_campaign_id": "987654321098765432",
+                "meta_web_to_app": false,
+                "active": true,
+                "default_link": true,
+                "attributed_users": 491,
+                "link": "https://yourdomain.com?c=XYZ123",
+                "shareable_link": "https://yourdomain.com/XYZ123",
+                "domain": "yourdomain.com",
+                "store_listings": [
+                    {
+                        "store_listing_id": "ios-store-v1",
+                        "name": "iOS Main Listing",
+                        "platform": "IOS"
+                    },
+                    {
+                        "store_listing_id": "android-promo-v2",
+                        "name": "Android Promo Listing",
+                        "platform": "ANDROID"
+                    }
+                ]
+            }
+            // ... more campaigns
+        ],
+        "pagination": {
+            "total": 35,
+            "pages": 4,
+            "page": 1,
+            "limit": 10
+        }
+    }
+}
+```
+
+#### Error Responses
+
+| Status Code | Error Message                                                      | Description                                           |
+| ----------- | ------------------------------------------------------------------ | ----------------------------------------------------- |
+| 400         | "Invalid request parameters."                                      | Invalid link, domain not found, or campaign not found |
+| 400         | "Invalid domain '{domain}'. Domain not found for this project."    | Specified domain does not exist or doesn't belong to your project |
+| 400         | "Invalid channel '{channel}'. Channel not found."                  | Specified channel/ad network does not exist           |
+| 401         | "Unauthorized access."                                             | Missing or invalid API key                            |
+| 422         | "Invalid page number '{page}'. Page must be a positive integer..." | Page parameter is not a positive integer              |
+| 422         | "Invalid limit '{limit}'. Limit must be between 1 and 1000..."     | Limit parameter is not between 1 and 1000             |
+| 422         | "Limit {limit} exceeds maximum allowed value of 1000..."           | Limit exceeds 1000                                    |
+
+#### TypeScript Types
+
+```tsx
+interface StoreListing {
+    store_listing_id: string;
+    name: string;
+    platform: "IOS" | "ANDROID";
+}
+
+interface Campaign {
+    display_id: string;
+    name: string;
+    created_at: string;
+    update_at: string;
+    google: boolean;
+    meta: boolean;
+    meta_campaign_id: string | null;
+    meta_web_to_app: boolean;
+    active: boolean;
+    default_link: boolean;
+    attributed_users: number;
+    link: string;
+    shareable_link: string;
+    website: string | null;
+    domain: string | null;
+    store_listings: StoreListing[];
+    network_account: NetworkAccount | null;
+}
+
+interface NetworkAccount {
+    id: number;
+    name: string | null;
+    status: string;
+    capi_configured: boolean;
+}
+
+interface PaginationInfo {
+    total: number;
+    pages: number;
+    page: number;
+    limit: number;
+}
+
+interface CampaignsResponse {
+    msg: string;
+    status: number;
+    data: {
+        total_campaigns: number;
+        campaigns: Campaign[];
+        pagination: PaginationInfo;
+    };
+}
+```
+
+### 2. Get Attributed Users
+
+Retrieve a paginated list of users attributed to a specific campaign with optional time range filtering.
+
+#### Request
+
+```
+GET /attributed-users
+```
+
+#### Query Parameters
+
+| Parameter       | Type   | Required | Description                                                                                              |
+| --------------- | ------ | -------- | -------------------------------------------------------------------------------------------------------- |
+| display_id      | string | Yes      | The display ID of the campaign to retrieve attributed users for                                          |
+| start_timestamp | string | No       | Start time in RFC 3339 format with a UTC or offset suffix (e.g., `2025-06-23T10:29:26Z` or `2025-06-23T10:29:26+05:30`) |
+| end_timestamp   | string | No       | End time in RFC 3339 format with a UTC or offset suffix (e.g., `2025-06-24T10:29:26Z` or `2025-06-24T10:29:26+05:30`)   |
+| page            | number | No       | The page number to retrieve. Must be a positive integer. (default: `1`)                                  |
+| limit           | number | No       | The number of users to return per page. Must be between 1 and 1000. (default: `50`, max: `1000`)         |
+
+#### Pagination
+
+Pagination is automatically applied to all requests with the following defaults:
+
+-   **Default page**: 1
+-   **Default limit**: 50 users per page
+-   **Maximum limit**: 1000 users per page
+
+#### Time Format Details
+
+-   **RFC 3339 Format**: Use `YYYY-MM-DDThh:mm:ssZ` for UTC (e.g., `2025-06-23T10:29:26Z`) or include an explicit UTC offset (e.g., `2025-06-23T10:29:26+05:30`)
+-   **Offset is required**: Timestamps without a `Z` or offset suffix are rejected with a `400` error
+-   **Timezone handling**: Express your local time window through the offset. For example, June 23 midnight to June 24 midnight IST is `2025-06-23T00:00:00+05:30` to `2025-06-24T00:00:00+05:30`
+-   **Time Range**: Both start and end timestamps are optional; you can filter by start time only, end time only, or both
+
+<Note>
+    The legacy `timezone` query parameter is accepted for backward compatibility
+    but has no effect. Use an explicit offset in the timestamps instead.
+</Note>
+
+#### Example Requests
+
+1. **Basic Request** (returns first 50 users):
+
+```
+GET /attributed-users?display_id=XYZ123
+```
+
+2. **With Time Range** (UTC):
+
+```
+GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-23T10:29:26Z&end_timestamp=2025-06-24T10:29:26Z
+```
+
+3. **With Pagination**:
+
+```
+GET /attributed-users?display_id=XYZ123&page=2&limit=100
+```
+
+4. **With All Parameters** (timestamps in IST, URL-encode `+` as `%2B`):
+
+```
+GET /attributed-users?display_id=XYZ123&start_timestamp=2025-06-23T00:00:00%2B05:30&end_timestamp=2025-06-24T00:00:00%2B05:30&page=3&limit=200
+```
+
+#### Response
+
+```json
+{
+    "msg": "Successfully retrieved 123 attributed users for campaign XYZ123. Showing page 1 of 3.",
+    "status": 200,
+    "data": {
+        "total_users": 50,
+        "users": [
+            {
+                "attributed_at": "2024-09-23T08:13:34.417Z",
+                "ad_channel": "META",
+                "campaign_display_id": "XYZ123",
+                "campaign_name": "Summer_Promo_2024",
+                "link": null,
+                "installed_at": "2024-08-12T20:59:03.000Z",
+                "store_click_at": "2024-08-12T20:58:25.000Z",
+                "meta_ad_id": "138726495012847390",
+                "ad_creative_id": "138726495084763210",
+                "ad_creative_name": "Variation_8",
+                "ad_set_id": "138726384957162840",
+                "ad_set_name": "Engagement",
+                "publisher_platform": "instagram",
+                "platform_position": null,
+                "user_data": {
+                    "id": "user123456789",
+                    "name": "John Smith",
+                    "email": "john.smith@example.com",
+                    "phone": "+1234567890",
+                    "device_data": {
+                        "brand": "Samsung",
+                        "base_os": "",
+                        "version": "0.7.6",
+                        "build_id": "XYZ123.456",
+                        "api_level": 33,
+                        "bundle_id": "com.example.app",
+                        "device_id": "DEVICE123456",
+                        "android_id": "ANDROID987654",
+                        "device_name": "Galaxy S21",
+                        "device_type": "user",
+                        "build_number": "2219",
+                        "connectivity": "Wi-Fi",
+                        "manufacturer": "Samsung",
+                        "application_name": "ExampleApp"
+                    }
+                }
+            }
+            // ... more users
+        ],
+        "pagination": {
+            "total": 123,
+            "pages": 3,
+            "page": 1,
+            "limit": 50
+        }
+    }
+}
+```
+
+#### Error Responses
+
+| Status Code | Error Message                                                      | Description                               |
+| ----------- | ------------------------------------------------------------------ | ----------------------------------------- |
+| 400         | "Invalid timestamp format."                                        | Timestamp is not RFC 3339 or is missing a `Z`/offset suffix |
+| 401         | "Authentication failed."                                           | Invalid or missing API key                |
+| 404         | "Resource not found."                                              | Campaign does not exist in the project    |
+| 422         | "Required parameter missing."                                      | Missing required display_id parameter     |
+| 422         | "Invalid page number '{page}'. Page must be a positive integer..." | Page parameter is not a positive integer  |
+| 422         | "Invalid limit '{limit}'. Limit must be between 1 and 1000..."     | Limit parameter is not between 1 and 1000 |
+| 422         | "Limit {limit} exceeds maximum allowed value of 1000..."           | Limit exceeds 1000                        |
+
+#### TypeScript Types
+
+```tsx
+interface DeviceData {
+    brand: string;
+    base_os: string;
+    version: string;
+    build_id: string;
+    api_level: number;
+    bundle_id: string;
+    device_id: string;
+    android_id: string;
+    device_name: string;
+    device_type: string;
+    build_number: string;
+    connectivity: string;
+    manufacturer: string;
+    application_name: string;
+}
+
+interface UserData {
+    id: string | null;
+    name: string | null;
+    email: string | null;
+    phone: string | null;
+    device_data: DeviceData;
+    // Additional user data fields may be included
+    [key: string]: any;
+}
+
+interface AttributedUser {
+    attributed_at: string;
+    ad_channel: "GOOGLE" | "META" | "TIKTOK" | null;
+    campaign_display_id: string;
+    campaign_name: string;
+    link: string | null;
+    installed_at: string | null;
+    store_click_at: string | null;
+    meta_ad_id: string;
+    ad_creative_id: string;
+    ad_creative_name: string;
+    ad_set_id: string;
+    ad_set_name: string;
+    publisher_platform: string | null;
+    platform_position: string | null;
+    user_data: UserData;
+}
+
+interface PaginationInfo {
+    total: number;
+    pages: number;
+    page: number;
+    limit: number;
+}
+
+interface AttributedUsersResponse {
+    msg: string;
+    status: number;
+    data: {
+        total_users: number;
+        users: AttributedUser[];
+        pagination: PaginationInfo;
+    };
+}
+```
+
+## Campaign Domain and Store Listings
+
+### Domain Field
+
+Each campaign response now includes a `domain` field that indicates which domain is being used for the campaign links:
+
+-   **Type**: `string | null`
+-   **Description**: The domain name used to generate campaign links
+-   **Behavior**: If the campaign has a specific domain assigned, it will be shown. Otherwise, it falls back to the project's primary domain.
+-   **Example**: `"yourdomain.com"` or `"promo.example.com"`
+
+### Store Listings Array
+
+Campaigns can now include multiple store listings in the response. Each store listing represents a different App Store or Play Store configuration.
+
+**Store Listing Object Structure**:
+
+| Field              | Type               | Description                                           |
+| ------------------ | ------------------ | ----------------------------------------------------- |
+| `store_listing_id` | string             | Unique identifier for the store listing               |
+| `name`             | string             | Display name of the store listing                     |
+| `platform`         | "IOS" \| "ANDROID" | Platform this store listing is for (iOS or Android)   |
+
+**Managing Store Listings**:
+
+-   Create and manage store listings in your [Dashboard Settings](https://dashboard.linkrunner.io/dashboard/settings/store-listings)
+-   Each store listing has a unique `store_listing_id` that you use when creating campaigns
+-   Store listings allow you to configure different App Store/Play Store parameters per campaign
+
+### 3. Get Attribution Result
+
+Retrieve attribution data for a specific user or device. This endpoint returns campaign and ad network information for attributed installs.
+
+#### Request
+
+```
+GET /get-attribution-result
+```
+
+#### Query Parameters
+
+| Parameter           | Type   | Required | Description                                                                                              |
+| ------------------- | ------ | -------- | -------------------------------------------------------------------------------------------------------- |
+| device_identifier   | string | Conditional | The unique device ID to look up. For Android, this is the GAID (Google Advertising ID). For iOS, this is the IDFA (Identifier for Advertisers). Required if `user_id` is not provided. |
+| user_id             | string | Conditional | The user ID to look up. Required if `device_identifier` is not provided.                             |
+
+**Note**: At least one of `device_identifier` or `user_id` must be provided. If both are provided and they match different installs, the `user_id` based result will be returned as it's more reliable.
+
+#### Example Requests
+
+1. **Get Attribution by Device Identifier**:
+
+```
+GET /get-attribution-result?device_identifier=550e8400-e29b-41d4-a716-446655440000
+```
+
+2. **Get Attribution by User ID**:
+
+```
+GET /get-attribution-result?user_id=user123456
+```
+
+3. **Get Attribution with Both Identifiers**:
+
+```
+GET /get-attribution-result?device_identifier=550e8400-e29b-41d4-a716-446655440000&user_id=user123456
+```
+
+#### Response
+
+**Success Response (200)**:
+
+```json
+{
+    "msg": "Attribution result retrieved successfully.",
+    "status": 200,
+    "data": {
+        "campaign_name": "Summer Sale 2024",
+        "display_id": "XYZ123",
+        "ad_network_campaign_id": "120214682829390250",
+        "deeplink": "https://app.domain.com/promo/summer",
+        "domain_name": "app.domain.com",
+        "ad_set_id": "138726384957162840",
+        "ad_set_name": "Engagement Campaign",
+        "ad_creative_id": "138726495084763210",
+        "ad_creative_name": "Creative Variation 1",
+        "keyword_id": "",
+        "keyword_name": "",
+        "ad_network": "META",
+        "attribution_type": "INORGANIC"
+    }
+}
+```
+
+**No Attribution Data (204)**:
+
+If no attribution data is found for the provided identifier, the API returns a `204 No Content` status with an empty response body.
+
+#### Response Properties
+
+| Property           | Type                  | Description                                                                                             |
+| ------------------ | --------------------- | ------------------------------------------------------------------------------------------------------- |
+| `campaign_name`    | string\|null          | The name of the campaign that the user was attributed to                                                |
+| `display_id`       | string\|null          | The campaign's display identifier                                                                       |
+| `ad_network_campaign_id` | string\|null    | The ad-network campaign ID (resolves to the Google campaign ID, else Meta campaign ID, else generic ad-network campaign ID) |
+| `deeplink`         | string\|null          | The deeplink URL associated with the campaign                                                           |
+| `domain_name`      | string\|null          | The domain name used for the campaign                                                                   |
+| `ad_set_id`        | string\|null          | The ad set ID from the advertising platform (e.g., Meta Ad Set ID)                                      |
+| `ad_set_name`      | string\|null          | The ad set name from the advertising platform                                                           |
+| `ad_creative_id`   | string\|null          | The ad creative ID from the advertising platform                                                        |
+| `ad_creative_name` | string\|null          | The ad creative name from the advertising platform                                                      |
+| `keyword_id`       | string\|null          | The keyword ID (primarily for Apple Search Ads campaigns)                                               |
+| `keyword_name`     | string\|null          | The keyword name (primarily for Apple Search Ads campaigns)                                             |
+| `ad_network`       | string\|null          | The advertising network. Can be `GOOGLE`, `META`, `TIKTOK`, `APPLE_SEARCH_ADS`, or other network codes |
+| `attribution_type` | "ORGANIC"\|"INORGANIC"| Whether the install was matched to a paid or owned source (`INORGANIC`) or not (`ORGANIC`) |
+| `user_id`          | string\|null          | Your identifier for the user, as sent to `signup`                                       |
+| `gaid`             | string\|null          | Google Advertising ID (Android)                                                         |
+| `idfa`             | string\|null          | Identifier for Advertisers (iOS)                                                        |
+| `store_click_at`   | string\|null          | When the store click was recorded (ISO 8601 UTC)                                        |
+| `installed_at`     | string\|null          | When the install was recorded (ISO 8601 UTC)                                            |
+
+
+#### Error Responses
+
+| Status Code | Error Message                                        | Description                                           |
+| ----------- | ---------------------------------------------------- | ----------------------------------------------------- |
+| 400         | "Either device_identifier or user_id is required."   | Neither device_identifier nor user_id was provided    |
+| 401         | "Unauthorized access."                               | Missing or invalid API key                            |
+| 204         | No Content                                           | No attribution data found for the provided identifier |
+
+#### TypeScript Types
+
+```tsx
+type AdNetwork = "GOOGLE" | "META" | "TIKTOK" | "APPLE_SEARCH_ADS" | string;
+type AttributionType = "ORGANIC" | "INORGANIC";
+
+interface AttributionResult {
+    campaign_name: string | null;
+    display_id: string | null;
+    ad_network_campaign_id: string | null;
+    deeplink: string | null;
+    domain_name: string | null;
+    ad_set_id: string | null;
+    ad_set_name: string | null;
+    ad_creative_id: string | null;
+    ad_creative_name: string | null;
+    keyword_id: string | null;
+    keyword_name: string | null;
+    ad_network: AdNetwork | null;
+    attribution_type: AttributionType;
+    user_id: string | null;
+    gaid: string | null;
+    idfa: string | null;
+    store_click_at: string | null;
+    installed_at: string | null;
+}
+
+interface AttributionResultResponse {
+    msg: string;
+    status: number;
+    data: AttributionResult;
+}
+```
+
+## Notes
+
+-   Request timestamps use RFC 3339 format with a `Z` or offset suffix; response timestamps are returned in ISO 8601 UTC.
+-   The `device_data` object contains detailed information about the user's device.
+-   The `active` field in the campaign data indicates whether the campaign is currently active.
+-   The `attributed_users` field in the campaign data shows the number of users attributed to that campaign.
+-   User data provided in this documentation is randomized for privacy reasons. Actual API responses will contain real user data.
+-   The TypeScript types provided are based on the example responses
+-   The `domain` field shows which domain is being used for campaign link generation
+-   The `store_listings` array contains store listing configurations associated with the campaign
+-   Store listings can be created and managed in the [Dashboard Settings](https://dashboard.linkrunner.io/dashboard/settings/store-listings)
+-   The `get-attribution-result` endpoint returns a 204 status code with no body when no attribution data is found
+
+For any help please reach out to [support@linkrunner.io](mailto:support@linkrunner.io)

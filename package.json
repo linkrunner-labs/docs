@@ -1,0 +1,29 @@
+{
+    "name": "linkrunner-docs",
+    "version": "1.0.0",
+    "description": "Linkrunner documentation built with Mintlify",
+    "main": "index.js",
+    "scripts": {
+        "dev": "mintlify dev --port 3001",
+        "build": "mintlify build",
+        "check:routes": "node scripts/check-doc-routes.mjs",
+        "check:agents": "node --test scripts/check-doc-agent-files.test.mjs",
+        "preview": "mintlify preview",
+        "install-mintlify": "npm install -g mintlify",
+        "export": "next build && next export"
+    },
+    "dependencies": {
+        "jsonc-parser": "^3.3.1",
+        "mintlify": "latest"
+    },
+    "keywords": [
+        "documentation",
+        "mintlify",
+        "linkrunner"
+    ],
+    "author": "Linkrunner Team",
+    "license": "MIT",
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}

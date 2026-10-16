@@ -1,0 +1,115 @@
+---
+title: "Custom Store Listings"
+description: "Drive users to custom store listings for targeted app marketing"
+icon: "store"
+---
+
+## Overview
+
+Custom Store Listings let you create targeted marketing campaigns with tailored app presentations on Google Play and App Store. This feature integrates seamlessly with Linkrunner, allowing you to direct different audience segments to specialized store listings with unique screenshots, descriptions, and promotional content.
+
+![Custom Store Listings](/images/store-listings-dashboard.webp)
+
+## Custom Store Listings
+
+A **custom store listing** is a separate version of your app's store page with different screenshots, descriptions, and promotional content. It is **not** the same as your regular/default Play Store or App Store link.
+
+<Warning>
+Your regular store link (e.g. `https://play.google.com/store/apps/details?id=com.yourapp`) is **not** a custom store listing. Linkrunner already redirects users to your default store link automatically — you don't need to add it here.
+</Warning>
+
+### Google Play - Custom Store Listings
+
+On Google Play, custom store listings are alternate versions of your store page targeted at specific audiences. When you create one in the Google Play Console, it generates a URL with a `listing` parameter:
+
+```
+https://play.google.com/store/apps/details?id=com.yourapp&listing=your-custom-listing-id
+```
+
+The `&listing=your-custom-listing-id` part is what makes it a custom store listing.
+
+<Card title="Google Play Documentation" icon="google" href="https://support.google.com/googleplay/android-developer/answer/9867158?hl=en">
+  Learn how to create custom store listings in the Google Play Console
+</Card>
+
+### App Store - Custom Product Pages
+
+On the App Store, these are called **Custom Product Pages**. When you create one in App Store Connect, it generates a URL with a `ppid` parameter:
+
+```
+https://apps.apple.com/app/your-app/id123456789?ppid=your-custom-page-id
+```
+
+The `?ppid=your-custom-page-id` part is what makes it a custom product page.
+
+<Card title="Apple Documentation" icon="apple" href="https://developer.apple.com/app-store/custom-product-pages/">
+  Learn how to create custom product pages in App Store Connect
+</Card>
+
+## How It Works
+
+When creating a marketing campaign, you can specify a custom store listing for users to be directed to when they click on your campaign link. The system automatically appends the correct parameters to the store URLs.
+
+This allows for targeted marketing campaigns with different store presentations for different audience segments.
+
+## Setting Up Custom Store Listings
+
+### Step 1: Create a Custom Listing on Google Play / App Store
+
+Before adding a custom store listing to Linkrunner, you need to create one on the respective platform first:
+
+- **Google Play**: Go to Google Play Console → Store presence → Custom store listings → [Create custom store listing](https://support.google.com/googleplay/android-developer/answer/9867158?hl=en)
+- **App Store**: Go to App Store Connect → Custom Product Pages → [Create custom product page](https://developer.apple.com/app-store/custom-product-pages/)
+
+Once created, copy the URL of your custom store listing. It should contain a `listing` parameter (Google Play) or `ppid` parameter (App Store).
+
+### Step 2: Access Store Listings in Linkrunner
+
+Navigate to the Store Listings section in your project settings:
+
+1. Go to [https://dashboard.linkrunner.io/settings?s=store-listings](https://dashboard.linkrunner.io/settings?s=store-listings)
+2. Or access it through Settings → Store Listings in the navigation menu
+
+### Step 3: Add the Custom Store Listing
+
+1. Click on the "+ Add Listing" button
+2. Fill in the required information:
+    - **Name**: A descriptive name for your store listing (e.g. "Holiday Campaign - US")
+    - **Store Listing Link**: The full URL of your custom store listing including the `listing` or `ppid` parameter
+3. Click "Create" to save your store listing
+
+<Info>
+Linkrunner will automatically extract the custom listing identifier from the URL. If you see an error, make sure your URL contains the `listing` (Google Play) or `ppid` (App Store) parameter.
+</Info>
+
+### Step 4: Manage Your Store Listings
+
+From the Store Listings dashboard, you can:
+
+-   View all your existing store listings
+-   Edit listings by clicking the edit icon
+-   Visit the actual store page by clicking the visit icon
+-   Delete listings when they're no longer needed
+
+## Using Custom Store Listings in Campaigns
+
+### When Creating a Campaign
+
+1. Start creating a new campaign as usual
+2. Expand the "More options" section
+3. Navigate to the "Redirect to a custom store listing" option
+4. Select your desired store listing from the dropdown menu
+5. Complete the campaign creation process
+
+The selected store listing will be automatically applied to all links generated from this campaign.
+
+## Best Practices
+
+-   **Create Targeted Listings**: Design different store listings for different audience segments or marketing channels
+-   **Track Performance**: Compare conversion rates between different custom store listings to optimize your marketing strategy
+-   **Update Regularly**: Keep your custom store listings fresh with updated screenshots and descriptions
+-   **Combine with Deep Linking**: For the best user experience, pair custom store listings with deep linking to create a seamless journey from ad to in-app content
+
+---
+
+For any questions or assistance with setting up custom store listings, please contact us at [support@linkrunner.io](mailto:support@linkrunner.io).

@@ -1,0 +1,87 @@
+---
+title: "SDK-less Integration"
+description: "Integrate Linkrunner on Android by calling the REST API directly, without the native SDK."
+icon: "plug"
+---
+
+Linkrunner's native SDKs handle attribution for you. If you cannot add the Android SDK to your app, you can integrate the same way the SDK does: by calling Linkrunner's REST API directly from your app.
+
+This section lists every endpoint the SDK uses, shows where to collect each signal on the device, and gives you ready-to-use client code for Android and iOS.
+
+<Note>
+  Use the [Android SDK](/sdk/android) when you can. It handles data collection, retries, and edge cases for you. Reach for SDK-less integration only when a policy, build constraint, or custom runtime stops you from adding the SDK.
+</Note>
+
+## How it works
+
+<Steps>
+  <Step title="Register the install">
+    Call `init` with your token, the install instance ID, and device data. Linkrunner starts attribution in the background.
+  </Step>
+  <Step title="Read attribution">
+    Poll `attribution-data` with the same install instance ID until campaign data appears.
+  </Step>
+  <Step title="Identify the user">
+    Call `signup` when the user signs up or logs in. Events and payments are only stored for users who have been through `signup`.
+  </Step>
+  <Step title="Track activity">
+    Send events and payments using the same install instance ID.
+  </Step>
+</Steps>
+
+## Key concepts
+
+### Project token
+
+Every request is authenticated with your project token in the JSON body. That is the only credential these endpoints need. Find your token on the [dashboard](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
+
+### Install instance ID
+
+`install_instance_id` is a UUID your app generates once, stores, and sends on every request. It ties an install to the events, signups, and payments that follow.
+
+**Generate it a single time and persist it** (`SharedPreferences` on Android, `UserDefaults` on iOS). If you create a new one per call, every request looks like a different device and attribution falls apart.
+
+## Two things that break attribution
+
+Get these right before anything else. Both fail silently.
+
+| Rule | Why it matters |
+| --- | --- |
+| **Call the API from the device, not your backend.** | Linkrunner matches installs using the IP of the client that calls the API. If you proxy these calls through your server, every install shares one IP and matching fails. |
+| **Treat `init` as asynchronous.** | The `init` response never contains campaign data. Attribution runs in the background, so you read the result by polling [`attribution-data`](/sdk-less/api-reference#attribution-data). |
+
+## Integrate on Android
+
+<CardGroup cols={2}>
+  <Card title="Full client (recommended)" icon="android" href="/sdk-less/android-quickstart">
+    One Kotlin client that collects every signal and calls every endpoint. Closest to the real SDK.
+  </Card>
+  <Card title="Minimal example" icon="feather" href="/sdk-less/android-minimal">
+    The smallest path that still attributes: install, signup, one event, one payment.
+  </Card>
+</CardGroup>
+
+See [collecting device data on Android](/sdk-less/android-device-data) for where each field comes from.
+
+## Integrate on iOS
+
+<CardGroup cols={2}>
+  <Card title="Full client (recommended)" icon="apple" href="/sdk-less/ios-quickstart">
+    One Swift client that collects every signal, applies SKAdNetwork values, and calls every endpoint.
+  </Card>
+  <Card title="Minimal example" icon="feather" href="/sdk-less/ios-minimal">
+    The smallest path that still attributes: install, signup, one event, one payment.
+  </Card>
+</CardGroup>
+
+See [collecting device data on iOS](/sdk-less/ios-device-data) for where each field comes from.
+
+## Reference
+
+<CardGroup cols={1}>
+  <Card title="API reference" icon="code" href="/sdk-less/api-reference">
+    Every endpoint, with request and response bodies.
+  </Card>
+</CardGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

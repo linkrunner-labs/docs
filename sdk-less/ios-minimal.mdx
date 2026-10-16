@@ -1,0 +1,162 @@
+---
+title: "Minimal Integration"
+description: "The smallest iOS integration that still attributes: install, signup, event, payment."
+icon: "feather"
+---
+
+This is the leanest SDK-less path on iOS. It registers an install, reads attribution, identifies the user, and sends one event and one payment. It collects only the highest-value signals: the Apple Search Ads token, the IDFV, and the IDFA when tracking is already authorized.
+
+<Tip>
+  For production, prefer the [full client](/sdk-less/ios-quickstart). It collects more signals, applies SKAdNetwork conversion values, and retries failed requests, which improves match rates. Use this minimal version only when you want the smallest possible footprint.
+</Tip>
+
+## LinkrunnerMinimal.swift
+
+Set your project token at the top. No third-party dependencies are needed.
+
+```swift
+import Foundation
+import UIKit
+import AdSupport
+import AppTrackingTransparency
+import AdServices
+
+@available(iOS 15.0, *)
+enum LinkrunnerMinimal {
+    private static let baseURL = "https://api.linkrunner.io"
+    private static let token = "YOUR_PROJECT_TOKEN"
+    private static let installIdKey = "linkrunner_min_iid"
+
+    /// Generated once, then reused for the life of the install.
+    private static func installId() -> String {
+        if let id = UserDefaults.standard.string(forKey: installIdKey) { return id }
+        let id = UUID().uuidString
+        UserDefaults.standard.set(id, forKey: installIdKey)
+        return id
+    }
+
+    private static func base() -> [String: Any] {
+        ["token": token, "platform": "IOS", "install_instance_id": installId()]
+    }
+
+    private static func post(_ path: String, _ body: [String: Any]) async throws -> [String: Any] {
+        var request = URLRequest(url: URL(string: baseURL + path)!)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        let code = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard (200..<300).contains(code) else {
+            throw NSError(domain: "Linkrunner", code: code,
+                          userInfo: [NSLocalizedDescriptionKey: String(data: data, encoding: .utf8) ?? ""])
+        }
+        return (try? JSONSerialization.jsonObject(with: data) as? [String: Any]) ?? [:]
+    }
+
+    private static func deviceData() async -> [String: Any] {
+        var d: [String: Any] = ["brand": "Apple", "manufacturer": "Apple"]
+        if let idfv = await MainActor.run(body: { UIDevice.current.identifierForVendor?.uuidString }) {
+            d["idfv"] = idfv
+        }
+        if ATTrackingManager.trackingAuthorizationStatus == .authorized {
+            d["idfa"] = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+        }
+        if let token = try? AAAttribution.attributionToken() {
+            d["adservices_attribution_token"] = token
+        }
+        return d
+    }
+
+    // MARK: - Endpoints
+
+    @discardableResult
+    static func initialize() async throws -> [String: Any] {
+        var body = base()
+        body["device_data"] = await deviceData()
+        return try await post("/api/client/init", body)
+    }
+
+    static func attribution() async throws -> [String: Any] {
+        var body = base()
+        body["device_data"] = await deviceData()
+        return try await post("/api/client/attribution-data", body)
+    }
+
+    @discardableResult
+    static func signup(userId: String) async throws -> [String: Any] {
+        var body = base()
+        body["user_data"] = ["id": userId]
+        body["data"] = ["device_data": await deviceData()]
+        return try await post("/api/client/trigger", body)
+    }
+
+    @discardableResult
+    static func trackEvent(_ name: String, data: [String: Any]? = nil) async throws -> [String: Any] {
+        var body = base()
+        body["event_name"] = name
+        if let data { body["event_data"] = data }
+        return try await post("/api/client/capture-event", body)
+    }
+
+    @discardableResult
+    static func capturePayment(userId: String, amount: Double, paymentId: String) async throws -> [String: Any] {
+        var body = base()
+        body["user_id"] = userId
+        body["amount"] = amount
+        body["payment_id"] = paymentId
+        body["status"] = "PAYMENT_COMPLETED"
+        return try await post("/api/client/capture-payment", body)
+    }
+}
+```
+
+## Using it
+
+Register the install and read attribution on app start.
+
+```swift
+import SwiftUI
+
+@main
+struct MyApp: App {
+    init() {
+        Task {
+            // 1. Register the install
+            try? await LinkrunnerMinimal.initialize()
+
+            // 2. Read attribution (poll until campaign_data appears)
+            for _ in 0..<5 {
+                let data = (try? await LinkrunnerMinimal.attribution())?["data"] as? [String: Any]
+                if let campaign = data?["campaign_data"] as? [String: Any] {
+                    print("Attributed: \(campaign)")
+                    break
+                }
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+            }
+        }
+    }
+
+    var body: some Scene {
+        WindowGroup { ContentView() }
+    }
+}
+```
+
+Then identify the user and track activity.
+
+```swift
+// 3. When the user signs up or logs in
+Task { try? await LinkrunnerMinimal.signup(userId: "user_123") }
+
+// 4. Track an event
+Task { try? await LinkrunnerMinimal.trackEvent("purchase_initiated", data: ["amount": 99.99]) }
+
+// 5. Capture a payment
+Task { try? await LinkrunnerMinimal.capturePayment(userId: "user_123", amount: 99.99, paymentId: "payment_123") }
+```
+
+<Warning>
+  Call from the device so Linkrunner sees the device IP. To collect the IDFA, request App Tracking Transparency first (see the [full client](/sdk-less/ios-quickstart)).
+</Warning>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

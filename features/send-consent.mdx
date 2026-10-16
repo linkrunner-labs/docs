@@ -1,0 +1,179 @@
+---
+title: "Send Consent"
+description: "Report DMA consent signals with your installs and events"
+icon: "user-shield"
+sidebarTitle: "Send Consent"
+---
+
+## What this consent is for
+
+Google's [EU User Consent Policy](https://www.google.com/about/company/user-consent-policy/) and the EU **Digital Markets Act (DMA)** require you to tell Google what a user agreed to before Google may use their conversion. Enforcement began on 6 March 2024.
+
+It applies to end users located in the **European Economic Area** (the 27 EU states plus Iceland, Liechtenstein, and Norway), the **United Kingdom**, and **Switzerland**. It follows the user's location, not where your company is based.
+
+Linkrunner forwards these values with every install and event it sends to Google. Report nothing for an in-scope user and Google has less to match on, so conversions can be dropped and campaign performance suffers.
+
+**By default Linkrunner sends nothing.** Every signal starts as `unknown` until you set it, and unknown signals are left out of the request entirely. Linkrunner never fills in a default on your behalf, in either direction, so a user's consent state is only ever what your app reported.
+
+<Note>
+    Other privacy laws (India's DPDP Act, Brazil's LGPD, and so on) are separate frameworks with no Google conversion parameter. For a user outside the EEA, the UK, and Switzerland, report `isEEA` as denied and leave the other two unset.
+</Note>
+
+## The three signals
+
+| SDK field | Sent to Google as | Denied (`0`) | Granted (`1`) |
+| --- | --- | --- | --- |
+| `isEEA` | `eea` | European regulations do not apply to this user | They do apply |
+| `hasConsentForDataUsage` | `ad_user_data` | The user refused sending user-level data to Google | The user agreed |
+| `hasConsentForAdsPersonalization` | `ad_personalization` | The user refused ads personalization | The user agreed |
+
+Each signal is `granted`, `denied`, or `unknown`. Google treats all three as required whenever their value is known, which cuts both ways:
+
+- A value you know **must** be sent.
+- A value you do not know **must not** be invented.
+
+Linkrunner drops any signal left `unknown` instead of sending it as a denial, so a choice your user never made is never reported on their behalf. Never map `unknown` to `granted`.
+
+<Note>
+    Google also requires `lat` (limit ad tracking), but you do not set it. Linkrunner derives it from the device. A missing advertising ID is not a consent signal and is never treated as one.
+</Note>
+
+## What to report
+
+<Warning>
+    **For users outside the EEA, the UK, and Switzerland, report `isEEA` as denied and leave the other two unset.** The DMA does not apply to them, so `ad_user_data` and `ad_personalization` are not required.
+</Warning>
+
+<Tabs>
+  <Tab title="User outside the EEA, UK, Switzerland">
+    Report `isEEA` as denied and leave the other two unset. The DMA does not apply, so `ad_user_data` and `ad_personalization` are not required for this user. Send them only if you genuinely know them.
+
+    ```kotlin
+    LinkRunner.getInstance().setConsent(
+        LinkrunnerConsent(isEEA = ConsentStatus.DENIED)
+    )
+    ```
+
+    The two omitted fields default to `UNKNOWN` and are dropped from the payload.
+  </Tab>
+
+  <Tab title="User inside the EEA, UK, Switzerland">
+    Report all three from the answers your consent screen actually collected.
+
+    ```kotlin
+    LinkRunner.getInstance().setConsent(
+        LinkrunnerConsent(
+            isEEA = ConsentStatus.GRANTED,
+            hasConsentForDataUsage = ConsentStatus.GRANTED,
+            hasConsentForAdsPersonalization = ConsentStatus.DENIED
+        )
+    )
+    ```
+
+    The values above are only an example of the shape of the call, not what you should send. Report whatever the user actually chose. Denying personalization while granting data usage is a normal combination, not a mistake.
+  </Tab>
+
+  <Tab title="You do not know yet">
+    Leave the signal `unknown`, which is what it is before you set anything. Linkrunner omits it.
+
+    ```kotlin
+    LinkRunner.getInstance().setConsent(
+        LinkrunnerConsent(isEEA = ConsentStatus.UNKNOWN)
+    )
+    ```
+
+    This is the correct state before your consent screen has been answered. Call `setConsent` again once the user chooses.
+  </Tab>
+</Tabs>
+
+<Warning>
+    Do not guess the region. If you cannot determine whether the user is in scope, leave `isEEA` unknown rather than assuming denied. Reporting a European user as non-European applies the wrong rule set to their conversion.
+</Warning>
+
+## Collecting consent
+
+A **Consent Management Platform (CMP)** shows the consent screen at first launch and stores the answers, or you can build the screen yourself. Either way, you read the answers and report them with `setConsent`.
+
+<Steps>
+  <Step title="Ask the user">
+    Show your consent screen at first launch, before you initialize the SDK. Ask whether they agree to their data being sent to Google for advertising, and whether they agree to it being used to personalize ads.
+  </Step>
+
+  <Step title="Determine whether the user is in scope">
+    Most CMPs detect this for you. Otherwise resolve it server side from the IP address. If you cannot resolve it, leave `isEEA` unknown.
+  </Step>
+
+  <Step title="Call setConsent before you initialize">
+    Map each answer to `granted`, `denied`, or `unknown`, then pass them in. The first payload has to carry the right state, so this must run before `init`.
+
+    The values below are an example. Send what the user actually chose, never a hardcoded set.
+
+    <Tabs>
+      <Tab title="Android">
+        ```kotlin
+        import io.linkrunner.sdk.models.ConsentStatus
+        import io.linkrunner.sdk.models.LinkrunnerConsent
+
+        LinkRunner.getInstance().setConsent(
+            LinkrunnerConsent(
+                isEEA = ConsentStatus.GRANTED,
+                hasConsentForDataUsage = ConsentStatus.GRANTED,
+                hasConsentForAdsPersonalization = ConsentStatus.DENIED
+            )
+        )
+        ```
+      </Tab>
+      <Tab title="iOS">
+        ```swift
+        LinkrunnerSDK.shared.setConsent(
+            LinkrunnerConsent(
+                isEEA: .granted,
+                hasConsentForDataUsage: .granted,
+                hasConsentForAdsPersonalization: .denied
+            )
+        )
+        ```
+      </Tab>
+      <Tab title="React Native">
+        ```javascript
+        linkrunner.setConsent({
+            isEEA: "granted",
+            hasConsentForDataUsage: "granted",
+            hasConsentForAdsPersonalization: "denied",
+        });
+        ```
+      </Tab>
+      <Tab title="Flutter">
+        ```dart
+        await LinkRunner().setConsent(
+          LRConsent(
+            isEEA: ConsentStatus.GRANTED,
+            hasConsentForDataUsage: ConsentStatus.GRANTED,
+            hasConsentForAdsPersonalization: ConsentStatus.DENIED,
+          ),
+        );
+        ```
+      </Tab>
+      <Tab title="Expo">
+        ```javascript
+        linkrunner.setConsent({
+            isEEA: "granted",
+            hasConsentForDataUsage: "granted",
+            hasConsentForAdsPersonalization: "denied",
+        });
+        ```
+      </Tab>
+      <Tab title="Unity">
+        ```csharp
+        LinkrunnerSDK.SetConsent("granted", "granted", "denied");
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Call it again whenever the choice changes">
+    Consent is stored between launches, so the last value you set keeps being sent. If the user reopens your privacy settings and withdraws consent, call `setConsent` again or you will keep reporting the old answer.
+  </Step>
+</Steps>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

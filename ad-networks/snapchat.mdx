@@ -1,0 +1,258 @@
+---
+title: "Snapchat Ads"
+description: "Run Snapchat ads for your app with in-app event optimization and deferred deep linking"
+icon: "/images/logos/snapchat.png"
+---
+
+## Overview
+
+Linkrunner sends your app's installs and in-app events to Snapchat through Snapchat's Conversions API. Where they go depends on what you add to your Snapchat account in Linkrunner, and on how each user reached your app:
+
+| You add | Snapchat receives | Linkrunner sends | Use it for |
+| --- | --- | --- | --- |
+| A **Snap App ID** for Android, iOS, or both | App events on your Snap App | Installs, sign ups, and mapped in-app events from that platform, from users who did not come through your Linkrunner campaign link. | Sharing your app events with Snapchat |
+| A **Pixel ID** | Web events on your Pixel | Installs, sign ups, and mapped in-app events from users who clicked a Snapchat ad through your Linkrunner campaign link | Web-to-app campaigns |
+
+You can add both. Linkrunner decides for each user: users who clicked a Snapchat ad through your Linkrunner campaign link go to your Pixel, and other users go to your Snap App. Adding a Snap App ID does not move those users off your Pixel.
+
+<Note>
+    Linkrunner attributes an install to Snapchat only when the user came through your Linkrunner campaign link. Installs that Linkrunner reports as organic are sent to your Snap App ID, and Snapchat matches them to its ads in its own reporting. Snapchat's install count can differ from Linkrunner's because Snapchat also credits users who only viewed an ad. To compare the two, choose an attribution window without view-through in Snapchat Ads Manager reporting.
+</Note>
+
+## Setup Process
+
+| Step | Where | What you do |
+| --- | --- | --- |
+| 1 | Linkrunner and Snapchat Ads Manager | Add your Snapchat account, create a Pixel, and copy its Pixel ID and Access Token |
+| 2 | Snapchat Ads Manager | Optional: create a Snap App ID |
+| 3 | Linkrunner | Enter your Snap App IDs, Pixel ID, and Access Token |
+| 4 | Linkrunner and Snapchat Ads Manager | Send a test event and check that Snapchat received it |
+| 5 | Snapchat Ads Manager and Linkrunner | Create your campaign |
+
+## 1. Configuring Pixel in Snapchat Ads Manager
+
+This process takes approximately 5 minutes and connects your app tracking with Snapchat's advertising platform.
+
+### Step 1: Connect Snapchat Account on Linkrunner
+
+1. Go to [Snapchat Integration tab on Linkrunner](https://dashboard.linkrunner.io/dashboard/integrations/snapchat-ads)
+
+### Step 2: Add Snapchat Account
+
+1. Click **Add Snapchat Account** to add your Snapchat Ad accounts
+
+![Linkrunner - Snapchat Integration](/images/snapchat-ss/image_1.png)
+
+### Step 3: Navigate to Snapchat Ads Manager
+
+1. Go to [Snapchat Ads Manager](https://ads.snapchat.com/)
+2. Click the menu from the top left corner and select **Pixels**
+
+![Snapchat Ads Manager - Pixels Menu](/images/snapchat-ss/image_2.png)
+
+### Step 4: Create Pixel
+
+1. Click **Create Pixel**
+
+![Snapchat Ads Manager - Create Pixel](/images/snapchat-ss/image_3.png)
+
+### Step 5: Name Your Pixel
+
+1. Add a name for your Pixel
+2. Click **Create my Snap Pixel**
+
+![Snapchat Ads Manager - Name Pixel](/images/snapchat-ss/image_4.png)
+
+### Step 6: Skip Website URL
+
+1. Skip the website URL dialog
+
+![Snapchat Ads Manager - Skip Website URL](/images/snapchat-ss/image_5.png)
+
+### Step 7: Select Manual Setup
+
+1. In **Event setup method**, select **Manual set-up**
+
+![Snapchat Ads Manager - Manual Setup](/images/snapchat-ss/image_6.png)
+
+### Step 8: Select Conversion API
+
+1. For **Set up web events**, select **Conversion API**
+
+![Snapchat Ads Manager - Conversion API](/images/snapchat-ss/image_7.png)
+
+### Step 9: Choose Manual Set-up Method
+
+1. For **Set-up method**, select **Manual set-up**
+
+![Snapchat Ads Manager - Manual Set-up Method](/images/snapchat-ss/image_8.png)
+
+### Step 10: Select Events to Track
+
+1. In **Event source set-up**, select all the events you want to track
+
+![Snapchat Ads Manager - Select Events](/images/snapchat-ss/image_9.png)
+
+### Step 11: Select Event Parameters
+
+1. Select the parameters for your events
+
+![Snapchat Ads Manager - Event Parameters](/images/snapchat-ss/image_10.png)
+
+### Step 12: Copy Credentials
+
+1. Copy the **Access Token** and **Pixel ID**
+
+![Snapchat Ads Manager - Copy Credentials](/images/snapchat-ss/image_11.png)
+
+## 2. Creating a Snap App ID
+
+This section is optional. Skip it if you only want events sent to your Pixel.
+
+Snapchat records app events, such as installs and purchases, on a Snap App ID. Linkrunner does not import Snap App IDs from Snapchat, so you copy yours from Snapchat Ads Manager.
+
+### Step 1: Open Apps
+
+1. In [Snapchat Ads Manager](https://ads.snapchat.com/), click the menu in the top left corner and select **Apps** under **Assets**
+
+![Snapchat Ads Manager menu with Apps under Assets](/images/snapchat-ss/snapchat-ads-manager-menu-apps.webp)
+
+### Step 2: Create your Snap App
+
+1. Click **Add an App**
+2. Keep **Create a new Snap App ID** selected, enter an **App Name**, and fill in **iOS App ID** (your App Store ID), **Android App URL** (your Android package name), or both
+3. Click **Continue**
+
+One Snap App can cover both your iOS and Android apps, or you can create one for each store. Snapchat's guide [Generate Your Snap App ID](https://businesshelp.snapchat.com/s/article/generate-snap-app-id?language=en_US) has more detail.
+
+![The Create a Snap App ID window in Snapchat Business Manager](/images/snapchat-ss/snapchat-create-snap-app-id.webp)
+
+### Step 3: Copy the Snap App ID
+
+1. The **Apps** page lists each Snap App with its **App ID** under the app name. Copy it for each app. It looks like `9b5b83ec-c593-4a64-9c6d-a0eb9da0edb9`.
+
+![The Apps page in Snapchat Business Manager showing the App ID under the app name](/images/snapchat-ss/snapchat-apps-list-snap-app-id.webp)
+
+<Warning>
+    A Snap App ID is not your App Store ID (such as `1234567890`) or your Android package name (such as `com.example.app`). Linkrunner rejects those values in the Snap App ID fields.
+</Warning>
+
+### Step 4: Check your store links in Linkrunner
+
+Linkrunner includes your app's store ID in every app event it sends to Snapchat. Open [Settings → Project Details](https://dashboard.linkrunner.io/dashboard/settings/project-details) and check that:
+
+-   **Playstore URL** is your app's Google Play listing, such as `https://play.google.com/store/apps/details?id=com.example.app`
+-   **App Store URL** is your app's own App Store page, such as `https://apps.apple.com/app/id1234567890`, not a developer page
+
+If Linkrunner finds no App Store ID for your iOS app, it does not send iOS app events.
+
+## 3. Configuring Snapchat on Linkrunner
+
+### Step 1: Open the configuration
+
+1. Go to the [Snapchat integration on Linkrunner](https://dashboard.linkrunner.io/dashboard/integrations/snapchat-ads) and open the **Pixel Management** tab
+2. Click the three dots of the Snapchat account you added
+3. Click **Configure Pixel**
+
+![Linkrunner - Configure Pixel Menu](/images/snapchat-ss/image_12.png)
+
+### Step 2: Enter your IDs and Access Token
+
+1. In **Snap App ID (Android)** and **Snap App ID (iOS)**, paste the Snap App ID for each platform from section 2. If one Snap App covers both stores, enter it in both fields. Leave a field empty for a platform you do not want to send app events for.
+2. In **Pixel ID**, paste the Pixel ID from section 1. You need a Pixel ID, a Snap App ID, or both. If you run web-to-app campaigns, keep the Pixel ID after you add a Snap App ID: users who clicked a Snapchat ad through your Linkrunner campaign link still go to your Pixel.
+3. In **Access Token**, paste the Access Token from section 1. Linkrunner uses this one token for your Pixel and your Snap App IDs.
+4. Click **Save Configuration**
+
+![The Configure Snapchat Pixel and App window in Linkrunner with Android and iOS Snap App IDs, a Pixel ID, and a saved Access Token](/images/snapchat-ss/linkrunner-snapchat-pixel-and-app-config.webp)
+
+To add a Snap App ID to an account you already configured, open **Configure Pixel** again, enter the Snap App ID, and click **Save Configuration**. Fields showing `****` keep their saved values, so you do not need to paste the Access Token again.
+
+## 4. Sending a test event
+
+**Install** and **Sign up** are always sent as `APP_INSTALL` and `SIGN_UP`. Map any other in-app events that Snapchat should receive on the **Event Mapping** tab.
+
+1. Open the **Event Mapping** tab of the [Snapchat integration on Linkrunner](https://dashboard.linkrunner.io/dashboard/integrations/snapchat-ads)
+2. Click the send icon on a mapping row. Linkrunner sends the test as an app event to each Snap App ID you added. If you added no Snap App ID, or Snapchat accepts none of the app events, Linkrunner tests your Pixel instead.
+3. In [Snapchat Ads Manager](https://ads.snapchat.com/), open **Events Manager** from the top left menu, select your Snap App under **Event Sources**, and check that **Last Event Received** shows the test event
+
+![The Snapchat Event Mapping tab in Linkrunner with a send icon on each mapping row](/images/snapchat-ss/linkrunner-snapchat-send-test-event.webp)
+
+![A Snap App in Snapchat Events Manager showing Total Events and Last Event Received](/images/snapchat-ss/snapchat-events-manager-snap-app.webp)
+
+If no test event reaches Snapchat, the error message says why. For example, an iOS Snap App ID needs your App Store URL (section 2, step 4). A success message can still mean one platform was skipped, so check **Last Event Received** for each Snap App.
+
+<Note>
+    **At this point your Snapchat setup is complete.** Linkrunner sends events from users who clicked a Snapchat ad through your Linkrunner campaign link to your Pixel, and events from other users to the Snap App for their platform.
+</Note>
+
+## 5. Setting up your first Snapchat campaign
+
+These steps create a web-to-app campaign that sends users through your Linkrunner campaign link.
+
+### Step 1: Navigate to Manage Ads
+
+1. Go to [Snapchat Ads Manager](https://ads.snapchat.com/)
+2. Click the menu from the top left corner and select **Manage Ads**
+
+![Snapchat Ads Manager - Manage Ads](/images/snapchat-ss/image_14.png)
+
+### Step 2: Choose Campaign Objective
+
+1. Choose the objective for your campaign
+
+![Snapchat Campaign - Choose Objective](/images/snapchat-ss/image_15.png)
+
+### Step 3: Select Manual Build
+
+1. Choose **Manual Build**
+
+![Snapchat Campaign - Manual Build](/images/snapchat-ss/image_16.png)
+
+### Step 4: Add Campaign Info
+
+1. Add info for your Campaign
+
+![Snapchat Campaign - Campaign Info](/images/snapchat-ss/image_17.png)
+
+### Step 5: Add Ad Set Details
+
+1. Add ad set details
+
+![Snapchat Campaign - Ad Set Details](/images/snapchat-ss/image_18.png)
+
+### Step 6: Create Linkrunner Campaign Links
+
+1. Go to [Linkrunner Dashboard](https://dashboard.linkrunner.io)
+2. Create a new campaign for each ad creative you plan to run
+3. Select **Snapchat** as the ad channel and select an Ad account
+4. Copy the **Shareable campaign link** for each campaign
+
+![Linkrunner - Create Snapchat Campaign](/images/snapchat-ss/image_19.png)
+
+### Step 7: Add Website URL for the Creative
+
+1. For every ad you create, add a different **Linkrunner Campaign Link** in the **Website URL** field
+2. This allows you to track performance for each ad creative separately
+
+![Snapchat Campaign - Website URL](/images/snapchat-ss/image_20.png)
+
+### Step 8: Publish the Campaign
+
+1. Review your campaign settings and publish
+
+![Snapchat Campaign - Publish](/images/snapchat-ss/image_21.png)
+
+## Deferred Deep Linking
+
+One of the powerful features of running Snapchat ads with Linkrunner is deferred deep linking support:
+
+-   If your campaign includes deep link parameters, Linkrunner ensures that **after the install and first open**, users land on the correct in-app content
+-   This means a user who clicked an ad for a specific product but hadn't installed your app yet will still be taken directly to that product screen inside the app after installation
+-   Works seamlessly across both iOS and Android platforms
+
+<Tip>
+    Start by optimizing on simple events like app installs or sign-ups before moving to more complex conversion events
+    like purchases. This helps Snapchat's algorithm gather initial data.
+</Tip>
+
+For any questions or assistance with Snapchat Ads integration, please contact us at [support@linkrunner.io](mailto:support@linkrunner.io).

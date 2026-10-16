@@ -1,0 +1,382 @@
+{
+    "$schema": "https://mintlify.com/docs.json",
+    "theme": "mint",
+    "name": "Linkrunner",
+    "colors": {
+        "primary": "#4D4BF7",
+        "light": "#8F8DFF",
+        "dark": "#3D3BD6"
+    },
+    "favicon": "/favicon.svg",
+    "navigation": {
+        "tabs": [
+            {
+                "tab": "Guides",
+                "groups": [
+                    {
+                        "group": "Getting Started",
+                        "pages": ["introduction", "quickstart", "features/website-projects", "ai-agent-skills"]
+                    },
+                    {
+                        "group": "SDK Guides",
+                        "pages": [
+                            "testing/integration-testing",
+                            "testing/event-and-revenue-testing",
+                            "testing/web-sdk-testing",
+                            "testing/meta-android-attribution-testing",
+                            "sdk/react-native",
+                            "sdk/flutter",
+                            "sdk/capacitor",
+                            "sdk/cordova",
+                            "sdk/ios",
+                            "sdk/android",
+                            "sdk/expo",
+                            "sdk/appbrew",
+                            "sdk/web",
+                            "sdk/unity",
+                            "sdk/shopify"
+                        ]
+                    },
+                    {
+                        "group": "Links & Journeys",
+                        "pages": [
+                            "features/subdomain-setup",
+                            "features/deep-linking-setup",
+                            "features/deferred-deep-linking",
+                            "features/web-to-app-journeys",
+                            "features/push-notification-tracking",
+                            "features/push-notification-providers",
+                            "features/link-redirection",
+                            "features/deep-link-management",
+                            "features/referral-codes",
+                            "features/custom-store-listing",
+                            "features/social-media-intermediary-page"
+                        ]
+                    },
+                    {
+                        "group": "Analytics",
+                        "pages": ["features/users-tab", "features/events-tab", "features/data-export"]
+                    },
+                    {
+                        "group": "Measurement & Privacy",
+                        "pages": [
+                            "features/uninstall-tracking",
+                            "features/retention",
+                            "features/meta-install-referrer",
+                            "features/send-consent",
+                            "features/ios-campaign-data-limitations",
+                            "features/attribution-windows",
+                            "features/fraud-control",
+                            {
+                                "group": "SKAdNetwork",
+                                "icon": "apple",
+                                "pages": [
+                                    "features/skadnetwork-integration",
+                                    "features/google-skan-setup",
+                                    "features/meta-skan-setup",
+                                    "features/skadnetwork-conversion-values",
+                                    {
+                                        "group": "SKAN Dashboard",
+                                        "icon": "gauge",
+                                        "pages": [
+                                            "features/skan-dashboard/overview",
+                                            "features/skan-dashboard/stats-cards",
+                                            "features/skan-dashboard/privacy-tiers",
+                                            "features/skan-dashboard/conversion-values",
+                                            "features/skan-dashboard/trend-graph",
+                                            "features/skan-dashboard/conversion-table"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "group": "Remarketing",
+                        "pages": [
+                            "features/remarketing-guide",
+                            "features/remarketing",
+                            {
+                                "group": "Creating Audience Segments",
+                                "pages": [
+                                    "features/remarketing-audience-segments",
+                                    "features/remarketing-audience-events",
+                                    "features/remarketing-audience-upload"
+                                ]
+                            },
+                            "features/remarketing-campaigns"
+                        ]
+                    },
+                    {
+                        "group": "Billing",
+                        "pages": ["billing/overview", "billing/wallet"]
+                    },
+                    {
+                        "group": "Troubleshooting",
+                        "pages": [
+                            "testing/testing-attribution-troubleshooting",
+                            "ad-networks/google-ads-discrepancies",
+                            "ad-networks/meta-ads-discrepancies",
+                            "ad-networks/meta-view-through-attribution"
+                        ]
+                    },
+                    {
+                        "group": "SDK-less Integration",
+                        "pages": [
+                            "sdk-less/introduction",
+                            {
+                                "group": "Android",
+                                "icon": "android",
+                                "pages": [
+                                    "sdk-less/android-quickstart",
+                                    "sdk-less/android-device-data",
+                                    "sdk-less/android-minimal"
+                                ]
+                            },
+                            {
+                                "group": "iOS",
+                                "icon": "apple",
+                                "pages": [
+                                    "sdk-less/ios-quickstart",
+                                    "sdk-less/ios-device-data",
+                                    "sdk-less/ios-minimal"
+                                ]
+                            },
+                            "sdk-less/api-reference"
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": "Integrations",
+                "groups": [
+                    {
+                        "group": "Ad Networks",
+                        "pages": [
+                            "ad-networks/google-ads",
+                            "features/google-icm",
+                            "ad-networks/meta-ads",
+                            "ad-networks/tiktok",
+                            "ad-networks/snapchat",
+                            "ad-networks/reddit-ads",
+                            "ad-networks/chatgpt-ads",
+                            "ad-networks/sharechat-ads",
+                            "ad-networks/linkedin-ads",
+                            "ad-networks/meta-web-to-app"
+                        ]
+                    },
+                    {
+                        "group": "Analytics Integrations",
+                        "pages": [
+                            "analytics-integrations/amplitude",
+                            "analytics-integrations/braze",
+                            "analytics-integrations/clevertap",
+                            "analytics-integrations/ga4",
+                            "analytics-integrations/mixpanel",
+                            "analytics-integrations/moengage",
+                            "analytics-integrations/netcore",
+                            "analytics-integrations/posthog",
+                            "analytics-integrations/revenuecat",
+                            "analytics-integrations/webengage"
+                        ]
+                    },
+                    {
+                        "group": "Ecommerce Manager",
+                        "pages": [
+                            "ecommerce-manager/meta-commerce-manager",
+                            "ecommerce-manager/google-commerce-manager"
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": "API Reference",
+                "groups": [
+                    {
+                        "group": "API Reference",
+                        "pages": [
+                            "api-reference/data-apis",
+                            "api-reference/revenue-tracking",
+                            "api-reference/event-capture",
+                            "api-reference/campaign-apis",
+                            "api-reference/s2s-clicks",
+                            "api-reference/s2s-impressions",
+                            "api-reference/reporting-campaigns",
+                            "api-reference/reporting-web-campaigns"
+                        ]
+                    },
+                    {
+                        "group": "Developer Tools",
+                        "pages": [
+                            "features/webhooks",
+                            "features/mcp"
+                        ]
+                    }
+                ]
+            },
+            {
+                "tab": "Partners",
+                "groups": [
+                    {
+                        "group": "Affiliate Partners",
+                        "pages": [
+                            "affiliate-partners/getting-started",
+                            "affiliate-partners/overview",
+                            "affiliate-partners/create-account",
+                            "affiliate-partners/add-agency-account",
+                            "affiliate-partners/create-campaign-link",
+                            "affiliate-partners/tracking-links",
+                            "affiliate-partners/s2s-clicks",
+                            "affiliate-partners/s2s-impressions",
+                            "affiliate-partners/turn-on-s2s-clicks",
+                            "affiliate-partners/postbacks",
+                            "affiliate-partners/event-mapping",
+                            "affiliate-partners/postback-logs",
+                            "affiliate-partners/fraud-data"
+                        ]
+                    },
+                    {
+                        "group": "Affiliate APIs",
+                        "pages": [
+                            "affiliate-partners/affiliate-apis"
+                        ]
+                    },
+                    {
+                        "group": "Affiliate Platforms",
+                        "pages": [
+                            "integrations/everflow"
+                        ]
+                    },
+                    {
+                        "group": "Agency Partners",
+                        "pages": [
+                            "agency-partners/overview",
+                            "agency-partners/accept-invitation",
+                            "agency-partners/add-affiliate-account",
+                            "agency-partners/manage-workspace",
+                            "agency-partners/create-campaign-link",
+                            "agency-partners/campaigns-for-affiliates",
+                            "agency-partners/invite-an-agency",
+                            "agency-partners/control-agency-access"
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "logo": {
+        "light": "/logo/light.svg",
+        "dark": "/logo/dark.svg"
+    },
+    "navbar": {
+        "links": [
+            {
+                "label": "Support",
+                "href": "mailto:support@linkrunner.io"
+            }
+        ],
+        "primary": {
+            "type": "button",
+            "label": "Dashboard",
+            "href": "https://dashboard.linkrunner.io"
+        }
+    },
+    "redirects": [
+        {
+            "source": "/sdk/react-native/installation",
+            "destination": "/sdk/react-native"
+        },
+        {
+            "source": "/sdk/react-native/usage",
+            "destination": "/sdk/react-native"
+        },
+        {
+            "source": "/sdk/flutter/installation",
+            "destination": "/sdk/flutter"
+        },
+        {
+            "source": "/sdk/flutter/usage",
+            "destination": "/sdk/flutter"
+        },
+        {
+            "source": "/sdk/flutter/uninstall-tracking",
+            "destination": "/sdk/flutter"
+        },
+        {
+            "source": "/sdk/ios/installation",
+            "destination": "/sdk/ios"
+        },
+        {
+            "source": "/sdk/ios/usage",
+            "destination": "/sdk/ios"
+        },
+        {
+            "source": "/sdk/android/installation",
+            "destination": "/sdk/android"
+        },
+        {
+            "source": "/sdk/android/usage",
+            "destination": "/sdk/android"
+        },
+        {
+            "source": "/sdk/expo/installation",
+            "destination": "/sdk/expo"
+        },
+        {
+            "source": "/sdk/expo/migration-guide",
+            "destination": "/sdk/expo"
+        },
+        {
+            "source": "/sdk/deep-linking/setup",
+            "destination": "/features/deep-linking-setup"
+        },
+        {
+            "source": "/sdk/deep-linking/verification",
+            "destination": "/features/deep-linking-setup"
+        },
+        {
+            "source": "/features/deep-linking-verification",
+            "destination": "/features/deep-linking-setup"
+        },
+        {
+            "source": "/sdk/skadnetwork/integration",
+            "destination": "/features/skadnetwork-integration"
+        },
+        {
+            "source": "/sdk/skadnetwork/conversion-values",
+            "destination": "/features/skadnetwork-conversion-values"
+        },
+        {
+            "source": "/sdk/integration-testing",
+            "destination": "/testing/integration-testing"
+        },
+        {
+            "source": "/feature/custom-store-listing",
+            "destination": "/features/custom-store-listing"
+        },
+        {
+            "source": "/feature/referral-codes",
+            "destination": "/features/referral-codes"
+        },
+        {
+            "source": "/feature/deferred-deep-linking",
+            "destination": "/features/deferred-deep-linking"
+        },
+        {
+            "source": "/feature/uninstall-tracking",
+            "destination": "/features/uninstall-tracking"
+        },
+        {
+            "source": "/web-to-app/google",
+            "destination": "/ad-networks/google-ads"
+        },
+        {
+            "source": "/ad-networks/google-web-to-app",
+            "destination": "/ad-networks/google-ads"
+        },
+        {
+            "source": "/ecommerce-manager/google-merchant-center",
+            "destination": "/ecommerce-manager/google-commerce-manager"
+        }
+    ]
+}

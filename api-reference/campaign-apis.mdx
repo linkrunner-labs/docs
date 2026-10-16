@@ -1,0 +1,510 @@
+---
+title: "Campaign APIs"
+description: "Documentation for Linkrunner Campaign APIs"
+icon: "rocket"
+---
+
+## Base URL
+
+```
+https://api.linkrunner.io/api/v1
+```
+
+## Authentication
+
+All API requests require authentication using an API key. You must include this key in the header of every request.
+
+### API Key Header
+
+Include the following header in all API requests:
+
+```
+linkrunner-key: YOUR_API_KEY
+```
+
+Replace `YOUR_API_KEY` with your actual API key.
+
+### Obtaining Your API Key
+
+You can find your API key on the Linkrunner settings page:
+
+1. Go to https://dashboard.linkrunner.io/settings?s=data-apis
+2. Locate your Server key on this page
+3. Use this key in the `linkrunner-key` header for all API requests
+
+Keep your API key confidential. Do not share it or expose it in client-side code. Always make API requests from a secure server-side environment.
+
+### Error Responses
+
+-   **401 Unauthorized**
+    -   `"Server key missing!"`
+    -   `"Server key invalid!"`
+-   **429 Too Many Requests**
+-   Message: `"Rate limit exceeded. Please try again later."`
+-   Cause: You've exceeded the rate limit of 10 requests per second.
+
+### Rate Limit Details
+
+-   Rate: 10 requests per second
+-   Status code on limit exceeded: 429 (Too Many Requests)
+
+## Endpoints
+
+### 1. List Campaigns
+
+For getting/listing existing campaigns, please refer to the [List Campaigns API documentation](https://docs.linkrunner.io/api-reference/data-apis#1-list-campaigns).
+
+### 2. Create Campaign
+
+Create a new campaign. You can optionally create a short link by including the `is_shortlink: true` parameter. To group Linkrunner links under a project-level custom channel such as WhatsApp, Offline QR, or CleverTap Push, include `custom_channel_names`.
+
+#### Request
+
+```
+POST /create-campaign
+```
+
+#### Request Body Examples
+
+**Creating Campaign:**
+
+```json
+{
+    "name": "Summer Sale 2023",
+    "deeplink": "https://app.domain.com/promo/summer25",
+    "link_for_desktop_users": "https://www.your-website.com",
+    "custom_display_id": "summer-sale-2025",
+    "is_shortlink": false //pass this as true to create a shortened campaign link
+}
+```
+
+**Creating Campaign with a Custom Channel:**
+
+```json
+{
+    "name": "WhatsApp Summer Sale 2025",
+    "deeplink": "https://app.domain.com/promo/summer25",
+    "link_for_desktop_users": "https://www.your-website.com",
+    "custom_display_id": "whatsapp-summer-sale-2025",
+    "custom_channel_names": ["WhatsApp"]
+}
+```
+
+#### Request Parameters
+
+| Parameter                | Type     | Required | Description                                                                                                                                        |
+| ------------------------ | -------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                   | string   | Yes      | The display name of your campaign. This helps you identify the campaign in your dashboard.                                                         |
+| `deeplink`               | string   | No       | The URL that mobile app users will be directed to when they click your campaign link. Should be a valid deep link URL for your mobile application. |
+| `link_for_desktop_users` | string   | No       | The fallback URL for desktop users who click your campaign link. Typically points to your website or web application.                              |
+| `android_web_redirect`   | string   | No       | Provide this only if you want the user to be explicitly redirected to a specific web URL on Android.                                               |
+| `ios_web_redirect`       | string   | No       | Provide this only if you want the user to be explicitly redirected to a specific web URL on iOS.                                                   |
+| `custom_display_id`      | string   | No       | A custom identifier for your campaign. Must be unique across your account. If not provided, a random ID will be generated.                         |
+| `is_shortlink`           | boolean  | No       | Set to `true` to create a shortened campaign link. When enabled, creates a compact URL format suitable for sharing.                                |
+| `domain`                 | string   | No       | The domain name to use for this campaign (e.g., "app.example.com"). Must belong to your project. If not provided, the project's primary domain will be used. |
+| `store_listing_ids`      | string[] | No       | Array of store listing IDs to associate with this campaign. Get store listing IDs from your [dashboard settings](https://dashboard.linkrunner.io/dashboard/settings/store-listings). Allows targeting different store URLs per platform (iOS/Android). |
+| `custom_channel_names`   | string[] | No       | Array containing one custom channel name to group this campaign under. If the active channel already exists for the project, the campaign is attached to it; otherwise, a new custom channel is created. |
+
+##### Note: If `android_web_redirect` or `ios_web_redirect` is provided, it will override the default store listing link for that platform within the campaign and redirect users to the specified URL instead.
+
+#### Domain and Store Listing Features
+
+##### Domain (`domain`)
+
+The `domain` parameter allows you to specify which domain should be used for generating campaign links. This is useful when you have multiple domains configured for your project.
+
+**Parameter Type**: `string` (domain name)
+
+**Behavior**:
+- If provided and valid: Campaign will use the specified domain for all link generation
+- If not provided: Campaign will automatically use the project's primary domain
+- Must be a valid domain name that belongs to your project
+
+**Examples**:
+```json
+// Valid domain names
+{ "domain": "app.example.com" }
+{ "domain": "promo.yourapp.io" }
+{ "domain": "track.mysite.com" }
+
+// Invalid - will return error
+{ "domain": "other-company.com" }   // Error: Domain doesn't belong to your project
+```
+
+##### Multiple Store Listings (`store_listing_ids`)
+
+The `store_listing_ids` parameter allows you to associate multiple store listings with a single campaign.
+
+**Parameter Type**: `string[]` (array of store listing ID strings)
+
+**Getting Store Listing IDs**:
+- Navigate to your [Store Listings Dashboard](https://dashboard.linkrunner.io/dashboard/settings/store-listings)
+- View or create store listings for your project
+- Copy the store listing IDs to use in your API requests
+
+**Behavior**:
+- Accepts an array of store listing ID strings
+- Each ID must be a non-empty string
+- All store listings must belong to your project
+- Cannot have multiple store listings for the same platform (only one iOS and one Android listing per campaign)
+
+**Validation**:
+```json
+// Valid store listing IDs
+{ "store_listing_ids": ["ios-main-v1", "android-promo-v2"] }
+{ "store_listing_ids": ["my-custom-listing-id"] }
+
+// Invalid - will return errors
+{ "store_listing_ids": "ios-main-v1" }            // Error: "store_listing_ids must be an array of non-empty strings!"
+{ "store_listing_ids": ["", "android-promo-v2"] }  // Error: "store_listing_ids must be an array of non-empty strings!"
+{ "store_listing_ids": ["non-existent-id"] }       // Error: "Store listing(s) not found for this project"
+{ "store_listing_ids": ["ios-v1", "ios-v2"] }      // Error: "Cannot assign multiple store listings with the same platform to a campaign!"
+```
+
+##### Custom Channel Grouping (`custom_channel_names`)
+
+The `custom_channel_names` parameter lets you group Linkrunner campaigns under a custom channel for dashboard filtering and channel-level aggregation.
+
+##### Note: Linkrunner currently supports only one custom channel per campaign.
+
+**Parameter Type**: `string[]` (array containing at most one custom channel name)
+
+**Behavior**:
+- If the channel already exists and is active for the project, the campaign is attached to it
+- If the channel does not exist, Linkrunner creates it for the project and attaches the campaign to it
+- The channel code is generated from the name by lowercasing it and replacing non-alphanumeric characters with underscores
+- A campaign can have at most one custom channel
+- Default channel names such as Google, Meta, Reddit, Snapchat, TikTok, LinkedIn, Apple Search Ads, Organic, Linkrunner Links, and None cannot be used as custom channel names
+
+**Examples**:
+```json
+// Valid custom channel names
+{ "custom_channel_names": ["WhatsApp"] }
+{ "custom_channel_names": ["Offline QR"] }
+{ "custom_channel_names": ["CleverTap Push"] }
+
+// Invalid - will return errors
+{ "custom_channel_names": ["WhatsApp", "Offline QR"] }  // Error: "A campaign can have at most one custom channel"
+{ "custom_channel_names": ["Google"] }                  // Error: reserved channel name
+{ "custom_channel_names": ["<script>alert(1)</script>"] } // Error: HTML/scripts are not allowed
+```
+
+#### Response
+
+**Standard Campaign Response:**
+
+```json
+{
+    "msg": "Campaign created successfully!",
+    "status": 201,
+    "data": {
+        "id": 123,
+        "name": "Summer Sale 2023",
+        "link": "https://app.domain.com/promo/summer25?c=summer-sale-2025",
+        "website": "https://www.your-website.com",
+        "display_id": "summer-sale-2025",
+        "created_at": "2023-05-01T12:00:00Z",
+        "android_web_redirect": null,
+        "ios_web_redirect": null,
+        "domain": "app.domain.com",
+        "custom_channels": [
+            {
+                "id": 456,
+                "name": "WhatsApp",
+                "slug": "whatsapp"
+            }
+        ],
+        "store_listings": [
+            {
+                "store_listing_id": "android-store-v1",
+                "name": "Android Main Store",
+                "platform": "ANDROID"
+            }
+        ]
+    }
+}
+```
+
+**Short Link Campaign Response:**
+
+```json
+{
+    "msg": "Campaign created successfully!",
+    "status": 201,
+    "data": {
+        "id": 124,
+        "name": "Spring Launch 2024",
+        "link": "https://app.domain.com/?c=spring-launch-2024",
+        "website": null,
+        "display_id": "spring-launch-2024",
+        "created_at": "2023-05-01T12:00:00Z",
+        "android_web_redirect": null,
+        "ios_web_redirect": null,
+        "domain": "app.domain.com",
+        "custom_channels": [],
+        "store_listings": []
+    }
+}
+```
+
+#### Response Properties
+
+| Property           | Type                  | Description                                                                                                             |
+| ------------------ | --------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `id`               | number                | Unique numerical identifier for the campaign in the system.                                                             |
+| `name`             | string                | The campaign name as provided in the request.                                                                           |
+| `link`             | string                | The generated shareable campaign URL. For short links, this will be in format `https://app.domain.com/?c={display_id}`. |
+| `website`          | string\|null          | The desktop fallback URL. Will be `null` for short link campaigns.                                                      |
+| `display_id`       | string                | The campaign's display identifier (custom or auto-generated).                                                           |
+| `created_at`       | string                | ISO 8601 timestamp of when the campaign was created.                                                                    |
+| `domain`           | string\|null          | The domain name used for this campaign.                                                                                 |
+| `store_listings`   | StoreListing[]        | Array of store listings associated with this campaign. Each object contains `store_listing_id` (string), `name` (string), and `platform` ("IOS" \| "ANDROID"). |
+| `android_web_redirect` | string\|null      | The Android web redirect URL if specified, otherwise `null`.                                                            |
+| `ios_web_redirect`     | string\|null      | The iOS web redirect URL if specified, otherwise `null`.                                                                |
+| `custom_channels`      | CustomChannel[]     | Custom channels attached to this campaign. At most one custom channel is currently supported.                           |
+
+##### Note: Some responses may include legacy custom-channel aliases such as `custom_channel`, `custom_channel_code`, `custom_channel_name`, `custom_channel_codes`, or `custom_channel_names`. Use `custom_channels` as the canonical response field.
+
+### 3. Edit Campaign
+
+Update an existing campaign.
+
+#### Request
+
+```
+PATCH /campaigns/:display_id
+```
+
+#### Request Body
+
+```json
+{
+    "name": "campaign name",
+    "active": false,
+    "website": "https://www.your-website.com",
+    "android_web_redirect": "https://www.your-website.com/android",
+    "ios_web_redirect": "https://www.your-website.com/ios",
+    "custom_channel_names": ["WhatsApp"]
+}
+```
+
+To remove the custom channel from a campaign, pass an empty array:
+
+```json
+{
+    "custom_channel_names": []
+}
+```
+
+To clear a web field, pass an empty string or `null`. Omitting a field leaves its stored value unchanged:
+
+```json
+{
+    "android_web_redirect": "",
+    "ios_web_redirect": null
+}
+```
+
+| Parameter                | Type     | Description |
+| ------------------------ | -------- | ----------- |
+| name                     | string   | **Optional**. Name of the campaign |
+| active                   | boolean  | **Optional**. Campaign status |
+| website                  | string\|null | **Optional**. The desktop fallback URL. This is the same field the Create Campaign endpoint accepts as `link_for_desktop_users`; either name is accepted here, but sending both with different values is rejected. Pass an empty string or `null` to clear it. |
+| android_web_redirect     | string\|null | **Optional**. Web URL that Android users are redirected to, overriding the campaign's store listing link for that platform. Must be an absolute `http(s)` URL. Pass an empty string or `null` to clear it. |
+| ios_web_redirect         | string\|null | **Optional**. Web URL that iOS users are redirected to, overriding the campaign's store listing link for that platform. Must be an absolute `http(s)` URL. Pass an empty string or `null` to clear it. |
+| custom_channel_names     | string[] | **Optional**. Omit to leave unchanged, pass one name to set or replace the campaign custom channel, or pass an empty array to clear it. Linkrunner currently supports only one custom channel per campaign. |
+
+<Note>
+    Changes to `website`, `android_web_redirect` and `ios_web_redirect` are applied to live campaign links immediately — the cached copy the click path serves is cleared as part of the update.
+</Note>
+
+#### Responses
+
+1. **200** Campaign updated successfully
+2. **400** Invalid request parameters
+3. **404** Campaign not found
+4. **500** Internal server error
+
+#### Success Response
+
+```json
+{
+    "msg": "Campaign updated successfully!",
+    "status": 200,
+    "data": {
+        "display_id": "TOhmGM",
+        "name": "campaign name",
+        "created_at": "2025-07-09T17:18:41.912Z",
+        "update_at": "2025-07-17T08:58:26.740Z",
+        "google": false,
+        "meta": false,
+        "meta_campaign_id": "",
+        "meta_web_to_app": false,
+        "active": false,
+        "default_link": true,
+        "website": "https://www.your-website.com",
+        "android_web_redirect": "https://www.your-website.com/android",
+        "ios_web_redirect": "https://www.your-website.com/ios",
+        "attributed_users": 0,
+        "custom_channels": [
+            {
+                "id": 456,
+                "name": "WhatsApp",
+                "slug": "whatsapp"
+            }
+        ]
+    }
+}
+```
+
+#### Error Responses
+
+| HTTP Status | Message                                                       | When/Why                                                 |
+| ----------- | ------------------------------------------------------------- | -------------------------------------------------------- |
+| 400         | "Campaign display ID is required!"                            | If the display_id param is missing                       |
+| 400         | "At least one field (name, active, website, android_web_redirect or ios_web_redirect) is required for update!" | If no supported update field is provided |
+| 400         | "Please enter a valid URL (e.g., https://example.com/android)" | If a web redirect is not an absolute http(s) URL |
+| 400         | "website and link_for_desktop_users refer to the same field and cannot be sent with different values!" | If both spellings of the website field are sent with different values |
+| 400         | "Campaign name cannot be empty!"                              | If name is provided but is empty or only whitespace      |
+| 400         | "Active field must be a boolean!"                             | If active is provided but is not a boolean               |
+| 400         | "A campaign can have at most one custom channel"              | If more than one custom channel name is provided         |
+| 400         | "The system MAIN_DOMAIN campaign cannot be renamed."          | The MAIN_DOMAIN campaign is a system marker and cannot be renamed |
+| 400         | "A campaign cannot be renamed to the reserved name MAIN_DOMAIN." | MAIN_DOMAIN is reserved                              |
+| 404         | "Campaign not found!"                                         | If the campaign with the given display_id does not exist |
+| 500         | "Internal server error"                                       |                                                          |
+
+### 4. Delete Campaign
+
+Delete an existing campaign.
+
+#### Request
+
+```
+DELETE /campaigns/:display_id
+```
+
+#### Responses
+
+1. **204** Campaign deleted successfully
+2. **400** Invalid request parameters
+3. **404** Campaign not found
+4. **500** Internal server error
+
+#### Success Response
+
+```json
+{
+    "msg": "Campaign deleted successfully!",
+    "status": 204
+}
+```
+
+#### Error Responses
+
+| HTTP Status | Message                            | When/Why                                                 |
+| ----------- | ---------------------------------- | -------------------------------------------------------- |
+| 400         | "Campaign display ID is required!" | If the display_id param is missing                       |
+| 400         | "Only manually-created LinkRunner campaigns can be deleted. System (MAIN_DOMAIN) and ad-network campaigns cannot be deleted." | The campaign is the system MAIN_DOMAIN campaign or is owned by an ad-network sync |
+| 404         | "Campaign not found!"              | If the campaign with the given display_id does not exist |
+| 500         | "Internal server error"            |                                                          |
+
+## Best Practices
+
+1. **Campaign naming**: Use descriptive names that identify the purpose of the campaign
+2. **Deep links**: Ensure your deep links are properly formatted and lead to valid destinations
+3. **Custom IDs**: Use meaningful custom display IDs that are easy to recognize and remember. Duplicate ids are not allowed!
+4. **Desktop links**: Provide a `link_for_desktop_users` URL to ensure desktop visitors are redirected to a relevant webpage instead of app stores.
+
+## Examples
+
+### Creating a New Campaign
+
+```javascript
+fetch("https://api.linkrunner.io/api/v1/create-campaign", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "linkrunner-key": "YOUR-SERVER-KEY",
+    },
+    body: JSON.stringify({
+        name: "Product Launch 2023",
+        deeplink: "https://app.domain.com/promo/summer25",
+        link_for_desktop_users: "https://www.your-website.com",
+        custom_display_id: "summer-sale-2025",
+        custom_channel_names: ["WhatsApp"],
+    }),
+})
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error("Error:", error));
+```
+
+### Editing a Campaign
+
+```javascript
+fetch("https://api.linkrunner.io/api/v1/campaigns/TOhmGM", {
+    method: "PATCH",
+    headers: {
+        "Content-Type": "application/json",
+        "linkrunner-key": "YOUR-SERVER-KEY",
+    },
+    body: JSON.stringify({
+        name: "Updated Campaign Name",
+        active: true,
+        website: "https://www.your-website.com",
+        android_web_redirect: "https://www.your-website.com/android",
+        // Pass an empty string or null to clear a field; omit it to leave it unchanged.
+        ios_web_redirect: "",
+    }),
+})
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error("Error:", error));
+```
+
+### Deleting a Campaign
+
+```javascript
+fetch("https://api.linkrunner.io/api/v1/campaigns/TOhmGM", {
+    method: "DELETE",
+    headers: {
+        "linkrunner-key": "YOUR-SERVER-KEY",
+    },
+})
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error("Error:", error));
+```
+
+## Error Handling
+
+The API will return appropriate HTTP status codes along with error messages when issues occur. Common errors across all endpoints include:
+
+-   **400 Bad Request**: Missing required parameters or invalid input
+-   **401 Unauthorized**: API key is required or invalid
+-   **404 Not Found**: Campaign not found
+-   **429 Too Many Requests**: You've exceeded the rate limit, please try again later
+-   **500 Internal Server Error**: Contact support if this persists
+
+Specific error responses for each endpoint are detailed in their respective sections above.
+
+### Domain and Store Listing Specific Errors
+
+| Status Code | Error Message                                                          | Description                                                |
+| ----------- | ---------------------------------------------------------------------- | ---------------------------------------------------------- |
+| 400         | "Domain '{name}' not found for this project!"                          | The specified domain name doesn't exist or isn't in your project |
+| 400         | "store_listing_ids must be an array of non-empty strings!"             | store_listing_ids parameter is not an array or contains empty strings |
+| 400         | "Store listing(s) not found for this project: {ids}"                   | One or more store listing IDs don't exist in your project  |
+| 400         | "Cannot assign multiple store listings with the same platform to a campaign!" | Attempting to add more than one iOS or Android store listing |
+
+### Custom Channel Specific Errors
+
+| Status Code | Error Message                                             | Description                                                       |
+| ----------- | --------------------------------------------------------- | ----------------------------------------------------------------- |
+| 400         | "A campaign can have at most one custom channel"          | More than one value was provided in `custom_channel_names`.        |
+| 400         | "Custom channel name must be less than 80 characters"     | A custom channel name is longer than the allowed limit.            |
+| 400         | "Custom channel name cannot contain HTML tags or scripts" | A custom channel name contains HTML or script content.             |
+| 400         | `"{name}" is a reserved channel name`                     | The custom channel name resolves to a default or reserved channel. |
+| 409         | "Channel name conflicts with a previously deleted channel - pick a different name" | The channel code belongs to an inactive custom channel. |
+
+For any help please reach out to [support@linkrunner.io](mailto:support@linkrunner.io)

@@ -1,0 +1,251 @@
+{
+  "info": {
+    "name": "Linkrunner Web Campaigns Reporting API",
+    "description": "Test the Linkrunner Web Campaigns Reporting API. Set the `linkrunner_key` collection variable once, then run any request.\n\nDocs: https://docs.linkrunner.io/api-reference/reporting-web-campaigns\n\nRate limit: 1 request per minute per API key, separate from /reporting/campaigns.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.linkrunner.io/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "linkrunner_key",
+      "value": "REPLACE_WITH_YOUR_LINKRUNNER_KEY",
+      "type": "string",
+      "description": "Your project's server key. Find it under Dashboard → Settings → Data APIs."
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "linkrunner-key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{linkrunner_key}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "List web campaigns (default)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/web-campaigns?page=1&limit=20",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reporting",
+            "web-campaigns"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "20",
+              "description": "Max 100."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List web campaigns (date range, by revenue)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/web-campaigns?from=2026-10-01&to=2026-10-07&sort_field=revenue&limit=20",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reporting",
+            "web-campaigns"
+          ],
+          "query": [
+            {
+              "key": "from",
+              "value": "2026-10-01",
+              "description": "YYYY-MM-DD. Max 366 days per request."
+            },
+            {
+              "key": "to",
+              "value": "2026-10-07"
+            },
+            {
+              "key": "sort_field",
+              "value": "revenue"
+            },
+            {
+              "key": "limit",
+              "value": "20"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Group by channel",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/web-campaigns?group_by=channel&from=2026-10-01&to=2026-10-07",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reporting",
+            "web-campaigns"
+          ],
+          "query": [
+            {
+              "key": "group_by",
+              "value": "channel",
+              "description": "campaign | channel | source | network_campaign | ad_set | ad"
+            },
+            {
+              "key": "from",
+              "value": "2026-10-01"
+            },
+            {
+              "key": "to",
+              "value": "2026-10-07"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Meta campaigns (first touch)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/web-campaigns?group_by=network_campaign&network=meta&attribution=first_touch&from=2026-10-01&to=2026-10-07",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reporting",
+            "web-campaigns"
+          ],
+          "query": [
+            {
+              "key": "group_by",
+              "value": "network_campaign"
+            },
+            {
+              "key": "network",
+              "value": "meta",
+              "description": "meta | google. Required with network_campaign, ad_set and ad."
+            },
+            {
+              "key": "attribution",
+              "value": "first_touch",
+              "description": "last_touch | first_touch"
+            },
+            {
+              "key": "from",
+              "value": "2026-10-01"
+            },
+            {
+              "key": "to",
+              "value": "2026-10-07"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Ad sets of one Meta campaign",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/web-campaigns?group_by=ad_set&network=meta&network_campaign_id=REPLACE_WITH_CAMPAIGN_ID&from=2026-10-01&to=2026-10-07",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reporting",
+            "web-campaigns"
+          ],
+          "query": [
+            {
+              "key": "group_by",
+              "value": "ad_set"
+            },
+            {
+              "key": "network",
+              "value": "meta"
+            },
+            {
+              "key": "network_campaign_id",
+              "value": "REPLACE_WITH_CAMPAIGN_ID",
+              "description": "An id from a group_by=network_campaign row."
+            },
+            {
+              "key": "from",
+              "value": "2026-10-01"
+            },
+            {
+              "key": "to",
+              "value": "2026-10-07"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Custom event columns",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/web-campaigns?events=add_to_cart,checkout_started&from=2026-10-01&to=2026-10-07",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reporting",
+            "web-campaigns"
+          ],
+          "query": [
+            {
+              "key": "events",
+              "value": "add_to_cart,checkout_started",
+              "description": "Comma-separated. Up to 50 names."
+            },
+            {
+              "key": "from",
+              "value": "2026-10-01"
+            },
+            {
+              "key": "to",
+              "value": "2026-10-07"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

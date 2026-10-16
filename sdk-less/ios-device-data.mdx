@@ -1,0 +1,114 @@
+---
+title: "Collecting Device Data"
+description: "Where each device_data field comes from on iOS, and what attribution loses without it."
+icon: "database"
+---
+
+`device_data` is the object you send on `init`, `attribution-data`, and `signup`. It carries the signals Linkrunner uses to match an install to a click. On iOS, every field comes from an Apple framework, so you need no third-party libraries.
+
+The [full client](/sdk-less/ios-quickstart) collects all of these for you. This page explains each one so you can trust, trim, or rebuild that collection.
+
+## Info.plist
+
+To collect the IDFA, add a tracking usage description. Nothing else here needs a permission.
+
+```xml
+<key>NSUserTrackingUsageDescription</key>
+<string>We use your data to attribute installs and measure ad performance.</string>
+```
+
+## What to send
+
+| Field | Source on iOS | Importance |
+| --- | --- | --- |
+| `adservices_attribution_token` | `AAAttribution.attributionToken()` | **High**. Apple Search Ads attribution. |
+| `idfa` | `ASIdentifierManager`, after ATT consent | **High**, when the user allows tracking. |
+| `idfv` | `UIDevice.identifierForVendor` | Recommended. Matching fallback. |
+| `device`, `device_name`, `system_version` | `UIDevice` | Recommended. |
+| `brand`, `manufacturer` | Always `"Apple"` | Recommended. |
+| `version`, `build_number`, `bundle_id` | `Bundle.main` | Recommended. |
+| `locale`, `language`, `country`, `timezone`, `timezone_offset` | `Locale`, `TimeZone` | Recommended. |
+| `device_display` | `UIScreen.main` | Optional. |
+| `user_agent`, `connectivity` | App-defined, `NWPathMonitor` | Optional. |
+
+<Warning>
+  If you send neither `adservices_attribution_token` nor `idfa`, install registration still works, but paid attribution for Apple Search Ads and ad-network matching will be weak or missing.
+</Warning>
+
+## Apple Search Ads attribution token
+
+This is the most reliable iOS attribution signal and needs no user permission. The `AdServices` framework returns a short-lived token that Linkrunner exchanges with Apple server-side.
+
+```swift
+import AdServices
+
+func adServicesToken() -> String? {
+    try? AAAttribution.attributionToken()
+}
+```
+
+<Tip>
+  The token is valid only briefly. Fetch it fresh each time you build `device_data` rather than caching it.
+</Tip>
+
+## Advertising ID (IDFA)
+
+The IDFA is only available after the user grants App Tracking Transparency. Add `NSUserTrackingUsageDescription`, prompt while the app is active, then read the IDFA.
+
+```swift
+import AppTrackingTransparency
+import AdSupport
+
+// Prompt once, when the app is active (for example after the first screen appears)
+func requestTracking() async {
+    await withCheckedContinuation { cont in
+        ATTrackingManager.requestTrackingAuthorization { _ in cont.resume() }
+    }
+}
+
+// Read the IDFA only if the user authorized tracking
+func idfa() -> String? {
+    guard ATTrackingManager.trackingAuthorizationStatus == .authorized else { return nil }
+    return ASIdentifierManager.shared().advertisingIdentifier.uuidString
+}
+```
+
+If your app targets children, do not request tracking and do not collect the IDFA.
+
+## Vendor ID (IDFV)
+
+The IDFV needs no permission. It is stable across your apps on the same device, but resets when the user removes all of your apps.
+
+```swift
+import UIKit
+
+let idfv = await UIDevice.current.identifierForVendor?.uuidString
+```
+
+## SKAdNetwork
+
+iOS measures ad-driven installs through SKAdNetwork. After you call `init`, `signup`, `capture-event`, or `capture-payment`, the response can include a conversion value:
+
+```json
+{
+  "data": {
+    "fine_conversion_value": 12,
+    "coarse_conversion_value": "medium",
+    "lock_postback": false
+  }
+}
+```
+
+Apply it with `SKAdNetwork.updatePostbackConversionValue`. The [full client](/sdk-less/ios-quickstart#skadnetwork) does this for you in `applySKAN`. See [SKAdNetwork integration](/features/skadnetwork-integration) for the dashboard side.
+
+## Everything else
+
+Plain framework lookups. The [full client](/sdk-less/ios-quickstart) includes them.
+
+- `device`, `device_name`, `system_version`: `UIDevice.current`
+- `device_display`: `UIScreen.main.bounds` and `scale`
+- `locale`, `language`, `country`: `Locale.current`
+- `timezone`, `timezone_offset`: `TimeZone.current`
+- App info: `Bundle.main` for `version` (`CFBundleShortVersionString`), `build_number` (`CFBundleVersion`), and `bundle_id`
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

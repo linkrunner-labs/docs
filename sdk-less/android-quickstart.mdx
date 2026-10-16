@@ -1,0 +1,563 @@
+---
+title: "Android Quickstart"
+description: "The recommended SDK-less path: one Kotlin client that collects every signal and calls every endpoint."
+icon: "android"
+---
+
+This is the recommended way to integrate without the SDK. You add two Kotlin files, configure your token, and call typed methods that mirror the SDK. The client collects all device signals, manages the install instance ID, and retries failed requests.
+
+## 1. Add dependencies
+
+```gradle
+dependencies {
+    // HTTP and JSON
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+
+    // Device signals
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
+    implementation 'com.google.android.gms:play-services-appset:16.0.2'
+    implementation 'com.android.installreferrer:installreferrer:2.2'
+}
+```
+
+## 2. Add permissions and queries
+
+In `AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+
+<queries>
+    <package android:name="com.facebook.katana" />
+    <package android:name="com.instagram.android" />
+    <package android:name="com.facebook.lite" />
+</queries>
+```
+
+For Meta attribution, add your Facebook App ID inside `<application>`:
+
+```xml
+<meta-data android:name="com.facebook.sdk.ApplicationId" android:value="fb1234567890" />
+```
+
+## 3. Add the device data collector
+
+Create `LinkrunnerDeviceData.kt`. This gathers everything Linkrunner uses for matching. See [Collecting device data](/sdk-less/android-device-data) for what each field means.
+
+```kotlin
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import android.telephony.TelephonyManager
+import android.webkit.WebSettings
+import com.android.installreferrer.api.InstallReferrerClient
+import com.android.installreferrer.api.InstallReferrerStateListener
+import com.google.android.gms.ads.identifier.AdvertisingIdClient
+import com.google.android.gms.appset.AppSet
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
+import java.net.Inet4Address
+import java.net.NetworkInterface
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
+
+/** Collects the device signals Linkrunner uses for matching. */
+object LinkrunnerDeviceData {
+
+    @SuppressLint("HardwareIds")
+    suspend fun collect(context: Context): JSONObject = withContext(Dispatchers.IO) {
+        val d = JSONObject()
+
+        // App and package info
+        runCatching {
+            val pm = context.packageManager
+            val pkg = context.packageName
+            val info = pm.getPackageInfo(pkg, 0)
+            d.put("application_name", pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString())
+            d.put("app_version", info.versionName ?: "")
+            d.put("version", info.versionName ?: "")
+            d.put(
+                "build_number",
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) info.longVersionCode.toString()
+                else @Suppress("DEPRECATION") info.versionCode.toString()
+            )
+            d.put("bundle_id", pkg)
+        }
+
+        // Device info
+        d.put("device_id", Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: "")
+        d.put("device_name", "${Build.MANUFACTURER} ${Build.MODEL}")
+        d.put("manufacturer", Build.MANUFACTURER)
+        d.put("brand", Build.BRAND)
+        d.put("system_version", Build.VERSION.RELEASE ?: "")
+        d.put("connectivity", connectivity(context))
+        d.put("user_agent", userAgent(context))
+        d.put("carrier", JSONArray().apply { carrier(context)?.let { put(it) } })
+
+        // iOS-only fields, sent empty on Android
+        d.put("idfa", "")
+        d.put("idfv", "")
+
+        // Device IP (best effort)
+        deviceIp()?.let { d.put("device_ip", it) }
+
+        // Advertising ID
+        d.put("gaid", gaid(context) ?: "")
+
+        // App Set ID
+        appSet(context)?.let {
+            d.put("appsetid", it.first)
+            d.put("appsetid_scope", it.second)
+        }
+
+        // Google Play install referrer (flattened into device_data)
+        installReferrer(context)?.let { ref -> ref.keys().forEach { d.put(it, ref.get(it)) } }
+
+        // Meta install referrer
+        metaInstallReferrer(context)?.let { d.put("meta_install_ref", it) }
+
+        d
+    }
+
+    private fun connectivity(context: Context): String = try {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            "Unknown"
+        } else {
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val caps = cm.getNetworkCapabilities(cm.activeNetwork)
+            when {
+                caps == null -> "Not Connected"
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> "Wi-Fi"
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> "Mobile Network"
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> "Ethernet"
+                else -> "Unknown"
+            }
+        }
+    } catch (e: Exception) {
+        "Unknown"
+    }
+
+    private fun userAgent(context: Context): String = try {
+        WebSettings.getDefaultUserAgent(context)
+    } catch (e: Exception) {
+        "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE}; ${Build.MODEL})"
+    }
+
+    private fun carrier(context: Context): String? = try {
+        val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        tm.networkOperatorName?.takeIf { it.isNotEmpty() }
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun deviceIp(): String? = try {
+        var ip: String? = null
+        for (ni in java.util.Collections.list(NetworkInterface.getNetworkInterfaces())) {
+            for (addr in java.util.Collections.list(ni.inetAddresses)) {
+                if (!addr.isLoopbackAddress && addr is Inet4Address) ip = addr.hostAddress
+            }
+        }
+        ip
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun gaid(context: Context): String? = try {
+        val info = AdvertisingIdClient.getAdvertisingIdInfo(context)
+        if (info.isLimitAdTrackingEnabled) null else info.id
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun appSet(context: Context): Pair<String, Int>? = try {
+        val info = com.google.android.gms.tasks.Tasks.await(
+            AppSet.getClient(context).appSetIdInfo, 1500, TimeUnit.MILLISECONDS
+        )
+        if (info.id.isNullOrBlank()) null else Pair(info.id, info.scope)
+    } catch (e: Exception) {
+        null
+    }
+
+    private suspend fun installReferrer(context: Context): JSONObject? = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine { cont ->
+            val client = InstallReferrerClient.newBuilder(context).build()
+            client.startConnection(object : InstallReferrerStateListener {
+                override fun onInstallReferrerSetupFinished(code: Int) {
+                    try {
+                        if (code == InstallReferrerClient.InstallReferrerResponse.OK) {
+                            val r = client.installReferrer
+                            val o = JSONObject().apply {
+                                put("install_ref", r.installReferrer ?: "")
+                                put("install_ref_install_version", r.installVersion ?: "")
+                                put("install_ref_installBeginTimestampSeconds", r.installBeginTimestampSeconds)
+                                put("install_ref_referrerClickTimestampSeconds", r.referrerClickTimestampSeconds)
+                                put("install_ref_googlePlayInstantParam", r.googlePlayInstantParam)
+                            }
+                            if (cont.isActive) cont.resume(o)
+                        } else if (cont.isActive) {
+                            cont.resume(null)
+                        }
+                    } catch (e: Exception) {
+                        if (cont.isActive) cont.resume(null)
+                    } finally {
+                        runCatching { client.endConnection() }
+                    }
+                }
+
+                override fun onInstallReferrerServiceDisconnected() {
+                    if (cont.isActive) cont.resume(null)
+                }
+            })
+            cont.invokeOnCancellation { runCatching { client.endConnection() } }
+        }
+    }
+
+    private fun metaInstallReferrer(context: Context): JSONObject? {
+        val appId = facebookAppId(context) ?: return null
+        val providers = listOf(
+            "com.facebook.katana.provider.InstallReferrerProvider" to "facebook",
+            "com.instagram.contentprovider.InstallReferrerProvider" to "instagram",
+            "com.facebook.lite.provider.InstallReferrerProvider" to "facebook_lite",
+        )
+        for ((authority, source) in providers) {
+            if (context.packageManager.resolveContentProvider(authority, 0) == null) continue
+            val uri = Uri.parse("content://$authority/$appId")
+            context.contentResolver.query(
+                uri, arrayOf("install_referrer", "is_ct", "actual_timestamp"), null, null, null
+            )?.use { c ->
+                if (c.moveToFirst()) {
+                    val refIdx = c.getColumnIndex("install_referrer")
+                    val ref = if (refIdx >= 0) c.getString(refIdx) else null
+                    if (!ref.isNullOrEmpty()) {
+                        return JSONObject().apply {
+                            put("install_referrer", ref)
+                            put("source", source)
+                            c.getColumnIndex("is_ct").let { if (it >= 0) put("is_ct", c.getInt(it)) }
+                            c.getColumnIndex("actual_timestamp").let { if (it >= 0) put("actual_timestamp", c.getLong(it)) }
+                        }
+                    }
+                }
+            }
+        }
+        return null
+    }
+
+    private fun facebookAppId(context: Context): String? = try {
+        val meta = context.packageManager
+            .getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData
+        meta?.getString("com.facebook.sdk.ApplicationId")
+            ?: meta?.getString("com.linkrunner.FacebookApplicationId")
+    } catch (e: Exception) {
+        null
+    }
+}
+```
+
+## 4. Add the client
+
+Create `LinkrunnerClient.kt`. It authenticates with your project token in the request body.
+
+```kotlin
+import android.content.Context
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.IOException
+import java.util.UUID
+import java.util.concurrent.TimeUnit
+
+/**
+ * Linkrunner REST client. Mirrors the SDK's API over plain HTTP.
+ * Call configure() once, then use the suspend methods from a background coroutine.
+ */
+object LinkrunnerClient {
+    private const val BASE_URL = "https://api.linkrunner.io"
+    private const val PLATFORM = "ANDROID"
+    private const val PREFS = "linkrunner_sdkless"
+    private const val KEY_INSTALL_ID = "install_instance_id"
+    private const val MAX_RETRIES = 3
+
+    private lateinit var appContext: Context
+    private lateinit var token: String
+    private var debug = false
+
+    private val http = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .build()
+
+    private val jsonMedia = "application/json; charset=utf-8".toMediaType()
+    private val retriable = setOf(408, 429, 500, 502, 503, 504)
+
+    fun configure(context: Context, token: String, debug: Boolean = false) {
+        this.appContext = context.applicationContext
+        this.token = token
+        this.debug = debug
+    }
+
+    /** Stable per-install identity. Generated once, then reused forever. */
+    fun installInstanceId(): String {
+        val prefs = appContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        prefs.getString(KEY_INSTALL_ID, null)?.let { return it }
+        return UUID.randomUUID().toString().also { prefs.edit().putString(KEY_INSTALL_ID, it).apply() }
+    }
+
+    // ---- Endpoints ----
+
+    suspend fun init(link: String? = null): JSONObject {
+        val device = LinkrunnerDeviceData.collect(appContext)
+        val body = base().apply {
+            put("package_version", "android-rest-1.0")
+            put("app_version", device.optString("app_version", ""))
+            put("device_data", device)
+            if (link != null) put("link", link)
+            put("debug", debug)
+        }
+        return post("/api/client/init", body)
+    }
+
+    suspend fun getAttributionData(): JSONObject =
+        post("/api/client/attribution-data", base().put("device_data", LinkrunnerDeviceData.collect(appContext)))
+
+    suspend fun signup(
+        userData: Map<String, Any?>,
+        additionalData: Map<String, Any?> = emptyMap(),
+    ): JSONObject {
+        val data = JSONObject().put("device_data", LinkrunnerDeviceData.collect(appContext))
+        additionalData.forEach { (k, v) -> if (v != null) data.put(k, wrap(v)) }
+        val body = base().apply {
+            put("user_data", jsonOf(userData))
+            put("data", data)
+        }
+        return post("/api/client/trigger", body)
+    }
+
+    suspend fun setUserData(userData: Map<String, Any?>): JSONObject =
+        post("/api/client/set-user-data", base().put("user_data", jsonOf(userData)))
+
+    suspend fun trackEvent(eventName: String, eventData: Map<String, Any?>? = null): JSONObject {
+        val body = base().put("event_name", eventName)
+        if (eventData != null) body.put("event_data", jsonOf(eventData))
+        return post("/api/client/capture-event", body)
+    }
+
+    suspend fun capturePayment(
+        amount: Double,
+        paymentId: String,
+        userId: String? = null,
+        type: String = "DEFAULT",
+        status: String = "PAYMENT_COMPLETED",
+        eventData: Map<String, Any?>? = null,
+    ): JSONObject {
+        val body = base().apply {
+            put("amount", amount)
+            put("type", type)
+            put("status", status)
+            put("payment_id", paymentId)
+            if (userId != null) put("user_id", userId)
+            if (eventData != null) put("event_data", jsonOf(eventData))
+        }
+        return post("/api/client/capture-payment", body)
+    }
+
+    suspend fun removePayment(paymentId: String? = null, userId: String? = null): JSONObject {
+        require(paymentId != null || userId != null) { "Provide paymentId or userId" }
+        val body = base().apply {
+            if (paymentId != null) put("payment_id", paymentId)
+            if (userId != null) put("user_id", userId)
+        }
+        return post("/api/client/remove-captured-payment", body)
+    }
+
+    suspend fun setPushToken(pushToken: String): JSONObject =
+        post("/api/client/update-push-token", base().put("push_token", pushToken))
+
+    suspend fun setIntegrationData(clevertapId: String): JSONObject =
+        post(
+            "/api/client/integrations",
+            base().put("integration_info", JSONObject().put("clevertap_id", clevertapId))
+        )
+
+    suspend fun handleDeeplink(deeplinkUrl: String): JSONObject {
+        val device = LinkrunnerDeviceData.collect(appContext)
+        val body = base().apply {
+            put("deeplink_url", deeplinkUrl)
+            put("device_data", device)
+            device.optJSONObject("meta_install_ref")?.let { put("meta_install_referrer", it) }
+        }
+        return post("/api/client/handle-deeplink", body)
+    }
+
+    // ---- Internals ----
+
+    private fun base() = JSONObject()
+        .put("token", token)
+        .put("platform", PLATFORM)
+        .put("install_instance_id", installInstanceId())
+
+    private suspend fun post(path: String, body: JSONObject): JSONObject = withContext(Dispatchers.IO) {
+        var attempt = 0
+        while (true) {
+            try {
+                val request = Request.Builder()
+                    .url(BASE_URL + path)
+                    .post(body.toString().toRequestBody(jsonMedia))
+                    .build()
+                http.newCall(request).execute().use { res ->
+                    val text = res.body?.string().orEmpty()
+                    when {
+                        res.isSuccessful -> return@withContext if (text.isEmpty()) JSONObject() else JSONObject(text)
+                        res.code in retriable && attempt < MAX_RETRIES -> Unit // fall through to retry
+                        else -> throw RuntimeException("Linkrunner ${res.code}: $text")
+                    }
+                }
+            } catch (e: IOException) {
+                if (attempt >= MAX_RETRIES) throw e
+            }
+            delay(1000L * (1L shl attempt)) // 1s, 2s, 4s
+            attempt++
+        }
+    }
+
+    private fun wrap(value: Any?): Any = when (value) {
+        is Map<*, *> -> JSONObject().also { o -> value.forEach { (k, v) -> if (v != null) o.put(k.toString(), wrap(v)) } }
+        is List<*> -> JSONArray().also { a -> value.forEach { a.put(if (it == null) JSONObject.NULL else wrap(it)) } }
+        else -> value ?: JSONObject.NULL
+    }
+
+    private fun jsonOf(map: Map<String, Any?>): JSONObject {
+        val o = JSONObject()
+        map.forEach { (k, v) -> if (v != null) o.put(k, wrap(v)) }
+        return o
+    }
+}
+```
+
+## 5. Initialize and read attribution
+
+Call `configure` once, then `init`, then poll `getAttributionData`. The `Application` class is a good place.
+
+```kotlin
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        LinkrunnerClient.configure(applicationContext, token = "YOUR_PROJECT_TOKEN")
+
+        CoroutineScope(Dispatchers.IO).launch {
+            LinkrunnerClient.init()
+
+            repeat(5) {
+                val data = LinkrunnerClient.getAttributionData().optJSONObject("data")
+                if (data?.isNull("campaign_data") == false) {
+                    println("Campaign: ${data.getJSONObject("campaign_data")}")
+                    return@launch
+                }
+                delay(2000)
+            }
+        }
+    }
+}
+```
+
+## 6. Identify the user
+
+Call `signup` when the user signs up or logs in so events and payments are linked to a user.
+
+```kotlin
+CoroutineScope(Dispatchers.IO).launch {
+    LinkrunnerClient.signup(
+        userData = mapOf(
+            "id" to "user_123",
+            "email" to "user@example.com",
+            "name" to "John Doe"
+        )
+    )
+}
+```
+
+## 7. Track events and payments
+
+```kotlin
+// Custom event
+LinkrunnerClient.trackEvent(
+    "purchase_initiated",
+    mapOf("product_id" to "12345", "amount" to 99.99)
+)
+
+// Payment
+LinkrunnerClient.capturePayment(
+    amount = 99.99,
+    userId = "user_123",
+    paymentId = "payment_123",
+    type = "FIRST_PAYMENT"
+)
+```
+
+<Note>
+  Add `amount` as a number in event or payment data to enable revenue sharing with Google and Meta.
+</Note>
+
+## Other endpoints
+
+The client also wraps the remaining endpoints:
+
+```kotlin
+LinkrunnerClient.setUserData(mapOf("id" to "user_123", "phone" to "9876543210"))
+LinkrunnerClient.setPushToken(fcmToken)
+LinkrunnerClient.setIntegrationData(clevertapId = "YOUR_CLEVERTAP_ID")
+LinkrunnerClient.handleDeeplink("https://app.example.com/product/123")
+LinkrunnerClient.removePayment(paymentId = "payment_123")
+```
+
+## Retries and idempotency
+
+The client retries failed requests up to 3 times with exponential backoff (1s, 2s, 4s). It retries on network errors and on HTTP `408`, `429`, and `5xx`. Other responses, such as `400` or `401`, are not retried.
+
+A retry can send the same request twice if the first attempt reached the server but the response was lost. How that is handled depends on the endpoint:
+
+| Endpoint | Safe to retry? | Why |
+| --- | --- | --- |
+| `init` | Yes | The server deduplicates on `install_instance_id`. |
+| `capture-payment` | Yes, with `payment_id` | The server deduplicates on `payment_id`. Always send one. |
+| `capture-event` | Not deduplicated | A retried event can be counted twice. |
+
+<Tip>
+  `payment_id` is required for `capturePayment`, and a unique value ensures retries cannot double count revenue. Events have no server-side deduplication, so if exact event counts matter, disable retries for those calls.
+</Tip>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Attribution data is always organic">
+    Make sure `init` ran on the device, not your backend, and that `gaid` and `install_ref` are present in `device_data`. Without them, only organic installs resolve. See [Collecting device data](/sdk-less/android-device-data).
+  </Accordion>
+  <Accordion title="Events or payments do not appear">
+    Check that you called `signup` and used the same `install_instance_id` everywhere. Events and payments are stored for all users, including organic ones, so a missing campaign does not mean the event was dropped.
+  </Accordion>
+  <Accordion title="Every install looks like the same device or location">
+    You are likely calling from your backend. The server matches on the calling IP, so calls must come from the user's device.
+  </Accordion>
+  <Accordion title="429 responses">
+    You are over the 25 requests per second per token limit. The client already retries with backoff. Slow down bursty calls.
+  </Accordion>
+</AccordionGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

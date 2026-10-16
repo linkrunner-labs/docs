@@ -1,0 +1,96 @@
+---
+title: "Affiliate Partner Integration"
+sidebarTitle: "How It Works"
+description: "Send Linkrunner your clicks and receive server-to-server postbacks on installs and in-app events"
+icon: "handshake"
+---
+
+## Overview
+
+Linkrunner is a Mobile Measurement Partner (MMP). When you run traffic to an advertiser who uses Linkrunner, the integration works in two directions:
+
+1. **You send us clicks.** You point your traffic at a Linkrunner tracking link and append your own identifiers (most importantly your click ID). Linkrunner records the click and uses it to attribute installs.
+2. **We send you postbacks.** When an install or a post-install event is attributed to your click, Linkrunner fires a server-to-server postback to your endpoint with the data filled into the macros you define.
+
+Optionally, you can also **send us impressions** (the ad was shown but not tapped), so Linkrunner can credit an install to your ad view when there is no click. See [View-through (optional)](#view-through-optional).
+
+This is the same model used across the industry, so if you have integrated with other MMPs the flow will feel familiar.
+
+<Note>
+New affiliate partner? Start with [Getting Started](/affiliate-partners/getting-started) for the full setup checklist.
+</Note>
+
+```
+Your traffic
+   │  click  (you append tid + s2/s3/s4 params)
+   ▼
+Linkrunner tracking link  ──►  install attributed to your click
+   │
+   │  postback (we fill your macros: click_id, event_name, revenue, ...)
+   ▼
+Your endpoint
+```
+
+## How attribution works
+
+The link between a click and a conversion is your **click ID**. You generate a unique ID for every click and pass it to Linkrunner on the tracking link as `tid`. When a conversion is attributed back to that click, Linkrunner returns the same value in the `{click_id}` and `{tid}` macros on the postback. You match the postback to your original click using that value.
+
+<Note>
+Pass a unique `tid` on every click. Without it, Linkrunner cannot echo an identifier back to you on the postback, and you cannot reconcile conversions against your clicks.
+</Note>
+
+### View-through (optional)
+
+If you report impressions through [S2S impressions](/affiliate-partners/s2s-impressions), an install with no click can be credited to an impression instead:
+
+- **Off by default.** The advertiser turns on view-through for your partner account and sets your window, from 1 to 24 hours.
+- **Device ID only.** The impression must carry the installing device's `gaid` or `idfa`.
+- **Clicks always win.** An impression is credited only when no click, from any source, can be credited.
+
+The postback carries the `tid` you sent on the impression, and `{touch_type}` is `impression` instead of `click`, so you can tell view-through installs apart.
+
+## What you can receive postbacks for
+
+| Conversion | When it fires |
+|---|---|
+| **Install** | A new app install is attributed to your click, or to your impression if you use [view-through](#view-through-optional). Sent automatically. |
+| **Signup** | The user completes registration, as defined by the advertiser. Sent automatically once a signup postback is set up. |
+| **In-app event** | A post-install event the advertiser tracks (for example a purchase). Sent only for events that have an event mapping. |
+
+In-app events are not sent by default. Linkrunner sends an in-app event only after it is mapped, either by the advertiser (**Integrations →** your network **→ Event Mapping**) or by you (**Event Mapping** in your affiliate dashboard). A mapping can rename the event to your goal name and can include revenue.
+
+You provide one postback URL template per conversion you want to receive. See [Event mapping](/affiliate-partners/postbacks#event-mapping) for details.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Create an affiliate account" icon="user-plus" href="/affiliate-partners/create-account">
+    Create your workspace and get approved.
+  </Card>
+  <Card title="Add an agency account" icon="briefcase" href="/affiliate-partners/add-agency-account">
+    Also run campaigns for customers as an agency, from the same login.
+  </Card>
+  <Card title="Create a campaign link" icon="link" href="/affiliate-partners/create-campaign-link">
+    Create a link from the affiliate dashboard with your template parameters included.
+  </Card>
+  <Card title="Tracking links" icon="link" href="/affiliate-partners/tracking-links">
+    The parameters included in your click tracking links.
+  </Card>
+  <Card title="Server-to-server clicks" icon="server" href="/affiliate-partners/s2s-clicks">
+    Report clicks from your server when the user goes straight to the store.
+  </Card>
+  <Card title="Server-to-server impressions" icon="eye" href="/affiliate-partners/s2s-impressions">
+    Report ad impressions so installs without a click can be credited to your views.
+  </Card>
+  <Card title="Postbacks and macros" icon="satellite-dish" href="/affiliate-partners/postbacks">
+    The macros Linkrunner fills into your postback URLs, with examples.
+  </Card>
+  <Card title="Event Mapping" icon="arrows-left-right" href="/affiliate-partners/event-mapping">
+    Choose which events reach you and what they are called.
+  </Card>
+  <Card title="Postback Logs" icon="list-check" href="/affiliate-partners/postback-logs">
+    Check whether each conversion reached your endpoint.
+  </Card>
+</CardGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

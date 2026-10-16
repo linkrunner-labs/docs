@@ -1,0 +1,285 @@
+---
+title: "Meta SKAN Setup"
+description: "Set up SKAdNetwork attribution for Meta Ads iOS campaigns with Linkrunner"
+icon: "/images/logos/meta.webp"
+sidebarTitle: "Meta SKAN Setup"
+---
+
+SKAdNetwork (SKAN) is Apple's privacy-preserving framework for iOS attribution. Meta uses SKAN postbacks to measure and optimize iOS App Promotion campaigns. Setup happens in four places: your app, the Linkrunner Dashboard, Meta Events Manager, and Meta Ads Manager.
+
+<Warning>
+    Only Meta campaigns with the **App Promotion** objective support the SKAN framework.
+</Warning>
+
+Track your progress with the **Meta SKAN Integration Checklist**: [Integrations → Meta Ads → SKAN Integration](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=skan_integration).
+
+<Note>
+    This guide covers the Meta-specific SKAN setup. If you haven't connected Meta Ads to Linkrunner yet, start with the
+    [Meta Ads integration guide](/ad-networks/meta-ads).
+</Note>
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- A [connected Meta Ads integration](/ad-networks/meta-ads) (App ID, ad account, and CAPI configured)
+- Your app live with a SKAN-ready Linkrunner SDK version (see [minimum versions](/features/skadnetwork-integration#minimum-sdk-versions))
+- Admin access to your Meta Business Manager and Meta Events Manager
+- Your app events arriving in Meta Events Manager. Meta requires events from your app in the past 90 days, and its SKAN setup only lists events it has received. See [Configure Events in Meta Events Manager](/ad-networks/meta-ads#3-configure-events-in-meta-events-manager).
+
+## 1. Prepare Your App
+
+### Update the SDK
+
+Your app must run a SKAN-ready SDK version. The SDK updates conversion values automatically as users perform events, so no SKAN code is needed on your side. Check the [minimum SDK versions](/features/skadnetwork-integration#minimum-sdk-versions).
+
+### Add Meta's Ad Network Identifiers
+
+Apple only generates SKAN postbacks for ad networks listed in your app's `Info.plist`. Add Meta's identifiers under `SKAdNetworkItems`:
+
+```xml
+<key>SKAdNetworkItems</key>
+<array>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>v9wttpbfk9.skadnetwork</string>
+    </dict>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>n38lu8286q.skadnetwork</string>
+    </dict>
+</array>
+```
+
+<Info>On Expo, add these under `ios.infoPlist.SKAdNetworkItems` in your `app.json`.</Info>
+
+### Add the Postback Copy Endpoints
+
+Add these keys to your `Info.plist` so Apple sends copies of SKAN postbacks to Linkrunner:
+
+```xml
+<key>NSAdvertisingAttributionReportEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+<key>AttributionCopyEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+```
+
+<Info>The Linkrunner Expo plugin adds these keys automatically.</Info>
+
+## 2. Configure the SKAN Schema in Linkrunner
+
+Linkrunner converts your event list into SKAN conversion values (0-63) and generates the fine and coarse values Meta needs.
+
+<Steps>
+    <Step title="Set up event priority">
+        Go to **Settings → SKAN Setup → Events Setup** in the [Linkrunner
+        Dashboard](https://dashboard.linkrunner.io/dashboard/settings/skan-setup?tab=event-setup). Add the events that
+        matter for optimization and drag rows to set priority. The topmost event has the highest priority.
+    </Step>
+    <Step title="Set ranges">
+        For revenue events, set a **min** and **max** range. For other events, click **Add Average** to track how often
+        the event happens. Without an average, Linkrunner only records whether the event happened.
+    </Step>
+    <Step title="Generate the mapping">
+        Click **Next: Generate SKAN Mapping**. The button stays disabled while your configuration would exceed Apple's
+        limit of 64 conversion values. Remove an event or an average until it becomes available.
+    </Step>
+    <Step title="Turn on SKAN">
+        Turn the switch at the top of **Settings → SKAN Setup** to **Enabled**. Linkrunner does not send conversion
+        values to your app while SKAN is disabled.
+    </Step>
+</Steps>
+
+<Note>
+    If you already configured the schema for Google Ads, no extra work is needed. Linkrunner reuses the same schema for
+    Meta.
+</Note>
+
+For background on how this maps to SKAN 4.0, see [Conversion Values in SKAdNetwork](/features/skadnetwork-conversion-values).
+
+## 3. Map Events to Meta
+
+Map each Linkrunner event to the corresponding Meta event (for example, `Purchase`, `AddToCart`, `ViewContent`) so postbacks are tagged correctly in Meta Events Manager.
+
+<Steps>
+    <Step title="Open event mapping">
+        Go to [Integrations → Meta Ads → Event
+        Mapping](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=event_mapping).
+    </Step>
+    <Step title="Map each event">
+        For each event in your SKAN schema, select the Meta event it should map to.
+    </Step>
+    <Step title="Enable revenue">Turn on **Send Revenue** for revenue events and select the currency.</Step>
+    <Step title="Save">Click **Save**.</Step>
+</Steps>
+
+Every event in your SKAN schema except `signup` must be mapped. Until it is, the **Meta SKAN Configuration** tab lists the events that still need a mapping instead of your conversion values.
+
+See the full walkthrough in [Meta Ads → Event Mapping](/ad-networks/meta-ads#2-set-up-event-mapping).
+
+## 4. Configure SKAN in Meta Events Manager
+
+<Warning>
+    Complete this section only after the SKAN-ready SDK version is live in your app. Configuring Meta before the SDK
+    update ships leads to mismatched conversion values.
+</Warning>
+
+Keep the Linkrunner values open in a separate tab while you work in Meta. Go to **Settings → SKAN Setup → Meta SKAN Configuration** in the [Linkrunner Dashboard](https://dashboard.linkrunner.io/dashboard/settings/skan-setup?tab=meta-skan-configuration). It has two tabs:
+
+- **Fine Conversion Values**: each **Priority** number, the Meta event (or events) for it, and the revenue range for revenue events
+- **Coarse Conversion Values**: one Meta event each for **High**, **Medium**, and **Low**
+
+### Step 1: Turn On SKAdNetwork 4.0
+
+1. Open [Meta Events Manager](https://business.facebook.com/events_manager2), go to **Datasets**, and select your app's dataset
+2. Open the **Settings** tab and scroll to **Set up tasks for iOS app events**
+3. Under **Apple's SKAdNetwork**, click **See extra settings**
+4. Turn **SKAdNetwork 4.0** on
+5. Turn **SKAdNetwork for the Facebook SDK** off, so SKAN conversion values come only from Linkrunner
+6. Click **Configure events**. If your app already has a SKAN configuration, the button reads **Edit events**.
+
+The numbers in the screenshot match the steps above.
+
+![Meta Events Manager dataset settings with the dataset, Settings tab, extra settings, SKAdNetwork 4.0 toggle, SKAdNetwork for the Facebook SDK toggle, and Edit events button numbered 1 to 6](/images/meta/skan/events-manager-skan-settings.webp)
+
+<Note>
+    Switching between SKAdNetwork 4.0 and 3.0 can take at least 24 hours to apply. Avoid switching back and forth.
+</Note>
+
+<Note>
+    **Edit events** reopens your current setup, where **Priority** can show as text such as **High** instead of a
+    number you can type. To get the number field, click **Edit**, then **Back** until you reach **Choose an app event
+    connection**, click **Change Method**, and continue from Step 2.
+</Note>
+
+### Step 2: Choose Custom Integration
+
+1. On **Choose how to configure events**, select **Customise**. Linkrunner does not provide a schema URL for **Import from partner app**.
+2. Click **Next**
+
+![Choose how to configure events step with Customise selected as 1 and the Next button as 2](/images/meta/skan/choose-customise.webp)
+
+3. On **Choose an app event connection**, select **Custom integration for SKAdNetwork**
+4. Check that your app meets the requirements listed on the card, then click **Next**
+
+![Choose an app event connection step with Custom integration for SKAdNetwork selected as 3 and the Next button as 4](/images/meta/skan/custom-integration.webp)
+
+### Step 3: Add the Fine Conversion Values
+
+Recreate every row of Linkrunner's **Fine Conversion Values** table. Your app reports the **Priority** number, and Meta credits the event you assign to that number, so the numbers must match Linkrunner's exactly.
+
+1. In **Priority**, type the row's **Priority** number from Linkrunner
+2. In **Event name**, select the Meta event for that row
+3. If the Linkrunner row lists more than one event, click **+** under the event and add each one to the same row
+4. Click **Add Event** to add the next row. When every Linkrunner row is added, click **Next**
+
+![Choose fine conversion values step with the Priority field set to 1 as 1, the event dropdown as 2, the add bundled event button as 3, and the Add Event button as 4](/images/meta/skan/fine-conversion-values.webp)
+
+<Note>
+    The dropdown only lists events Meta has received from your app in the past 90 days. If an event is missing, see
+    [An event is missing from the Meta event list](#an-event-is-missing-from-the-meta-event-list).
+</Note>
+
+### Step 4: Add the Coarse Conversion Values
+
+1. Keep **Apply this setup to all three windows** checked. Linkrunner uses the same coarse mapping for all three postbacks.
+2. Select the event for **High**, matching Linkrunner's **Coarse Conversion Values** tab
+3. Click **+** next to **Medium** and **Low** and select their events, then click **Review**
+
+![Choose coarse conversion values step with an arrow to the Apply this setup to all three windows checkbox as 1, the High event as 2, and the add buttons for Medium and Low as 3 and 4](/images/meta/skan/coarse-conversion-values.webp)
+
+### Step 5: Review and Apply
+
+<Warning>
+    Changing fine conversion values pauses your running iOS ads for 72 hours while the new configuration takes effect.
+    Changing only coarse values does not pause ads. Apply fine value changes when a 72-hour pause is acceptable.
+</Warning>
+
+1. Check each **Priority ID** in the review table against the **Priority** numbers in Linkrunner's **Fine Conversion Values** table. They must match exactly.
+2. Read the notice at the top of the page. If Meta offers auto-unpause, turn it on if you want ads to restart automatically after the pause.
+3. Click **Apply**
+
+![Review event configuration step with the Priority ID column as 1, the 72-hour pause notice as 2, and the Apply button as 3](/images/meta/skan/review-and-apply.webp)
+
+## 5. Create an iOS Campaign in Meta Ads Manager
+
+Start a campaign as described in [Create Your First Campaign](/ad-networks/meta-ads#4-create-your-first-campaign), with the **App promotion** objective. Then complete these SKAN-specific settings.
+
+### Campaign Settings
+
+1. In the **iOS 14+ campaign** section, select your app from the App Store under **App**
+2. Keep **Apple's SKAdNetwork reporting** checked
+3. Check **iOS 14+ campaign limits**. Meta limits how many iOS 14+ campaigns can run for each app, and how many ad sets each campaign can have.
+
+![Campaign editor with the iOS 14+ campaign App field, the Apple's SKAdNetwork reporting checkbox, and the iOS 14+ campaign limits panel highlighted](/images/meta/skan/campaign-ios14-section.webp)
+
+### Ad Set Settings
+
+1. Under **App promotion**, confirm **Mobile app store** shows **Apple App Store** and your app. You change these in the campaign's **iOS 14+ campaign** section.
+2. Under **Performance goal**, select **Maximise number of app events** to optimize for an in-app event
+3. Under **App event**, select an event from your SKAN configuration. Meta marks events without a conversion value as inactive for campaign and ad set reporting.
+4. Review **Attribution**. It shows how Meta attributes this ad set. See Meta's guide to [Aggregated Event Measurement and SKAdNetwork](https://www.facebook.com/business/help/331612538028890) before you change it.
+
+![Ad set editor with the Apple App Store and app, performance goal, app event, and attribution settings highlighted](/images/meta/skan/ad-set-app-event.webp)
+
+Create the ad and publish the campaign as described in [Create the Ad](/ad-networks/meta-ads#step-3-create-the-ad).
+
+## 6. Grant Access to Linkrunner (Optional)
+
+If you want Linkrunner to configure the SKAN schema in Meta for you, share your app's dataset with **access@linkrunner.io** in Meta Business Manager. Access to the ad account alone is not enough, because the SKAN settings live on the dataset.
+
+## 7. Verify the Setup
+
+<Steps>
+    <Step title="Check the checklist">
+        Confirm every item is complete in the [Meta SKAN Integration
+        Checklist](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=skan_integration).
+    </Step>
+    <Step title="Check the Meta configuration">
+        In Meta Events Manager, open your dataset's **Settings** tab and click **Edit events**. The **Review** step should
+        list the same events and priorities as Linkrunner's **Meta SKAN Configuration** tab. Click **Cancel** to leave
+        without changes.
+    </Step>
+    <Step title="Run an iOS campaign">
+        SKAN postbacks only flow once a Meta iOS App Promotion campaign is live and driving installs.
+    </Step>
+    <Step title="Watch the SKAN dashboard">
+        Postbacks appear in the [SKAN dashboard](/features/skan-dashboard/overview) as Apple delivers them. Apple delays
+        postbacks by design, so expect data 24 to 48 hours after installs begin.
+    </Step>
+</Steps>
+
+## Troubleshooting
+
+### No postbacks in the SKAN dashboard
+
+- Confirm SKAN is **Enabled** at the top of **Settings → SKAN Setup**
+- Confirm the `Info.plist` keys from [section 1](#1-prepare-your-app) are in the live app build
+- Confirm the SKAN-ready SDK version is live and rolled out to 100% of users
+- Wait 24 to 48 hours. Apple delays SKAN postbacks by design
+
+### An event is missing from the Meta event list
+
+Meta only lists events it has received from your app in the past 90 days.
+
+- Open your dataset's **Overview** tab in Meta Events Manager and select a longer date range to check whether Meta has received the event
+- Confirm the event is mapped in [Integrations → Meta Ads → Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=event_mapping)
+- Trigger the event from your app and wait for it to appear in Events Manager, then return to **Edit events**
+
+### Meta SKAN Configuration asks for event mappings
+
+Map every event listed on that screen in [Integrations → Meta Ads → Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=event_mapping), then reload **Settings → SKAN Setup → Meta SKAN Configuration**.
+
+### Conversion values look wrong in Meta
+
+- Confirm the **Priority ID** of each event in Meta's **Review** step matches the **Priority** numbers in **Settings → SKAN Setup → Meta SKAN Configuration**
+- Confirm you regenerated and re-entered the values after any schema change in Linkrunner
+
+### Meta still attributes via the Facebook SDK
+
+- Confirm the **SKAdNetwork for the Facebook SDK** toggle is **OFF** for your dataset
+- Confirm **Custom integration for SKAdNetwork** is selected under **Edit events**
+
+---
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

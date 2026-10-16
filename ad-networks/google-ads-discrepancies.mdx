@@ -1,0 +1,142 @@
+---
+title: "Google Ads FAQ and Discrepancies"
+description: "Troubleshoot common issues and understand expected discrepancies between Google Ads and Linkrunner"
+icon: "circle-question"
+---
+
+Google Ads and Linkrunner rarely show identical numbers. Check your integration first, then compare the same date range, time zone, and conversion actions.
+
+For setup instructions, see the [Google Ads integration guide](/ad-networks/google-ads).
+
+<Note>
+    Google publishes its own explanation of the unavoidable differences: [Discrepancies in App Conversion Attribution](https://developers.google.com/app-conversion-tracking/api/discrepancies).
+</Note>
+
+## Google Ads FAQ
+
+<AccordionGroup>
+
+<Accordion title="Installs aren't showing up in Google Ads">
+Walk through this checklist.
+
+<Steps>
+<Step title="Confirm the Google Ads integration is active in Linkrunner">
+Open [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads), open the three-dot menu on the Google Ads row, choose **Setup Link IDs**, and verify the link ID is saved for the correct platform (Android or iOS).
+</Step>
+<Step title="Import first_open in Google Ads">
+In Linkrunner, open [Google Ads → Event Mapping → App Event Mapping](https://dashboard.linkrunner.io/dashboard/integrations/google-ads?tab=event_mapping). Under **Google app conversion goals**, select the account and platform and check the `first_open` action. If it is hidden, follow [Manage Google conversion actions](/ad-networks/google-ads#4-importing-events-for-conversion-actions-setup) to import it. **Import** opens the editor and does not save the change until you confirm. An already enabled action does not need importing again.
+
+If it was previously deleted, follow [Re-enabling Previously Deleted Events](/ad-networks/google-ads#re-enabling-previously-deleted-events).
+</Step>
+<Step title="Check MCC vs. sub-account responsibility">
+If you run from an MCC (manager account) with sub-accounts, either:
+
+- The MCC imports `first_open` on behalf of all linked sub-accounts, or
+- The MCC shares the Link ID with the sub-account, and the sub-account imports `first_open` itself.
+</Step>
+<Step title="Wait for activation">
+Google processing time varies after you create or update a Link ID. There is no fixed activation-time guarantee. Confirm the account and platform, then use **Refresh goals** to check conversion-action discovery. Discovery does not confirm receipt or attribution of an individual event.
+</Step>
+</Steps>
+</Accordion>
+
+<Accordion title="first_open conversions are missing in Google Ads">
+Check whether `first_open` is pending discovery, hidden, or already enabled in **Google app conversion goals**. Follow [Manage Google conversion actions](/ad-networks/google-ads#4-importing-events-for-conversion-actions-setup) to refresh discovery or import a hidden action. Google may automatically enable an action as **Secondary**. An enabled action alone does not confirm individual event receipt or campaign bidding eligibility. Review **Action optimization** and **Account default goal** through **Edit goal**, and check campaign-specific goal selection in Google Ads.
+</Accordion>
+
+<Accordion title="In-app events aren't appearing in the Google Ads dashboard">
+<Steps>
+<Step title="Verify events reach Linkrunner">
+Trigger the event in your app (on iOS, allow tracking so the IDFA is available) and confirm it appears in your Linkrunner dashboard.
+</Step>
+<Step title="Verify postbacks to Google Ads are enabled">
+In the Linkrunner Google Ads integration tab, confirm the event is mapped and postbacks are enabled.
+</Step>
+<Step title="Import the event in Google Ads">
+In Linkrunner's **App Event Mapping**, find **Google app conversion goals**, select the account and platform, and click **Refresh goals**. Check the exact mapped event name. If the action is hidden, click **Import**, review the goal settings, and set **Import conversion action** to **Import and enable**. Click **Save changes**, review the **Confirm Google Ads account changes** dialog, then click **Confirm and save**. The action is imported only after the save succeeds. Choose **Keep hidden** if you do not want to import it.
+
+For an enabled action, use **Edit goal** instead. See [Manage Google conversion actions](/ad-networks/google-ads#4-importing-events-for-conversion-actions-setup) for the settings and their account-level scope. Campaign-specific selection remains in Google Ads.
+</Step>
+</Steps>
+
+<Note>
+    Event receipt, conversion-action discovery, import, and reporting are separate. Google processing time varies, with no fixed guarantee. A discovered or enabled action does not prove that Google received or attributed a particular event.
+</Note>
+</Accordion>
+
+<Accordion title="Do I need to import session_start?">
+It depends on the campaign type.
+
+- **User acquisition campaigns:** Not mandatory.
+- **Re-engagement campaigns:** Recommended. Import `session_start` to measure engagements.
+</Accordion>
+
+<Accordion title="Using multiple Google Ads accounts">
+Linkrunner works with a single Link ID per platform. Generate one Link ID in Google Ads and share it across the relevant accounts. See [Google's documentation on sharing Link IDs](https://support.google.com/google-ads/answer/3030657).
+</Accordion>
+
+<Accordion title="MCC-level vs. account-level Link IDs">
+Both are supported. Work with your Google Ads representative to confirm the account structure, especially if multiple teams or agencies manage the same ad accounts.
+</Accordion>
+
+<Accordion title="How Android and iOS attribution differs">
+Google is a Self-Reporting Network (SRN), so Google Ads reports its own attributed installs and events back to Linkrunner through its API.
+
+- **Android:** Requires GAID collection. The Linkrunner SDK captures GAID automatically when the user has not opted out.
+- **iOS:** Measurement happens via **SKAdNetwork (SKAN)**. Google Ads sends SKAN postbacks to Linkrunner, and installs with `did_win=TRUE` are counted. Deterministic SDK attribution only works when the user grants ATT and the IDFA is available. See [SKAdNetwork integration](/features/skadnetwork-integration) and [iOS Campaign Data Limitations](/features/ios-campaign-data-limitations).
+- **iOS without ATT consent:** [Integrated Conversion Measurement](/sdk/ios#google-integrated-conversion-measurement-optional) can attribute installs even when ATT is denied and no IDFA is available. It complements SKAN rather than replacing it, and needs setup in your iOS app. Google keeps it inactive for users in the EEA, the UK, and Switzerland.
+
+See the [Google Ads integration guide](/ad-networks/google-ads) for full setup on each platform.
+</Accordion>
+
+</AccordionGroup>
+
+## What causes discrepancies
+
+The differences fall into three groups.
+
+<CardGroup cols={3}>
+<Card title="Timing" icon="clock">
+Google Ads dates conversions to the **ad click**. Linkrunner dates them to the **first app open** (or the event itself). A Jan 5 conversion in Linkrunner can show on Jan 1 in Google Ads if the click happened then.
+</Card>
+<Card title="Counting" icon="calculator">
+As an SRN, Google attributes every install that follows any Google Ads engagement within its window. Linkrunner uses **last-click attribution**, deduplicates across networks, and counts one install per user.
+</Card>
+<Card title="iOS (SKAN)" icon="apple">
+On iOS, Linkrunner counts only SKAN postbacks with `did_win=TRUE`. Google Ads treats all SKAN events the same, so its dashboard typically reports more iOS installs. [Integrated Conversion Measurement](/sdk/ios#google-integrated-conversion-measurement-optional) narrows this gap for users who declined ATT.
+</Card>
+</CardGroup>
+
+### Row-by-row comparison
+
+| Area                     | Google Ads                                                                   | Linkrunner                                                            |
+| ------------------------ | ---------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Install record time      | Click time                                                                   | First app open (Android) or SKAN postback time (iOS)                  |
+| In-app event record time | Click time                                                                   | Dashboard views: install time. Raw data: actual event time            |
+| Attribution window       | 30 days for installs, 90 days for in-app events                              | Uses Google's API defaults; configurable per project                  |
+| Time zones               | Account local time                                                           | Project time zone                                                     |
+| View-through conversions | Shown in **All conversions** column, not **Conversions** column by default   | Click-through and view-through surfaced separately when Google provides them |
+| Assisted installs        | Every install following any engagement within the window is credited         | Last-click attribution; earlier engagements are assists               |
+| Reinstalls               | Reported as `session_start` conversions                                      | Surfaced as re-attributions in the remarketing view                   |
+| Count setting            | "Every" conversion counted                                                   | One install per user; multiple occurrences of the same in-app event   |
+| Processing delay         | Varies by processing stage; no fixed guarantee                                | Near real time                                                        |
+| Deduplication            | Reports all claims, including overlap with other networks                    | Credits a single source per user                                      |
+| SKAN installs (iOS)      | Counts postbacks with `did_win=TRUE` and `did_win=NULL` together             | Counts only `did_win=TRUE`                                            |
+
+<Note>
+    **Web-to-App is a Linkrunner-specific case.** When a Google Ads click originates from a web page that carries `gad_campaignid` in its referrer URL, Linkrunner attributes the resulting install to the **original SEARCH campaign from the referrer** rather than the App Campaign returned by Google's API. This keeps the real source intact across the web → install handoff. Google Ads will still report the install under the App Campaign, which produces a predictable per-campaign discrepancy.
+</Note>
+
+## Troubleshooting checklist
+
+If the gap is much bigger than expected:
+
+- Conversion action is **enabled** in the correct Google Ads account, either through import or automatic enablement. For bidding, also check **Action optimization**, **Account default goal**, and campaign-specific selection in Google Ads.
+- Event is **mapped and enabled** in the Linkrunner → Google Ads integration.
+- The correct **Link ID** is saved in Linkrunner and shared with the right MCC sub-account.
+- iOS: SKAdNetwork is configured and you're running App Campaigns. See [SKAdNetwork integration](/features/skadnetwork-integration).
+- Android: cross-check the re-install rate in the Google Play Developer Console to rule out measurement-model differences.
+
+---
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

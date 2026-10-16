@@ -1,0 +1,319 @@
+---
+title: "Conversion Values in SKAdNetwork"
+description: "Understanding conversion values in SKAdNetwork 4.0 for iOS attribution"
+icon: "chart-line"
+---
+
+SKAdNetwork conversion values allow you to measure the quality and behavior of users who install your app through Apple's privacy-preserving attribution framework. This guide explains what conversion values are, how they work, and how to design an effective schema for your app.
+
+## What Are Conversion Values?
+
+Conversion values are integer values between 0 and 63 that represent user actions or engagement levels within your app. When a user installs your app through an ad, you can update the conversion value based on their behavior, and this value is included in the SKAdNetwork postback sent to the ad network.
+
+Think of conversion values as a way to communicate "how valuable is this user?" to your ad networks, helping them optimize campaigns for quality users rather than just install volume.
+
+<Note>
+    Conversion values provide a privacy-preserving way to measure user quality without sharing individual user data.
+    Apple uses crowd anonymity to protect user privacy while still providing useful attribution data.
+</Note>
+
+## How Conversion Values Work in SKAN 4.0
+
+SKAdNetwork 4.0 introduced significant improvements to conversion value tracking through a multi-window approach:
+
+### Three Measurement Windows
+
+Instead of a single 24-hour window, SKAN 4.0 uses three distinct measurement windows:
+
+<CardGroup cols={3}>
+    <Card title="Window 1" icon="1">
+        **0-2 days** after install Early engagement signals
+    </Card>
+    <Card title="Window 2" icon="2">
+        **3-7 days** after install Mid-term user behavior
+    </Card>
+    <Card title="Window 3" icon="3">
+        **8-35 days** after install Long-term value signals
+    </Card>
+</CardGroup>
+
+Each window can have its own conversion value, allowing you to track user progression over time. For example:
+
+-   **Window 1**: User completed onboarding
+-   **Window 2**: User made their first purchase
+-   **Window 3**: User became a repeat customer
+
+### Conversion Value Updates
+
+You can update the conversion value multiple times within a measurement window:
+
+-   The value can be increased or decreased at any time
+-   The final value at the end of each window is what gets reported in the postback
+-   Each window's postback is sent independently
+
+<Note>
+    Unlike SKAN 3.0, where you could only increase conversion values, SKAN 4.0 allows both increases and decreases,
+    giving you more flexibility in tracking user behavior.
+</Note>
+
+## Fine vs Coarse Conversion Values
+
+SKAN 4.0 introduces two types of conversion values based on privacy thresholds:
+
+### Fine Conversion Values
+
+**Fine conversion values** provide the full 6-bit granularity (0-63) and are available when Apple's privacy threshold is met.
+
+-   **Range**: 0 to 63 (64 possible values)
+-   **Requirement**: Sufficient ad campaign volume to meet crowd anonymity threshold
+-   **Use Case**: Detailed user segmentation and behavior tracking
+
+Example fine conversion value schema:
+
+```
+0-9:   Non-engaged users
+10-19: Completed onboarding
+20-29: Made first in-app action
+30-39: Light spenders ($0.99 - $4.99)
+40-49: Medium spenders ($5 - $19.99)
+50-59: High spenders ($20 - $49.99)
+60-63: VIP users ($50+)
+```
+
+### Coarse Conversion Values
+
+**Coarse conversion values** are a privacy fallback that provides only three levels of granularity when the privacy threshold is not met.
+
+-   **Values**: Low, Medium, High
+-   **Requirement**: Used when campaign volume is insufficient for fine values
+-   **Use Case**: Basic quality signals for smaller campaigns
+
+<Warning>
+    You cannot predict whether your campaign will receive fine or coarse conversion values. Design your schema to work
+    effectively with both by ensuring your most critical user segments align with the three coarse levels.
+</Warning>
+
+### Privacy Thresholds
+
+Apple uses crowd anonymity to determine whether fine or coarse values are provided:
+
+-   **Threshold Met**: Campaign has enough installs → Fine conversion values (0-63)
+-   **Threshold Not Met**: Campaign has too few installs → Coarse conversion values (Low/Medium/High)
+
+The exact threshold is not publicly disclosed by Apple and may vary based on factors like geography and time period.
+
+## Designing Your Conversion Value Schema
+
+A well-designed conversion value schema aligns with your business goals and provides actionable insights. Here's how to create an effective schema:
+
+### Step 1: Identify Key User Actions
+
+List the most important actions users can take in your app:
+
+-   Completing onboarding or tutorial
+-   First meaningful action (e.g., creating content, adding items to cart)
+-   Subscription or purchase events
+-   Social engagement (sharing, inviting friends)
+-   Retention milestones (daily usage, weekly activity)
+
+### Step 2: Prioritize Actions by Business Value
+
+Rank these actions based on their importance to your business:
+
+1. **Highest Value**: Actions that directly generate revenue
+2. **High Value**: Actions that strongly correlate with retention
+3. **Medium Value**: Engagement signals that predict future value
+4. **Low Value**: Basic app usage indicators
+
+### Step 3: Map Actions to Conversion Values
+
+Assign conversion value ranges to different user segments:
+
+<CardGroup cols={2}>
+    <Card title="Progressive Schema" icon="arrow-up">
+        Values increase as users progress through your funnel Best for: Apps with clear progression paths
+    </Card>
+    <Card title="Revenue-Based Schema" icon="dollar-sign">
+        Values map directly to revenue brackets Best for: E-commerce and subscription apps
+    </Card>
+</CardGroup>
+
+### Step 4: Align with Coarse Values
+
+Ensure your schema works with coarse conversion values:
+
+-   **Low (0-21)**: Basic engagement, no revenue
+-   **Medium (22-42)**: Moderate engagement, small revenue
+-   **High (43-63)**: Strong engagement, significant revenue
+
+<Note>
+    The mapping of fine values to coarse values (Low/Medium/High) is approximate. Design your schema so that critical
+    business segments have clear separation even at the coarse level.
+</Note>
+
+## Example Conversion Value Schemas
+
+### E-commerce App Example
+
+A practical conversion value schema for a shopping app:
+
+**Window 1 (0-2 days):**
+
+```
+0:     No activity
+10:    Viewed products
+20:    Added to cart
+30:    Completed purchase ($0-$25)
+40:    Completed purchase ($25-$50)
+50:    Completed purchase ($50-$100)
+60:    Completed purchase ($100+)
+```
+
+**Window 2 (3-7 days):**
+
+```
+0:     No return visit
+15:    Returned but no action
+25:    Viewed products
+35:    Made 2nd purchase (any amount)
+50:    Made multiple purchases
+63:    High-value repeat customer
+```
+
+**Window 3 (8-35 days):**
+
+```
+0:     Churned (no activity)
+20:    Occasional browser
+40:    Regular purchaser (3+ purchases)
+60:    VIP customer (high LTV)
+```
+
+### Subscription App Example
+
+A conversion value schema for a subscription-based app:
+
+**Window 1 (0-2 days):**
+
+```
+0:     Opened app only
+15:    Completed onboarding
+30:    Used core feature
+45:    Started free trial
+63:    Converted to paid subscription
+```
+
+**Window 2 (3-7 days):**
+
+```
+0:     Inactive
+20:    Active free trial
+40:    Daily active user
+55:    Paid subscriber (active)
+63:    Paid subscriber (power user)
+```
+
+**Window 3 (8-35 days):**
+
+```
+0:     Churned
+25:    Canceled trial/subscription
+45:    Active subscriber (low engagement)
+60:    Active subscriber (high engagement)
+63:    Subscriber + referred others
+```
+
+### Gaming App Example
+
+A conversion value schema for a mobile game:
+
+**Window 1 (0-2 days):**
+
+```
+0:     Tutorial incomplete
+10:    Completed tutorial
+20:    Played 5+ levels
+30:    Made in-app purchase ($0.99-$4.99)
+45:    Made in-app purchase ($5-$19.99)
+60:    Made in-app purchase ($20+)
+```
+
+**Window 2 (3-7 days):**
+
+```
+0:     Did not return
+15:    Played 1-2 sessions
+30:    Daily player
+45:    Daily player + purchase
+60:    Power player (10+ sessions, purchase)
+```
+
+**Window 3 (8-35 days):**
+
+```
+0:     Churned
+20:    Weekly player
+40:    Retained daily player
+55:    High LTV ($50+ total spend)
+63:    Whale ($100+ total spend)
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+    <Card title="Start Simple" icon="lightbulb">
+        Begin with a straightforward schema and iterate based on data. Complexity doesn't always mean better
+        optimization.
+    </Card>
+    <Card title="Focus on Business Goals" icon="bullseye">
+        Map conversion values to actions that matter to your business, not just any user activity.
+    </Card>
+    <Card title="Test and Iterate" icon="rotate">
+        Monitor campaign performance and adjust your schema based on what drives the best results.
+    </Card>
+    <Card title="Consider Coarse Values" icon="shield">
+        Ensure your schema provides value even when only coarse conversion values are available.
+    </Card>
+</CardGroup>
+
+### Common Pitfalls to Avoid
+
+<Warning>
+    **Don't use all 64 values**: Most apps only need 5-10 distinct segments per window. Too many values dilute the
+    signal.
+</Warning>
+
+<Warning>
+    **Don't ignore early actions**: Window 1 happens in just 0-2 days. Make sure you're tracking early engagement
+    signals, not just revenue.
+</Warning>
+
+<Warning>
+    **Don't forget about retention**: A user who returns regularly but hasn't paid yet might be more valuable than a
+    one-time purchaser.
+</Warning>
+
+## Privacy Considerations
+
+SKAdNetwork conversion values are designed with privacy at their core:
+
+-   **Crowd Anonymity**: Postbacks are only sent when there's sufficient volume to prevent individual user tracking
+-   **Delayed Reporting**: Postbacks are sent with random delays to prevent timing-based tracking
+-   **Limited Information**: Only the conversion value is shared, not specific user actions or identities
+
+Your conversion value schema should respect user privacy:
+
+-   Don't try to encode personally identifiable information
+-   Focus on aggregate user quality signals
+-   Design schemas that work within Apple's privacy framework
+
+## Next Steps
+
+Now that you understand conversion values, you can:
+
+1. **Design your schema**: Map out conversion values that align with your business goals
+2. **Implement tracking**: Configure your SDK to update conversion values based on user actions
+3. **Set up dashboard**: Configure your conversion value schema in the Linkrunner dashboard
+4. **Monitor and optimize**: Track campaign performance and refine your schema over time
+
+For implementation details, see the [SKAdNetwork Integration Guide](/sdk/skadnetwork/integration).
