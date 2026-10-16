@@ -49,7 +49,7 @@ Send all parameters as URL-encoded query parameters. Each value is limited to 25
 | `s3` | `af_sub2` | No | Passthrough value, returned in `{s3}`. |
 | `s4` | `af_sub3` | No | Passthrough value, returned in `{s4}`. |
 
-Every impression needs a `gaid` or an `idfa`. View-through attribution matches on device ID only, so unlike [S2S clicks](/api-reference/s2s-clicks), an IP address alone is rejected.
+Every impression needs a `gaid` or an `idfa`. This endpoint matches on device ID only, so unlike [S2S clicks](/api-reference/s2s-clicks), an IP address alone is rejected. For connected TV impressions that carry only an IP address, use the [CTV Impression API](/api-reference/ctv-impressions).
 
 If both a name and its alias are sent, the name wins. `click_time` is ignored on this endpoint; use `impression_time`. `pid`, `af_siteid` and `af_lang` are ignored, so an AppsFlyer impression template works once the host and `c` are changed and your token is added.
 
