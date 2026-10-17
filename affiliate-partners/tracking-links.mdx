@@ -94,11 +94,13 @@ If you do this, pass the user's device IP and user agent on the link:
 https://track.example.com/?c=OgWmhiSXhG&tid=a1b2c3d4e5&ip=49.204.110.61&ua=Mozilla%2F5.0%20%28Linux%3B%20Android%2014%3B%20Pixel%208%29...&redirect=false
 ```
 
-With `redirect=false`, Linkrunner answers `200` with:
+With `redirect=false`, Linkrunner records the click before it answers, and responds `200` with:
 
 ```json
 {"status": "accepted", "click_id": "8f6d2a1e-3c4b-4d5e-9f60-7a8b9c0d1e2f"}
 ```
+
+If Linkrunner could not record the click, it responds `503` with `{"status": "rejected", "reason": "unavailable"}`. Retry the same request later.
 
 If the click is not recorded, the response says why, for example `{"status": "ignored", "reason": "invalid_ip"}`:
 
