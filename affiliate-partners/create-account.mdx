@@ -1,6 +1,6 @@
 ---
 title: "Create an Affiliate Account"
-description: "Create your affiliate workspace, add your network details, and submit it for approval"
+description: "Create your affiliate workspace, add your network details and postback URLs, and get approved"
 icon: "user-plus"
 ---
 
@@ -53,16 +53,28 @@ Use complete HTTPS URLs, including any credentials that Linkrunner should use. Y
 Click **Complete setup**.
 
 <Note>
-  Linkrunner configures your postbacks after your application is approved. Installs, and signups once set up, are sent automatically. In-app events are sent only after they are mapped. See [Postbacks and Macros](/affiliate-partners/postbacks) for event mapping, supported macros, and IP allowlisting.
+  If your postback URLs pass Linkrunner's checks, your workspace is approved as soon as you click **Complete setup**. Each URL you add needs:
+
+  - Your click ID as `{click_id}` (or `{tid}`), so each postback tells you which click it is for.
+  - Only [Linkrunner macros](/affiliate-partners/postbacks#macro-syntax), in curly braces. Placeholders such as `(event-name)` or `{REPLACE}` are not filled.
+  - A value for every `{secret.name}` the URL uses.
+
+  Installs, and signups once set up, are sent automatically. In-app events are sent only after they are mapped. See [Postbacks and Macros](/affiliate-partners/postbacks) for event mapping, supported macros, and IP allowlisting.
 </Note>
 
-## 4. Wait for approval
+## 4. Get approved
 
-The **Pending verification** page confirms that Linkrunner received your application. You can close the page safely.
+If your postback URLs pass every check, Linkrunner approves your workspace straight away, opens your affiliate dashboard, and sends you an approval email.
+
+If something needs fixing, the **Pending verification** page lists each problem. Click **Fix postback URLs**, correct the URLs, and save. Your workspace is approved as soon as they pass.
+
+![Pending verification page listing the postback URL fixes, with a Fix postback URLs button](/images/affiliate-partners/create-account-pending-fix.webp)
+
+If another partner already uses your network name, the Linkrunner team reviews your application by hand. The page says the application is under review, and you can close it safely. Linkrunner emails you when the workspace is approved.
 
 ![Affiliate application pending verification](/images/affiliate-partners/create-account-pending.webp)
 
-Linkrunner emails you when the workspace is approved. After approval, you can sign in and work with connected Linkrunner customers.
+Approval alone sends no postbacks. They start once an advertiser connects your workspace to their app.
 
 ## Troubleshooting
 
@@ -76,6 +88,6 @@ Upload a supported logo, enter an affiliate name, and add a description.
 Enter a valid HTTPS post-install event URL. The install postback URL can remain blank.
 
 **Your workspace still shows Pending verification.**
-Your application is waiting for Linkrunner approval. You receive an email after the review is complete.
+If the page lists fixes, click **Fix postback URLs** and correct each one. Your workspace is approved when you save URLs that pass. If the page says your application is under review, the Linkrunner team is checking it by hand and emails you when it is done.
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
