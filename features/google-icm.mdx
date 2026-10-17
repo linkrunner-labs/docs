@@ -127,6 +127,50 @@ See [Send Consent](/features/send-consent) for what to report for users outside 
   </Card>
 </CardGroup>
 
+## Deferred deep links
+
+An install that Google credits through ICM can open a specific screen on first launch, the same as any other Google install. You set the deep link on the Google campaign in Linkrunner, and your app reads it from `getAttributionData()`. There is no ICM-specific code to write.
+
+<Steps>
+  <Step title="Open the Google campaign">
+    Go to [Campaigns](https://dashboard.linkrunner.io/dashboard/campaigns), filter by **Google**, and click the campaign. Campaigns where Google credited installs through ICM in the selected date range show an **ICM** tag next to the name.
+
+    ![Linkrunner Campaigns list filtered to Google, with the ICM tag next to a campaign name](/images/google_ads/icm-deep-link/campaigns-icm-tag.webp)
+
+    <Note>
+        A Google campaign shows up in Linkrunner after its first attributed install. Add the deep link once it appears. Installs attributed before you save it do not get it.
+    </Note>
+  </Step>
+
+  <Step title="Set the deep link destination">
+    In the campaign panel, click **Edit**.
+
+    ![Google campaign panel with the Edit button highlighted](/images/google_ads/icm-deep-link/campaign-panel-edit.webp)
+
+    Enter the in-app path in **Deeplink destination** (for example `/product/sneakers-123`) and click **Update**.
+
+    ![Edit campaign window with a path entered in Deeplink destination](/images/google_ads/icm-deep-link/edit-campaign-deeplink.webp)
+
+    The path is added to your project's domain, as shown under the field.
+  </Step>
+
+  <Step title="Read it in your app">
+    On first launch, call `getAttributionData()` and route the user with the `deeplink` field. See [Handle in your app](/features/deferred-deep-linking#2-handle-in-your-app).
+  </Step>
+</Steps>
+
+<Warning>
+    Set the deep link on the campaign, not on an ad set. Ad set deep links are not available for Google iOS campaigns, and Google often credits an ICM install to the campaign without naming an ad group.
+</Warning>
+
+What your app receives:
+
+| Situation | `deeplink` |
+| --- | --- |
+| The campaign has a deep link | The full URL, for example `https://yourdomain.com/product/sneakers-123` |
+| The campaign has no deep link | Empty. Open your default screen. |
+| The user is in the EEA, the UK, or Switzerland | ICM does not run there, so the install gets the deep link only if Google attributes it another way |
+
 ## Upgrade from a pre-ICM SDK version
 
 Update the Linkrunner SDK before adding Google's ODM SDK or calling `setConsent`.

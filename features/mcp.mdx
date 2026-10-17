@@ -444,6 +444,15 @@ revoke an unused token before creating a new one.
   hides the path, because a Slack webhook path is a credential in itself.
 - SDK private keys, billing settings, and admin actions are not exposed.
 - Tokens are revocable from the dashboard at any time.
+- To improve the connector, Linkrunner records basic usage for each call: the
+  tool used, whether it worked, how long it took, the names of the arguments
+  (not their values), the AI app you use, and the token, project, and person it
+  belongs to. Returned data is never recorded.
+- Error messages and a short summary of what you asked (your assistant may
+  send one with a call) are recorded with emails, links, phone numbers, and
+  long IDs hidden. Names and other plain text are kept as written, so avoid
+  putting personal or confidential details in your prompts.
+- Usage records are kept for one year.
 - Per-project token cap of 10 limits the blast radius if one leaks.
 
 <Note>

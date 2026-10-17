@@ -155,7 +155,7 @@ try {
 ```
 
 <Note>
-    The identifier is stored securely on-device and persists across app restarts. Calling `setCustomerUserId` again with a **different** identifier updates the stored value; passing the same identifier is a no-op. `signup()` / `setUserData()` also update it.
+    The identifier is stored securely on-device and persists across app restarts. Calling `setCustomerUserId` again with a **different** identifier updates the stored value; passing the same identifier is a no-op. `signup()`, and `setUserData()` called with an `id`, also update it.
 </Note>
 
 ## User Identification (Required)
@@ -268,9 +268,13 @@ The `getAttributionData` function returns:
         adSetName?: string; // Ad set name
         adCreativeId?: string; // Ad creative ID
         adCreativeName?: string; // Ad creative name
-    }
+    };
+    gaid?: string | null; // Android only
+    idfa?: string | null; // iOS only, null when ATT is not authorized
 }
 ```
+
+`gaid` is set on Android and `idfa` on iOS. Each one is `null` when it is not available, for example on the other platform, when the user has not allowed tracking (ATT), or when limited ad tracking is on. Requires `capacitor-linkrunner` 2.2.0 or later.
 
 **Example response:**
 
@@ -284,7 +288,7 @@ The `getAttributionData` function returns:
         "adNetwork": "META",
         "installedAt": "2024-03-20T10:30:00Z",
         "storeClickAt": "2024-03-20T10:29:45Z",
-        "groupName": "iOS Campaign",
+        "groupName": "Summer Sale Group",
         "assetName": "Banner Ad 1",
         "assetGroupName": "Product Catalog",
         "adNetworkCampaignId": "120214682829390250",
@@ -292,30 +296,60 @@ The `getAttributionData` function returns:
         "adSetName": "Productivity",
         "adCreativeId": "120214682926100250",
         "adCreativeName": "Static_2"
-    }
+    },
+    "gaid": "38400000-8cf0-11bd-b23e-10b96e40000d",
+    "idfa": null
 }
 ```
 
 ## Setting User Data
 
-Call `setUserData` each time the app opens and the user is logged in:
+Call `setUserData` to send user details and the IDs your product analytics tools use for this user. You can call it right after `init`, before the user logs in: `id` is optional for `setUserData`. Pass `id` once the user is logged in.
+
+When you pass a tool's ID and that integration is configured in Linkrunner, Linkrunner sends this install's attribution to that tool for this user, the same attribution it sends after `signup` (for example, `lr_campaign` and `lr_ad_network` on the Mixpanel profile). This applies to installs attributed to a campaign. If the install is not attributed yet, Linkrunner sends the properties once attribution completes. Supported IDs:
+
+| Tool | Field |
+|------|-------|
+| Mixpanel | `mixpanel_distinct_id` |
+| Amplitude | `amplitude_device_id` |
+| PostHog | `posthog_distinct_id` |
+| MoEngage | `moengage_user_id` |
+| Braze | `braze_device_id` |
+| Google Analytics 4 | `ga_app_instance_id` and `ga_session_id` |
+| Netcore | `netcore_device_guid` |
 
 <Note>
-**`setUserData` is optional and is not a replacement for `signup`.** Always call `signup` first as soon as the user is identified (signup or login). Use `setUserData` afterwards only when additional user details become available later — for example, when the user adds a phone number, email, or completes their profile after identification.
+**`setUserData` is not a replacement for `signup`.** Call `signup` as soon as the user is identified (signup or login). `signup` still requires `id`.
 </Note>
+
+<Note>
+Calling `setUserData` without `id` requires Capacitor SDK 2.3.0 or later. On earlier versions `id` is required.
+</Note>
+
+Right after `init`, before the user logs in:
+
+```typescript
+import linkrunner from "capacitor-linkrunner";
+
+const setAnalyticsIds = async (mixpanelDistinctId: string) => {
+    await linkrunner.setUserData({
+        mixpanel_distinct_id: mixpanelDistinctId,
+    });
+};
+```
+
+After the user logs in:
 
 ```typescript
 import linkrunner from "capacitor-linkrunner";
 
 const setUserData = async () => {
     await linkrunner.setUserData({
-        id: "123", // Required: User ID
+        id: "123", // Your customer user ID
         name: "John Doe", // Optional
         phone: "9876543210", // Optional
         email: "user@example.com", // Optional
-        mixpanel_distinct_id: "mixpanel_distinct_id", // Optional - Mixpanel Distinct ID
-        amplitude_device_id: "amplitude_device_id", // Optional - Amplitude User ID
-        posthog_distinct_id: "posthog_distinct_id", // Optional - PostHog Distinct ID
+        mixpanel_distinct_id: "mixpanel_distinct_id", // Optional
     });
 };
 ```
@@ -636,7 +670,7 @@ Connect APNs with Linkrunner
 | [`linkrunner.handleDeeplink`](/sdk/capacitor#handle-deeplink) | Required | Deep link entry points | When app is opened via a deep link |
 | [`linkrunner.getAttributionData`](/sdk/capacitor#getting-attribution-data) | Optional | Attribution data handling flow | Whenever the attribution data is needed |
 | [`linkrunner.setAdditionalData`](/sdk/capacitor#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
-| [`linkrunner.setUserData`](/sdk/capacitor#setting-user-data) | Optional | Profile update flow after `signup` | When additional user details become available |
+| [`linkrunner.setUserData`](/sdk/capacitor#setting-user-data) | Optional | App start, authentication or profile update logic | Right after `init` with your analytics IDs, and when user details become available |
 | [`linkrunner.trackEvent`](/sdk/capacitor#tracking-custom-events) | Optional | Throughout app | When specific user actions occur |
 | [`linkrunner.capturePayment`](/sdk/capacitor#capture-payment) | Optional | Payment processing | When user makes a payment |
 | [`linkrunner.removePayment`](/sdk/capacitor#removing-payments) | Optional | Refund flow | When payment needs to be removed |

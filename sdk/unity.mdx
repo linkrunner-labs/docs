@@ -59,7 +59,7 @@ In your Unity project, create or edit the file `Assets/Plugins/Android/mainTempl
 
 ```gradle
 dependencies {
-    implementation 'io.linkrunner:android-sdk:4.1.0'
+    implementation 'io.linkrunner:android-sdk:4.2.0'
 }
 ```
 
@@ -208,23 +208,37 @@ public class LinkrunnerBridge {
         );
     }
 
+    // JsonUtility writes unset strings as "", so treat empty values as absent.
+    private static String optNonEmpty(JSONObject obj, String key) {
+        String value = obj.optString(key, "");
+        return value.isEmpty() ? null : value;
+    }
+
+    // Argument order matches the Android SDK 4.3.0 UserDataRequest constructor.
+    // id is null when absent: setUserData accepts that, signup rejects it.
+    private static UserDataRequest parseUserData(JSONObject obj) {
+        return new UserDataRequest(
+            optNonEmpty(obj, "id"),
+            optNonEmpty(obj, "name"),
+            optNonEmpty(obj, "phone"),
+            optNonEmpty(obj, "email"),
+            optNonEmpty(obj, "mixpanelDistinctId"),
+            optNonEmpty(obj, "amplitudeDeviceId"),
+            optNonEmpty(obj, "posthogDistinctId"),
+            optNonEmpty(obj, "brazeDeviceId"),
+            optNonEmpty(obj, "netcoreDeviceGuid"),
+            optNonEmpty(obj, "gaAppInstanceId"),
+            optNonEmpty(obj, "gaSessionId"),
+            optNonEmpty(obj, "userCreatedAt"),
+            obj.has("isFirstTimeUser") ? obj.optBoolean("isFirstTimeUser") : null,
+            optNonEmpty(obj, "moengageUserId")
+        );
+    }
+
     public static void signup(String userDataJson, String additionalDataJson) {
         try {
             JSONObject obj = new JSONObject(userDataJson);
-            UserDataRequest userData = new UserDataRequest(
-                obj.optString("id", ""),
-                obj.optString("name", null),
-                obj.optString("phone", null),
-                obj.optString("email", null),
-                obj.optString("mixpanelDistinctId", null),
-                obj.optString("amplitudeDeviceId", null),
-                obj.optString("posthogDistinctId", null),
-                obj.optString("brazeDeviceId", null),
-                obj.optString("gaAppInstanceId", null),
-                obj.optString("gaSessionId", null),
-                obj.optString("userCreatedAt", null),
-                obj.has("isFirstTimeUser") ? obj.optBoolean("isFirstTimeUser") : null
-            );
+            UserDataRequest userData = parseUserData(obj);
 
             Map<String, Object> additionalData = jsonToMap(additionalDataJson);
             LinkrunnerJava lr = LinkrunnerJava.getInstance();
@@ -250,20 +264,7 @@ public class LinkrunnerBridge {
     public static void setUserData(String userDataJson) {
         try {
             JSONObject obj = new JSONObject(userDataJson);
-            UserDataRequest userData = new UserDataRequest(
-                obj.optString("id", ""),
-                obj.optString("name", null),
-                obj.optString("phone", null),
-                obj.optString("email", null),
-                obj.optString("mixpanelDistinctId", null),
-                obj.optString("amplitudeDeviceId", null),
-                obj.optString("posthogDistinctId", null),
-                obj.optString("brazeDeviceId", null),
-                obj.optString("gaAppInstanceId", null),
-                obj.optString("gaSessionId", null),
-                obj.optString("userCreatedAt", null),
-                obj.has("isFirstTimeUser") ? obj.optBoolean("isFirstTimeUser") : null
-            );
+            UserDataRequest userData = parseUserData(obj);
 
             LinkrunnerJava lr = LinkrunnerJava.getInstance();
             lr.setUserData(
@@ -534,20 +535,28 @@ private func toOptionalString(_ cString: UnsafePointer<CChar>?) -> String? {
     return str.isEmpty ? nil : str
 }
 
+// JsonUtility writes unset strings as "", so treat empty values as absent.
+// id is nil when absent: setUserData accepts that, signup ignores the call.
 private func parseUserData(_ dict: [String: Any]) -> UserData {
+    func nonEmpty(_ key: String) -> String? {
+        guard let value = dict[key] as? String, !value.isEmpty else { return nil }
+        return value
+    }
     return UserData(
-        id: dict["id"] as? String ?? "",
-        name: dict["name"] as? String,
-        phone: dict["phone"] as? String,
-        email: dict["email"] as? String,
+        id: nonEmpty("id"),
+        name: nonEmpty("name"),
+        phone: nonEmpty("phone"),
+        email: nonEmpty("email"),
         isFirstTimeUser: dict["isFirstTimeUser"] as? Bool,
-        userCreatedAt: dict["userCreatedAt"] as? String,
-        mixPanelDistinctId: dict["mixpanelDistinctId"] as? String,
-        amplitudeDeviceId: dict["amplitudeDeviceId"] as? String,
-        posthogDistinctId: dict["posthogDistinctId"] as? String,
-        brazeDeviceId: dict["brazeDeviceId"] as? String,
-        gaAppInstanceId: dict["gaAppInstanceId"] as? String,
-        gaSessionId: dict["gaSessionId"] as? String
+        userCreatedAt: nonEmpty("userCreatedAt"),
+        mixPanelDistinctId: nonEmpty("mixpanelDistinctId"),
+        amplitudeDeviceId: nonEmpty("amplitudeDeviceId"),
+        posthogDistinctId: nonEmpty("posthogDistinctId"),
+        brazeDeviceId: nonEmpty("brazeDeviceId"),
+        gaAppInstanceId: nonEmpty("gaAppInstanceId"),
+        gaSessionId: nonEmpty("gaSessionId"),
+        netcoreDeviceGuid: nonEmpty("netcoreDeviceGuid"),
+        moengageUserId: nonEmpty("moengageUserId")
     )
 }
 
@@ -634,6 +643,7 @@ func linkrunnerGetAttributionData() {
         var result: [String: Any] = [:]
         if let deeplink = response.deeplink { result["deeplink"] = deeplink }
         result["attributionSource"] = response.attributionSource
+        if let idfa = response.idfa { result["idfa"] = idfa }
 
         if let campaign = response.campaignData {
             var campaignDict: [String: Any] = [:]
@@ -1200,7 +1210,8 @@ public class LinkrunnerSDK : MonoBehaviour
 }
 
 /// <summary>
-/// User data model. All fields except id are optional.
+/// User data model. Signup requires id; SetUserData does not, so it can be
+/// called right after Init with only analytics ids.
 /// </summary>
 [Serializable]
 public class LinkrunnerUserData
@@ -1215,6 +1226,8 @@ public class LinkrunnerUserData
     public string brazeDeviceId;
     public string gaAppInstanceId;
     public string gaSessionId;
+    public string netcoreDeviceGuid;
+    public string moengageUserId;
     public string userCreatedAt;
     public bool isFirstTimeUser;
 }
@@ -1354,18 +1367,48 @@ Deeplinks on iOS are handled through the `AppDelegate`. After Unity generates th
 
 ### Set User Data on App Open
 
-Call every time the app opens and the user is logged in:
+Call `SetUserData` to send user details and the IDs your product analytics tools use for this user. You can call it right after `Initialize`, before the user logs in: `id` is optional for `SetUserData`. Set `id` once the user is logged in.
+
+When you pass a tool's ID and that integration is configured in Linkrunner, Linkrunner sends this install's attribution to that tool for this user, the same attribution it sends after `Signup` (for example, `lr_campaign` and `lr_ad_network` on the Mixpanel profile). This applies to installs attributed to a campaign. If the install is not attributed yet, Linkrunner sends the properties once attribution completes. Supported IDs:
+
+| Tool | Field |
+|------|-------|
+| Mixpanel | `mixpanelDistinctId` |
+| Amplitude | `amplitudeDeviceId` |
+| PostHog | `posthogDistinctId` |
+| MoEngage | `moengageUserId` |
+| Braze | `brazeDeviceId` |
+| Google Analytics 4 | `gaAppInstanceId` and `gaSessionId` |
+| Netcore | `netcoreDeviceGuid` |
 
 <Note>
-**`SetUserData` is optional and is not a replacement for `Signup`.** Always call `Signup` first as soon as the user is identified (signup or login). Use `SetUserData` afterwards only when additional user details become available later — for example, when the user adds a phone number, email, or completes their profile after identification.
+**`SetUserData` is not a replacement for `Signup`.** Call `Signup` as soon as the user is identified (signup or login). `Signup` still requires `id`.
 </Note>
+
+<Note>
+Calling `SetUserData` without `id` requires the native Android SDK 4.3.0 and iOS SDK 4.3.0 or later, with the bridge code in this guide. On earlier versions `id` is required.
+</Note>
+
+Right after `Initialize`, before the user logs in:
 
 ```csharp
 var userData = new LinkrunnerUserData
 {
-    id = "user_123",
+    mixpanelDistinctId = mixpanelDistinctId // From the Mixpanel SDK
+};
+
+LinkrunnerSDK.SetUserData(userData);
+```
+
+After the user logs in:
+
+```csharp
+var userData = new LinkrunnerUserData
+{
+    id = "user_123", // Your customer user ID
     name = "Jane Doe",
-    email = "jane@example.com"
+    email = "jane@example.com",
+    mixpanelDistinctId = mixpanelDistinctId
 };
 
 LinkrunnerSDK.SetUserData(userData);
@@ -1391,6 +1434,7 @@ The result arrives as a JSON string on the `OnAttributionData` event. With the r
 {
     "deeplink": "https://...",      // optional
     "attributionSource": "string",  // "ORGANIC", "META", "GOOGLE", etc.
+    "idfa": "string",               // optional, only when ATT is authorized (LinkrunnerKit 4.2.0+)
     "campaignData": {
         "id": "string",
         "name": "string",
@@ -1497,7 +1541,7 @@ LinkrunnerSDK.SetDisableAaidCollection(true);
 | [`SetCustomerUserId`](/sdk/unity#set-customer-user-id) | Required | Not exposed by this reference wrapper | Pass the customer user ID through `LinkrunnerUserData.id` instead |
 | [`HandleDeeplink`](/sdk/unity#handle-deeplinks) | Required | Deeplink entry points | When app is opened via a deeplink |
 | [`GetAttributionData`](/sdk/unity#get-attribution-data) | Optional | After init completes | When you need campaign/deeplink info |
-| [`SetUserData`](/sdk/unity#set-user-data-on-app-open) | Optional | Profile update flow after `Signup` | When additional user details become available |
+| [`SetUserData`](/sdk/unity#set-user-data-on-app-open) | Optional | App start, authentication or profile update logic | Right after `Initialize` with your analytics IDs, and when user details become available |
 | [`TrackEvent`](/sdk/unity#track-events) | Optional | Throughout the app | On user actions |
 | [`CapturePayment`](/sdk/unity#capture-payment) | Optional | Payment flow | When payment succeeds |
 | [`RemovePayment`](/sdk/unity#remove-payment-refunds) | Optional | Refund flow | When payment is reversed |

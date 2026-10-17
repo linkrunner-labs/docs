@@ -15,13 +15,14 @@
                 "groups": [
                     {
                         "group": "Getting Started",
-                        "pages": ["introduction", "quickstart", "ai-agent-skills"]
+                        "pages": ["introduction", "quickstart", "features/website-projects", "ai-agent-skills"]
                     },
                     {
                         "group": "SDK Guides",
                         "pages": [
                             "testing/integration-testing",
                             "testing/event-and-revenue-testing",
+                            "testing/web-sdk-testing",
                             "testing/meta-android-attribution-testing",
                             "sdk/react-native",
                             "sdk/flutter",
@@ -39,6 +40,7 @@
                     {
                         "group": "Links & Journeys",
                         "pages": [
+                            "features/create-trackable-link",
                             "features/subdomain-setup",
                             "features/deep-linking-setup",
                             "features/deferred-deep-linking",
@@ -160,6 +162,7 @@
                             "ad-networks/snapchat",
                             "ad-networks/reddit-ads",
                             "ad-networks/chatgpt-ads",
+                            "ad-networks/sharechat-ads",
                             "ad-networks/linkedin-ads",
                             "ad-networks/meta-web-to-app"
                         ]
@@ -200,7 +203,8 @@
                             "api-reference/campaign-apis",
                             "api-reference/s2s-clicks",
                             "api-reference/s2s-impressions",
-                            "api-reference/reporting-campaigns"
+                            "api-reference/reporting-campaigns",
+                            "api-reference/reporting-web-campaigns"
                         ]
                     },
                     {
@@ -221,13 +225,16 @@
                             "affiliate-partners/getting-started",
                             "affiliate-partners/overview",
                             "affiliate-partners/create-account",
+                            "affiliate-partners/add-agency-account",
                             "affiliate-partners/create-campaign-link",
                             "affiliate-partners/tracking-links",
                             "affiliate-partners/s2s-clicks",
                             "affiliate-partners/s2s-impressions",
+                            "affiliate-partners/turn-on-s2s-clicks",
                             "affiliate-partners/postbacks",
                             "affiliate-partners/event-mapping",
-                            "affiliate-partners/postback-logs"
+                            "affiliate-partners/postback-logs",
+                            "affiliate-partners/fraud-data"
                         ]
                     },
                     {
@@ -247,8 +254,12 @@
                         "pages": [
                             "agency-partners/overview",
                             "agency-partners/accept-invitation",
+                            "agency-partners/add-affiliate-account",
                             "agency-partners/manage-workspace",
-                            "agency-partners/invite-an-agency"
+                            "agency-partners/create-campaign-link",
+                            "agency-partners/campaigns-for-affiliates",
+                            "agency-partners/invite-an-agency",
+                            "agency-partners/control-agency-access"
                         ]
                     }
                 ]

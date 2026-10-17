@@ -28,12 +28,12 @@ that brought the shopper in.
         `yourstore.myshopify.com` while your storefront is on `yourstore.com`, Step 2 below
         is required rather than optional.
     </Accordion>
-    <Accordion title="Get your Web SDK token">
-        Web attribution is in beta, so tokens are issued by us. Email
-        [support@linkrunner.io](mailto:support@linkrunner.io) with your project name and
-        store domain, and we'll send you a Web SDK token.
-
-
+    <Accordion title="Get your Web project token">
+        Copy your **Web project token** from
+        [Settings → Project Details](https://dashboard.linkrunner.io/dashboard/settings/project-details).
+        If it is not there, [create a website project](/features/website-projects), or ask a
+        project admin to turn on **Web Campaigns** in Project Details. Use this token wherever
+        this guide says `YOUR_WEB_SDK_TOKEN`.
     </Accordion>
     <Accordion title="Back up your theme">
         Steps 1 to 3 edit your theme's code. In **Online Store → Themes**, use **Actions →
@@ -268,6 +268,8 @@ that brought the shopper in.
 
         You should see page views for the visit, one sign-up, and a `purchase` event carrying
         the order value, all attributed to `utm_campaign=test`.
+
+        For a guided check from your own browser, follow [Test the Web SDK](/testing/web-sdk-testing).
 
         <Tip>
             Refund the test order afterwards. Refunding does not remove the tracked event, which
