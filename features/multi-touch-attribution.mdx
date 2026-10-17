@@ -1,0 +1,120 @@
+---
+title: "Multi-Touch Attribution: Credit Every Channel in the Journey"
+sidebarTitle: "Multi-Touch Attribution"
+description: "See every ad network that helped drive an install, not just the one that won it, side by side with last touch attribution."
+keywords: ["multi-touch attribution", "MTA", "assisted conversions", "assisted installs", "data-driven attribution", "last touch", "last click", "customer journey", "view-through"]
+icon: "route"
+---
+
+Open **Multi-touch** from the left sidebar of the [dashboard](https://dashboard.linkrunner.io/dashboard/attribution). It has two tabs, **Overview** and **Journeys**, and is available for projects where multi-touch attribution changes the answer; see [Who can use it](#who-can-use-it).
+
+<Info>
+**Last touch is never replaced.** Every number is shown beside last touch attribution, so you can see exactly what changed and by how much. Your existing reports and postbacks are not affected.
+</Info>
+
+## The basics
+
+**Journey.** Everything one person did before installing, in date order: the ad touches Linkrunner recorded for them in the 30 days before the install. Devices that belong to the same person are joined, so a person who clicked on one phone and installed on another is one journey. Only touches that carry a device identifier can be joined to a journey.
+
+**Touch and step.** A touch is one recorded click, network claim or view. Back-to-back touches on the same channel fold into one step, so `Meta, Meta, Google` is the two-step path `Meta > Google`. A journey keeps its last 20 steps.
+
+**Last touch.** The touch that won the install: the network the install is attributed to, as on the Campaigns page. It is usually a click, and can be a view (for example an affiliate impression or a Meta view). The page labels it **Last click**. Every multi-touch number is compared with it.
+
+**Install.** A person's first install in the date range. Existing users and reinstalls are not counted. An install with no paid touch counts as **Direct / organic**.
+
+**Revenue.** The payments a person made in the first 7 days after installing (your project's revenue window). Each payment is counted once and payments flagged as fraud are left out.
+
+### Which touches count
+
+Journeys are built from tracking link clicks and the claims ad networks make on an install. Where view journeys are switched on for your project, the views Linkrunner sees for a specific person count as touches too:
+
+- **Affiliate impressions** your partners send to Linkrunner, for partners with view-through switched on. They count over the same 30 days as clicks.
+- **Meta views** on an install another network won, from Meta's install referrer. Meta does not say when the person saw the ad, so the view is placed just before the last touch.
+
+Within one network, a click outranks a view: when the same step has both, the click gets the step's share. Google views never enter a journey, because Google reports view-through only as daily totals per campaign, never per person.
+
+## How credit is shared
+
+Last touch gives each install to one network. Multi-touch attribution shares each install between every channel in its journey, according to how much each channel matters.
+
+1. **Install impact.** A statistical model of every journey in the last 30 days estimates the chance that a journey ends in an install. For each channel it asks how much lower that chance would be if journeys that reached the channel had stopped there. An impact of 40% means 40% of installs depend on that channel being in the journey. Impacts are judged one channel at a time, so they do not add up to 100%.
+2. **Sharing one install.** Each install is split across the channels in its own journey in proportion to their impact. The shares of one install always add up to exactly 1, and a journey with a single channel gives that channel the whole install.
+3. **Down to campaigns.** A channel's share is split between the campaigns, ad sets and ads it touched in that step.
+4. **Revenue follows the same shares.** A channel that gets 0.4 of an install also gets 40% of that person's revenue.
+
+### Worked example
+
+One person clicks a Meta ad, then a Google ad, then installs. The install is attributed to Google and the person pays 1,000 in the first week. Meta's impact is 30% and Google's is 45%.
+
+|                         | Meta                     | Google                   | Total |
+| :---------------------- | :----------------------- | :----------------------- | :---- |
+| Share of the install    | 30 / (30 + 45) = **0.4** | 45 / (30 + 45) = **0.6** | 1.0   |
+| Multi-touch installs    | 0.4                      | 0.6                      | 1     |
+| Last touch installs     | 0                        | 1                        | 1     |
+| Multi-touch revenue     | 400                      | 600                      | 1,000 |
+
+Over many installs these fractions add up, which is why a channel can show `668.1` multi-touch installs. The total across channels still equals the number of installs: no install is counted twice and none is lost.
+
+## Overview tab
+
+The headline says how much of your installs multi-touch moves between channels compared with last touch, and which channel gains the most.
+
+| Tile                  | What it means                                                                                         |
+| :-------------------- | :---------------------------------------------------------------------------------------------------- |
+| **Installs**          | Installs in the range, organic included.                                                              |
+| **Assisted installs** | Installs with at least one network other than the last touch network in the journey.                  |
+| **Time to install**   | Average time from a journey's first touch to the install.                                             |
+
+### Channel table
+
+One row per paid channel. **Installs / Revenue** switches every column that has both.
+
+| Column                      | What it means                                                                                                                  |
+| :-------------------------- | :----------------------------------------------------------------------------------------------------------------------------- |
+| **Install impact**          | Share of installs estimated to be lost without this channel.                                                                   |
+| **Last click, Multi-touch** | Two bars on one scale: last touch installs (gray) and multi-touch installs (blue). Hover for the exact values.                |
+| **Vs last click**           | Installs or revenue gained or lost compared with last touch.                                                                   |
+| **Assisted**                | Installs the channel helped with before another network got the last touch. A plain count: each network counts once per install. |
+| **Role**                    | **Mostly assists**, **Mostly last click** or **Assists and last click**, from assisted installs divided by last touch installs. |
+
+Switch to **Campaign** to see the same columns per campaign, with search and a channel filter. A network's campaigns add up to the network's multi-touch installs. Install impact per campaign shows only when every day in the range was modelled per campaign; otherwise the network table carries it.
+
+### Installs by touch and journey length
+
+**Installs by touch** splits every install by the paid networks in its journey: none (**Organic**), one (**Single-touch**) or two or more (**Multi-touch**). **Journey length** shows how many distinct channels journeys touched: 1, 2, 3, or 4 or more. Single-channel journeys are the part multi-touch cannot change.
+
+### Who assisted whom
+
+A heatmap of your networks. Each row is the network that got the last touch, each column a network that was in the journey before it. A cell shows how many installs the two share and what share that is of the row network's last touch installs.
+
+## Journeys tab
+
+The **journey funnel** draws journeys that touched two or more networks, lined up by their end under the column headings **Third assist**, **Second assist**, **First assist** and **Last touch**: the last network before the outcome sits in Last touch, next to **Install**, the one before it in First assist, then Second assist and Third assist. A two-network journey starts in First assist; a longer one shows its last four. The last column splits each journey into **Install** or **No install**. Hover a bar to follow it.
+
+Switch between **Network** and **Campaign** to see the same journeys per campaign. The five campaigns with the most journeys keep their name; the rest share one **Other campaigns** bar.
+
+## What the model cannot see
+
+- **Self-attributing networks are only seen when they convert.** Google, Meta and Apple report the installs they win, not the users who saw an ad and never installed, so their credit may be higher than their true share.
+- **Users without a device identifier cannot be joined to a journey.**
+- **Google view-through conversions are not in journeys or credit.** Google reports them only as totals per campaign.
+
+## Who can use it
+
+Multi-touch attribution only helps when people touch more than one ad network before installing. Linkrunner measures this every week for each project and shows numbers when at least 5% of your identifiable devices touched two or more ad networks in the last 30 days.
+
+When your project is not eligible, the page says why instead of showing zeros:
+
+| Message                                         | What unblocks it                                                   |
+| :---------------------------------------------- | :----------------------------------------------------------------- |
+| Not set up, or turned off, for this project      | Ask Linkrunner to set it up.                                       |
+| Waiting for the first measurement               | The next weekly measurement.                                       |
+| Not enough devices to measure                   | At least 2,000 devices with an advertising ID in the last 30 days. |
+| Too few journeys touch more than one ad network | A media mix with more overlap between networks.                    |
+| The measurement is out of date                  | The next weekly measurement.                                       |
+
+A low multi-touch share usually reflects your media mix, for example buying on a single network, rather than a tracking gap.
+
+Only project admins and members can open Multi-touch. Revenue is hidden for roles that cannot view financial data.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).
