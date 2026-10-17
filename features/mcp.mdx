@@ -100,8 +100,10 @@ Your assistant then works through these steps. It asks you to confirm before it 
   <Step title="Create the project">
     The assistant calls `create_project` with the project name, company, project
     type (app or website), store links, report timezone, and optionally the
-    billing currency (USD or INR). Check these details before you approve. The
-    tool returns the new project ID and your SDK token.
+    billing currency (USD or INR). If you already have a Linkrunner billing
+    account, the assistant asks which one the project belongs to. Check these
+    details before you approve. The tool returns the new project ID and your SDK
+    token.
   </Step>
   <Step title="Install the SDK">
     Add the SDK to your app with that token. The assistant can find the guide
@@ -126,8 +128,9 @@ These are the same rules the dashboard applies.
 
 - **You need a company email to create a project.** Gmail accounts can sign up and be invited to existing projects, but cannot create one. For help, contact [support@linkrunner.io](mailto:support@linkrunner.io).
 - **An app project needs a live App Store or Play Store listing.** You cannot set up an app that is not published yet. Come back once its listing is live. A website-only project needs the website URL instead.
-- **You can create up to 3 projects per day from an AI assistant.**
+- **You can create up to 3 projects per day from an AI assistant.** Only projects you created this way count.
 - **To use an existing project, you must be its Admin, Owner, or Manager.**
+- **If you already have a billing account, you choose which one the new project uses.** On your first project, a new billing account is created for you.
 - New projects get the same free allowance and billing setup as projects you create in the dashboard. See [Billing](/billing/overview).
 
 ## What you can ask
@@ -185,7 +188,7 @@ token decides the project, and the overview and account tools are not offered.
 
 | Tool | Use it for |
 |------|------------|
-| `get_my_account` | The email you signed in with, and whether your account can create projects. |
+| `get_my_account` | The email you signed in with, whether your account can create projects, and the billing accounts a new project can use. |
 | `list_projects` | Your existing projects, with their IDs, store links, and timezones. |
 | `find_app_in_store` | Search the App Store or Play Store by app name, or look up a store link. |
 | `get_sdk_configuration` | The project's SDK token, with links to the dashboard and the SDK docs. |
