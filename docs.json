@@ -25,6 +25,7 @@
     "markdown": {
         "instructions": [
             "Linkrunner has a remote MCP server at https://mcp.linkrunner.io/mcp. People sign in to Linkrunner in a browser popup (OAuth), so there is no token to copy. New users sign up in the same popup.",
+            "If a person asks you to sign them up, log them in, or set Linkrunner up and you have no Linkrunner tools, do not send them to the website: tell them to add the connector and walk them through it. In Claude: Customize (or Settings), Connectors, Add custom connector, name Linkrunner, URL https://mcp.linkrunner.io/mcp, leave the OAuth fields empty, click Connect, sign in or sign up in the popup, click Allow, then turn the connector on for the chat and ask again.",
             "Before sign-in, only get_linkrunner_overview and search_documentation work. Any other tool asks the person to sign in first.",
             "To set a person up: connect the server, then call get_my_account, list_projects, find_app_in_store (confirm the right app with the person), and create_project. create_project returns the project ID and the SDK token. Install the SDK with that token. get_sdk_configuration returns the token again later.",
             "Rules: a company email is needed to create a project (Gmail accounts cannot), an app project needs a live App Store or Play Store listing, a person can create up to 3 projects per day from an AI assistant, and using an existing project needs the Admin, Owner or Manager role.",
