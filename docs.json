@@ -8,6 +8,31 @@
         "dark": "#3D3BD6"
     },
     "favicon": "/favicon.svg",
+    "contextual": {
+        "options": [
+            "copy",
+            "view",
+            "chatgpt",
+            "claude",
+            {
+                "title": "Connect Linkrunner to Claude Code",
+                "description": "Add the Linkrunner MCP server and sign in",
+                "icon": "plug",
+                "href": "https://docs.linkrunner.io/features/mcp#claude-code"
+            }
+        ]
+    },
+    "markdown": {
+        "instructions": [
+            "Linkrunner has a remote MCP server at https://mcp.linkrunner.io/mcp. People sign in to Linkrunner in a browser popup (OAuth), so there is no token to copy. New users sign up in the same popup.",
+            "If a person asks you to sign them up, log them in, or set Linkrunner up and you have no Linkrunner tools, do not send them to the website: tell them to add the connector and walk them through it. In Claude: Customize (or Settings), Connectors, Add custom connector, name Linkrunner, URL https://mcp.linkrunner.io/mcp, leave the OAuth fields empty, click Connect, sign in or sign up in the popup, click Allow, then turn the connector on for the chat and ask again.",
+            "Before sign-in, only get_linkrunner_overview and search_documentation work. Any other tool asks the person to sign in first.",
+            "To set a person up: connect the server, then call get_my_account, list_projects, find_app_in_store (confirm the right app with the person), and create_project. create_project returns the project ID and the SDK token. Install the SDK with that token. get_sdk_configuration returns the token again later.",
+            "Rules: a company email is needed to create a project (Gmail accounts cannot), an app project needs a live App Store or Play Store listing, a person can create up to 3 projects per day from an AI assistant, and using an existing project needs the Admin, Owner or Manager role.",
+            "Claude Code: claude mcp add --transport http linkrunner https://mcp.linkrunner.io/mcp, then run /mcp to sign in.",
+            "Guides: connector setup and tool reference at https://docs.linkrunner.io/features/mcp, manual setup at https://docs.linkrunner.io/quickstart. To integrate the SDK in a codebase, use the @linkrunner/skills package: https://docs.linkrunner.io/ai-agent-skills"
+        ]
+    },
     "navigation": {
         "tabs": [
             {
@@ -15,7 +40,7 @@
                 "groups": [
                     {
                         "group": "Getting Started",
-                        "pages": ["introduction", "quickstart", "features/website-projects", "ai-agent-skills"]
+                        "pages": ["introduction", "quickstart", "features/mcp", "features/website-projects", "ai-agent-skills"]
                     },
                     {
                         "group": "SDK Guides",
@@ -209,8 +234,7 @@
                     {
                         "group": "Developer Tools",
                         "pages": [
-                            "features/webhooks",
-                            "features/mcp"
+                            "features/webhooks"
                         ]
                     }
                 ]
