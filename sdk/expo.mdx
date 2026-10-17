@@ -181,6 +181,22 @@ Since `expo-linkrunner` is a config plugin that prepares your project, the actua
 - Ecommerce Events
 - Enhanced privacy controls
 
+### Event parameters
+
+Put details that change from one event to the next, such as a plan or a product category, in the event's parameters instead of creating one event per variant. Track `purchase` with a `plan` parameter, not `purchase_gold` and `purchase_silver`:
+
+```javascript
+import linkrunner from "rn-linkrunner";
+
+await linkrunner.trackEvent("purchase", {
+    plan: "gold",
+    billing_period: "yearly",
+    is_trial: false,
+});
+```
+
+You can then filter and break down the event by each parameter in the dashboard. See [Event parameters](/features/event-parameters) for value types, limits, and reserved keys.
+
 ## Function Placement Guide
 
 Expo uses the `rn-linkrunner` runtime. The function links below open the implementation details in the React Native guide.

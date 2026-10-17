@@ -199,6 +199,26 @@ Use `item_group_ids` when you want to boost an entire product group rather than 
 - Use `item_group_ids` + `content_type: "product_group"` when you want Meta to optimize across all variants in a group (e.g., the user viewed the "Blue T-Shirt" product page without selecting a size).
 </Tip>
 
+### Adding your own event parameters
+
+The fields above are [event parameters](/features/event-parameters) with a fixed meaning for Meta. Add your own keys in the same `event_data` object to analyze these events in Linkrunner, for example by `category` or `coupon_code`:
+
+```json
+"event_data": {
+    "content_ids": ["sku_blue_tshirt_m"],
+    "contents": [{ "id": "sku_blue_tshirt_m", "quantity": 1, "item_price": 799 }],
+    "content_type": "product",
+    "currency": "INR",
+    "value": 799.00,
+    "num_items": 1,
+    "order_id": "order_98765",
+    "category": "apparel",
+    "coupon_code": "DIWALI10"
+}
+```
+
+Only the commerce fields are used for Meta. Linkrunner stores every key, so you can filter and break down these events by your own parameters in the dashboard. Do not reuse the commerce field names for anything else: `value` must stay the numeric order value.
+
 ---
 
 > **Note:** For full integration details and request examples, refer to the [Capture Event API](/api-reference/event-capture) and [Capture Payment API](/api-reference/revenue-tracking) documentation.

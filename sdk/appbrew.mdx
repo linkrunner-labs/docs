@@ -105,12 +105,14 @@ Deep links need your Linkrunner domain in the iOS Associated Domains entitlement
 | `refund` | `removePayment`, only when `enableRefunds` is on |
 | `signup`, `login`, customer details | `signup` once per install and customer, `setUserData` after |
 | `logout` | Identity reset to the device id |
-| Every other event | `trackEvent` with the Appbrew name unchanged and Meta catalog fields added from `items[]` |
+| Every other event | `trackEvent` with the Appbrew name unchanged, the Appbrew event's data as its [event parameters](/features/event-parameters), and Meta catalog fields added from `items[]` |
 | Link opened with the app installed | `handleDeeplink`. Appbrew routes it |
 | First open after install | `getAttributionData`, and the deferred link is routed once per install |
 | Push token | `setPushToken` for uninstall tracking |
 | CleverTap installed | `setAdditionalData` with the CleverTap ID |
 | Firebase Analytics installed | `ga_app_instance_id` and `ga_session_id` on user data |
+
+Each event's Appbrew data arrives as [event parameters](/features/event-parameters), so you can filter and break down these events by it in the dashboard without writing tracking code.
 
 <Warning>
   Map your events to standard commerce events in **Dashboard → Meta Ads → Event Mapping** (`add_to_cart` → `AddToCart`, `view_item` → `ViewContent`, payment type `DEFAULT` → `Purchase`). Without the mapping, events are stored but never sync to Meta.
