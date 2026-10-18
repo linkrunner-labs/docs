@@ -59,27 +59,45 @@ Over many installs these fractions add up, which is why a channel can show `668.
 
 The headline says how much of your installs multi-touch moves between channels compared with last touch, and which channel gains the most.
 
+<Frame>
+  <img src="/images/multi-touch-attribution/overview.webp" alt="The Multi-touch Overview tab: the headline sentence above five tiles for Installs, Assisted installs, Time to install, Top assister and Top last click" />
+</Frame>
+
 | Tile                  | What it means                                                                                         |
 | :-------------------- | :---------------------------------------------------------------------------------------------------- |
 | **Installs**          | Installs in the range, organic included.                                                              |
 | **Assisted installs** | Installs with at least one network other than the last touch network in the journey.                  |
 | **Time to install**   | Average time from a journey's first touch to the install.                                             |
+| **Top assister**      | The network that assisted the most installs, and how many.                                            |
+| **Top last click**    | The network with the most last touch installs, and how many.                                          |
 
 ### Channel table
 
-One row per paid channel. **Installs / Revenue** switches every column that has both.
+One row per paid channel, below an **Organic** row with the installs no paid network touched. **Installs / Revenue** switches every column that has both.
+
+<Frame>
+  <img src="/images/multi-touch-attribution/channel-table.webp" alt="The channel table with Install impact, Last click and Multi-touch bars, Won, Assisted and Role columns, and the Installs / Revenue switch" />
+</Frame>
 
 | Column                      | What it means                                                                                                                  |
 | :-------------------------- | :----------------------------------------------------------------------------------------------------------------------------- |
 | **Install impact**          | Share of installs estimated to be lost without this channel.                                                                   |
 | **Last click, Multi-touch** | Two bars on one scale: last touch installs (gray) and multi-touch installs (blue). Hover for the exact values.                |
-| **Vs last click**           | Installs or revenue gained or lost compared with last touch.                                                                   |
+| **Won**                     | Installs, or their revenue, the channel got the last touch for.                                                               |
 | **Assisted**                | Installs the channel helped with before another network got the last touch. A plain count: each network counts once per install. |
 | **Role**                    | **Mostly assists**, **Mostly last click** or **Assists and last click**, from assisted installs divided by last touch installs. |
 
-Switch to **Campaign** to see the same columns per campaign, with search and a channel filter. A network's campaigns add up to the network's multi-touch installs. Install impact per campaign shows only when every day in the range was modelled per campaign; otherwise the network table carries it.
+Switch to **Campaigns** to see the same columns per campaign, with search and a channel filter. A network's campaigns add up to the network's multi-touch installs. Install impact per campaign shows only when every day in the range was modelled per campaign; otherwise the network table carries it.
+
+<Frame>
+  <img src="/images/multi-touch-attribution/campaign-table.webp" alt="The Campaigns view of the table, with campaign search, the All Channels filter and the same columns per campaign" />
+</Frame>
 
 ### Installs by touch and journey length
+
+<Frame>
+  <img src="/images/multi-touch-attribution/charts.webp" alt="The Installs by touch and Journey length charts beside the Who assisted whom heatmap" />
+</Frame>
 
 **Installs by touch** splits every install by the paid networks in its journey: none (**Organic**), one (**Single-touch**) or two or more (**Multi-touch**). **Journey length** shows how many distinct channels journeys touched: 1, 2, 3, or 4 or more. Single-channel journeys are the part multi-touch cannot change.
 
@@ -90,6 +108,10 @@ A heatmap of your networks. Each row is the network that got the last touch, eac
 ## Journeys tab
 
 The **journey funnel** draws journeys that touched two or more networks, lined up by their end under the column headings **Third assist**, **Second assist**, **First assist** and **Last touch**: the last network before the outcome sits in Last touch, next to **Install**, the one before it in First assist, then Second assist and Third assist. A two-network journey starts in First assist; a longer one shows its last four. The last column splits each journey into **Install** or **No install**. Hover a bar to follow it.
+
+<Frame>
+  <img src="/images/multi-touch-attribution/journeys.webp" alt="The Journeys tab: the journey funnel by network, with flows from earlier networks to the last touch and on to Install or No install" />
+</Frame>
 
 Switch between **Network** and **Campaign** to see the same journeys per campaign. The five campaigns with the most journeys keep their name; the rest share one **Other campaigns** bar.
 
