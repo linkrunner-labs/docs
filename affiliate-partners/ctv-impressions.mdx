@@ -8,7 +8,7 @@ icon: "tv"
 
 A TV ad has no click, and a TV's advertising ID never equals the phone's GAID or IDFA. The signal a TV and a phone share is the household's public IP address. Use this endpoint when your ads play on connected TVs (smart TVs, streaming sticks, set-top boxes, game consoles) and the app installs happen on a phone in the same home.
 
-Your **server** reports each CTV impression to Linkrunner with the device IP and user agent. If an Android phone on the same IP address installs the app within the view-through window and nothing else can be credited, Linkrunner credits the install to your impression. This is **CTV view-through attribution**. It accepts AppsFlyer's CTV parameter names.
+Your **server** reports each CTV impression to Linkrunner with the device IP and user agent. If a phone on the same IP address installs the app within the view-through window and nothing else can be credited, Linkrunner credits the install to your impression. This is **CTV view-through attribution**. It accepts AppsFlyer's CTV parameter names.
 
 If your impressions carry the phone's GAID or IDFA, use [S2S impressions](/affiliate-partners/s2s-impressions) instead. They are matched on the device ID and rank above CTV impressions.
 
@@ -38,11 +38,11 @@ A CTV match is probabilistic: the same IP address suggests the same household, b
 | Rule | Detail |
 |---|---|
 | **Same IP address** | The phone installs from the same public IP address the impression reported. In practice this means the phone is on the same home Wi-Fi as the TV. Installs over mobile data use the carrier's addresses and do not match. |
-| **Android only** | iOS installs are never credited to CTV impressions. |
+| **Android and iOS** | Installs on both platforms are credited. |
 | **Everything else wins** | Any click that can be credited, from any source, and any [S2S impression](/affiliate-partners/s2s-impressions) matched on the device ID win over every CTV impression. |
 | **Inside the window** | The install happens within the view-through window after the impression. The advertiser sets it for you, from 1 to 24 hours (24 by default). Your `vt_lookback` can shorten it, never lengthen it. |
 | **Latest impression** | If several impressions match, the most recent one inside its own window is credited. Each impression is credited to at most one install. |
-| **Not a shared address** | When more than four Android installs of the app that no click or device-ID impression was credited for come from the same IP address within a day, Linkrunner treats it as a shared network, such as an office or a public hotspot, and stops crediting CTV impressions to its installs. |
+| **Not a shared address** | When more than four installs of the app that no click or device-ID impression was credited for come from the same IP address within a day, Linkrunner treats it as a shared network, such as an office or a public hotspot, and stops crediting CTV impressions to its installs. |
 
 Postbacks work as for clicks. Your [postback templates](/affiliate-partners/postbacks), [event mapping](/affiliate-partners/event-mapping) and [postback logs](/affiliate-partners/postback-logs) apply unchanged, and `{touch_type}` is `impression` for CTV installs.
 
@@ -79,7 +79,7 @@ In the campaign table, CTV installs count as installs and as **View Through Attr
     ```
   </Step>
   <Step title="Turn it into the CTV impression URL">
-    Keep your parameters, and send them to `https://s2s.linkrunner.io/v1/ctv/impression/<app_id>`. `<app_id>` is the app's Android package name (`com.example.app`).
+    Keep your parameters, and send them to `https://s2s.linkrunner.io/v1/ctv/impression/<app_id>`. `<app_id>` is the app's Android package name (`com.example.app`) or App Store ID (`id1234567890`). Either one finds the same app, and its Android and iOS installs are both matched.
 
     Then add the TV's IP address (`ip`) and user agent (`ua`), both required, and the time of the impression. Your token goes in the `X-Linkrunner-Token` header:
 
@@ -100,7 +100,7 @@ In the campaign table, CTV installs count as installs and as **View Through Attr
     Replace your macros and call the URL with `GET` and the token header when the impression happens. A `200` with `"status":"accepted"` means the impression is recorded. See [retries](#retries) for the other responses.
   </Step>
   <Step title="Test it end to end">
-    Send one impression with the public IP address of a test home network. On an Android phone connected to that Wi-Fi, without tapping any ad, install and open the app within the window. The install postback arrives with your `tid` and `{touch_type}` = `impression`. Check it in [Postback logs](/affiliate-partners/postback-logs).
+    Send one impression with the public IP address of a test home network. On a phone connected to that Wi-Fi, without tapping any ad, install and open the app within the window. The install postback arrives with your `tid` and `{touch_type}` = `impression`. Check it in [Postback logs](/affiliate-partners/postback-logs).
   </Step>
 </Steps>
 
@@ -151,7 +151,7 @@ If you already send cross-platform CTV impressions to AppsFlyer, you can reuse t
 
 | AppsFlyer | Linkrunner | Notes |
 |---|---|---|
-| `impressions.onelink.me/<template_id>` | `s2s.linkrunner.io/v1/ctv/impression/<app_id>` | Linkrunner uses the Android package name, not a OneLink template |
+| `impressions.onelink.me/<template_id>` | `s2s.linkrunner.io/v1/ctv/impression/<app_id>` | Linkrunner uses the Android package name or App Store ID, not a OneLink template |
 | `c` (campaign name) | `c` (campaign code) | Use the `c` value from your Linkrunner tracking link, not a campaign name |
 | | `tid` (or `clickid`) | Required. Send a unique ID per impression |
 | `af_ip` | `ip` | Either name works. Required |
@@ -203,6 +203,6 @@ Send the TV's user agent in `ua`.
 S2S traffic, view-through or CTV is not on for your partner account on this app. Ask the advertiser. They turn on S2S traffic ([these steps](/affiliate-partners/turn-on-s2s-clicks)) and view-through ([how](/features/attribution-windows#view-through-attribution)) themselves, and ask [Linkrunner support](mailto:support@linkrunner.io) to turn on CTV. Changes take up to 5 minutes to apply.
 
 **Impressions are accepted but installs aren't credited to them.**
-Check that the impression carries the TV's real public IP address and arrives before the install, and that the phone installed over the same home Wi-Fi on Android. A click from any source, a device-ID impression, or a more recent impression takes priority. The install must also fall inside the view-through window the advertiser set for you.
+Check that the impression carries the TV's real public IP address and arrives before the install, and that the phone installed over the same home Wi-Fi. A click from any source, a device-ID impression, or a more recent impression takes priority. The install must also fall inside the view-through window the advertiser set for you.
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

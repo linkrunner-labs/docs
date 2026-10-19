@@ -4,7 +4,7 @@ description: "Report affiliate connected TV ad impressions server-to-server for 
 icon: "tv"
 ---
 
-Affiliate partners use this endpoint to report an ad impression shown on a connected TV, so Linkrunner can credit an Android install from the same household IP address. For the setup guide and the attribution rules, see [Connected TV (CTV) Impressions](/affiliate-partners/ctv-impressions).
+Affiliate partners use this endpoint to report an ad impression shown on a connected TV, so Linkrunner can credit an Android or iOS install from the same household IP address. For the setup guide and the attribution rules, see [Connected TV (CTV) Impressions](/affiliate-partners/ctv-impressions).
 
 ## Endpoint
 
@@ -32,7 +32,7 @@ Send all parameters as URL-encoded query parameters. Each value is limited to 25
 
 | Parameter | Alias | Required | Description |
 |---|---|---|---|
-| `app_id` | path | One of `app_id` or `d` | The app's Android package name (`com.example.app`). Can also be sent in the path: `/v1/ctv/impression/{app_id}`. |
+| `app_id` | path | One of `app_id` or `d` | The app's Android package name (`com.example.app`) or App Store ID (`id1234567890` or `1234567890`). Can also be sent in the path: `/v1/ctv/impression/{app_id}`. |
 | `d` | | One of `app_id` or `d` | Domain of your Linkrunner tracking link, for example `app.example.com`. Wins over `app_id` when both are sent. |
 | `c` | | Yes | Campaign code, the `c` value of your tracking link. Must match a campaign of that app or domain exactly. |
 | `lr_token` | | Only without the header | Your partner token, for ad servers that can't set the `X-Linkrunner-Token` header. Removed before the request is stored. |
