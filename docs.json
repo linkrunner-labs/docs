@@ -141,6 +141,8 @@
                         "group": "Troubleshooting",
                         "pages": [
                             "testing/testing-attribution-troubleshooting",
+                            "ad-networks/meta-support-access",
+                            "ad-networks/google-support-access",
                             "ad-networks/google-ads-discrepancies",
                             "ad-networks/meta-ads-discrepancies",
                             "ad-networks/meta-view-through-attribution"
