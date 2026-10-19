@@ -6,7 +6,7 @@ keywords: ["data export", "csv export", "campaign export", "export report", "onb
 icon: "file-arrow-down"
 ---
 
-**Data Export gives you your Linkrunner data as a CSV file.** You choose what you want, we build the file in the background, and we email it to you as an attachment when it is ready. Most exports finish in a few minutes.
+**Data Export gives you your Linkrunner data as a CSV file.** You choose what you want, we build the file in the background, and we email it to you when it is ready. Most files arrive as an attachment, and very large ones as a download link. Most exports finish in a few minutes.
 
 There are two places to export from: **Settings** for a whole project, and the **campaign drawer** for a single campaign.
 
@@ -147,11 +147,14 @@ A few things in these files surprise people. None of them are errors.
 
 ## How the file reaches you
 
-The CSV arrives as an **attachment on an email**, not as a download link. Files above 10 MB are zipped first.
+The CSV arrives by email, sent only to the person who started the export. Files above 10 MB are zipped first.
 
-<Warning>
-  Email has a **25 MB** attachment limit. If an export is still larger than that after zipping, the email cannot be sent and the export is marked failed. Run it again over a shorter date range, or split it into a few exports.
-</Warning>
+- **Up to 25 MB after zipping**: the file is attached to the email.
+- **Over 25 MB after zipping**: the email has a **download link** instead. The link works for **72 hours**, and anyone with the email can use it without signing in, so do not forward it.
+
+<Note>
+  If the link expires before you download the file, run the export again.
+</Note>
 
 ## Limits
 
@@ -159,7 +162,8 @@ The CSV arrives as an **attachment on an email**, not as a download link. Files 
 | --- | --- |
 | Date range in one export | 3 calendar months |
 | Exports per user | 5 every 5 minutes |
-| Attachment size | 25 MB after zipping |
+| Attachment size | 25 MB after zipping (larger files come as a download link) |
+| Download link | Works for 72 hours |
 
 The export limit is per user, not per project, so exporting several different projects in a row shares the same budget.
 
@@ -191,10 +195,12 @@ Only project **admins** and **managers** can run an export.
   Yes. Network, platform, ad account and date range all carry into the file.
 </Accordion>
 
-<Accordion title="My export failed and the email said it was too large">
-  Email attachments are capped at 25 MB, and that is measured after we zip the file. A wide date range on a busy project can pass it.
+<Accordion title="My email has a download link instead of a file">
+  The file was over 25 MB even after zipping, which is too large to attach. Download it from the link within 72 hours. After that the link stops working and you need to run the export again.
+</Accordion>
 
-  Export a shorter range, or split one export into two or three.
+<Accordion title="My export failed and the email said it was too large">
+  This is rare. It happens when a file is too large to attach and the download link could not be created. Export a shorter range, or split one export into two or three.
 </Accordion>
 
 <Accordion title="I clicked export several times and nothing happened">

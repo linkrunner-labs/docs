@@ -47,7 +47,9 @@ Webhooks allow you to receive real-time HTTP notifications when attribution even
 </Steps>
 
 <Note>
-Your endpoint must be publicly accessible. Linkrunner retries failed requests up to three times, but does not follow redirects.
+Your endpoint must be publicly accessible and answer directly with a 2xx. Linkrunner tries each webhook up to three times.
+
+Saving or testing a URL that redirects fails. Do not add a redirect later either: live webhooks do follow redirects, and every request carries your `linkrunner-key` header, so a redirect would hand that key to whichever server it points at. If your endpoint moves, update the URL in **Settings → Data Export** instead.
 </Note>
 
 ### Allowlisting Linkrunner IPs
@@ -409,6 +411,10 @@ Sent only when **Send webhooks for organic users** is enabled:
 ## Authentication
 
 Every webhook request includes a `linkrunner-key` header containing your project's private key. Use this to verify that requests are genuinely from Linkrunner.
+
+<Warning>
+This is the same server key that authenticates the [Data APIs](/api-reference/data-apis). Use an `https://` endpoint, never log the header, and keep it out of anything that stores raw request headers.
+</Warning>
 
 ```javascript
 // Example: Verifying the webhook key

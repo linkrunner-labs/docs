@@ -786,6 +786,10 @@ private fun capturePurchase() {
 
 If you run Google App Campaigns, report your users' consent choices. Google's App Conversion API treats these values as required whenever they are known, and reads them when it matches your installs, so an install with no consent state attached is harder to attribute. This matters most for users in the European Economic Area, the United Kingdom, and Switzerland.
 
+<Warning>
+  Linkrunner does not forward Android consent values to Google yet. Until it is switched on, Android installs are sent with fixed values instead. Set consent now so your users' real choices are used once it is on. See [Send Consent](/features/send-consent).
+</Warning>
+
 Set the values with `setConsent` before you call `init`, and again whenever the user changes their choice:
 
 ```kotlin

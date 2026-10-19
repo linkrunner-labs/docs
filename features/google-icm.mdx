@@ -98,6 +98,10 @@ Everything else is automatic. There is no ICM API to call and attribution still 
 
 `setConsent` takes three signals, each of which is `granted`, `denied`, or `unknown`. Linkrunner forwards them to Google with your installs and events.
 
+<Warning>
+    **Android installs do not carry your consent values yet.** Forwarding SDK consent to Google is on for iOS. For Android it stays off while apps move to Android SDK 4.1.0 or later. Until it is switched on, Linkrunner sends Google its previous fixed values for every Android install (`eea=0`, `ad_user_data=1`, `ad_personalization=1`), whatever your app reported. Call `setConsent` on Android now anyway, so your users' real choices are used as soon as forwarding is switched on.
+</Warning>
+
 | Parameter | Sent to Google as | What it means |
 | --- | --- | --- |
 | `isEEA` | `eea` | European regulations apply to this user (the EEA, the UK, or Switzerland) |
