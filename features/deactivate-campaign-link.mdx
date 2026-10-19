@@ -22,11 +22,17 @@ Both options stop crediting the link for new installs. They differ in where user
 | --- | --- | --- |
 | Where a tap goes | The link's own destination, as before | Your domain's base link, then on to the app or store |
 | Link's redirects, deep link and link preview | Keep working | Stop |
-| New installs from the link | Credited to the user's next eligible click on another link, otherwise organic | Credited to your base link |
+| New installs from the link | Credited to the user's next eligible click on another link, otherwise organic | Usually credited to your base link (see below) |
 | Users already attributed to the link | Keep their attribution | Keep their attribution |
 | Postbacks to ad networks and partners | Not sent for this link | Not sent for this link |
 
 Choose **Stop attributing traffic** for links that are already printed, posted or shared. Users who tap them still reach your app or store with the right deep link. Choose **Stop redirecting** only when the link's own destination should no longer be used.
+
+With **Stop redirecting**, an install is never credited to the deactivated link, but it is not always credited to your base link:
+
+- **Web-to-app taps** keep the web-to-app campaign they came through.
+- **If your base link cannot be loaded at that moment**, the tap opens the link's own destination instead of an error page. The install goes to the user's next eligible click, otherwise organic.
+- **If your base link is turned off**, the tap goes to your app's store listing and the install counts as organic.
 
 <Note>
   The rule applies when the install happens, not when the click happens. A user who tapped the link before you deactivated it and installs afterwards is not credited to this link.
@@ -54,7 +60,7 @@ Choose **Stop attributing traffic** for links that are already printed, posted o
   </Step>
 </Steps>
 
-The change is saved immediately and applies to the link within about 30 seconds.
+The change is saved immediately and usually reaches the link within 30 seconds.
 
 ## Check the result
 
@@ -73,7 +79,7 @@ To confirm Stop redirecting on a device, tap the link. It should open your base 
 
 ## Reactivate a link
 
-Open the campaign's edit form and click **Reactivate** in the **Link status** row. The link starts redirecting and getting credit again within about 30 seconds.
+Open the campaign's edit form and click **Reactivate** in the **Link status** row. The link starts redirecting and getting credit again, usually within 30 seconds.
 
 A deactivated link does not count toward your plan's campaign limit, and a reactivated one does. If the project is at its limit, reactivation is refused. Contact [support@linkrunner.io](mailto:support@linkrunner.io) to raise the limit.
 
