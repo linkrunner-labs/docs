@@ -54,10 +54,25 @@ In the campaign table, CTV installs count as installs and as **View Through Attr
   <Step title="Get your S2S token">
     If you already send [S2S clicks](/affiliate-partners/s2s-clicks) or [S2S impressions](/affiliate-partners/s2s-impressions), use the same token and skip this step.
 
-    Otherwise, in your affiliate dashboard, open [**Settings → S2S Credentials**](https://dashboard.linkrunner.io/affiliate/settings?tab=s2s) and click **Generate token**. Copy the token (it starts with `lrs2s_`) and store it as a secret on your server. It is shown only once.
+    Otherwise, in your affiliate dashboard, open [**Settings → S2S Credentials**](https://dashboard.linkrunner.io/affiliate/settings?tab=s2s) and click **Generate token**. Copy the token (it starts with `lrs2s_`) and store it as a secret on your server. It is shown only once. One token covers every app you work with.
+
+    ![S2S Credentials with the Generate token button](/images/affiliate-partners/ctv-s2s-credentials.webp)
   </Step>
-  <Step title="Start from your campaign link">
-    Create the link in your affiliate dashboard as usual. See [Create a campaign link](/affiliate-partners/create-campaign-link). You get a tracking link like this:
+  <Step title="Open the advertiser's app">
+    Pick the advertiser's app in the switcher at the top left. Campaigns, and the CTV setting, are per app.
+
+    <img src="/images/affiliate-partners/ctv-pick-customer-app.webp" alt="The app switcher open, with the advertiser's app under Projects and your partner account below it" width="250" />
+  </Step>
+  <Step title="Create the campaign link">
+    In **All Campaigns**, click **Create Link**, name the CTV campaign and click **Create Campaign**. See [Create a campaign link](/affiliate-partners/create-campaign-link) for the other options.
+
+    <img src="/images/affiliate-partners/ctv-create-campaign.webp" alt="Create Campaign with a CTV campaign name filled in" width="420" />
+
+    Copy the **Template URL** from the confirmation.
+
+    <img src="/images/affiliate-partners/ctv-campaign-created.webp" alt="Campaign Created with the Template URL and its copy button" width="420" />
+
+    It is a tracking link like this:
 
     ```
     https://app.example.com/?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}
@@ -106,7 +121,7 @@ The **Impressions** column is off by default. Turn it on once for each app and i
   <Step title="Turn on Impressions">
     Tick **Impressions** and click **Save**. Keep **View Through Attribution** ticked as well.
 
-    ![Edit Columns with Impressions ticked and the Save button at the top](/images/affiliate-partners/ctv-edit-columns-impressions.webp)
+    <img src="/images/affiliate-partners/ctv-edit-columns-impressions.webp" alt="Edit Columns with Impressions ticked and the Save button at the top" width="420" />
   </Step>
   <Step title="Read your CTV campaigns">
     Each CTV campaign shows its accepted impressions, and the installs credited to them under **Installs** and **View Through Attribution**. A TV-only campaign has no clicks.
