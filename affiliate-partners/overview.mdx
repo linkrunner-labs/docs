@@ -41,10 +41,10 @@ Pass a unique `tid` on every click. Without it, Linkrunner cannot echo an identi
 
 ### View-through (optional)
 
-If you report impressions through [S2S impressions](/affiliate-partners/s2s-impressions), an install with no click can be credited to an impression instead:
+If you report impressions through [S2S impressions](/affiliate-partners/s2s-impressions) or [CTV impressions](/affiliate-partners/ctv-impressions), an install with no click can be credited to an impression instead:
 
 - **Off by default.** The advertiser turns on view-through for your partner account in **Settings → Attribution Windows** and sets your window, from 1 to 24 hours. See [View-through attribution](/features/attribution-windows#view-through-attribution).
-- **Device ID only.** The impression must carry the installing device's `gaid` or `idfa`.
+- **Device ID first.** An S2S impression must carry the installing device's `gaid` or `idfa`. A CTV impression is matched on the household IP address instead, on Android and iOS, and ranks below S2S impressions.
 - **Clicks always win.** An impression is credited only when no click, from any source, can be credited.
 
 The postback carries the `tid` you sent on the impression, and `{touch_type}` is `impression` instead of `click`, so you can tell view-through installs apart.
