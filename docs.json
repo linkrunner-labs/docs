@@ -73,6 +73,7 @@
                             "features/push-notification-tracking",
                             "features/push-notification-providers",
                             "features/link-redirection",
+                            "features/deactivate-campaign-link",
                             "features/deep-link-management",
                             "features/referral-codes",
                             "features/custom-store-listing",
