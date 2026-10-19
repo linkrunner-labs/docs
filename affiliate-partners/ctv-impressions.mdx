@@ -46,7 +46,7 @@ A CTV match is probabilistic: the same IP address suggests the same household, b
 
 Postbacks work as for clicks. Your [postback templates](/affiliate-partners/postbacks), [event mapping](/affiliate-partners/event-mapping) and [postback logs](/affiliate-partners/postback-logs) apply unchanged, and `{touch_type}` is `impression` for CTV installs.
 
-In the campaign table, CTV installs count as installs and as **View Through Attribution** installs. Accepted impressions appear in the **Impressions** column.
+In the campaign table, CTV installs count as installs and as **View Through Attribution** installs. Accepted impressions appear in the **Impressions** column. See [See your results](#see-your-results).
 
 ## Set it up
 
@@ -92,6 +92,30 @@ In the campaign table, CTV installs count as installs and as **View Through Attr
 <Warning>
 Send each impression as it happens. An impression that arrives after the install can't be credited, and impressions older than 24 hours are rejected.
 </Warning>
+
+## See your results
+
+The **Impressions** column is off by default. Turn it on once for each app and it stays on.
+
+<Steps>
+  <Step title="Open Edit Columns">
+    In your affiliate dashboard, open **All Campaigns** and click the columns icon at the right of the toolbar, below **Create Link**.
+
+    ![The Edit Columns icon at the right of the campaign toolbar, below Create Link](/images/affiliate-partners/ctv-edit-columns-button.webp)
+  </Step>
+  <Step title="Turn on Impressions">
+    Tick **Impressions** and click **Save**. Keep **View Through Attribution** ticked as well.
+
+    ![Edit Columns with Impressions ticked and the Save button at the top](/images/affiliate-partners/ctv-edit-columns-impressions.webp)
+  </Step>
+  <Step title="Read your CTV campaigns">
+    Each CTV campaign shows its accepted impressions, and the installs credited to them under **Installs** and **View Through Attribution**. A TV-only campaign has no clicks.
+
+    ![Campaign table with Impressions, Installs and View Through Attribution for two CTV campaigns and one click campaign](/images/affiliate-partners/ctv-campaign-table.webp)
+
+    A new campaign can show impressions before its first install. Installs count on the day they happen, so a household that saw the ad late at night can install the next day.
+  </Step>
+</Steps>
 
 ## Authenticate your requests
 
