@@ -45,6 +45,7 @@ If you report impressions through [S2S impressions](/affiliate-partners/s2s-impr
 
 - **Off by default.** The advertiser turns on view-through for your partner account in **Settings → Attribution Windows** and sets your window, from 1 to 24 hours. See [View-through attribution](/features/attribution-windows#view-through-attribution).
 - **Device ID first.** An S2S impression must carry the installing device's `gaid` or `idfa`. A CTV impression is matched on the household IP address instead, on Android and iOS, and ranks below S2S impressions.
+- **CTV has its own switch.** The advertiser also turns on CTV for your partner account, under S2S traffic in **Integrations → Affiliate Partners → Configure**.
 - **Clicks always win.** An impression is credited only when no click, from any source, can be credited.
 
 The postback carries the `tid` you sent on the impression, and `{touch_type}` is `impression` instead of `click`, so you can tell view-through installs apart.
