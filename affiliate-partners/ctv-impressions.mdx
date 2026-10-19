@@ -13,7 +13,7 @@ Your **server** reports each CTV impression to Linkrunner with the device IP and
 If your impressions carry the phone's GAID or IDFA, use [S2S impressions](/affiliate-partners/s2s-impressions) instead. They are matched on the device ID and rank above CTV impressions.
 
 <Note>
-CTV is off by default. Three things must be on for your partner account on each app: S2S traffic, which the advertiser turns on in **Integrations → Affiliate Partners → Configure** (see [these steps](/affiliate-partners/turn-on-s2s-clicks)), and view-through and CTV, which [Linkrunner support](mailto:support@linkrunner.io) turns on at the advertiser's request. Until then, requests are rejected with `partner_not_enabled`, `view_through_disabled` or `ctv_not_enabled`.
+CTV is off by default. Three things must be on for your partner account on each app. The advertiser turns on two of them: S2S traffic in **Integrations → Affiliate Partners → Configure** (see [these steps](/affiliate-partners/turn-on-s2s-clicks)), and view-through with its window in **Settings → Attribution Windows** (see [View-through attribution](/features/attribution-windows#view-through-attribution)). [Linkrunner support](mailto:support@linkrunner.io) turns on CTV at the advertiser's request. Until then, requests are rejected with `partner_not_enabled`, `view_through_disabled` or `ctv_not_enabled`.
 </Note>
 
 ## How it works
@@ -185,7 +185,7 @@ The `ip` belongs to a cloud or hosting provider, which usually means your ad ser
 Send the TV's user agent in `ua`.
 
 **Requests return `partner_not_enabled`, `view_through_disabled` or `ctv_not_enabled`.**
-S2S traffic, view-through or CTV is not on for your partner account on this app. Ask the advertiser. They turn on S2S traffic themselves (see [these steps](/affiliate-partners/turn-on-s2s-clicks)) and ask [Linkrunner support](mailto:support@linkrunner.io) to turn on view-through and CTV. Changes take up to 5 minutes to apply.
+S2S traffic, view-through or CTV is not on for your partner account on this app. Ask the advertiser. They turn on S2S traffic ([these steps](/affiliate-partners/turn-on-s2s-clicks)) and view-through ([how](/features/attribution-windows#view-through-attribution)) themselves, and ask [Linkrunner support](mailto:support@linkrunner.io) to turn on CTV. Changes take up to 5 minutes to apply.
 
 **Impressions are accepted but installs aren't credited to them.**
 Check that the impression carries the TV's real public IP address and arrives before the install, and that the phone installed over the same home Wi-Fi on Android. A click from any source, a device-ID impression, or a more recent impression takes priority. The install must also fall inside the view-through window the advertiser set for you.
