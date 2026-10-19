@@ -18,6 +18,15 @@ The domain belongs to the advertiser. `c` is the Linkrunner campaign identifier.
 
 Your platform replaces those macros before it sends the click to Linkrunner. Linkrunner does not expand them for you.
 
+<Warning>
+Only the values after each `=` come from your platform. Keep everything else exactly as generated:
+
+- `c` stays as it is. Do not add a campaign or publisher name to it. `c=OgWmhiSXhG_MyCampaign` does not match any campaign, so those clicks are lost.
+- Parameter names stay as they are. Send your click ID as `tid={your_macro}`, not `CLICK_ID={tid}` or `clickid={tid}`.
+
+A link the advertiser created without selecting your network does not send you postbacks. Create the link from your own dashboard, or ask the advertiser to select your network when they create it.
+</Warning>
+
 <Tip>
 Does your placement send the user straight to the store without opening a browser (OEM icons, preloads)? Report those clicks from your server instead. See [Server-to-Server Clicks](/affiliate-partners/s2s-clicks).
 
@@ -78,6 +87,16 @@ Pass device advertising IDs when you have them. They improve match rates, especi
 URL-encode every value before appending it. Linkrunner stores values as received.
 </Note>
 
+## Links for your sub-publishers
+
+Use one campaign link for all your sub-publishers. Pass each sub-publisher's ID in `s2` or `s3` through your platform's macro. Linkrunner returns both in your postbacks, so you can split conversions by sub-publisher.
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}&s3={sub_publisher_id}
+```
+
+Create a separate link only when you want a separate campaign in the Linkrunner dashboard.
+
 ## What not to put in the tracking link
 
 Do not add postback-only values to the tracking link.
@@ -99,7 +118,13 @@ https://track.example.com/?c=OgWmhiSXhG&tid=a1b2c3d4e5&s2=camp_88&s3=pub_4471&ga
 ## Troubleshooting
 
 **Conversions arrive with an empty click ID.**
-You did not send `tid` on the click, or the value was empty. Confirm the final clicked URL includes `tid=` with a unique value.
+You did not send `tid` on the click, sent it under another name (such as `CLICK_ID` or `clickid`), or the value was empty. Confirm the final clicked URL includes `tid=` with a unique value.
+
+**Clicks do not show up on the campaign.**
+The `c` value was changed. Use the exact value from the generated link, with nothing added to it.
+
+**Installs show up, but you get no postbacks.**
+The campaign link was not created under your network. Create it from your own dashboard, or ask the advertiser to recreate it with your network selected. Also check that your postback URLs are set up. See [Postbacks](/affiliate-partners/postbacks).
 
 **The final URL still shows `{click_id}` or another macro.**
 Your platform did not replace that macro before redirecting the user. Replace it in your platform first, then send the resolved value to Linkrunner.
