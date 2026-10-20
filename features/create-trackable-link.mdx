@@ -30,6 +30,10 @@ Create one link for each place, so you can compare them.
 | A "Get the app" banner on your website | `site-banner` |
 | Podcast show notes and video descriptions | `podcast-ep12` |
 
+<Warning>
+  A link you give to an affiliate partner must be assigned to that partner. Without it, Linkrunner still credits installs to the link but sends the partner no postbacks, so they cannot see or pay out on your conversions. See [Assign a partner to a link](#assign-a-partner-to-a-link).
+</Warning>
+
 <Note>
   Running ads on Meta, Google or another ad network? Those campaigns come in through the network's integration, not a link you create here. See [Ad networks](/ad-networks/meta-ads).
 </Note>
@@ -115,6 +119,22 @@ Your link now has its own row in [App Campaigns](https://dashboard.linkrunner.io
 2. When they install and open your app, Linkrunner credits the install to your link.
 3. If you set a deep link, your app opens on that page. If the app is already installed, it opens there straight away.
 
+## Assign a partner to a link
+
+When a link gets clicks from a partner's tracking platform (a click ID such as `tid` or `click_id` on the click) but has no partner, [App Campaigns](https://dashboard.linkrunner.io/dashboard/campaigns) shows a notice above the campaign list. Click **Review links** to see each link, with its clicks and the installs that sent no postback.
+
+![The notice on App Campaigns listing two links that get partner traffic but have no partner](/images/campaigns/unassigned-partner-links-notice.webp)
+
+1. Click **Assign** next to a link, or **Details** to see what happened on it first.
+2. Check the partner. Linkrunner suggests one from the link name, because the click ID does not say which partner sent the click. Pick another partner if the suggestion is wrong.
+3. Click **Assign**.
+
+![The Assign a partner to this link window, with the suggested partner selected](/images/campaigns/assign-partner-modal.webp)
+
+Postbacks start with the next install. Installs already on the link are not sent to the partner.
+
+Only partners you have connected are listed. Account admins and members see the notice.
+
 ## Troubleshooting
 
 **The Display ID is already taken.** Display IDs are unique within a project. Pick another one, or leave it empty for a random ID.
@@ -122,6 +142,8 @@ Your link now has its own row in [App Campaigns](https://dashboard.linkrunner.io
 **The link opens the store even though the app is installed.** Finish [deep linking setup](/features/deep-linking-setup) for your domain. For in-app browsers such as Instagram, turn on **Open in app**.
 
 **You reached the campaign limit.** Contact [support@linkrunner.io](mailto:support@linkrunner.io) to raise it.
+
+**Your partner says they get no postbacks.** The link their offer points at is probably not assigned to them. Check for the notice on App Campaigns and [assign the partner](#assign-a-partner-to-a-link).
 
 **An install is not credited to the link.** Install the app from the link on a test device, then check [Testing attribution](/testing/testing-attribution-troubleshooting).
 
