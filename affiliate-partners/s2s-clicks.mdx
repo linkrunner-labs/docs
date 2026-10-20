@@ -14,6 +14,10 @@ For this traffic, your **server** reports each click to Linkrunner, and the user
 
 Every S2S request must carry your partner token. See [Authenticate your requests](#authenticate-your-requests).
 
+<Tip>
+Already calling the advertiser's tracking link from your server? You can keep doing that if you pass the user's `ip` and `ua` on the link. See [Calling the link from your server](/affiliate-partners/tracking-links#calling-the-link-from-your-server). For a new integration, use the S2S click API on this page: it checks your token, returns a reason for every rejected click, and stores a retried `tid` once.
+</Tip>
+
 <Note>
 The advertiser turns on S2S clicks for each partner separately, in **Integrations → Affiliate Partners → Configure**. Send them [these steps](/affiliate-partners/turn-on-s2s-clicks) and ask them to turn it on for your partner account before you send traffic. Until then, requests are rejected with `partner_not_enabled`. S2S clicks stop if the advertiser disconnects your account.
 </Note>

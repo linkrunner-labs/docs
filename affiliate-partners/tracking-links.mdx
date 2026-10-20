@@ -97,6 +97,49 @@ https://track.example.com/?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}&s3={sub_
 
 Create a separate link only when you want a separate campaign in the Linkrunner dashboard.
 
+## Calling the link from your server
+
+Some platforms call the tracking link from their own server instead of sending the user's browser to it. Linkrunner then sees your server's IP address, not the user's, and the click can't be matched to an install.
+
+If you do this, pass the user's device IP and user agent on the link:
+
+| Parameter | Also accepted | Description |
+|---|---|---|
+| `ip` | `af_ip`, `ip_address` | The user's public device IP address, IPv4 or IPv6. |
+| `ua` | `af_ua`, `user_agent` | The user's device user agent, URL-encoded. |
+| `redirect` | | Optional. Set to `false` to get a JSON response instead of a redirect to the store. |
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid=a1b2c3d4e5&ip=49.204.110.61&ua=Mozilla%2F5.0%20%28Linux%3B%20Android%2014%3B%20Pixel%208%29...&redirect=false
+```
+
+With `redirect=false`, Linkrunner records the click before it answers, and responds `200` with:
+
+```json
+{"status": "accepted", "click_id": "8f6d2a1e-3c4b-4d5e-9f60-7a8b9c0d1e2f"}
+```
+
+If Linkrunner could not record the click, it responds `503` with `{"status": "rejected", "reason": "unavailable"}`. Retry the same request later.
+
+If the click is not recorded, the response says why, for example `{"status": "ignored", "reason": "invalid_ip"}`:
+
+| `reason` | What to fix |
+|---|---|
+| `missing_ip` | Send the user's IP in `ip`. |
+| `invalid_ip` | `ip` is not a public address. Send the device's public IP, not a private, loopback or carrier-NAT one. |
+| `not_a_browser` | Send the user's user agent in `ua`. |
+| `declared_bot` | The user agent belongs to a crawler or bot. |
+
+<Warning>
+Linkrunner reads `ip` and `ua` only after the advertiser turns on **S2S clicks** for your partner account. Send them [these steps](/affiliate-partners/turn-on-s2s-clicks). Until then, these parameters are ignored and the click records your server's IP.
+</Warning>
+
+Notes:
+
+- Always send `ip` with a public address. If your server sends its own `User-Agent` header, a click without a valid `ip` is not recorded. If your server forwards the user's user agent as its `User-Agent` header, Linkrunner keeps that header, and a click without a valid `ip` records your server's IP.
+- Don't add `ip` or `ua` to links that open in the user's browser. Linkrunner already sees the right values there.
+- Building a new integration? Use [Server-to-Server Clicks](/affiliate-partners/s2s-clicks) instead. It authenticates each request with your partner token and returns errors you can act on.
+
 ## What not to put in the tracking link
 
 Do not add postback-only values to the tracking link.
@@ -131,5 +174,8 @@ Your platform did not replace that macro before redirecting the user. Replace it
 
 **Installs are not attributed to your clicks.**
 Check that traffic actually passes through the Linkrunner tracking link and that the campaign identifier (`c`) is correct. If you rely on device-ID matching, make sure `gaid` or `idfa` is present on the click.
+
+**Your server calls the link and installs are not attributed.**
+Pass the user's `ip` and `ua` on the link, and ask the advertiser to turn on S2S clicks for your account. See [Calling the link from your server](#calling-the-link-from-your-server).
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
