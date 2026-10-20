@@ -83,7 +83,8 @@
                             "features/deep-link-management",
                             "features/referral-codes",
                             "features/custom-store-listing",
-                            "features/social-media-intermediary-page"
+                            "features/social-media-intermediary-page",
+                            "features/custom-landing-page"
                         ]
                     },
                     {

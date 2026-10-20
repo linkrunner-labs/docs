@@ -1,0 +1,133 @@
+---
+title: "Custom Landing Page"
+description: "Show your own page before the app or store opens, checked and sped up by Linkrunner"
+icon: "browser"
+---
+
+When someone taps your link inside Instagram, Facebook, LinkedIn or a similar app, Linkrunner shows a short [intermediary page](/features/social-media-intermediary-page) before opening your app or the store. You can replace it with your own page, for example an offer, reviews or a hero image.
+
+Linkrunner checks your page, fixes what it can, and shows you the result before anyone sees it. Opening the app, picking the right store and crediting installs to your campaigns keep working.
+
+## When your page is shown
+
+Your page can replace the Linkrunner page wherever it appears today:
+
+- Campaigns with **Open in app** turned on
+- Google web-to-app links
+- Links opened inside the Instagram, Facebook, LinkedIn, X, Snapchat and TikTok apps, and Threads on iPhone
+
+Campaigns with their own iOS or Android redirect URL skip the page on phones, and desktop visitors go to your website. Google web-to-app links always show the page, on every device.
+
+## How it differs from the Linkrunner page
+
+| | Linkrunner page | Your page |
+|---|---|---|
+| Visitors see it | Up to about 2 seconds, then it moves on by itself | Until they tap your button |
+| Taps needed to reach the store | Usually 0 | 1 |
+| App already installed | Opens straight away | Opens straight away |
+| Size | About 45 KB | Up to 500 KB |
+
+Because visitors tap to continue, some will leave without tapping. Linkrunner shows you the tap rate once your page is live, so you can compare it with the Linkrunner page.
+
+## Before you upload
+
+- **Format:** a `.zip` with `index.html` at the top and every image and font next to it, or a single `.html` file. Up to 10 MB.
+- **Download button:** point it at `{{linkrunner_link}}`, or add `data-linkrunner="cta"` to it. If you forget, Linkrunner does it for you.
+- **Phones only:** design for screens 320 to 430 px wide.
+
+```html
+<a href="{{linkrunner_link}}" data-linkrunner="cta">Start running free</a>
+```
+
+<Tip>
+Don't worry about image sizes, fonts or store links. Linkrunner fixes those for you. Starting from scratch? Download the starter template from the **Landing Page** screen. It is already fast and has the button set up.
+</Tip>
+
+## Set up your page
+
+<Steps>
+  <Step title="Upload your page">
+    Go to [**Settings → Landing Page**](https://dashboard.linkrunner.io/dashboard/settings/landing-page) and drop your file into **Use your own page**.
+
+    ![Landing Page settings with the upload area](/images/custom-landing-page/upload.webp)
+  </Step>
+  <Step title="Watch the check">
+    Linkrunner opens your page the way a visitor would: on an Android phone, inside Instagram, on a slow mobile network. It takes about 20 seconds.
+
+    ![Your page being checked on a slow network](/images/custom-landing-page/checking.webp)
+  </Step>
+  <Step title="Let Linkrunner fix it">
+    The report lists what needs to change before your page can go live. Click **Fix it for me**. To make only the changes your page needs to go live, choose **Required only** first.
+
+    ![Check report with the Fix it for me button](/images/custom-landing-page/report.webp)
+
+    Click **Details** on any item to see the exact change.
+
+    ![List of fixes Linkrunner will make](/images/custom-landing-page/what-we-fix.webp)
+  </Step>
+  <Step title="Wait for the email">
+    Fixing takes about 2 minutes. You can close the page: Linkrunner emails you when it is ready. Your current page stays live until you approve the new one.
+
+    ![Fixes in progress](/images/custom-landing-page/fixing.webp)
+  </Step>
+  <Step title="Review the result">
+    Check the summary, then compare your page before and after inside Instagram, iPhone Safari and Android Chrome. The ring marks your download button. Scan the QR code to try the page on your own phone. The preview does not count as a click.
+
+    ![Summary of the fixed page](/images/custom-landing-page/review-summary.webp)
+
+    ![Before and after preview with the download button highlighted](/images/custom-landing-page/before-after.webp)
+
+    **On a slow network** shows what a visitor sees second by second, before and after the fixes.
+
+    ![Filmstrip of the page loading on a slow network, before and after](/images/custom-landing-page/slow-network.webp)
+
+    If the ring is on the wrong element, click **Pick another**.
+  </Step>
+  <Step title="Go live">
+    Click **Keep and go live**, choose **Every campaign that shows a landing page** or **Only campaigns I pick**, then click **Go live**. Your campaigns switch over within a minute.
+
+    ![Go live dialog](/images/custom-landing-page/go-live.webp)
+
+    <Tip>Try your page on one campaign first, then compare its tap rate with the Linkrunner page before switching everything.</Tip>
+  </Step>
+</Steps>
+
+## What Linkrunner fixes, and what needs you
+
+| Linkrunner fixes it | You fix it |
+|---|---|
+| Images larger than they show on screen | A page still over 500 KB because of its content, such as a video background |
+| Fonts loaded from Google Fonts or other servers | Forms that collect personal data, such as a phone number |
+| Download buttons that link straight to the App Store or Play Store | A page that needs a login or your own servers |
+| Code that picks a store by phone type | Content loaded from other sites, such as embedded videos or chat widgets |
+| Code that sends visitors to another page by itself | Analytics and ad pixels. Linkrunner lists the ones it finds |
+| Search engines listing the page | Anything that would change your design or wording |
+
+Fixes are designed to keep your design the same. Linkrunner compares screenshots of your page before and after on iPhone and Android and shows you the result before anything goes live.
+
+## Track how it's doing
+
+Once your page is live, **Settings → Landing Page** shows page views, how many visitors tapped your button, how many already had the app, and how fast the page was ready, by browser.
+
+![Visitor results for the live page](/images/custom-landing-page/results.webp)
+
+To go back, click **Switch back to Linkrunner page**. To change your page, click **Replace page** and upload a new file. Linkrunner checks every version, and earlier versions stay listed under **Versions**.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="The report says something needs me">
+    Linkrunner only fixes changes that keep your design the same. The item tells you what to change in your file. Upload the new version with **Upload a different file**.
+  </Accordion>
+  <Accordion title="The wrong button is marked as the download button">
+    On the review screen, click **Pick another** and choose your download button. You can also add `data-linkrunner="cta"` to it in your file before uploading.
+  </Accordion>
+  <Accordion title="Fewer visitors reach the store than with the Linkrunner page">
+    This is expected: visitors now need to tap. Put your button where it is visible without scrolling, keep the page light, and try it on one campaign first. If installs drop, switch back to the Linkrunner page in one click.
+  </Accordion>
+  <Accordion title="A campaign still shows the Linkrunner page">
+    If you chose **Only campaigns I pick** when going live, check that the campaign is on your list. Campaigns with an iOS or Android redirect URL skip the landing page, except on Google web-to-app links.
+  </Accordion>
+</AccordionGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
