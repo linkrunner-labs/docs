@@ -40,9 +40,9 @@ Linkrunner matches the install to your click in one of three ways, strongest fir
 |---|---|---|
 | **Referrer** | Open the Play Store with `referrer=lr_ia_id%3D<click_id>`, using the `click_id` from our response | Exact |
 | **Device ID** | `gaid` (Android) or `idfa` (iOS) on the click | Exact |
-| **IP** | The user's public device `ip`, plus `ua`, when there is no device ID | Probabilistic |
+| **IP** | The user's public device `ip`, when there is no device ID | Probabilistic |
 
-Send a device ID whenever you have one. IP matching is a fallback: users behind the same public IP can be confused with each other.
+Send a device ID whenever you have one. IP matching is a fallback: users behind the same public IP can be confused with each other. The user agent (`ua`) is optional and isn't used to match installs.
 
 Only report ads the user tapped. For ads that were only shown, use [S2S impressions](/affiliate-partners/s2s-impressions).
 
@@ -140,7 +140,7 @@ If you already send S2S clicks to AppsFlyer, you can reuse that template. Linkru
 | `advertising_id` | `gaid` | Either name works |
 | `idfa` | `idfa` | Same |
 | `af_ip` | `ip` | Either name works |
-| `af_ua` | `ua` | Either name works |
+| `af_ua` | `ua` | Either name works. Optional. Not used for matching |
 | `af_sub1`, `af_sub2`, `af_sub3` | `s2`, `s3`, `s4` | Either name works. Returned in `{s2}`–`{s4}` |
 | `redirect=false` | Not needed | This endpoint never redirects. Ignored if present |
 | `pid`, `af_siteid`, `af_lang` | Not needed | Ignored if present |
