@@ -36,9 +36,13 @@ You need three switches on, per partner and per app. Only admins and managers ca
   </Step>
   <Step title="Turn on Connected TV (CTV) impressions">
     On the same page, turn on **Connected TV (CTV) impressions** under the S2S switch. It stays disabled until S2S is on. Turning S2S off also turns CTV off.
+
+    ![The partner's Configure page with S2S clicks and impressions and Connected TV (CTV) impressions both on](/images/ctv-attribution/ctv-switches-on.webp)
   </Step>
   <Step title="Turn on view-through for the partner">
     Go to **Settings → Attribution Windows**, find the partner, turn on **View-through attribution**, and choose a window from 1 to 24 hours. The default is 24 hours. See [View-through attribution](/features/attribution-windows#view-through-attribution).
+
+    ![View-through attribution turned on for the partner with a 24 hour window](/images/ctv-attribution/ctv-view-through-on.webp)
   </Step>
 </Steps>
 
@@ -46,9 +50,17 @@ You need three switches on, per partner and per app. Only admins and managers ca
 
 Once CTV is on for a partner, Linkrunner shows a **CTV impression URL** with a copy button on that partner's campaigns. You can find it in three places:
 
-- **Campaigns table:** the TV icon next to the template URL copy button. It appears when you hover over the row.
-- **Campaign details:** the header of the details panel, next to **Template URL** and **View-through URL**.
-- **Create Campaign:** the confirmation screen after you create a campaign.
+**Campaigns table.** Hover over the campaign's row and click the TV icon next to the template URL copy button.
+
+![The TV icon in the campaign table, with its Copy CTV impression URL tooltip](/images/ctv-attribution/ctv-campaign-table-copy-url.webp)
+
+**Campaign details.** Open the campaign. The URL is in the header, under **Template URL** and **View-through URL**.
+
+![The campaign details header with the CTV impression URL and its copy button](/images/ctv-attribution/ctv-campaign-details-url.webp)
+
+**Create Campaign.** The confirmation screen shows it after you create a campaign for the partner.
+
+<img src="/images/ctv-attribution/ctv-campaign-created-url.webp" alt="Campaign Created with the Template URL, View-through URL and CTV impression URL" width="420" />
 
 The URL looks like this:
 
@@ -65,8 +77,13 @@ The partner replaces the macros in braces with its own values, including the TV'
 CTV installs appear in your campaign table as installs and as **View Through Attribution** installs. Accepted impressions appear in the **Impressions** column.
 
 - The **Impressions** column is off by default. Click the **Edit Columns** icon in the table toolbar, tick **Impressions**, and click **Save**.
+
+  ![The Edit Columns icon at the right of the campaign toolbar](/images/affiliate-partners/ctv-edit-columns-button.webp)
+
 - A TV impression belongs to neither Android nor iOS. A view filtered to one platform leaves CTV impressions out. Clear the platform filter to see them.
 - Postbacks to the partner carry `{touch_type}` = `impression` for CTV installs.
+
+![Campaign table with Impressions, Installs and View Through Attribution for CTV campaigns](/images/affiliate-partners/ctv-campaign-table.webp)
 
 ## Turn it off
 
