@@ -1,24 +1,28 @@
 ---
-title: "Custom Landing Page"
-description: "Show your own page before the app or store opens, checked and sped up by Linkrunner"
+title: "Custom landing pages"
+description: "Show your own pages before the app or store opens, checked and sped up by Linkrunner, and choose which page each Meta ad or campaign link shows"
 icon: "browser"
 ---
 
-When someone taps your link inside Instagram, Facebook, LinkedIn or a similar app, Linkrunner shows a short [intermediary page](/features/social-media-intermediary-page) before opening your app or the store. You can replace it with your own page, for example an offer, reviews or a hero image.
+When someone taps your link inside Instagram, Facebook, LinkedIn or a similar app, Linkrunner shows a short [intermediary page](/features/social-media-intermediary-page) before opening your app or the store. You can replace it with your own pages, for example an offer, reviews or a hero image, and use a different page for each Meta ad set, Meta ad or campaign link.
 
-Linkrunner checks your page, fixes what it can, and shows you the result before anyone sees it. Opening the app, picking the right store and crediting installs to your campaigns keep working.
+Linkrunner checks every page, fixes what it can, and shows you the result before anyone sees it. Opening the app, picking the right store and crediting installs to your campaigns keep working.
 
-## When your page is shown
+<Note>
+Landing pages are being rolled out project by project. If you don't see **Landing Pages** in Settings, contact [support@linkrunner.io](mailto:support@linkrunner.io).
+</Note>
 
-Your page can replace the Linkrunner page wherever it appears today:
+## When your pages are shown
 
-- Campaigns with **Open in app** turned on
-- Google web-to-app links
+Your pages replace the Linkrunner page wherever it appears today:
+
+- Linkrunner campaigns with **Open in app** turned on
 - Links opened inside the Instagram, Facebook, LinkedIn, X, Snapchat and TikTok apps, and Threads on iPhone
+- [Meta web-to-app](/ad-networks/meta-web-to-app) campaigns, ad sets and ads
 
-Campaigns with their own iOS or Android redirect URL skip the page on phones, and desktop visitors go to your website. Google web-to-app links always show the page, on every device.
+Campaigns with their own iOS or Android redirect URL skip the page on phones, and desktop visitors go to your website. Google web-to-app campaigns always keep the Linkrunner page.
 
-## How it differs from the Linkrunner page
+## How your page differs from the Linkrunner page
 
 | | Linkrunner page | Your page |
 |---|---|---|
@@ -27,72 +31,87 @@ Campaigns with their own iOS or Android redirect URL skip the page on phones, an
 | App already installed | Opens straight away | Opens straight away |
 | Size | About 45 KB | Up to 500 KB |
 
-Because visitors tap to continue, some will leave without tapping. Linkrunner shows you the tap rate once your page is live, so you can compare it with the Linkrunner page.
+Because visitors tap to continue, some will leave without tapping. Try a new page on one ad set or campaign first, then compare installs before you use it everywhere.
 
 ## Before you upload
 
 - **Format:** a `.zip` with `index.html` at the top and every image and font next to it, or a single `.html` file. Up to 10 MB.
 - **Download button:** point it at `{{linkrunner_link}}`, or add `data-linkrunner="cta"` to it. If you forget, Linkrunner does it for you.
 - **Phones only:** design for screens 320 to 430 px wide.
+- **Up to 50 pages** per project.
 
 ```html
 <a href="{{linkrunner_link}}" data-linkrunner="cta">Start running free</a>
 ```
 
 <Tip>
-Don't worry about image sizes, fonts or store links. Linkrunner fixes those for you. Starting from scratch? Download the starter template from the **Landing Page** screen. It is already fast and has the button set up.
+Don't worry about image sizes, fonts or store links. Linkrunner fixes those for you.
 </Tip>
 
-## Set up your page
+## Add and approve a page
 
 <Steps>
-  <Step title="Upload your page">
-    Go to [**Settings → Landing Page**](https://dashboard.linkrunner.io/dashboard/settings/landing-page) and drop your file into **Use your own page**.
+  <Step title="Open Landing Pages">
+    Go to [**Settings → Landing Pages**](https://dashboard.linkrunner.io/dashboard/settings/landing-page). Your pages are listed with their status, where they show and their size. Click **New page** or drop a file at the bottom of the list.
 
-    ![Landing Page settings with the upload area](/images/custom-landing-page/upload.webp)
+    ![Landing Pages library with a page in each status](/images/custom-landing-page/library.webp)
+  </Step>
+  <Step title="Upload your page">
+    Choose your `.zip` or `.html` file.
+
+    ![Uploading a page](/images/custom-landing-page/upload.webp)
   </Step>
   <Step title="Watch the check">
-    Linkrunner opens your page the way a visitor would: on an Android phone, inside Instagram, on a slow mobile network. It takes about 20 seconds.
+    Linkrunner opens your page the way a visitor would: on an Android phone, inside Instagram, on a slow mobile network. It usually takes under a minute.
 
     ![Your page being checked on a slow network](/images/custom-landing-page/checking.webp)
   </Step>
   <Step title="Let Linkrunner fix it">
-    The report lists what needs to change before your page can go live. Click **Fix it for me**. To make only the changes your page needs to go live, choose **Required only** first.
+    The report lists what needs to change before your page can go live. Click **Fix it for me**. Choose **Required only** to make just the changes your page needs, or **Everything** to also make it faster. Click an item to see which files it touches.
 
     ![Check report with the Fix it for me button](/images/custom-landing-page/report.webp)
-
-    Click **Details** on any item to see the exact change.
-
-    ![List of fixes Linkrunner will make](/images/custom-landing-page/what-we-fix.webp)
   </Step>
   <Step title="Wait for the email">
-    Fixing takes about 2 minutes. You can close the page: Linkrunner emails you when it is ready. Your current page stays live until you approve the new one.
+    Fixing takes about 2 minutes. You can leave the page: Linkrunner emails you when it is ready, or if it could not fix the page. Nothing goes live until you approve it.
 
     ![Fixes in progress](/images/custom-landing-page/fixing.webp)
   </Step>
   <Step title="Review the result">
     Check the summary, then compare your page before and after inside Instagram, iPhone Safari and Android Chrome. The ring marks your download button. Scan the QR code to try the page on your own phone. The preview does not count as a click.
 
-    ![Summary of the fixed page](/images/custom-landing-page/review-summary.webp)
-
-    ![Before and after preview with the download button highlighted](/images/custom-landing-page/before-after.webp)
+    ![Summary and before and after phones with the download button highlighted](/images/custom-landing-page/review.webp)
 
     **On a slow network** shows what a visitor sees second by second, before and after the fixes.
 
     ![Filmstrip of the page loading on a slow network, before and after](/images/custom-landing-page/slow-network.webp)
-
-    If the ring is on the wrong element, click **Pick another**.
   </Step>
-  <Step title="Go live">
-    Click **Keep and go live**, choose **Every campaign that shows a landing page** or **Only campaigns I pick**, then click **Go live**. Your campaigns switch over within a minute.
+  <Step title="Approve it">
+    Click **Approve and go live**. Choose **Make it my default page** to use it for every Meta ad and link that has no page of its own, or **Only the Meta ads and links I pick** to choose where it shows yourself. Your links switch over within a minute.
 
-    ![Go live dialog](/images/custom-landing-page/go-live.webp)
-
-    <Tip>Try your page on one campaign first, then compare its tap rate with the Linkrunner page before switching everything.</Tip>
+    ![Choosing whether the page becomes the default](/images/custom-landing-page/approve.webp)
   </Step>
 </Steps>
 
-## What Linkrunner fixes, and what needs you
+## Choose where each page shows
+
+Open the **Where they show** tab to pick a page for each Meta web-to-app campaign, ad set or ad, and for each Linkrunner campaign link. For each click, Linkrunner uses the most specific choice it finds:
+
+1. The ad
+2. The ad set
+3. The campaign
+4. Your default page
+5. The Linkrunner page, if none of the above is set
+
+![Where they show: Meta campaigns, ad sets and ads, and Linkrunner campaign links](/images/custom-landing-page/where-they-show.webp)
+
+- **Meta web-to-app:** pick a page for a whole campaign, an ad set or a single ad. Pages for ad sets and ads need `adset_id={{adset.id}}` and `ad_id={{ad.id}}` in the ad's URL parameters. The URL parameters in our [Meta web-to-app setup](/ad-networks/meta-web-to-app) already include them, and **Copy URL parameters** gives them to you again. Without `ad_id`, clicks use the ad set's page.
+- **Linkrunner campaigns:** pick a page in the **Links** table, or in the **Landing page** field under **Advanced Options** when you create or edit a campaign.
+
+![Landing page field when creating a campaign](/images/custom-landing-page/campaign-picker.webp)
+
+Only pages that passed the checks can be picked. Pages that still need fixes, are being checked or are waiting for your approval are greyed out. A page that is in use cannot be deleted: pick another page for those ads and links first.
+
+## What Linkrunner fixes and what needs you
 
 | Linkrunner fixes it | You fix it |
 |---|---|
@@ -105,28 +124,39 @@ Don't worry about image sizes, fonts or store links. Linkrunner fixes those for 
 
 Fixes are designed to keep your design the same. Linkrunner compares screenshots of your page before and after on iPhone and Android and shows you the result before anything goes live.
 
-## Track how it's doing
+## Change or stop using a page
 
-Once your page is live, **Settings → Landing Page** shows page views, how many visitors tapped your button, how many already had the app, and how fast the page was ready, by browser.
-
-![Visitor results for the live page](/images/custom-landing-page/results.webp)
-
-To go back, click **Switch back to Linkrunner page**. To change your page, click **Replace page** and upload a new file. Linkrunner checks every version, and earlier versions stay listed under **Versions**.
+To change a page, upload a new file for it from its row. Linkrunner checks every new version, and your current version stays live until you approve the new one. To stop using a page, pick another page, or the Linkrunner page, for the ads and links that use it.
 
 ## Troubleshooting
 
 <AccordionGroup>
-  <Accordion title="The report says something needs me">
-    Linkrunner only fixes changes that keep your design the same. The item tells you what to change in your file. Upload the new version with **Upload a different file**.
+  <Accordion title="I don't see Landing Pages in Settings">
+    Landing pages are rolled out per project. Contact [support@linkrunner.io](mailto:support@linkrunner.io) and we will check your project.
   </Accordion>
-  <Accordion title="The wrong button is marked as the download button">
-    On the review screen, click **Pick another** and choose your download button. You can also add `data-linkrunner="cta"` to it in your file before uploading.
+  <Accordion title="The report says something needs me">
+    Linkrunner only fixes changes that keep your design the same. The item tells you what to change in your file. Click **Upload a different file** to add the new version.
+  </Accordion>
+  <Accordion title="My page shows Check failed">
+    Open the page to see the reason. The most common causes are a `.zip` without `index.html` at the top and a file over 10 MB. Upload a corrected file.
+  </Accordion>
+  <Accordion title="I can't pick my page for an ad or campaign">
+    Only pages that passed the checks can be picked. Open the page and finish the fix or approval first.
+  </Accordion>
+  <Accordion title="A Meta ad set or ad shows a different page than I picked">
+    Linkrunner uses the ad's page, then the ad set's, then the campaign's, then your default. Check **Where they show** for a more specific choice. If every ad shows its ad set's page, the ad's URL parameters are missing `ad_id={{ad.id}}`.
+  </Accordion>
+  <Accordion title="A Google web-to-app campaign shows the Linkrunner page">
+    This is expected. Google web-to-app campaigns always keep the Linkrunner page.
+  </Accordion>
+  <Accordion title="The wrong element is used as the download button">
+    Add `data-linkrunner="cta"` to your download button in your file and upload the new version.
   </Accordion>
   <Accordion title="Fewer visitors reach the store than with the Linkrunner page">
-    This is expected: visitors now need to tap. Put your button where it is visible without scrolling, keep the page light, and try it on one campaign first. If installs drop, switch back to the Linkrunner page in one click.
+    This is expected: visitors now need to tap. Put your button where it is visible without scrolling, keep the page light, and try it on one ad set or campaign first. To go back, pick the Linkrunner page for it.
   </Accordion>
-  <Accordion title="A campaign still shows the Linkrunner page">
-    If you chose **Only campaigns I pick** when going live, check that the campaign is on your list. Campaigns with an iOS or Android redirect URL skip the landing page, except on Google web-to-app links.
+  <Accordion title="A link still shows the Linkrunner page">
+    Check that **Open in app** is on for the campaign and that it has no iOS or Android redirect URL. Then check that the campaign, or your default page, has a page selected.
   </Accordion>
 </AccordionGroup>
 
