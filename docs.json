@@ -93,6 +93,7 @@
                             "features/send-consent",
                             "features/ios-campaign-data-limitations",
                             "features/attribution-windows",
+                            "features/ctv-attribution",
                             "features/fraud-control",
                             {
                                 "group": "SKAdNetwork",

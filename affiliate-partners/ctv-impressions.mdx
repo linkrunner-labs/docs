@@ -68,7 +68,7 @@ In the campaign table, CTV installs count as installs and as **View Through Attr
 
     <img src="/images/affiliate-partners/ctv-create-campaign.webp" alt="Create Campaign with a CTV campaign name filled in" width="420" />
 
-    Copy the **Template URL** from the confirmation.
+    Copy the **Template URL** from the confirmation. If the advertiser has turned on CTV for you, the confirmation also shows a ready-made **CTV impression URL** with its own copy button. Copy that one instead of building the URL by hand.
 
     <img src="/images/affiliate-partners/ctv-campaign-created.webp" alt="Campaign Created with the Template URL and its copy button" width="420" />
 
@@ -79,6 +79,8 @@ In the campaign table, CTV installs count as installs and as **View Through Attr
     ```
   </Step>
   <Step title="Turn it into the CTV impression URL">
+    If the advertiser has turned on CTV for you, your dashboard already builds this URL for you. Copy the **CTV impression URL** from the Campaign Created screen, from the TV icon in the campaign table, or from the campaign details panel. Then replace its macros with your own values. To build it by hand, or to check what the dashboard gave you, follow the rest of this step.
+
     Keep your parameters, and send them to `https://s2s.linkrunner.io/v1/ctv/impression/<app_id>`. `<app_id>` is the app's Android package name (`com.example.app`) or App Store ID (`id1234567890`). Either one finds the same app, and its Android and iOS installs are both matched.
 
     Then add the TV's IP address (`ip`) and user agent (`ua`), both required, and the time of the impression. Your token goes in the `X-Linkrunner-Token` header:
