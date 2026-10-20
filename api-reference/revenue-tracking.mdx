@@ -101,6 +101,7 @@ If the payment comes from a user of your website rather than your app, send `"so
 - **Stored details.** `amount`, `currency`, `payment_id`, `type`, and `status` are added to the event's `event_data`, together with any `event_data` you send. The amount is stored as both `amount` and `value`, so a `value` in your `event_data` is replaced.
 - **Attribution.** Linkrunner credits the payment to the channel and campaign of that user's latest visit recorded by the Web SDK in the last 90 days. If the Web SDK has not recorded a visit from that user, the payment shows as Direct.
 - **No deduplication.** Unlike app payments, every website payment request is stored, including retries with the same `type` and `payment_id`. Avoid resending a payment that was already accepted.
+- **Send each purchase from one place.** If your website also calls `lr.track('purchase', …)` for the same order, the purchase is counted twice. Track it either in the browser or from your backend, not both.
 
 ### Responses
 
