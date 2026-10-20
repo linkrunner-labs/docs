@@ -8,6 +8,12 @@
         "dark": "#3D3BD6"
     },
     "favicon": "/favicon.svg",
+    "seo": {
+        "metatags": {
+            "og:image": "https://docs.linkrunner.io/images/og-image.png",
+            "twitter:image": "https://docs.linkrunner.io/images/og-image.png"
+        }
+    },
     "contextual": {
         "options": [
             "copy",
