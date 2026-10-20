@@ -69,6 +69,7 @@ POST: /capture-event
 | install_instance_id | string | **Required** unless `user_id` is sent. Linkrunner's ID for the install |
 | event_id   | string | **Optional**. Your own unique identifier for the event, useful for deduplication and correlating with your backend |
 | client_ip_address | string | **Optional**. Public IP of the user's device when the event happened. See [End-user IP address](#end-user-ip-address) |
+| source     | string | **Optional**. `app` (default) or `web`. Send `web` for a user of your website. See [Website events](#website-events) |
 
 ### End-user IP address
 
@@ -77,10 +78,30 @@ These calls come from your server, so Linkrunner never sends your server's IP to
 - Send only the device's public IP. Private, loopback and link-local addresses are ignored.
 - Leave it out if you don't have it. Linkrunner then uses the install-time device IP.
 
+### Website events
+
+If the event comes from a user of your website rather than your app, send `"source": "web"`. Your website must be tracked with the [Web SDK](/sdk/web), and the event then shows up on the [Web Events](https://dashboard.linkrunner.io/dashboard/web-events) page instead of the app dashboards. Leave `source` out, or send `app`, for app users. Existing integrations do not need to change.
+
+```json
+{
+  "event_name": "plan_upgraded",
+  "event_data": {
+    "plan": "pro"
+  },
+  "user_id": "user_12345",
+  "event_id": "evt_12345",
+  "source": "web"
+}
+```
+
+- **Identify the user with `user_id`.** Use the same ID your website passes to `lr.identify`. `install_instance_id` does not apply to website users, so `user_id` is required.
+- **Attribution.** Linkrunner credits the event to the channel and campaign of that user's latest visit recorded by the Web SDK in the last 90 days. If the Web SDK has not recorded a visit from that user, the event shows as Direct.
+- **No deduplication.** Every request is stored, including retries. Send your own `event_id` so repeated requests for the same action carry the same ID.
+
 ### Responses
 
 1. **200** Event captured successfully
-2. **400** Missing required parameters, or neither `user_id` nor `install_instance_id` was sent
+2. **400** Missing required parameters, neither `user_id` nor `install_instance_id` was sent, `source` is not `app` or `web`, or `source` is `web` and `user_id` is missing or website tracking is not enabled for the project
 3. **401** Invalid server key
 
 #### Sample Response

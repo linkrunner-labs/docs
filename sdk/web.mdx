@@ -341,7 +341,7 @@ Use [first-party collection](#first-party-collection). A same-origin proxy is th
 </Accordion>
 
 <Accordion title="A payment or other trusted event can be sent from the browser">
-Do not trust client-side events for payments, entitlements, or other sensitive state changes. Send those events from your backend with the [Event Capture API](/api-reference/event-capture) or [Revenue Tracking API](/api-reference/revenue-tracking).
+Do not trust client-side events for payments, entitlements, or other sensitive state changes. Send those events from your backend with the [Event Capture API](/api-reference/event-capture#website-events) or [Revenue Tracking API](/api-reference/revenue-tracking#website-payments), with `"source": "web"` and the `user_id` you pass to `lr.identify`.
 </Accordion>
 </AccordionGroup>
 
