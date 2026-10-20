@@ -42,7 +42,7 @@ Send all parameters as URL-encoded query parameters. Each value is limited to 25
 | `gaid` | `advertising_id` | See below | Google Advertising ID, as a UUID. |
 | `idfa` | | See below | Apple IDFA, as a UUID. |
 | `ip` | `af_ip` | See below | The user's device IP. Only public addresses are used. |
-| `ua` | `af_ua` | No | The user's device user agent. |
+| `ua` | `af_ua` | No | The user's device user agent. Not used to match installs. Returned in the `{user_agent}` postback macro. |
 | `s2` | `af_sub1` | No | Passthrough value, returned in `{s2}`. |
 | `s3` | `af_sub2` | No | Passthrough value, returned in `{s3}`. |
 | `s4` | `af_sub3` | No | Passthrough value, returned in `{s4}`. |
