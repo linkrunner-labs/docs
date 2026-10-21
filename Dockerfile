@@ -6,7 +6,7 @@
 # Image is pushed to asia-south1-docker.pkg.dev/lr-prod-482009/docs/docs
 # by .github/workflows/prod-docs-image-build.yml on `prod-v*` tags.
 
-FROM node:20-alpine
+FROM node:24.22.1-alpine
 
 # Base image ships a `node` user at uid/gid 1000 — reuse it so the chart's
 # runAsUser: 1000 lines up.
