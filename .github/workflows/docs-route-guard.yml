@@ -28,7 +28,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - name: Check published documentation routes
         run: node scripts/check-doc-routes.mjs "${{ github.event.pull_request.base.sha }}"
