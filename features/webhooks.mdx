@@ -222,7 +222,7 @@ For supported non-Meta and non-Google ad networks, `campaign_details` contains:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `platform` | `"IOS"` \| `"ANDROID"` \| `null` | Operating system of the install. React Native, Flutter, Expo, and Capacitor apps report the underlying OS |
+| `platform` | `"IOS"` \| `"ANDROID"` | Operating system of the install. React Native, Flutter, Expo, and Capacitor apps report the underlying OS |
 | `ip_address` | `string` \| `null` | IP address the install request came from, as seen by Linkrunner's servers |
 | `user_agent` | `string` \| `null` | `User-Agent` header of the install request. This is usually your app's HTTP client, such as `okhttp/4.12.0`, not a browser |
 | `manufacturer` | `string` \| `null` | Device manufacturer, such as `samsung` |
@@ -242,7 +242,7 @@ For supported non-Meta and non-Google ad networks, `campaign_details` contains:
 | `city` | `string` \| `null` | City name |
 
 <Note>
-  Both objects always contain every key. A key is `null` when Linkrunner did not receive that value or could not resolve the IP address. The values match the device and location columns in the user files from [Data Export](/features/data-export).
+  Both objects always contain every key. Apart from `device_data.platform`, which is always set, a key is `null` when Linkrunner did not receive that value or could not resolve the IP address. The values match the device and location columns in the user files from [Data Export](/features/data-export).
 </Note>
 
 ### Additional Data
