@@ -1,0 +1,292 @@
+---
+title: "DSP Sources"
+sidebarTitle: "DSPs"
+description: "Count the impressions of your Samsung Ads, The Trade Desk and Google DV360 line items in Linkrunner, and credit installs where the DSP shares a device ID or a household IP"
+icon: "rectangle-ad"
+keywords: ["dsp", "dsp sources", "samsung ads", "samsung dsp", "the trade desk", "ttd", "google dv360", "display and video 360", "impression tracking", "third party impression tag", "view-through attribution", "ctv attribution", "connected tv", "programmatic"]
+---
+
+## Overview
+
+If you buy ads through a demand-side platform (DSP), you paste one Linkrunner impression tag into the DSP. Each time the DSP shows an ad, it calls the tag, and Linkrunner:
+
+- **Counts the impression** under that DSP. The DSP appears as its own channel, and each line item you run creates its own campaign the first time it reports an impression.
+- **Credits installs, where the DSP shares enough to match.** If the DSP passes a device ID or the viewer's household IP address, Linkrunner can credit a later install to the impression with [view-through attribution](/features/attribution-windows#view-through-attribution). If it passes neither, the impressions are only counted.
+
+Three DSPs are supported:
+
+| | Samsung Ads | The Trade Desk | Google DV360 |
+| --- | --- | --- | --- |
+| Counts impressions | Yes | Yes | Yes |
+| Matches installs by device ID | No | Yes, mobile in-app inventory | No |
+| Matches installs by household IP (CTV) | Yes, when Samsung fills in the IP | No | No |
+| Tag URL | `/v1/ctv/impression` | `/v1/impression` | `/v1/impression` |
+
+<Warning>
+  This integration brings in impressions and, where possible, installs. It does not sync your spend from the DSP and does not send postbacks to the DSP.
+</Warning>
+
+<Note>
+  Amazon DSP is not supported. Amazon only accepts measurement tags from its certified partners, so a Linkrunner tag cannot be added to an Amazon DSP campaign. Other DSPs cannot be set up yet.
+</Note>
+
+## What you need
+
+- The **Admin** or **Manager** role in your Linkrunner project to set up, change, rotate or remove a DSP. Members can view the page.
+- Access to the DSP account where you can edit the creatives of the line items you want to measure.
+- [View-through attribution](/features/attribution-windows#view-through-attribution) turned on, if you want installs credited. Counting impressions does not need it.
+
+## Set up a DSP
+
+<Steps>
+  <Step title="Create the key">
+    Go to [Integrations → DSPs](https://dashboard.linkrunner.io/dashboard/integrations/dsps), find the card for your DSP and click **Set up**. Linkrunner creates a key for that DSP in this project and shows the ready-to-paste tag.
+  </Step>
+  <Step title="Copy the tag">
+    Click the copy button next to the tag. The tag already contains your key and your DSP's macros. Paste it exactly as copied, because the DSP replaces the macros when it fires the tag.
+  </Step>
+  <Step title="Paste it into the DSP">
+    Add the tag to your creatives as an impression tracker. The exact field is different in each DSP, see [Samsung Ads](#samsung-ads), [The Trade Desk](#the-trade-desk) and [Google DV360](#google-dv360).
+  </Step>
+  <Step title="Choose what the DSP can credit">
+    On the card, turn on view-through and choose a window from 1 to 24 hours. For Samsung Ads, also turn on the CTV switch. See [View-through and CTV switches](#view-through-and-ctv-switches).
+  </Step>
+  <Step title="Check the result">
+    After the DSP serves its first impression for a line item, a campaign for it appears in the [Campaigns table](https://dashboard.linkrunner.io/dashboard/campaigns) and the DSP appears in Channels. The card shows how many campaigns were created and when the last one appeared, with a link to the Campaigns table filtered to that DSP.
+  </Step>
+</Steps>
+
+The **Impressions** column in the Campaigns table is off by default. Turn it on with **Edit Columns**, as described in [CTV attribution](/features/ctv-attribution#see-your-results). Installs credited from an impression appear as **View Through Attribution** installs.
+
+## The impression tag
+
+Every DSP uses the same URL shape. Only the macros after each `=` sign change from DSP to DSP, and the dashboard fills them in for you. The tag is a plain `GET` request:
+
+```text wrap
+https://s2s.linkrunner.io/v1/impression?lr_key=<your key>&li=<line item id>&li_name=<line item name>&tid=<impression id>&gaid=<gaid>&idfa=<idfa>&ip=<ip>&ua=<user agent>&impression_time=<time>
+```
+
+Use `/v1/impression` when the DSP can share a device ID or nothing at all. Use `/v1/ctv/impression` when the DSP shares the household IP of a connected TV. The dashboard picks the right one for each DSP. Only `lr_key` is required, and a DSP sends only the fields it has a macro for.
+
+| Parameter | What to send |
+| --- | --- |
+| `lr_key` | Your key for this DSP in this project. It starts with `lrdsp_`. It tells Linkrunner which project and which DSP the impression is for. Required. |
+| `li` | The DSP's line item or campaign ID, at the level shown in [How campaigns are created](#how-campaigns-are-created). Each distinct value becomes one Linkrunner campaign. If the tag sends none, or the DSP leaves the macro unfilled, all impressions go to a single campaign for that DSP. |
+| `li_name` | The DSP's name for the line item or campaign, used in the Linkrunner campaign name. Optional. |
+| `tid` | The DSP's unique ID for this impression. Linkrunner records the same `tid` for the same line item once, so a retried call is not counted twice. Optional, but without it every call is counted as a new impression. |
+| `gaid`, `idfa` | The device's Google Advertising ID (Android) or IDFA (iOS), as a UUID. Used to match installs. Read only on `/v1/impression`. Without a usable one, the impression is counted but cannot be matched. |
+| `ip` | The public IP address of the device or TV. On `/v1/ctv/impression` it is required and it is what installs are matched on. On `/v1/impression` it is not used for matching. |
+| `ua` | The user agent of the device or TV. Optional. Stored with the impression and not used for matching. |
+| `impression_time` | When the impression happened, as a Unix timestamp in seconds or milliseconds. Optional. Linkrunner uses the time of the call when it is missing or unusable. |
+
+Each value can be up to 256 characters. The [S2S Impression API](/api-reference/s2s-impressions) and [CTV Impression API](/api-reference/ctv-impressions) list the other parameters, such as `vt_lookback`, which shortens the view-through window for one impression.
+
+## How campaigns are created
+
+You do not create campaigns for a DSP. The first time a new `li` value reports an impression, Linkrunner creates a campaign for it under that DSP and keeps counting its later impressions there.
+
+- **Name:** `<DSP name> - <line item name>`. When the tag sends no name, the line item ID takes its place. The Trade Desk and Google DV360 tags send no name, so their campaigns are named after the ID.
+- **One campaign per `li` value.** The tags use each DSP's own level: a Samsung Ads campaign, a Trade Desk campaign, or a DV360 line item. Linkrunner uses the `li` value as the identity. Characters other than letters, digits, `.`, `_`, `:` and `-` are replaced with `_`, and a value longer than 64 characters is shortened.
+- **Limits:** Linkrunner creates at most 100 new DSP campaigns per day, and at most 1000 campaigns per DSP in a project. When a new line item would go over a limit, no campaign is created and its impressions are not recorded. Impressions of campaigns that already exist keep counting.
+- **Timing:** the campaign is created when Linkrunner processes the first impression, not at the moment the DSP fires the tag, so it can appear a little after the first delivery.
+
+## Tags for each DSP
+
+The tags below are what the dashboard shows, with a placeholder for the key. Copy the tag from the dashboard so your own key is already in it.
+
+### Samsung Ads
+
+```text wrap
+https://s2s.linkrunner.io/v1/ctv/impression?lr_key=<your key>&li=__CAMPAIGN_ID__&li_name=__CAMPAIGN_NAME_ENCODED__&tid=__TXN_ID__&ip=__IP__&ua=__USER_AGENT__&impression_time=__TIMESTAMP__
+```
+
+**Where to paste it:** in Samsung DSP, add the tag to your creatives in the **Impression trackers** field. Samsung's [macro list](https://help.dsp.samsungads.com/docs/macros) says its macros work in third-party trackers and in impression tracker URLs. Do not use it as an ad server tag or a VAST URL, because Samsung only authorizes tags and VAST URLs from accredited third-party vendors there.
+
+**What it can do:** counts impressions and matches installs by household IP. Samsung does not share a device ID in this tag, so there is no device ID match. Linkrunner credits an install when the phone installs from the same public IP address as the TV, inside the view-through window. See [how much to trust household matching](/features/ctv-attribution#how-much-to-trust-it).
+
+| Parameter | Samsung macro |
+| --- | --- |
+| `li` | `__CAMPAIGN_ID__`, the Samsung campaign ID |
+| `li_name` | `__CAMPAIGN_NAME_ENCODED__`, the campaign name in the URL-encoded form Samsung documents for names |
+| `tid` | `__TXN_ID__`, Samsung's unique ID for the impression |
+| `ip` | `__IP__`, the IP address of the viewer's device |
+| `ua` | `__USER_AGENT__` |
+| `impression_time` | `__TIMESTAMP__`, in seconds |
+
+**Limits to know about:**
+
+- This tag needs both the **CTV switch** and **view-through** on. Otherwise Linkrunner rejects it and the impression is not counted.
+- Samsung documents that, in countries under the GDPR, `__IP__` "can only be added to trackers from Samsung certified vendors". Without the IP, Linkrunner rejects the impression with `missing_ip`, because there is nothing to match. If you deliver in GDPR countries, ask your Samsung Ads contact whether this tracker can receive `__IP__`.
+- `__USER_AGENT__` appears in Samsung's AppsFlyer integration guide, but Samsung does not list it in its macro table. It is optional here. If Samsung leaves it unfilled, Linkrunner ignores it and still accepts the impression.
+- Samsung does not document whether it fires a tracker from the TV or from its own servers. Linkrunner matches on the `ip` value from the macro only, never on the address of the connection that fired the tag.
+
+### The Trade Desk
+
+```text wrap
+https://s2s.linkrunner.io/v1/impression?lr_key=<your key>&li=%%TTD_CAMPAIGNID%%&tid=%%TTD_IMPRESSIONID%%&gaid=%%TTD_DEVICEID%%&idfa=%%TTD_DEVICEID%%
+```
+
+**Where to paste it:** on the creative, in its tracking settings. For display, HTML5 and native creatives, paste it as the **1x1 Pixel Impression Tracking URL**. For video and audio creatives, add it as a **Third-Party Tracking URL** with the event type **Impression**. These field names come from measurement partners' guides, so check them against your own Trade Desk account.
+
+**What it can do:** counts impressions and matches installs by device ID, on mobile in-app inventory. Linkrunner credits an install when the installing device has the same advertising ID as the impression, inside the view-through window.
+
+| Parameter | Trade Desk macro |
+| --- | --- |
+| `li` | `%%TTD_CAMPAIGNID%%`, the Trade Desk campaign ID |
+| `tid` | `%%TTD_IMPRESSIONID%%`, the Trade Desk impression ID |
+| `gaid`, `idfa` | `%%TTD_DEVICEID%%` in both, see below |
+
+**Limits to know about:**
+
+- The Trade Desk sends one device ID macro for both platforms and does not say which kind it holds, so the tag passes it as both `gaid` and `idfa`. Linkrunner checks that the value is a valid device ID and keeps it. An Android install looks up only a GAID and an iOS install only an IDFA, so the copy of the wrong platform never matches.
+- The Trade Desk does not publicly document a macro for IP address, user agent, time or connected TV device IDs. So connected TV impressions are counted but not matched to installs, and Linkrunner uses the time of the call as the impression time.
+- When the Trade Desk has no device ID for an impression, the macro is left unfilled and the impression is counted only.
+- The Trade Desk's own macro reference needs a Trade Desk login. The macros above are the ones its measurement partners document, for example [Kochava](https://support.kochava.com/articles/campaign-management/37531-create-the-trade-desk-campaign), so confirm them with your Trade Desk contact before launch.
+
+### Google DV360
+
+```text wrap
+https://s2s.linkrunner.io/v1/impression?lr_key=<your key>&li=${CAMPAIGN_ID}&tid=${IMPRESSION_ID}
+```
+
+**Where to paste it:** add it to your creatives as a third-party impression tracking URL, as described in Google's [macros help](https://support.google.com/displayvideo/answer/2789508).
+
+**What it can do:** counts impressions only. Display & Video 360 does not document a macro for a device ID, IP address, user agent or time, so Linkrunner cannot match an install to a DV360 impression.
+
+| Parameter | DV360 macro |
+| --- | --- |
+| `li` | `${CAMPAIGN_ID}`, which DV360 uses for the line item ID, so each DV360 line item becomes one Linkrunner campaign |
+| `tid` | `${IMPRESSION_ID}` |
+
+**Limits to know about:**
+
+- The URL must start with `https`. The Linkrunner tag does.
+- DV360 treats the tag as part of the creative, so it goes through creative review and must follow Google's, the exchange's and the publisher's policies.
+- You cannot use the tag in YouTube or VAST reservations. For those, Google allows only Display & Video 360 or Campaign Manager 360 tracking pixels. Google also says macros are not supported in YouTube ads or data-driven creatives.
+- Turning view-through on or off changes nothing for DV360, because there is nothing to match.
+
+## View-through and CTV switches
+
+Linkrunner matches an install to a DSP impression only when view-through is on for that DSP. You set it on the DSP's card, with a window from 1 to 24 hours. Changes can take up to 5 minutes to apply.
+
+| Tag | Switches it needs | When one is off |
+| --- | --- | --- |
+| `/v1/impression` (The Trade Desk, Google DV360) | View-through, to credit installs | The impression is still counted. Its device IDs are dropped, so it cannot be matched. |
+| `/v1/ctv/impression` (Samsung Ads) | The **CTV switch** and view-through | Linkrunner rejects the impression, with `ctv_not_enabled` or `view_through_disabled`, and does not count it. |
+
+- **Impressions are counted either way** on `/v1/impression`. Turn view-through on to also credit installs.
+- **Device IDs are not kept while view-through is off.** Turning it on later does not credit impressions that arrived earlier.
+- **Clicks win.** The same rules as for affiliate impressions apply: an impression is credited only when no click from any source can be credited, the most recent impression inside the window wins, and each impression is credited to at most one install. See [View-through attribution](/features/attribution-windows#view-through-attribution).
+- **CTV matching is probabilistic.** It rests on the home's shared public IP address and skips shared networks. See [CTV attribution](/features/ctv-attribution#how-much-to-trust-it).
+
+## Count-only impressions and missing macros
+
+Ad servers fire impression tags and nobody reads the answer, so Linkrunner is lenient. A value that is empty, still a literal macro such as `%%TTD_DEVICEID%%` or `__IP__`, or not usable is ignored. The impression is still counted.
+
+| What the DSP sends | What Linkrunner does |
+| --- | --- |
+| No usable `gaid` or `idfa` | Counts the impression only. It is never stored as something an install can match. |
+| No `li`, or `li` unfilled | Uses one campaign for the DSP, with the reference `default`. |
+| `li_name` unfilled | Names the campaign after the line item ID. |
+| No `tid`, or `tid` unfilled | Counts every call as a new impression. |
+| `ua` or `impression_time` unfilled or unusable | Ignores the value. The time of the call is the impression time. |
+
+Linkrunner still rejects a call with a missing or unknown key, a value over 256 characters, and, on `/v1/ctv/impression`, a missing or non-public `ip`. A connected TV impression without its household IP cannot be matched, so it is not counted.
+
+## Rotate or remove a key
+
+On the DSP's card:
+
+- **Rotate key:** Linkrunner creates a new key and revokes the old one. The old tag stops working within a minute and its impressions are rejected with `invalid_key`. Paste the new tag into the DSP right after you rotate, because impressions fired in between are not recorded.
+- **Remove:** Linkrunner revokes the key. The tag stops working within a minute. Campaigns and history stay in your reports. Setting the DSP up again creates a new key.
+
+Each DSP has one live key per project. Only Admins and Managers can rotate or remove it.
+
+### Security
+
+The key is part of the tag, so anyone who can read the tag can read the key. It is an identifier, not a password. It can only record impressions for that one DSP in that one project. It cannot read your data or change settings.
+
+Someone who has the key can still send impressions the DSP never served. They count in your reports and, with view-through on, can take credit for installs that would otherwise be organic. If you see unexpected impressions, or the tag was shared more widely than you intended, rotate the key.
+
+## Responses and reasons
+
+The tag answers with JSON. You see the answer only when you call the tag yourself, or when your DSP logs tracker responses.
+
+```json
+{ "status": "accepted", "impression_id": "dfa5b5ed-54c2-5f5b-bc48-2385c336fed8" }
+```
+
+```json
+{ "status": "rejected", "reason": "invalid_key" }
+```
+
+| Status | Reason | Meaning |
+| --- | --- | --- |
+| 200 | | Impression accepted. It may be count-only. |
+| 400 | `missing_ip`, `invalid_ip`, `datacenter_ip` | CTV tag only. The IP is missing, not public, or belongs to a cloud or hosting provider. |
+| 400 | `value_too_long` | A value is longer than 256 characters. |
+| 401 | `missing_key` | `lr_key` is in the URL but empty. |
+| 401 | `invalid_key` | The key is wrong, was rotated out, or was removed. |
+| 403 | `ctv_not_enabled` | CTV tag only. The CTV switch is off for this DSP. |
+| 403 | `view_through_disabled` | CTV tag only. View-through is off for this DSP. |
+| 429 | `rate_limited` | The key sent too many impressions per second. Retry after a short delay. |
+| 503 | `unavailable` | A temporary error. Retry after a short delay. |
+
+A request with no `lr_key` at all is not a DSP request. Linkrunner answers it as an affiliate partner request, with that flow's errors, such as `missing_token`. The [S2S Impression API](/api-reference/s2s-impressions) and [CTV Impression API](/api-reference/ctv-impressions) describe those.
+
+## Check the tag yourself
+
+To check the key before you launch, call the tag with a test line item:
+
+```bash
+curl "https://s2s.linkrunner.io/v1/impression?lr_key=<your key>&li=test-line-item&li_name=Test%20line%20item&tid=test-0001"
+```
+
+A response with `"status":"accepted"` means the key works. The call creates a campaign for `test-line-item`, which counts toward the [limits](#how-campaigns-are-created), so use a value you are happy to see in your Campaigns table.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="No campaign appears in Linkrunner">
+    Check, in order:
+
+    - The line item is serving. The DSP fires the tag only when it shows an ad, and your creatives must have passed the DSP's review.
+    - The tag in the creative matches the one on the card, with your key. A key set up in the last minute may not be active yet.
+    - The key was not rotated or removed. A tag with a stale key is rejected with `invalid_key`.
+    - For Samsung Ads, the CTV switch and view-through are both on, and `__IP__` is filled. Otherwise the impression is rejected and not counted.
+    - You have not reached a [limit](#how-campaigns-are-created) of 100 new campaigns per day or 1000 per DSP.
+    - For DV360, the creative is not in a YouTube or VAST reservation.
+
+    Then look in the Campaigns table. The campaign appears a little after the first impression, and the **Impressions** column is off by default.
+  </Accordion>
+  <Accordion title="Impressions are counted but no installs are credited">
+    Check, in order:
+
+    - The DSP can match. Google DV360 only counts. The Trade Desk matches mobile in-app impressions that carry a device ID. Samsung Ads matches on household IP.
+    - View-through was on when the impression arrived. Device IDs are not kept while it is off.
+    - The impression came before the install, and the install is inside the view-through window.
+    - No click from any source could be credited instead, because clicks always win.
+    - For Samsung Ads, the phone installed on the same home Wi-Fi as the TV, and the home IP address did not trigger the shared-network limit. See [CTV attribution](/features/ctv-attribution#how-much-to-trust-it).
+    - For The Trade Desk, the macro was filled. An unfilled device ID makes the impression count-only.
+  </Accordion>
+  <Accordion title="The tag returns 401 invalid_key or missing_key">
+    `missing_key` means the URL has `lr_key=` with no value. `invalid_key` means the key is wrong, was rotated out, or was removed. Copy the current tag from the card. If you rotated the key, update every creative that still has the old tag.
+  </Accordion>
+  <Accordion title="The tag returns 403 ctv_not_enabled or view_through_disabled">
+    This only happens on the Samsung Ads tag. Turn on the CTV switch and view-through on the DSP's card, wait up to 5 minutes and let the DSP fire the tag again.
+  </Accordion>
+  <Accordion title="Samsung Ads impressions are rejected with missing_ip">
+    Samsung did not fill `__IP__`. Samsung documents that in GDPR countries this macro can only be added to trackers from Samsung certified vendors, so ask your Samsung Ads contact whether this tracker can receive it. Samsung Ads impressions without an IP address cannot be matched, so Linkrunner does not count them.
+  </Accordion>
+  <Accordion title="The campaign is named after an ID, not the line item name">
+    The tag only sends a name when the DSP has a name macro. Samsung Ads sends one. The Trade Desk and Google DV360 tags send none, so their campaigns are named after the line item ID.
+  </Accordion>
+  <Accordion title="My impression counts differ from the DSP's report">
+    Linkrunner counts the tag calls it received and accepted. Calls that were rejected are not counted, and retries with the same `tid` count once. A tag that was never fired, for example for a creative that did not pass review, cannot be counted either. Check the reasons in [Responses and reasons](#responses-and-reasons).
+  </Accordion>
+  <Accordion title="Can I use another DSP, or Amazon DSP?">
+    Not yet. Only Samsung Ads, The Trade Desk and Google DV360 can be set up. Amazon DSP only accepts measurement tags from its certified partners, so it cannot fire a Linkrunner tag. Contact support if you want another DSP.
+  </Accordion>
+</AccordionGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

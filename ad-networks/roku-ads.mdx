@@ -1,0 +1,157 @@
+---
+title: "Roku Ads"
+description: "Connect your Roku Ads Manager account to see impressions and spend next to your installs in Linkrunner, and send your installs and in-app events back to Roku"
+icon: "tv"
+keywords: ["roku ads", "roku ads manager", "roku conversions api", "roku postbacks", "connected tv", "ctv spend", "ctv impressions", "streaming tv ads"]
+---
+
+## Overview
+
+Connect your Roku Ads Manager account and Linkrunner does two things for it:
+
+- **Reporting:** it syncs the impressions and spend of each Roku campaign, day by day. They appear in the Campaigns table, Channels and Home next to your installs, so you can compare what a Roku campaign cost with what it drove.
+- **Postbacks:** it sends your installs and in-app events to Roku through the Roku Conversions API, so Roku can measure and optimize the campaign. This is optional and set up separately, after the account is connected. See [Send conversions to Roku](#send-conversions-to-roku).
+
+<Warning>
+  The reporting connection brings in Roku's **impressions and spend only**. Roku shares aggregate numbers, not the device behind each impression, so Linkrunner cannot credit an install to a Roku campaign from this connection. To count installs, send viewers to a Linkrunner link (for example a QR code or short URL in your ad) or use [CTV attribution](/features/ctv-attribution) with a partner that reports impressions.
+</Warning>
+
+## What you need
+
+- A Roku Ads Manager ad account. Roku's API supports self-service accounts only, so accounts run through a Roku insertion order cannot be connected yet.
+- The **Admin** or **Member** role in your Linkrunner project. Agency users need the connect permission, and only Admins and Members can remove an account.
+- A currency and a timezone set on the Roku ad account. Linkrunner needs both to put spend on the right day and in the right currency.
+- For postbacks only: an **Event Group ID** and a **Conversions API key** from Roku Ads Manager. Only a Roku Organization Admin or Account Admin can generate the key.
+
+## Connect Roku Ads
+
+<Steps>
+  <Step title="Open the integration">
+    Go to [Integrations](https://dashboard.linkrunner.io/dashboard/integrations) and open **Roku Ads**. You can also go straight to [Roku Ads](https://dashboard.linkrunner.io/dashboard/integrations/roku-ads).
+  </Step>
+  <Step title="Sign in to Roku">
+    Click **Connect Roku Ads**. A Roku window opens. Sign in with the Roku Ads Manager user that owns the ad account and approve access.
+  </Step>
+  <Step title="Choose the ad accounts">
+    Back in Linkrunner, **Select Roku Ads accounts** lists every ad account you approved, with its currency and timezone. Tick the accounts to sync and click **Import**.
+  </Step>
+</Steps>
+
+An account that Roku reports without a supported currency or a timezone is listed but cannot be selected. Fix it in Roku Ads Manager and connect again.
+
+## What syncs
+
+- **When:** every 6 hours. The first sync of an account loads up to 13 months of history, and every later sync re-reads the last 14 days, so numbers Roku restates are picked up.
+- **What:** impressions and spend for each Roku campaign, for each day, in the ad account's timezone.
+- **Where:** each Roku campaign appears in the [Campaigns table](https://dashboard.linkrunner.io/dashboard/campaigns) under its Roku name. Spend is kept in the ad account's currency and shown in your project's currency on the Campaigns table.
+
+Roku can take several hours to report a day, so today's numbers are incomplete until later. A Roku campaign with no delivery has no rows until it starts serving.
+
+## Send conversions to Roku
+
+Postbacks send each install and the in-app events you choose to Roku, so Roku can match them to the people who saw your ads. Set them up once per connected Roku ad account.
+
+<Steps>
+  <Step title="Get the Event Group ID and Conversions API key from Roku">
+    In Roku Ads Manager, open the **Events** page. Copy the **Event Group ID**. Then choose **CAPI** and generate an API key. Copy the key right away, because Roku shows it only once. If you cannot generate a key, ask a Roku Organization Admin or Account Admin.
+  </Step>
+  <Step title="Add them in Linkrunner">
+    Open [Roku Ads](https://dashboard.linkrunner.io/dashboard/integrations/roku-ads) in Linkrunner. Next to your ad account, click **Set up postbacks**. Paste the Event Group ID and the Conversions API key, click **Validate**, then **Save**.
+  </Step>
+  <Step title="Map your events">
+    In **Event mapping for Roku Ads**, check the events Linkrunner sends and add any others you want Roku to see. See [Map events for Roku](#map-events-for-roku).
+  </Step>
+  <Step title="Choose who Linkrunner sends">
+    By default Linkrunner sends only the users your Roku links bring in. To send every user, change **For users from**. See [Choose which users to send](#choose-which-users-to-send).
+  </Step>
+</Steps>
+
+**Validate** sends a test event to Roku's test endpoint. Roku checks that the key and Event Group ID work together and does not count the event as a conversion, so it is safe to run at any time. Use an Event Group ID and key from the same Roku account.
+
+The key is write-only. Linkrunner never shows it again after you save it. To change the Event Group ID and keep the key, leave the key field empty when you edit.
+
+### Map events for Roku
+
+Roku accepts only its own standard event names, so each Linkrunner event you send has to be mapped to one of them. The **Roku Event** list in the mapping table shows the full set.
+
+Installs and sign-ups are always sent, under these two names. They are created for you the first time you save postbacks, and you cannot map them to another Roku event:
+
+| Linkrunner event | Roku event |
+| --- | --- |
+| Install or first open | `APP_INSTALL` |
+| Sign up | `SIGN_UP` |
+
+Click **Add Mapping** for any other in-app event. Common choices:
+
+| Linkrunner event | Roku event |
+| --- | --- |
+| Purchase or payment | `PURCHASE` |
+| Add to cart | `ADD_TO_CART` |
+| Checkout started | `INITIATE_CHECKOUT` |
+| Lead | `LEAD` |
+| Free trial started | `START_TRIAL` |
+| Subscription started | `SUBSCRIBE` |
+| Content view | `VIEW_CONTENT` |
+| Search | `SEARCH` |
+
+Turn on **Send Revenue** and choose a currency for events that carry an amount. Roku needs the value on `PURCHASE` events to report return on ad spend.
+
+To check a mapping without sending a real conversion, use the check button on its row. Roku validates the event and does not count it.
+
+### Choose which users to send
+
+- **Only users from your Roku links (default):** Linkrunner sends the events of users whose install was attributed to a Linkrunner link created with the **Roku Ads** network. To use this, create your campaign link with Roku Ads as the network and use it as the destination of your Roku ad.
+- **All media sources:** change **For users from** to send the installs and in-app events of every user, including organic users and users from other networks. Roku decides for itself which conversions to credit, by matching them to the ads it showed, so this setting gives Roku the most to match. Sign-ups are still sent only for users your Roku links bring in.
+
+The **For users from** setting needs at least one account with postbacks set up. With more than one Roku ad account, you can pick which account receives these conversions. **Automatic** uses the newest account with postbacks set up.
+
+### What Linkrunner sends
+
+Each conversion goes to Roku as one event with:
+
+- The Roku event name you mapped, and `mobile_app` as the event source.
+- The time of the event.
+- A deterministic event ID, so a retry never counts twice.
+- The Google advertising ID on Android or the advertising ID (IDFA) on iOS, when the device shares it.
+- The IP address and user agent, when known.
+- The amount and currency, for revenue events with **Send Revenue** on.
+
+Linkrunner does not send email addresses or phone numbers to Roku.
+
+A conversion is not sent when the project has no Event Group ID and key, when the event name is not one of Roku's standard events, or when Linkrunner has neither a device advertising ID nor a public IP address to give Roku for matching.
+
+## Reconnect or remove an account
+
+If Roku access is revoked or stops working, the page shows **Reconnect Roku Ads to resume syncing**. Click it and approve access again. History stays in place.
+
+To stop sending conversions, remove the postbacks from the account's row. The account keeps syncing impressions and spend. Changing or removing postbacks needs the Admin or Member role.
+
+To stop syncing an account, open its row menu and remove it. Linkrunner stops pulling its impressions and spend, and stops sending conversions through it. Numbers already synced stay in your reports, and you can connect the account again later.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="No Roku campaigns appear after I connect">
+    The first sync runs within 6 hours of the import. Campaigns that have not served an impression have no data to show. If the account still shows **Not synced yet** after a day, remove it and connect it again.
+  </Accordion>
+  <Accordion title="An account is greyed out in the account list">
+    Linkrunner shows why under the account: its currency is not supported, or Roku has no timezone for it. Set the missing value in Roku Ads Manager and connect again. A connected account that shows **Sync paused** has the same gap.
+  </Accordion>
+  <Accordion title="My numbers differ from Roku Ads Manager">
+    Check that both use the same dates and timezone. Linkrunner reports each day in the ad account's timezone, and Roku can restate the last days, which Linkrunner picks up on the next sync.
+  </Accordion>
+  <Accordion title="The Connect button is missing">
+    Only Admins, Members and agencies with the connect permission can connect an account. Ask a project Admin to connect it.
+  </Accordion>
+  <Accordion title="Validate says Roku rejected the credentials">
+    Check that the Event Group ID and the Conversions API key come from the same Roku account, and that you pasted the whole key. Roku shows a key only once, so generate a new one if you are not sure. Only a Roku Organization Admin or Account Admin can generate keys.
+  </Accordion>
+  <Accordion title="Roku does not show my conversions">
+    Check, in order: the account row shows an Event Group ID, the event has a mapping, **For users from** includes the users you expect, and the user's device shared an advertising ID or Linkrunner has a public IP address for them. Events that are only checked with the test button are validated and never counted.
+  </Accordion>
+  <Accordion title="I cannot edit or remove postbacks">
+    Setting up postbacks needs the same permission as connecting an account. Changing or removing them needs the Admin or Member role.
+  </Accordion>
+</AccordionGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

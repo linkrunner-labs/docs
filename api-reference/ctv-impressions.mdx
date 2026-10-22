@@ -26,6 +26,10 @@ X-Linkrunner-Token: <your_token>
 
 If your ad server can only fire URLs, send it as the `lr_token` query parameter instead: `&lr_token=<your_token>`. Linkrunner removes `lr_token` before it stores the impression, so it never appears in reports or postbacks. A request without a valid token is rejected with `401`.
 
+## DSP mode (lr_key)
+
+An advertiser can also send connected TV impressions from a DSP such as Samsung Ads with a Linkrunner DSP key. Add `lr_key=<your key>` to the request and it is handled as a DSP impression instead of a partner impression. The key replaces the partner token, `app_id`, `d` and `c`, and the campaign is created from the `li` parameter. The `ip` must still be a public address, and the key needs the CTV switch and view-through on. The parameters, tags and response reasons are on [DSP Sources](/ad-networks/dsps). Everything else on this page describes requests without `lr_key`.
+
 ## Parameters
 
 Send all parameters as URL-encoded query parameters. Each value is limited to 256 characters.
