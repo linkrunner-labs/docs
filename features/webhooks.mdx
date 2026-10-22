@@ -222,6 +222,7 @@ For supported non-Meta and non-Google ad networks, `campaign_details` contains:
 
 | Field | Type | Description |
 |-------|------|-------------|
+| `platform` | `"IOS"` \| `"ANDROID"` \| `null` | Operating system of the install. React Native, Flutter, Expo, and Capacitor apps report the underlying OS |
 | `ip_address` | `string` \| `null` | IP address the install request came from, as seen by Linkrunner's servers |
 | `user_agent` | `string` \| `null` | `User-Agent` header of the install request. This is usually your app's HTTP client, such as `okhttp/4.12.0`, not a browser |
 | `manufacturer` | `string` \| `null` | Device manufacturer, such as `samsung` |
@@ -299,6 +300,7 @@ Example:
   "gaid": "bk9384xs-p449-96ds-r132",
   "idfa": null,
   "device_data": {
+    "platform": "ANDROID",
     "ip_address": "203.0.113.24",
     "user_agent": "okhttp/4.12.0",
     "manufacturer": "samsung",
@@ -339,6 +341,7 @@ Sent only when **Send webhooks for organic users** is enabled:
   "gaid": "bk9384xs-p449-96ds-r132",
   "idfa": null,
   "device_data": {
+    "platform": "ANDROID",
     "ip_address": "198.51.100.7",
     "user_agent": "okhttp/4.12.0",
     "manufacturer": "Xiaomi",
@@ -390,6 +393,7 @@ Sent only when **Send webhooks for organic users** is enabled:
     "custom_param_name": "custom_value"
   },
   "device_data": {
+    "platform": "ANDROID",
     "ip_address": "203.0.113.58",
     "user_agent": "Dart/3.4 (dart:io)",
     "manufacturer": "Google",
