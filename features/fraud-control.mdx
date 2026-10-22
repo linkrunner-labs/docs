@@ -14,7 +14,7 @@ Open **Fraud Control** from the left sidebar of the [dashboard](https://dashboar
 | :--- | :--- |
 | **Fraud rate overview** | Shows what share of your installs looks fraudulent, and which networks it comes from. |
 | **Protection from day one** | Linkrunner-managed rules run on every project, so you see a fraud rate before you write anything. |
-| **Ready-made templates** | One-click rules for click injection, install hijacking, SDK spoofing, and installs from fraudulent clicks. |
+| **Ready-made templates** | Eight one-click rules, covering click injection, install hijacking, SDK spoofing, installs from fraudulent clicks, and click flooding. |
 | **Custom rules** | Write a rule in plain English, or build it condition by condition, for clicks, installs, or in-app events. |
 | **Impact preview** | Shows how much traffic a rule would flag over the last 7, 14, or 30 days before you save it. |
 | **Tag or suppress** | Only flag fraud for reporting, or also stop fraudulent conversions from being sent to ad networks. |
@@ -103,7 +103,7 @@ Select **Create rule**, then pick one of three ways to start:
 
 ### Start from a template
 
-![Rule builder with the template gallery open, showing click injection, install hijacking, SDK spoofing, and install from a fraudulent click](/images/fraud-control/fraud-templates.webp)
+![Rule builder with the template gallery open](/images/fraud-control/fraud-templates.webp)
 
 | Template | What it flags |
 | :--- | :--- |
@@ -111,6 +111,12 @@ Select **Create rule**, then pick one of three ways to start:
 | **Install hijacking** | Android installs whose Play referrer click was recorded after the install had already started. |
 | **SDK spoofing** | Installs whose SDK signature check failed, meaning the request did not come from your app. Unverified requests are excluded. |
 | **Install from a fraudulent click** | Installs matched to a click that a click rule already flagged. |
+| **SDK spoofing with IP mismatch** | Installs with a failed SDK signature whose device IP and server IP also differ. An IP mismatch on its own is not fraud. |
+| **Reinstall from a fraudulent click** | Reinstalls matched to a flagged click, for devices that have installed your app before. |
+| **Click flooding from one IP** | Clicks from an IP that sends more than 100 clicks in 1 minute. Raise the limit for shared networks such as offices or mobile carriers. |
+| **Click flooding from one device** | Clicks from an advertising ID that sends more than 20 clicks in 1 minute. |
+
+The two click flooding templates are click rules, so you cannot test them against past traffic before saving.
 
 Templates are a starting point. Adjust the threshold and check the impact before saving.
 
