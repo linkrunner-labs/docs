@@ -41,10 +41,11 @@ Pass a unique `tid` on every click. Without it, Linkrunner cannot echo an identi
 
 ### View-through (optional)
 
-If you report impressions through [S2S impressions](/affiliate-partners/s2s-impressions), an install with no click can be credited to an impression instead:
+If you report impressions through [S2S impressions](/affiliate-partners/s2s-impressions) or [CTV impressions](/affiliate-partners/ctv-impressions), an install with no click can be credited to an impression instead:
 
-- **Off by default.** The advertiser turns on view-through for your partner account and sets your window, from 1 to 24 hours.
-- **Device ID only.** The impression must carry the installing device's `gaid` or `idfa`.
+- **Off by default.** The advertiser turns on view-through for your partner account in **Settings → Attribution Windows** and sets your window, from 1 to 24 hours. See [View-through attribution](/features/attribution-windows#view-through-attribution).
+- **Device ID first.** An S2S impression must carry the installing device's `gaid` or `idfa`. A CTV impression is matched on the household IP address instead, on Android and iOS, and ranks below S2S impressions.
+- **CTV has its own switch.** The advertiser also turns on CTV for your partner account, under S2S traffic in **Integrations → Affiliate Partners → Configure**.
 - **Clicks always win.** An impression is credited only when no click, from any source, can be credited.
 
 The postback carries the `tid` you sent on the impression, and `{touch_type}` is `impression` instead of `click`, so you can tell view-through installs apart.
@@ -67,6 +68,9 @@ You provide one postback URL template per conversion you want to receive. See [E
   <Card title="Create an affiliate account" icon="user-plus" href="/affiliate-partners/create-account">
     Create your workspace and submit it for approval.
   </Card>
+  <Card title="Add an agency account" icon="briefcase" href="/affiliate-partners/add-agency-account">
+    Also run campaigns for customers as an agency, from the same login.
+  </Card>
   <Card title="Create a campaign link" icon="link" href="/affiliate-partners/create-campaign-link">
     Create a link from the affiliate dashboard with your template parameters included.
   </Card>
@@ -78,6 +82,9 @@ You provide one postback URL template per conversion you want to receive. See [E
   </Card>
   <Card title="Server-to-server impressions" icon="eye" href="/affiliate-partners/s2s-impressions">
     Report ad impressions so installs without a click can be credited to your views.
+  </Card>
+  <Card title="Connected TV impressions" icon="tv" href="/affiliate-partners/ctv-impressions">
+    Report TV ad impressions so installs from the same home can be credited to them.
   </Card>
   <Card title="Postbacks and macros" icon="satellite-dish" href="/affiliate-partners/postbacks">
     The macros Linkrunner fills into your postback URLs, with examples.

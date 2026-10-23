@@ -64,6 +64,10 @@ To retrieve the **Firebase App ID** and **Measurement Protocol API secret**:
 ### 2. Retrieve app instance ID in Linkrunner SDK
     The app instance ID uniquely identifies a specific installation of a Firebase app. This value needs to be retrieved from the Firebase SDK. After collecting this ID, pass it to `linkrunner.signup` so that Linkrunner can associate GA4 app instance IDs with installs and campaigns.
 
+    <Tip>
+      You can also pass the app instance ID and session ID with `setUserData` right after `init`, before the user signs up (`id` is optional there). Linkrunner then sends the attribution to GA4 without waiting for `signup`. If you pass them in both calls, GA4 can receive the attribution event twice. See [Setting user data](/sdk/android#setting-user-data) and the matching section of your SDK's page.
+    </Tip>
+
     Use the following examples to pass the app instance ID:
 
     <Tabs>

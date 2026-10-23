@@ -1,0 +1,151 @@
+---
+title: "Create an Agency Campaign Link"
+description: "Create a tracking link in a customer's project from your agency workspace"
+icon: "link"
+---
+
+<Warning>
+Create links from your agency workspace. A link the customer creates for you is not credited to your agency and does not appear in your workspace.
+</Warning>
+
+## Before you start
+
+You need:
+
+- An approved agency workspace. See [Set up your workspace](/agency-partners/accept-invitation).
+- A customer who has engaged your agency on their project.
+- Permission from that customer to create campaigns. Nothing is on until they turn it on (step 1).
+
+## 1. Ask the customer to turn on link creation
+
+The customer does this once, from their own dashboard. Send them these steps.
+
+<Steps>
+  <Step title="Open Members">
+    In their project, they go to **Settings → Members** and find your agency's row.
+  </Step>
+  <Step title="Open your agency's access">
+    They click the sliders icon on your row, next to the bin icon.
+
+    ![The sliders icon on the agency's row in Members](/images/agency-partners/agency-access-members.png)
+  </Step>
+  <Step title="Turn on Campaigns → Edit">
+    Under **Campaigns**, they turn on **Edit**. This also turns on **Read**. Then they click **Save**.
+
+    ![The agency access window with Campaigns Read and Edit turned on](/images/agency-partners/agency-access-modal.png)
+  </Step>
+</Steps>
+
+<Note>
+If the customer turns on **Only certain networks**, you can only create campaigns on the networks they pick, and every campaign must name one of them.
+</Note>
+
+[Control agency access](/agency-partners/control-agency-access) is the customer's own reference for that window: every switch, the two data scopes, and what you see while one is off. Send it with the steps above.
+
+## 2. Open the customer's project
+
+<Steps>
+  <Step title="Sign in">
+    Open [Linkrunner Dashboard](https://dashboard.linkrunner.io) and sign in with your agency account.
+  </Step>
+  <Step title="Select the customer">
+    Use the project picker at the top of the sidebar to open the customer's project.
+  </Step>
+  <Step title="Open All Campaigns">
+    Select **All Campaigns**, then click **Create Link**.
+  </Step>
+</Steps>
+
+![Create Link on the agency's All Campaigns page](/images/agency-partners/create-link-entry.png)
+
+## 3. Create the campaign
+
+<Steps>
+  <Step title="Name the campaign">
+    Enter a **Campaign Name** that you and the customer will recognise.
+  </Step>
+  <Step title="Set a display ID">
+    Add an optional **Display ID**. It becomes part of the link, so keep it short.
+  </Step>
+  <Step title="Choose link behavior">
+    Turn on deferred deep linking if the campaign should open a specific screen after install. Use **Link Preview** and **Custom Redirection** only when the customer has asked for them.
+  </Step>
+</Steps>
+
+![Agency campaign creation form](/images/agency-partners/create-link-form.png)
+
+## 4. Pick the ad channel
+
+Open **Advanced Options** and pick the **Ad Channel** where the traffic will run, for example one of the customer's connected partners.
+
+![Ad Channel set to a connected partner under Advanced Options](/images/agency-partners/create-link-channel.png)
+
+You can leave the channel empty unless the customer limited you to certain networks.
+
+<Info>
+**Meta**, **Google**, **Snapchat** and **LinkedIn** need a connected ad account on the customer's project. You can pick them only if the customer has also turned on **Manage integrations** for your agency.
+</Info>
+
+Click **Create Campaign**.
+
+## 5. Copy your link
+
+Copy the **Campaign link** and use it in your ads, or download the QR code.
+
+![Campaign created screen with the campaign link](/images/agency-partners/create-link-success.png)
+
+The campaign is credited to your agency. It appears in your workspace, and the customer sees your agency on it in their own campaign list.
+
+## 6. Test before launch
+
+1. Open the link on a phone and confirm it goes to the right store page or app screen.
+2. Install the app from the link and open it.
+3. Check that the click and install appear under the campaign in **All Campaigns**.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion
+    title="The Create Link button is missing"
+    description="The customer has not let your agency create campaigns."
+  >
+    Ask the customer to turn on **Campaigns → Edit** for your agency (step 1). You may need to refresh the page after they save.
+  </Accordion>
+
+  <Accordion
+    title="The customer's project does not appear"
+    description="Your agency is not engaged on that project yet."
+  >
+    Ask the customer to invite your agency from **Settings → Members → Invite Agency**. A new agency also needs Linkrunner's approval before any project appears.
+  </Accordion>
+
+  <Accordion
+    title="&quot;This customer has not granted your agency permission to create campaigns&quot;"
+    description="Link creation is switched off for your agency."
+  >
+    Same fix as a missing **Create Link** button. Ask the customer to turn on **Campaigns → Edit**.
+  </Accordion>
+
+  <Accordion
+    title="&quot;Your access is limited to specific networks&quot;"
+    description="The customer limited you to certain networks."
+  >
+    Open **Advanced Options** and pick one of the networks shown under **Ad Channel**. If the network you need is not listed, ask the customer to add it under **Only certain networks**.
+  </Accordion>
+
+  <Accordion
+    title="&quot;Ads accounts are not shared with you&quot;"
+    description="You picked Meta, Google, Snapchat or LinkedIn without access to the customer's ad accounts."
+  >
+    Ask the customer to turn on **Manage integrations** for your agency, or to create that campaign themselves.
+  </Accordion>
+
+  <Accordion
+    title="&quot;Ads account required&quot;"
+    description="The customer has not connected that ad network yet."
+  >
+    The customer's project has no connected account for that network. Ask them to connect it in **Integrations**, then try again.
+  </Accordion>
+</AccordionGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

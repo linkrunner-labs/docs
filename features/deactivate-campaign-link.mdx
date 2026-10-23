@@ -1,0 +1,105 @@
+---
+title: "Deactivate a Campaign Link"
+sidebarTitle: "Deactivate a Link"
+description: "Stop a campaign link from getting credit for installs, or send its taps to your base link, without deleting the campaign."
+keywords: ["deactivate link", "disable campaign link", "pause campaign link", "stop attributing", "stop redirecting", "reactivate link", "base link", "link status"]
+icon: "link-slash"
+---
+
+Deactivate a link when a campaign ends, a link was shared somewhere it should not be, or you want a link to stop getting credit. Unlike deleting the campaign, the link's past data stays in your reports and you can reactivate it at any time.
+
+## Before you start
+
+- You need the **Admin** or **Member** role on the project.
+- You can deactivate links created in Linkrunner. Ad network campaigns (such as Meta or Google Ads) and the system links (your root domain link and Referrals) cannot be deactivated.
+- Your **base link** is your domain's root link, such as `https://get.example.com`. In the campaigns table, it is the row named after your domain. **Stop redirecting** sends taps to this link.
+
+## Choose how to deactivate
+
+Both options stop crediting the link for new installs. They differ in where users go when they tap it.
+
+| | Stop attributing traffic (recommended) | Stop redirecting |
+| --- | --- | --- |
+| Where a tap goes | The link's own destination, as before | Your domain's base link, then on to the app or store |
+| Link's redirects, deep link and link preview | Keep working | Stop |
+| New installs from the link | Credited to the user's next eligible click on another link, otherwise organic | Usually credited to your base link (see below) |
+| Users already attributed to the link | Keep their attribution | Keep their attribution |
+| Postbacks to ad networks and partners | Not sent for this link | Not sent for this link |
+
+Choose **Stop attributing traffic** for links that are already printed, posted or shared. Users who tap them still reach your app or store with the right deep link. Choose **Stop redirecting** only when the link's own destination should no longer be used.
+
+With **Stop redirecting**, an install is never credited to the deactivated link, but it is not always credited to your base link:
+
+- **Web-to-app taps** keep the web-to-app campaign they came through.
+- **If your base link cannot be loaded at that moment**, the tap opens the link's own destination instead of an error page. The install goes to the user's next eligible click, otherwise organic.
+- **If your base link is turned off**, the tap goes to your app's store listing and the install counts as organic.
+
+<Note>
+  The rule applies when the install happens, not when the click happens. A user who tapped the link before you deactivated it and installs afterwards is not credited to this link.
+</Note>
+
+## Deactivate a link
+
+<Steps>
+  <Step title="Open the campaign's edit form">
+    On the [Campaigns](https://dashboard.linkrunner.io/dashboard/campaigns) page, click the campaign to open its details, then click **Edit**.
+  </Step>
+  <Step title="Click Deactivate link">
+    The **Link status** row is at the bottom of the **Edit campaign** form. It is separate from the form fields, so you do not need to click **Update** for a status change.
+
+    ![Link status row showing Active and the Deactivate link button](/images/deactivate-link/link-status-row.webp)
+  </Step>
+  <Step title="Choose an option">
+    **Stop attributing traffic** is selected by default. Click **Stop attributing** to confirm it.
+
+    ![Deactivate link dialog with Stop attributing traffic selected](/images/deactivate-link/deactivate-link-options.webp)
+
+    To send taps to your base link instead, select **Stop redirecting (send to your base link)**. Read the warning, select **I understand taps on this link will go to the base link instead of its own destination**, then click **Send to base link**.
+
+    ![Stop redirecting selected, with the warning and the confirmation checkbox ticked](/images/deactivate-link/stop-redirecting-confirm.webp)
+  </Step>
+</Steps>
+
+The change is saved immediately and usually reaches the link within 30 seconds.
+
+## Check the result
+
+The **Link status** row shows the new status:
+
+- **Not attributing** for Stop attributing traffic.
+- **Goes to base link** for Stop redirecting.
+
+While the change is reaching the link, the row also shows **Applying**. If it shows **Saved. Still reaching the link; we keep retrying.**, Linkrunner keeps retrying on its own. You can also click **Retry**.
+
+In the campaigns table, a deactivated link shows the same badge next to its name. Hover over the badge to see when the link was deactivated and by whom.
+
+![Campaigns table with Goes to base link and Not attributing badges](/images/deactivate-link/campaigns-table-link-status.webp)
+
+To confirm Stop redirecting on a device, tap the link. It should open your base link's destination instead of the campaign's own.
+
+## Reactivate a link
+
+Open the campaign's edit form and click **Reactivate** in the **Link status** row. The link starts redirecting and getting credit again, usually within 30 seconds.
+
+A deactivated link does not count toward your plan's campaign limit, and a reactivated one does. If the project is at its limit, reactivation is refused. Contact [support@linkrunner.io](mailto:support@linkrunner.io) to raise the limit.
+
+To switch a deactivated link to the other option, reactivate it first, then deactivate it again with the other option.
+
+## Webhooks and the Data API
+
+- **Webhooks.** Events from users attributed to a deactivated link are not sent to your webhook, except sign-ups, which still reach your sign-up webhook. With Stop redirecting, an install through your base link triggers your install webhook like any other base link install.
+- **Data API.** A link deactivated from the dashboard cannot be turned back on by setting `active` with [Edit Campaign](/api-reference/campaign-apis#3-edit-campaign). The request returns `409`. Reactivate the link from the dashboard instead.
+
+## Troubleshooting
+
+**The Link status row is missing.** The campaign is an ad network campaign or a system link, which cannot be deactivated. If an ad network campaign was deactivated before its ad account was connected, the row still appears with **Reactivate** only.
+
+**The row says "Couldn't check link status".** Click **Try again** before changing the status. Linkrunner could not load the current status, so it hides the controls to avoid changing a link it cannot see.
+
+**Stop redirecting is refused.** A base link on one of the project's domains is turned off, or the link's domain has no base link. Taps sent there would not be recorded. The message names the domain. Turn that base link back on first, or use Stop attributing traffic.
+
+**You cannot turn off your base link.** One or more links are set to Stop redirecting and send their taps to it. Reactivate those links, or switch them to Stop attributing traffic, first.
+
+**Reactivating shows a campaign limit message.** The project is at its plan's campaign limit. Contact support to raise it, or deactivate another link first.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

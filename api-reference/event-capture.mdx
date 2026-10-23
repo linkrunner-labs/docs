@@ -17,7 +17,7 @@ icon: "shuffle"
 Use this API to send custom events and payments from your backend. To track them from your app, use `trackEvent` in your platform's SDK, for example [Android](/sdk/android), [iOS](/sdk/ios), [React Native](/sdk/react-native), or [Flutter](/sdk/flutter).
 
 <Note>
-    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Each request must identify the user with `user_id` or `install_instance_id`. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, send the [payment fields](#payment-fields) with the event.
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Each request must identify the user with `user_id` or `install_instance_id`. If Linkrunner has not seen the `user_id` yet (your app has not called `signup` for that user), the event is held and shows up once that user signs up. Held events are kept for up to 30 days. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, send the [payment fields](#payment-fields) with the event.
 </Note>
 
 Use [Test Custom Events and Payments](/testing/event-and-revenue-testing) to decide whether an action is a custom event or a payment.
@@ -57,7 +57,8 @@ POST: /capture-event
     "is_featured": true
   },
   "user_id": "user_12345",
-  "event_id": "evt_12345"
+  "event_id": "evt_12345",
+  "source": "app" // optional: "app" (default) or "web"
 }
 ```
 
@@ -69,6 +70,7 @@ POST: /capture-event
 | install_instance_id | string | **Required** unless `user_id` is sent. Linkrunner's ID for the install |
 | event_id   | string | **Optional**. Your own unique identifier for the event, useful for deduplication and correlating with your backend |
 | client_ip_address | string | **Optional**. Public IP of the user's device when the event happened. See [End-user IP address](#end-user-ip-address) |
+| source     | string | **Optional**. `app` (default) or `web`. Send `web` for a user of your website. See [Website events](#website-events) |
 | amount | number | **Optional**. Payment amount. Send with `payment_id` and `currency` to record a payment. See [Payment fields](#payment-fields) |
 | payment_id | string | **Optional**. Your unique transaction ID. Send with `amount` and `currency` |
 | currency | string | **Optional**. 3-letter ISO 4217 code of `amount`, for example `USD` or `INR`. Send with `amount` and `payment_id` |
@@ -103,6 +105,8 @@ If `event_name` is one of the old payment types, such as `FIRST_PAYMENT`, `SUBSC
 
 Only `PAYMENT_COMPLETED` payments are sent to ad networks as revenue. An `amount` inside `event_data` does not make the event a payment.
 
+Payment fields apply to app events. For a payment from a user of your website, use [capture-payment with `"source": "web"`](/api-reference/revenue-tracking#website-payments).
+
 ### End-user IP address
 
 These calls come from your server, so Linkrunner never sends your server's IP to ad networks as the user's IP. By default it sends the device IP captured when the app was installed. If you know the IP of the user's device at the time of the action, pass it as `client_ip_address`. Linkrunner forwards it to ad networks (for example Meta `client_ip_address`) to improve matching.
@@ -110,10 +114,30 @@ These calls come from your server, so Linkrunner never sends your server's IP to
 - Send only the device's public IP. Private, loopback and link-local addresses are ignored.
 - Leave it out if you don't have it. Linkrunner then uses the install-time device IP.
 
+### Website events
+
+If the event comes from a user of your website rather than your app, send `"source": "web"`. Your website must be tracked with the [Web SDK](/sdk/web), and the event then shows up on the [Web Events](https://dashboard.linkrunner.io/dashboard/web-events) page instead of the app dashboards. Leave `source` out, or send `app`, for app users. Existing integrations do not need to change.
+
+```json
+{
+  "event_name": "plan_upgraded",
+  "event_data": {
+    "plan": "pro"
+  },
+  "user_id": "user_12345",
+  "event_id": "evt_12345",
+  "source": "web"
+}
+```
+
+- **Identify the user with `user_id`.** Use the same ID your website passes to `lr.identify`. `install_instance_id` does not apply to website users, so `user_id` is required.
+- **Attribution.** Linkrunner credits the event to the channel and campaign of that user's latest visit recorded by the Web SDK in the last 90 days. If the Web SDK has not recorded a visit from that user, the event shows as Direct.
+- **No deduplication.** Every request is stored, including retries. Send your own `event_id` so repeated requests for the same action carry the same ID.
+
 ### Responses
 
 1. **200** Event or payment captured successfully
-2. **400** Missing required parameters, neither `user_id` nor `install_instance_id` was sent, or the payment fields are incomplete or invalid
+2. **400** Missing required parameters, neither `user_id` nor `install_instance_id` was sent, the payment fields are incomplete or invalid, `source` is not `app` or `web`, or `source` is `web` and `user_id` is missing or website tracking is not enabled for the project
 3. **401** Invalid server key
 
 #### Sample Response
@@ -124,9 +148,14 @@ Upon successful event capture, the API returns:
 {
   "msg": "Event capture request received!",
   "status": 200,
-  "data": null
+  "processing_id": "6f1c2a9e-3b7d-4c55-9a0e-2f8d1b4e7c10",
+  "data": {
+    "message": "Event capture request received!"
+  }
 }
 ```
+
+`processing_id` identifies this request. Log it on your side and share it with Linkrunner support if an event does not show up. If you did not send an `event_id`, Linkrunner also uses `processing_id` as the event's ID.
 
 ## Common Event Names
 

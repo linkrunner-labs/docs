@@ -160,14 +160,29 @@ Identifies the user and ties the install to your user ID. Call when the user sig
 POST /api/client/set-user-data
 ```
 
-Updates user details after signup, for example when the user adds a phone number. Not a replacement for `signup`.
+Sends user details and the IDs your product analytics tools use for this user. You can call it right after your first `init` call, before the user logs in: `user_data.id` is optional here. Not a replacement for `signup`, which still requires `id`.
 
 | Field | Type | Description |
 | --- | --- | --- |
 | `token` | string | **Required**. |
-| `user_data` | object | Same shape as `signup`. |
-| `install_instance_id` | string | The persisted UUID. |
+| `user_data` | object | **Required**. Same fields as `signup`, plus `netcore_device_guid` and `moengage_user_id`. `id` is optional. |
+| `install_instance_id` | string | **Required**. The persisted UUID. |
 | `platform` | string | `"ANDROID"`. |
+
+When `user_data` carries a tool's ID (`mixpanel_distinct_id`, `amplitude_device_id`, `posthog_distinct_id`, `moengage_user_id`, `braze_device_id`, `ga_app_instance_id` with `ga_session_id`, or `netcore_device_guid`) and that integration is configured in Linkrunner, Linkrunner sends this install's attribution to that tool for this user, the same attribution it sends after `signup`. This applies to installs attributed to a campaign. If the install is not attributed yet, Linkrunner sends it once attribution completes.
+
+```json
+{
+  "token": "YOUR_PROJECT_TOKEN",
+  "platform": "ANDROID",
+  "install_instance_id": "f1e2...c9",
+  "user_data": { "mixpanel_distinct_id": "mp_distinct_123" }
+}
+```
+
+```json
+{ "msg": "User data updated successfully!", "status": 200, "data": null }
+```
 
 ## capture-event
 

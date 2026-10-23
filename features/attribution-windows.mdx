@@ -1,8 +1,8 @@
 ---
 title: "Attribution Windows: Default Click Lookback Windows"
 sidebarTitle: "Attribution Windows"
-description: "The default click-to-install lookback windows Linkrunner uses per ad network, why Google and Meta are 30 days, and how to change them per project."
-keywords: ["attribution window", "click lookback window", "click to install window", "attribution lookback", "click window per ad network", "30 day attribution window", "7 day attribution window"]
+description: "The default click-to-install lookback windows Linkrunner uses per ad network, how to change them per project, and how to turn on view-through attribution for affiliate partners."
+keywords: ["attribution window", "click lookback window", "click to install window", "attribution lookback", "click window per ad network", "30 day attribution window", "7 day attribution window", "view-through attribution", "view-through lookback window", "impression attribution window"]
 icon: "clock"
 ---
 
@@ -41,7 +41,7 @@ The timeline shows each connected channel and its current click-to-install windo
   </Step>
 </Steps>
 
-To return a channel to its default, select the italic default value. Changes take effect within about five minutes.
+To return a channel to its default, select the italic default value. Changes usually take effect within a minute.
 
 ## Limits
 
@@ -49,8 +49,39 @@ Windows can be set from **1 to 30 days**.
 
 The 30 day ceiling is not arbitrary. Linkrunner retains clicks for 30 days, so a click older than that cannot be matched to an install at all, and a longer window would have no effect.
 
+## View-through attribution
+
+**View-through attribution credits an install to a partner's ad impression when there was no click.** A user sees an affiliate partner's ad, doesn't tap it, and installs your app within the view-through window. Linkrunner then credits the install to that impression. Clicks always win: an impression is credited only when no click from any source can be credited.
+
+- **Off by default.** You turn it on for each affiliate partner separately. It applies to partners that report impressions through [S2S impressions](/affiliate-partners/s2s-impressions).
+- **1 to 24 hours.** The window starts at **24 hours** when you turn it on. You can shorten it to as little as 1 hour.
+- **New installs only.** A change applies to installs from then on. Installs already recorded keep their attribution.
+
+### Turn it on for a partner
+
+<Steps>
+  <Step title="Find the partner">
+    Go to **Settings → Attribution Windows** in the [dashboard](https://dashboard.linkrunner.io/dashboard/settings/attribution-windows) and find the affiliate partner.
+  </Step>
+  <Step title="Turn on view-through">
+    Turn on **View-through attribution** and select a window from **1 hour** to **24 hours**. Confirm the change.
+  </Step>
+</Steps>
+
+To stop crediting impressions, turn it off. Linkrunner keeps the window you chose, so turning it back on restores it. Changes usually take effect within a minute.
+
+### What your partner can change
+
+- **Shorten, never extend.** A partner can send a shorter window on each impression with `vt_lookback`. It can never be longer than the window you set. This keeps a partner from claiming your organic installs.
+- **Read only.** Partners see your view-through setting in their dashboard but can't change it.
+- **Rejected until you turn it on.** Until then, the partner's impressions are rejected with `view_through_disabled`.
+
+<Note>
+This matches AppsFlyer, where you turn on view-through and set its lookback window per partner. One difference: in AppsFlyer the partner's `af_viewthrough_lookback` sets the window. In Linkrunner it can only shorten yours.
+</Note>
+
 ## What this does not cover
 
-This setting governs **click matching only**. View-through and probabilistic attribution are not affected.
+The click window governs **click matching only**. It does not change the view-through window above, or probabilistic attribution.
 
 It is also separate from the **Lookback Window** on the Remarketing page. That one controls the reattribution window for users who already have your app. This one controls how a brand new install gets credited.

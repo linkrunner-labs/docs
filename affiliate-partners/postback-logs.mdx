@@ -69,7 +69,7 @@ The expanded row also shows the final response code, the time of the first and l
 
 ## Conversions rejected by Fraud Control
 
-A customer can run Fraud Control rules on the conversions attributed to you. A conversion one of those rules rejects shows as **Rejected (fraud)** or **Withheld (fraud)**. To list only those conversions, pick either status in the status filter.
+A customer can run Fraud Control rules on the conversions attributed to you. A conversion one of those rules rejects shows as **Rejected (fraud)** or **Withheld (fraud)**. To list only those conversions, pick either status in the status filter. For a step-by-step guide, see [See fraud data](/affiliate-partners/fraud-data).
 
 ![Postback Logs listing rejected and withheld conversions](/images/affiliate-partners/postback-logs-fraud.webp)
 
@@ -99,6 +99,10 @@ A **Withheld (fraud)** row has no request. Linkrunner did not call your endpoint
 
   <Accordion title="An event I expect is not in the log at all">
     In-app events appear only after they are mapped. Add the mapping on [Event Mapping](/affiliate-partners/event-mapping), or ask the customer to add it.
+  </Accordion>
+
+  <Accordion title="An install from my traffic is not in the log">
+    The customer's link that your offer points at is probably not assigned to you, so Linkrunner credits the install to the link but builds no postback for you. Ask the customer to [assign you to the link](/features/create-trackable-link#assign-a-partner-to-a-link). Postbacks start with the next install. Earlier installs are not sent.
   </Accordion>
 
   <Accordion title="The Click ID is empty">

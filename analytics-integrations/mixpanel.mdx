@@ -112,6 +112,9 @@ Every time a user is attributed by Linkrunner, we automatically send a request t
     <Tip>
       You can get the `mixpanelDistinctId` from the Mixpanel SDK in your app.
     </Tip>
+    <Tip>
+      You can also send the Mixpanel distinct ID with `setUserData` right after `init`, before the user signs up. `id` is optional there, and Linkrunner sends the attribution once it has the ID instead of waiting for `signup`. See [Setting user data](/sdk/android#setting-user-data) and the matching section of your SDK's page.
+    </Tip>
   </Step>
 
   <Step title="Sync with Mixpanel (Optional)">

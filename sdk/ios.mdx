@@ -284,7 +284,7 @@ func setCustomerUserId() async {
 ```
 
 <Note>
-    The identifier is stored in the Keychain and persists across app restarts. Calling `setCustomerUserId` again with a **different** identifier updates the stored value; passing the same identifier is a no-op. `signup()` / `setUserData()` also update it.
+    The identifier is stored in the Keychain and persists across app restarts. Calling `setCustomerUserId` again with a **different** identifier updates the stored value; passing the same identifier is a no-op. `signup()`, and `setUserData()` called with an `id`, also update it.
 </Note>
 
 ## User Identification (Required)
@@ -476,23 +476,51 @@ public enum AdNetwork: String, Codable, Sendable {
 
 ## Setting User Data
 
-Call `setUserData` each time the app opens and the user is logged in:
+Call `setUserData` to send user details and the IDs your product analytics tools use for this user. You can call it right after `init`, before the user logs in: `id` is optional for `setUserData`. Pass `id` once the user is logged in.
+
+When you pass a tool's ID and that integration is configured in Linkrunner, Linkrunner sends this install's attribution to that tool for this user, the same attribution it sends after `signup` (for example, `lr_campaign` and `lr_ad_network` on the Mixpanel profile). This applies to installs attributed to a campaign. If the install is not attributed yet, Linkrunner sends the properties once attribution completes. Supported IDs:
+
+| Tool | Field |
+|------|-------|
+| Mixpanel | `mixPanelDistinctId` |
+| Amplitude | `amplitudeDeviceId` |
+| PostHog | `posthogDistinctId` |
+| MoEngage | `moengageUserId` |
+| Braze | `brazeDeviceId` |
+| Google Analytics 4 | `gaAppInstanceId` and `gaSessionId` |
+| Netcore | `netcoreDeviceGuid` |
 
 <Note>
-**`setUserData` is optional and is not a replacement for `signup`.** Always call `signup` first as soon as the user is identified (signup or login). Use `setUserData` afterwards only when additional user details become available later — for example, when the user adds a phone number, email, or completes their profile after identification.
+**`setUserData` is not a replacement for `signup`.** Call `signup` as soon as the user is identified (signup or login). `signup` still requires `id`.
 </Note>
+
+<Note>
+Calling `setUserData` without `id` requires iOS SDK 4.3.0 or later. On earlier versions `id` is required.
+</Note>
+
+Right after `init`, before the user logs in:
+
+```swift
+func setAnalyticsIds(mixpanelDistinctId: String) async {
+    await LinkrunnerSDK.shared.setUserData(
+        UserData(mixPanelDistinctId: mixpanelDistinctId)
+    )
+}
+```
+
+After the user logs in:
 
 ```swift
 func setUserData() async {
     let userData = UserData(
-        id: "123", // Required: User ID
+        id: "123", // Your customer user ID
         name: "John Doe", // Optional
         phone: "9876543210", // Optional
-        email: "user@example.com" // Optional
+        email: "user@example.com", // Optional
+        mixPanelDistinctId: "mixpanel_distinct_id" // Optional
     )
 
     await LinkrunnerSDK.shared.setUserData(userData)
-    print("User data set successfully")
 }
 ```
 
@@ -926,7 +954,7 @@ Connect APNs with Linkrunner
 | [`LinkrunnerSDK.shared.handleDeeplink`](/sdk/ios#handle-deeplink) | Required | SceneDelegate deep link entry points | When app is opened via a deep link |
 | [`LinkrunnerSDK.shared.getAttributionData`](/sdk/ios#getting-attribution-data) | Optional | Attribution data handling flow | Whenever the attribution data is needed |
 | [`LinkrunnerSDK.shared.setAdditionalData`](/sdk/ios#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
-| [`LinkrunnerSDK.shared.setUserData`](/sdk/ios#setting-user-data) | Optional | Authentication or profile update logic | After `signup`, when additional user details become available |
+| [`LinkrunnerSDK.shared.setUserData`](/sdk/ios#setting-user-data) | Optional | App start, authentication or profile update logic | Right after `init` with your analytics IDs, and when user details become available |
 | [`LinkrunnerSDK.shared.trackEvent`](/sdk/ios#tracking-custom-events) | Optional | Throughout app | When specific user actions occur, including [ecommerce events](/sdk/ios#ecommerce-events) |
 | [`LinkrunnerSDK.shared.trackPayment`](/sdk/ios#tracking-payments) | Optional | Payment processing | When user makes a payment, including [ecommerce purchases](/sdk/ios#ecommerce-events) |
 | [`LinkrunnerSDK.shared.setPushToken`](/sdk/ios#uninstall-tracking) | Optional | Push notification setup | When APNs token is available |

@@ -1,9 +1,17 @@
 ---
 title: "Getting Started as an Affiliate Partner"
 sidebarTitle: "Getting Started"
-description: "What Linkrunner offers affiliate partners, and the steps from sign-up to your first postback"
 icon: "rocket"
 ---
+
+<video
+    src="https://media.assets.linkrunner.io/linkrunner-affiliate-partners-guide.mp4"
+    poster="https://media.assets.linkrunner.io/linkrunner-affiliate-partners-guide-thumbnail.jpg"
+    controls
+    preload="metadata"
+    playsInline
+    style={{ width: "100%", borderRadius: 8 }}
+/>
 
 Linkrunner is the Mobile Measurement Partner (MMP) for the apps you run traffic to. It records your clicks, credits installs and in-app events to them, and sends you a postback for each conversion.
 
@@ -39,6 +47,8 @@ This page lists what you get and what to set up, in order.
 
     If your placement sends users straight to the store without opening a browser, report the click from your server instead. See [S2S clicks](/affiliate-partners/s2s-clicks).
 
+    If your server calls the tracking link instead of the user's browser, pass the user's `ip` and `ua` on it. See [Calling the link from your server](/affiliate-partners/tracking-links#calling-the-link-from-your-server).
+
     Optional: to get credit for users who see your ad but don't tap it, also report impressions. See [S2S impressions](/affiliate-partners/s2s-impressions).
 
     Every S2S click and impression must carry your partner token. Generate it once in [**Settings → S2S Credentials**](https://dashboard.linkrunner.io/affiliate/settings?tab=s2s); it works for every app you're connected to. See [Authenticate your requests](/affiliate-partners/s2s-clicks#authenticate-your-requests).
@@ -66,6 +76,8 @@ For how a click becomes a postback, see [How attribution works](/affiliate-partn
   </Accordion>
   <Accordion title="Can I reuse my AppsFlyer templates?" icon="arrows-rotate">
     For server-to-server clicks, yes. The S2S click API accepts the AppsFlyer parameter names. You change the host and `c`, and add your partner token. See [Coming from AppsFlyer](/affiliate-partners/s2s-clicks#coming-from-appsflyer).
+
+    If your AppsFlyer template calls the attribution link with `af_ip`, `af_ua` and `redirect=false`, the Linkrunner tracking link accepts those names too, once the advertiser turns on S2S clicks for you. See [Calling the link from your server](/affiliate-partners/tracking-links#calling-the-link-from-your-server).
   </Accordion>
   <Accordion title="Do I need to integrate an SDK?" icon="mobile">
     No. The advertiser's app already runs the Linkrunner SDK. You send clicks and receive postbacks.

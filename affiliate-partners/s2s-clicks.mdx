@@ -14,8 +14,12 @@ For this traffic, your **server** reports each click to Linkrunner, and the user
 
 Every S2S request must carry your partner token. See [Authenticate your requests](#authenticate-your-requests).
 
+<Tip>
+Already calling the advertiser's tracking link from your server? You can keep doing that if you pass the user's `ip` and `ua` on the link. See [Calling the link from your server](/affiliate-partners/tracking-links#calling-the-link-from-your-server). For a new integration, use the S2S click API on this page: it checks your token, returns a reason for every rejected click, and stores a retried `tid` once.
+</Tip>
+
 <Note>
-The advertiser turns on S2S clicks for each partner separately. Ask them, or [Linkrunner support](mailto:support@linkrunner.io), to turn them on for your partner account before you send traffic. Until then, requests are rejected with `partner_not_enabled`. S2S clicks stop if the advertiser disconnects your account.
+The advertiser turns on S2S clicks for each partner separately, in **Integrations → Affiliate Partners → Configure**. Send them [these steps](/affiliate-partners/turn-on-s2s-clicks) and ask them to turn it on for your partner account before you send traffic. Until then, requests are rejected with `partner_not_enabled`. S2S clicks stop if the advertiser disconnects your account.
 </Note>
 
 ## How it works
@@ -40,9 +44,9 @@ Linkrunner matches the install to your click in one of three ways, strongest fir
 |---|---|---|
 | **Referrer** | Open the Play Store with `referrer=lr_ia_id%3D<click_id>`, using the `click_id` from our response | Exact |
 | **Device ID** | `gaid` (Android) or `idfa` (iOS) on the click | Exact |
-| **IP** | The user's public device `ip`, plus `ua`, when there is no device ID | Probabilistic |
+| **IP** | The user's public device `ip`, when there is no device ID | Probabilistic |
 
-Send a device ID whenever you have one. IP matching is a fallback: users behind the same public IP can be confused with each other.
+Send a device ID whenever you have one. IP matching is a fallback: users behind the same public IP can be confused with each other. The user agent (`ua`) is optional and isn't used to match installs.
 
 Only report ads the user tapped. For ads that were only shown, use [S2S impressions](/affiliate-partners/s2s-impressions).
 
@@ -140,7 +144,7 @@ If you already send S2S clicks to AppsFlyer, you can reuse that template. Linkru
 | `advertising_id` | `gaid` | Either name works |
 | `idfa` | `idfa` | Same |
 | `af_ip` | `ip` | Either name works |
-| `af_ua` | `ua` | Either name works |
+| `af_ua` | `ua` | Either name works. Optional. Not used for matching |
 | `af_sub1`, `af_sub2`, `af_sub3` | `s2`, `s3`, `s4` | Either name works. Returned in `{s2}`–`{s4}` |
 | `redirect=false` | Not needed | This endpoint never redirects. Ignored if present |
 | `pid`, `af_siteid`, `af_lang` | Not needed | Ignored if present |
@@ -183,7 +187,7 @@ The token is wrong, was revoked, or was replaced more than 24 hours ago. You als
 `c` must be the campaign code from your Linkrunner tracking link. An AppsFlyer campaign name in `c` doesn't match.
 
 **Requests return `partner_not_enabled`.**
-The advertiser hasn't turned on S2S clicks for your partner account on this app, or `c` is a campaign that isn't yours. Changes take up to 5 minutes to apply.
+The advertiser hasn't turned on S2S clicks for your partner account on this app, or `c` is a campaign that isn't yours. Send the advertiser [these steps](/affiliate-partners/turn-on-s2s-clicks). Changes take up to 5 minutes to apply.
 
 **Requests return `unknown_app`.**
 Check the app ID against the store listing: the package name for Android, `id` plus the number for iOS. An app newly set up in Linkrunner can take a few minutes to be recognised.

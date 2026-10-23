@@ -8,6 +8,37 @@
         "dark": "#3D3BD6"
     },
     "favicon": "/favicon.svg",
+    "seo": {
+        "metatags": {
+            "og:image": "https://docs.linkrunner.io/images/og-image.png",
+            "twitter:image": "https://docs.linkrunner.io/images/og-image.png"
+        }
+    },
+    "contextual": {
+        "options": [
+            "copy",
+            "view",
+            "chatgpt",
+            "claude",
+            {
+                "title": "Connect Linkrunner to Claude Code",
+                "description": "Add the Linkrunner MCP server and sign in",
+                "icon": "plug",
+                "href": "https://docs.linkrunner.io/features/mcp#claude-code"
+            }
+        ]
+    },
+    "markdown": {
+        "instructions": [
+            "Linkrunner has a remote MCP server at https://mcp.linkrunner.io/mcp. People sign in to Linkrunner in a browser popup (OAuth), so there is no token to copy. New users sign up in the same popup.",
+            "If a person asks you to sign them up, log them in, or set Linkrunner up and you have no Linkrunner tools, do not send them to the website: tell them to add the connector and walk them through it. In Claude: Customize (or Settings), Connectors, Add custom connector, name Linkrunner, URL https://mcp.linkrunner.io/mcp, leave the OAuth fields empty, click Connect, sign in or sign up in the popup, click Allow, then turn the connector on for the chat and ask again.",
+            "Before sign-in, only get_linkrunner_overview and search_documentation work. Any other tool asks the person to sign in first.",
+            "To set a person up: connect the server, then call get_my_account, list_projects, find_app_in_store (confirm the right app with the person), and create_project. create_project returns the project ID and the SDK token. Install the SDK with that token. get_sdk_configuration returns the token again later.",
+            "Rules: a company email is needed to create a project (Gmail accounts cannot), an app project needs a live App Store or Play Store listing, a person can create up to 3 projects per day from an AI assistant, and using an existing project needs the Admin, Owner or Manager role.",
+            "Claude Code: claude mcp add --transport http linkrunner https://mcp.linkrunner.io/mcp, then run /mcp to sign in.",
+            "Guides: connector setup and tool reference at https://docs.linkrunner.io/features/mcp, manual setup at https://docs.linkrunner.io/quickstart. To integrate the SDK in a codebase, use the @linkrunner/skills package: https://docs.linkrunner.io/ai-agent-skills"
+        ]
+    },
     "navigation": {
         "tabs": [
             {
@@ -15,7 +46,7 @@
                 "groups": [
                     {
                         "group": "Getting Started",
-                        "pages": ["introduction", "quickstart", "features/website-projects", "ai-agent-skills"]
+                        "pages": ["introduction", "quickstart", "features/mcp", "features/website-projects", "ai-agent-skills"]
                     },
                     {
                         "group": "SDK Guides",
@@ -42,6 +73,7 @@
                     {
                         "group": "Links & Journeys",
                         "pages": [
+                            "features/create-trackable-link",
                             "features/subdomain-setup",
                             "features/deep-linking-setup",
                             "features/deferred-deep-linking",
@@ -49,10 +81,12 @@
                             "features/push-notification-tracking",
                             "features/push-notification-providers",
                             "features/link-redirection",
+                            "features/deactivate-campaign-link",
                             "features/deep-link-management",
                             "features/referral-codes",
                             "features/custom-store-listing",
-                            "features/social-media-intermediary-page"
+                            "features/social-media-intermediary-page",
+                            "features/custom-landing-page"
                         ]
                     },
                     {
@@ -68,6 +102,7 @@
                             "features/send-consent",
                             "features/ios-campaign-data-limitations",
                             "features/attribution-windows",
+                            "features/ctv-attribution",
                             "features/fraud-control",
                             {
                                 "group": "SKAdNetwork",
@@ -117,6 +152,8 @@
                         "group": "Troubleshooting",
                         "pages": [
                             "testing/testing-attribution-troubleshooting",
+                            "ad-networks/meta-support-access",
+                            "ad-networks/google-support-access",
                             "ad-networks/google-ads-discrepancies",
                             "ad-networks/meta-ads-discrepancies",
                             "ad-networks/meta-view-through-attribution"
@@ -203,14 +240,15 @@
                             "api-reference/campaign-apis",
                             "api-reference/s2s-clicks",
                             "api-reference/s2s-impressions",
-                            "api-reference/reporting-campaigns"
+                            "api-reference/ctv-impressions",
+                            "api-reference/reporting-campaigns",
+                            "api-reference/reporting-web-campaigns"
                         ]
                     },
                     {
                         "group": "Developer Tools",
                         "pages": [
-                            "features/webhooks",
-                            "features/mcp"
+                            "features/webhooks"
                         ]
                     }
                 ]
@@ -224,13 +262,17 @@
                             "affiliate-partners/getting-started",
                             "affiliate-partners/overview",
                             "affiliate-partners/create-account",
+                            "affiliate-partners/add-agency-account",
                             "affiliate-partners/create-campaign-link",
                             "affiliate-partners/tracking-links",
                             "affiliate-partners/s2s-clicks",
                             "affiliate-partners/s2s-impressions",
+                            "affiliate-partners/ctv-impressions",
+                            "affiliate-partners/turn-on-s2s-clicks",
                             "affiliate-partners/postbacks",
                             "affiliate-partners/event-mapping",
-                            "affiliate-partners/postback-logs"
+                            "affiliate-partners/postback-logs",
+                            "affiliate-partners/fraud-data"
                         ]
                     },
                     {
@@ -250,8 +292,12 @@
                         "pages": [
                             "agency-partners/overview",
                             "agency-partners/accept-invitation",
+                            "agency-partners/add-affiliate-account",
                             "agency-partners/manage-workspace",
-                            "agency-partners/invite-an-agency"
+                            "agency-partners/create-campaign-link",
+                            "agency-partners/campaigns-for-affiliates",
+                            "agency-partners/invite-an-agency",
+                            "agency-partners/control-agency-access"
                         ]
                     }
                 ]
