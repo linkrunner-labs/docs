@@ -30,9 +30,9 @@ linkrunner-key: YOUR-SERVER-KEY
 
 ## Capture a payment
 
-Send the payment to the [capture-event](/api-reference/event-capture) endpoint with `amount`, `payment_id`, and `currency` at the top level. `event_name` becomes the payment type you see in reports, so use a name that describes the payment, such as `purchase_completed` or `subscription_renewed`.
+Send the payment to the [capture-event](/api-reference/event-capture) endpoint with `amount`, `payment_id`, and `currency` at the top level. `event_name` becomes the payment type you see in reports, so use a name that describes the payment, such as `purchase_completed` or `SUBSCRIPTION_RENEWED`.
 
-If `event_name` is one of the old payment types, such as `FIRST_PAYMENT`, `SUBSCRIPTION_RENEWED`, or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so existing event mappings, reports, and affiliate templates keep working. Any other name is stored exactly as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks. See [Choose the event name](/sdk/migrate-to-track-event#choose-the-event-name) for the full list.
+`event_name` is stored exactly as you send it. To keep existing event mappings, reports, and affiliate templates working, send an old payment type in uppercase, exactly as before, such as `FIRST_PAYMENT`, `SUBSCRIPTION_RENEWED`, or `DEFAULT`. A different spelling such as `first_payment` is a new payment type. Any other name is also stored exactly as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks. See [Choose the event name](/sdk/migrate-to-track-event#choose-the-event-name) for the full list.
 
 ```
 POST: /capture-event

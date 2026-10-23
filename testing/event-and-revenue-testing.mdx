@@ -137,8 +137,8 @@ If you record a failed or cancelled payment, send its final state once. Linkrunn
 | `checkout_started` | Custom event | `event_name`, `user_id` |
 | `purchase_initiated` as a funnel step | Custom event | `event_name`, `user_id` |
 | Completed purchase | Payment | `event_name`, `user_id`, `payment_id`, `amount`, `currency` |
-| Subscription renewal with a charge | Payment | `event_name: subscription_renewed` |
-| Wallet top-up | Payment | `event_name: wallet_topup` |
+| Subscription renewal with a charge | Payment | `event_name: SUBSCRIPTION_RENEWED` |
+| Wallet top-up | Payment | `event_name: WALLET_TOPUP` |
 | Failed payment that must be recorded | Payment | `status: PAYMENT_FAILED` |
 | Cancelled payment that must be recorded | Payment | `status: PAYMENT_CANCELLED` |
 

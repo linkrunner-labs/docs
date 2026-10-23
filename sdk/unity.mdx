@@ -1438,7 +1438,7 @@ An `amount` inside the event data is not sent to ad networks as revenue. To shar
 
 ### Track Payments
 
-Use `TrackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `subscription_renewed`. Requires the bridges above, built on Android SDK 5.0.0 and LinkrunnerKit 5.0.0 or later. For examples for every case and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
+Use `TrackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `SUBSCRIPTION_RENEWED`. Requires the bridges above, built on Android SDK 5.0.0 and LinkrunnerKit 5.0.0 or later. For examples for every case and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
 
 This example sets every parameter. Only the first five are required.
 
@@ -1506,7 +1506,7 @@ Linkrunner keeps one payment per `paymentId`, event name, and status, so a retry
 If a value breaks these rules, the native SDK rejects the payment, nothing is sent, and `OnEventTracked` reports `false` with the error.
 
 <Note>
-If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so your existing mappings and reports keep working. Any other name, such as `purchase`, is stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
+The event name is stored exactly as you send it. If you used one of the old payment types, pass it in uppercase exactly as before, such as `FIRST_PAYMENT` or `DEFAULT`, so your existing mappings and reports keep working. A different spelling such as `first_payment` is a new payment type. Any other name, such as `purchase`, is also stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
 </Note>
 
 #### Track a payment with `TrackEvent`

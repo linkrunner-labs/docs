@@ -33,14 +33,14 @@ This page covers the code change. For how payments work, what each status does, 
 
 Linkrunner shows the event name as the payment type in reports and matches it exactly against your event mappings to ad networks and affiliate templates. Choose the name before you change any code.
 
-If the name is one of the old payment types, in any letter case, Linkrunner stores it as that uppercase type. Your existing mappings, reports, and affiliate templates keep working with no dashboard change. The old types are `FIRST_PAYMENT`, `SECOND_PAYMENT`, `TRIAL_STARTED`, `TRIAL_CANCELLED`, `WALLET_TOPUP`, `FUNDS_WITHDRAWAL`, `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED`, `SUBSCRIPTION_REFUNDED`, `SUBSCRIPTION_BILLING_ISSUE`, `DEFAULT`, `ONE_TIME`, and `RECURRING`.
+Linkrunner stores the name exactly as you send it, letter case included. If you used one of the old payment types, pass it in uppercase exactly as before, and your existing mappings, reports, and affiliate templates keep working with no dashboard change. A different spelling such as `first_payment` is a new payment type that matches none of them. The old types are `FIRST_PAYMENT`, `SECOND_PAYMENT`, `TRIAL_STARTED`, `TRIAL_CANCELLED`, `WALLET_TOPUP`, `FUNDS_WITHDRAWAL`, `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED`, `SUBSCRIPTION_REFUNDED`, `SUBSCRIPTION_BILLING_ISSUE`, `DEFAULT`, `ONE_TIME`, and `RECURRING`.
 
-Any other name is stored exactly as you send it, letter case included. Add a mapping for it in the dashboard before it can reach ad networks.
+Any other name needs its own mapping in the dashboard before it can reach ad networks.
 
 | You called `capturePayment` with | Pass as `eventName` | Stored as | Mapping change |
 | --- | --- | --- | --- |
-| `type: FIRST_PAYMENT` (or any old type) | `"FIRST_PAYMENT"` or `"first_payment"` | `FIRST_PAYMENT` | None |
-| No `type` (the default) | `"DEFAULT"` or `"default"` | `DEFAULT` | None |
+| `type: FIRST_PAYMENT` (or any old type) | `"FIRST_PAYMENT"` | `FIRST_PAYMENT` | None |
+| No `type` (the default) | `"DEFAULT"` | `DEFAULT` | None |
 | Flutter `PaymentType.DEFAULT_PAYMENT` (the Flutter default) | `"DEFAULT"` | `DEFAULT` | None |
 | Any type, and you want a new name | `"purchase"` | `purchase` | Add a mapping for `purchase` |
 

@@ -382,7 +382,7 @@ This method allows you to connect user identities across different analytics and
 
 ### Tracking Payments
 
-Use `trackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `subscription_renewed`. Requires `capacitor-linkrunner` 3.0.0 or later. For examples for every case and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
+Use `trackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `SUBSCRIPTION_RENEWED`. Requires `capacitor-linkrunner` 3.0.0 or later. For examples for every case and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
 
 This example sets every parameter. Only the first five are required.
 
@@ -457,7 +457,7 @@ Linkrunner keeps one payment per `paymentId`, event name, and status, so a retry
 The promise returned by `trackPayment` rejects when a value breaks these rules, and nothing is sent. In TypeScript, you can import the `TrackPaymentOptions`, `EventPayment`, and `PaymentStatus` types from `capacitor-linkrunner`.
 
 <Note>
-    If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, in any letter case, Linkrunner stores it as that uppercase type, so your existing mappings and reports keep working. Any other name, such as `purchase`, is stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
+    The event name is stored exactly as you send it. If you used one of the old payment types, pass it in uppercase exactly as before, such as `FIRST_PAYMENT` or `DEFAULT`, so your existing mappings and reports keep working. A different spelling such as `first_payment` is a new payment type. Any other name, such as `purchase`, is also stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
 </Note>
 
 #### Track a payment with `trackEvent`

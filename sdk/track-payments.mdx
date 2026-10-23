@@ -62,9 +62,9 @@ So a payment can be accepted but not yet in reports, in reports but not sent to 
 
 ## Choose the event name
 
-Linkrunner shows the event name as the payment type and matches it exactly, letter case included, against your mappings. Use one name per kind of payment, such as `purchase` for one-time orders and `subscription_renewed` for renewals, and keep it the same across releases.
+Linkrunner shows the event name as the payment type and matches it exactly, letter case included, against your mappings. Use one name per kind of payment, such as `purchase` for one-time orders and `SUBSCRIPTION_RENEWED` for renewals, and keep it the same across releases.
 
-The 14 old payment types, such as `FIRST_PAYMENT`, `SUBSCRIPTION_RENEWED`, and `DEFAULT`, are matched in any letter case and stored as the uppercase type. If you already have mappings, reports, or affiliate templates for an old type, keep that name and nothing changes in the dashboard. Any other name is stored exactly as sent and needs its own mapping. See [Choose the event name](/sdk/migrate-to-track-event#choose-the-event-name) for the full list.
+The 14 old payment types, such as `FIRST_PAYMENT`, `SUBSCRIPTION_RENEWED`, and `DEFAULT`, match your existing mappings only when sent in uppercase, exactly as before. If you already have mappings, reports, or affiliate templates for an old type, keep that name and nothing changes in the dashboard. Every name is stored exactly as sent, so `first_payment` is a new payment type, and any new name needs its own mapping. See [Choose the event name](/sdk/migrate-to-track-event#choose-the-event-name) for the full list.
 
 ## Payment status
 
