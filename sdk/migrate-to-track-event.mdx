@@ -65,7 +65,7 @@ If you did not pass a `type` before, your payments were saved as `DEFAULT`. Use 
 
 ## Code examples
 
-Each example is from a sports booking app. It shows the old payment call, then the new custom event and payment with `trackEvent`. The payment keeps the old `FIRST_PAYMENT` name, so the existing mappings keep working. Use your own values.
+Each example is from a sports booking app. It shows the old `capturePayment` call, then the same payment with `trackEvent`. The payment keeps the old `FIRST_PAYMENT` name, so the existing mappings keep working. Use your own values.
 
 <Tabs>
   <Tab title="Android">
@@ -86,12 +86,6 @@ Each example is from a sports booking app. It shows the old payment call, then t
     After (Android SDK 5.0.0):
 
     ```kotlin
-    // Custom event, no change
-    LinkRunner.getInstance().trackEvent(
-        eventName = "venue_viewed",
-        eventData = mapOf("venue_id" to "v_221", "sport" to "badminton")
-    )
-
     // Payment: same trackEvent, payment fields in eventData
     LinkRunner.getInstance().trackEvent(
         eventName = "FIRST_PAYMENT", // was type, same spelling
@@ -124,12 +118,6 @@ Each example is from a sports booking app. It shows the old payment call, then t
     After (LinkrunnerKit 5.0.0):
 
     ```swift
-    // Custom event, no change
-    await LinkrunnerSDK.shared.trackEvent(
-        eventName: "venue_viewed",
-        eventData: ["venue_id": "v_221", "sport": "badminton"]
-    )
-
     // Payment: same trackEvent, payment fields in eventData
     await LinkrunnerSDK.shared.trackEvent(
         eventName: "FIRST_PAYMENT", // was type, same spelling
@@ -162,9 +150,6 @@ Each example is from a sports booking app. It shows the old payment call, then t
     After (`rn-linkrunner` 4.0.0):
 
     ```javascript
-    // Custom event, no change
-    await linkrunner.trackEvent("venue_viewed", { venue_id: "v_221", sport: "badminton" });
-
     // Payment: same trackEvent, payment fields in eventData
     await linkrunner.trackEvent("FIRST_PAYMENT", { // was type, same spelling
       amount: 1200,
@@ -196,12 +181,6 @@ Each example is from a sports booking app. It shows the old payment call, then t
     After (`linkrunner` 5.0.0):
 
     ```dart
-    // Custom event, no change
-    await LinkRunner().trackEvent(
-      eventName: 'venue_viewed',
-      eventData: {'venue_id': 'v_221', 'sport': 'badminton'},
-    );
-
     // Payment: same trackEvent, payment fields in eventData
     await LinkRunner().trackEvent(
       eventName: 'FIRST_PAYMENT', // was type, same spelling
@@ -235,9 +214,6 @@ Each example is from a sports booking app. It shows the old payment call, then t
     After (`rn-linkrunner` 4.0.0):
 
     ```javascript
-    // Custom event, no change
-    await linkrunner.trackEvent("venue_viewed", { venue_id: "v_221", sport: "badminton" });
-
     // Payment: same trackEvent, payment fields in eventData
     await linkrunner.trackEvent("FIRST_PAYMENT", { // was type, same spelling
       amount: 1200,
@@ -265,12 +241,6 @@ Each example is from a sports booking app. It shows the old payment call, then t
     After (`capacitor-linkrunner` 3.0.0):
 
     ```typescript
-    // Custom event, no change
-    await linkrunner.trackEvent({
-        eventName: "venue_viewed",
-        eventData: { venue_id: "v_221", sport: "badminton" },
-    });
-
     // Payment: same trackEvent, payment fields in eventData
     await linkrunner.trackEvent({
         eventName: "FIRST_PAYMENT", // was type, same spelling
@@ -303,9 +273,6 @@ Each example is from a sports booking app. It shows the old payment call, then t
     After (`cordova-linkrunner` 2.0.0):
 
     ```javascript
-    // Custom event, no change
-    linkrunner.trackEvent("venue_viewed", { venue_id: "v_221", sport: "badminton" });
-
     // Payment: same trackEvent, payment fields in eventData
     linkrunner.trackEvent("FIRST_PAYMENT", { // was type, same spelling
         amount: 1200,
@@ -337,9 +304,6 @@ Each example is from a sports booking app. It shows the old payment call, then t
     After (bridges built on native 5.0.0):
 
     ```csharp
-    // Custom event, no change
-    LinkrunnerSDK.TrackEvent("venue_viewed", "{\"venue_id\":\"v_221\",\"sport\":\"badminton\"}");
-
     // Payment: same TrackEvent, payment fields in the event data JSON
     string eventDataJson =
         "{\"amount\":1200.0," +
