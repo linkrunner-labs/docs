@@ -403,7 +403,7 @@ linkrunner.trackEvent(
     },
     "evt_order_123" // Optional: your own ID for this event
 ).catch(function (error) {
-    // An invalid payment rejects here, and nothing is sent
+    // On Android an invalid payment rejects here, and nothing is sent
     console.error("Error tracking payment:", error);
 });
 ```
@@ -423,8 +423,8 @@ How `trackEvent` decides:
 
 - **`amount`, `paymentId`, and `currency` are all in `eventData`:** the event is a payment. The SDK checks the payment keys and sends them as payment fields.
 - **None of them, or `amount` or `currency` without `paymentId`:** the event is a normal custom event, exactly as before. An `amount` or `currency` key on its own is ordinary event data.
-- **`paymentId` with `amount` or `currency` missing:** The promise returned by `trackEvent` rejects with `amount, paymentId and currency must be sent together`, and nothing is sent.
-- **A negative or non-numeric `amount`, a blank `paymentId`, a currency that is not 3 letters, or an unknown `status`:** The promise returned by `trackEvent` rejects, and nothing is sent.
+- **`paymentId` with `amount` or `currency` missing:** The promise returned by `trackEvent` rejects with `amount, paymentId and currency must be sent together`, and nothing is sent. On iOS the payment is dropped instead and debug builds log the reason.
+- **A negative or non-numeric `amount`, a blank `paymentId`, a currency that is not 3 letters, or an unknown `status`:** The promise returned by `trackEvent` rejects, and nothing is sent. On iOS the payment is dropped instead and debug builds log the reason.
 
 #### Payment status
 

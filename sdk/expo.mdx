@@ -215,7 +215,7 @@ const trackPurchase = async () => {
       },
     );
   } catch (error) {
-    // An invalid payment throws here, and nothing is sent
+    // On Android an invalid payment throws here, and nothing is sent
     console.error("Error tracking payment:", error);
   }
 };
