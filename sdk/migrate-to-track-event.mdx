@@ -7,18 +7,7 @@ icon: "arrow-right-arrow-left"
 
 In the new SDK versions, a payment is an in-app event with revenue. You send it with `trackEvent`, the same method you use for custom events. `capturePayment` and `removePayment` are removed.
 
-Apps on older SDK versions keep working with no change. Migrate when you upgrade.
-
-| Platform | Package | Old versions (`capturePayment`) | New versions (`trackEvent` for payments) |
-| --- | --- | --- | --- |
-| Android | `io.linkrunner:android-sdk` | 4.x | 5.0.0 |
-| iOS | LinkrunnerKit | 4.x | 5.0.0 |
-| React Native | `rn-linkrunner` | 3.x | 4.0.0 |
-| Flutter | `linkrunner` | 4.x | 5.0.0 |
-| Expo | `expo-linkrunner` | 3.x | 4.0.0, with `rn-linkrunner` 4.0.0 or later |
-| Capacitor | `capacitor-linkrunner` | 2.x | 3.0.0 |
-| Cordova | `cordova-linkrunner` | 1.x | 2.0.0 |
-| Unity | [Unity bridges](/sdk/unity#track-payments) | Bridges on native 4.x | Bridges on native 5.0.0 |
+Apps on older SDK versions keep working with no change. Migrate when you upgrade to the [versions below](#sdk-versions).
 
 <Warning>
   **Use the exact same event name, with the same spelling and letter case.**
@@ -28,44 +17,9 @@ Apps on older SDK versions keep working with no change. Migrate when you upgrade
   Linkrunner matches the name exactly. A different spelling is treated as a new in-app event, so your existing Meta and Google mappings will not match it, and those payments will not be sent to Meta or Google.
 </Warning>
 
-## How to migrate
+## Before and after
 
-For each `capturePayment` call, make three edits:
-
-1. **Rename `capturePayment` to `trackEvent`.**
-2. **Pass your old `type` as the event name,** the first argument, with exactly the same spelling.
-3. **Move the payment fields into the event data:** `amount`, `paymentId`, `userId`, and `status` keep their names. Add `currency`, which is new and required, for example `"USD"` or `"INR"`.
-
-Then remove every `removePayment` call, and test once with a debug build. The payment should show on the [Events](https://dashboard.linkrunner.io/dashboard/events) page under the same name as before.
-
-| `capturePayment` | `trackEvent` |
-| --- | --- |
-| `type` | the event name (first argument), same value and spelling |
-| `amount` | `amount` in the event data, the order total |
-| `paymentId` | `paymentId` in the event data, required |
-| `userId` | `userId` in the event data, still required. An empty string uses the user saved by `signup` or `setUserData` |
-| `status` | `status` in the event data, optional, defaults to `PAYMENT_COMPLETED` |
-| `eventData` | the other keys in the event data, such as product details |
-| Not available | `currency` in the event data, new and required |
-
-The event is a payment only when the event data has `amount`, `paymentId`, and `currency` together. If any of the three is missing, it is not a payment:
-
-- `amount` or `currency` without `paymentId` is a normal custom event, exactly as before.
-- `paymentId` with `amount` or `currency` missing is an error, and nothing is sent.
-
-Only `PAYMENT_COMPLETED` payments count as revenue and are sent to ad networks. See [Payment status](/sdk/track-payments#payment-status) for the other statuses.
-
-## Old payment types
-
-These are the old payment types. Send them exactly like this, in uppercase:
-
-`FIRST_PAYMENT`, `SECOND_PAYMENT`, `TRIAL_STARTED`, `TRIAL_CANCELLED`, `WALLET_TOPUP`, `FUNDS_WITHDRAWAL`, `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED`, `SUBSCRIPTION_REFUNDED`, `SUBSCRIPTION_BILLING_ISSUE`, `DEFAULT`, `ONE_TIME`, `RECURRING`
-
-If you did not pass a `type` before, your payments were saved as `DEFAULT`. Use `"DEFAULT"` as the event name. In Flutter, `PaymentType.DEFAULT_PAYMENT` was also saved as `DEFAULT`, so use `"DEFAULT"`, not `"DEFAULT_PAYMENT"`.
-
-## Code examples
-
-Each example is from a sports booking app. It shows the old `capturePayment` call, then the same payment with `trackEvent`. The product keys in `eventData` are optional: Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`, and Google receives `content_ids` as item IDs. `amount` stays the order total. Leave them out if you do not use [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager) or [Google Commerce Manager](/ecommerce-manager/google-commerce-manager). The payment keeps the old `FIRST_PAYMENT` name, so the existing mappings keep working. Use your own values.
+The old `capturePayment` call, then the same payment with `trackEvent`. The product keys are optional: Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`, and Google receives `content_ids` as item IDs. `amount` stays the order total.
 
 <Tabs>
   <Tab title="Android">
@@ -359,6 +313,54 @@ Each example is from a sports booking app. It shows the old `capturePayment` cal
     Update your Android and iOS bridge code and C# wrapper as shown in [Track Payments](/sdk/unity#track-payments).
   </Tab>
 </Tabs>
+
+## How to migrate
+
+For each `capturePayment` call, make three edits:
+
+1. **Rename `capturePayment` to `trackEvent`.**
+2. **Pass your old `type` as the event name,** the first argument, with exactly the same spelling.
+3. **Move the payment fields into the event data:** `amount`, `paymentId`, `userId`, and `status` keep their names. Add `currency`, which is new and required, for example `"USD"` or `"INR"`.
+
+Then remove every `removePayment` call, and test once with a debug build. The payment should show on the [Events](https://dashboard.linkrunner.io/dashboard/events) page under the same name as before.
+
+| `capturePayment` | `trackEvent` |
+| --- | --- |
+| `type` | the event name (first argument), same value and spelling |
+| `amount` | `amount` in the event data, the order total |
+| `paymentId` | `paymentId` in the event data, required |
+| `userId` | `userId` in the event data, still required. An empty string uses the user saved by `signup` or `setUserData` |
+| `status` | `status` in the event data, optional, defaults to `PAYMENT_COMPLETED` |
+| `eventData` | the other keys in the event data, such as product details |
+| Not available | `currency` in the event data, new and required |
+
+The event is a payment only when the event data has `amount`, `paymentId`, and `currency` together. If any of the three is missing, it is not a payment:
+
+- `amount` or `currency` without `paymentId` is a normal custom event, exactly as before.
+- `paymentId` with `amount` or `currency` missing is an error, and nothing is sent.
+
+Only `PAYMENT_COMPLETED` payments count as revenue and are sent to ad networks. See [Payment status](/sdk/track-payments#payment-status) for the other statuses.
+
+## Old payment types
+
+These are the old payment types. Send them exactly like this, in uppercase:
+
+`FIRST_PAYMENT`, `SECOND_PAYMENT`, `TRIAL_STARTED`, `TRIAL_CANCELLED`, `WALLET_TOPUP`, `FUNDS_WITHDRAWAL`, `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED`, `SUBSCRIPTION_REFUNDED`, `SUBSCRIPTION_BILLING_ISSUE`, `DEFAULT`, `ONE_TIME`, `RECURRING`
+
+If you did not pass a `type` before, your payments were saved as `DEFAULT`. Use `"DEFAULT"` as the event name. In Flutter, `PaymentType.DEFAULT_PAYMENT` was also saved as `DEFAULT`, so use `"DEFAULT"`, not `"DEFAULT_PAYMENT"`.
+
+## SDK versions
+
+| Platform | Package | Old versions (`capturePayment`) | New versions (`trackEvent` for payments) |
+| --- | --- | --- | --- |
+| Android | `io.linkrunner:android-sdk` | 4.x | 5.0.0 |
+| iOS | LinkrunnerKit | 4.x | 5.0.0 |
+| React Native | `rn-linkrunner` | 3.x | 4.0.0 |
+| Flutter | `linkrunner` | 4.x | 5.0.0 |
+| Expo | `expo-linkrunner` | 3.x | 4.0.0, with `rn-linkrunner` 4.0.0 or later |
+| Capacitor | `capacitor-linkrunner` | 2.x | 3.0.0 |
+| Cordova | `cordova-linkrunner` | 1.x | 2.0.0 |
+| Unity | [Unity bridges](/sdk/unity#track-payments) | Bridges on native 4.x | Bridges on native 5.0.0 |
 
 ## Refunds and removePayment
 
