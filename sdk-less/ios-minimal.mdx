@@ -90,22 +90,19 @@ enum LinkrunnerMinimal {
         return try await post("/api/client/trigger", body)
     }
 
+    // Send amount, paymentId, and currency together to record a payment; leave them out for a custom event
     @discardableResult
-    static func trackEvent(_ name: String, data: [String: Any]? = nil) async throws -> [String: Any] {
+    static func trackEvent(_ name: String, data: [String: Any]? = nil,
+                           amount: Double? = nil, paymentId: String? = nil, currency: String? = nil) async throws -> [String: Any] {
         var body = base()
         body["event_name"] = name
         if let data { body["event_data"] = data }
+        if let amount, let paymentId, let currency {
+            body["amount"] = amount
+            body["payment_id"] = paymentId
+            body["currency"] = currency
+        }
         return try await post("/api/client/capture-event", body)
-    }
-
-    @discardableResult
-    static func capturePayment(userId: String, amount: Double, paymentId: String) async throws -> [String: Any] {
-        var body = base()
-        body["user_id"] = userId
-        body["amount"] = amount
-        body["payment_id"] = paymentId
-        body["status"] = "PAYMENT_COMPLETED"
-        return try await post("/api/client/capture-payment", body)
     }
 }
 ```
@@ -151,8 +148,8 @@ Task { try? await LinkrunnerMinimal.signup(userId: "user_123") }
 // 4. Track an event
 Task { try? await LinkrunnerMinimal.trackEvent("purchase_initiated", data: ["amount": 99.99]) }
 
-// 5. Capture a payment
-Task { try? await LinkrunnerMinimal.capturePayment(userId: "user_123", amount: 99.99, paymentId: "payment_123") }
+// 5. Track a payment
+Task { try? await LinkrunnerMinimal.trackEvent("purchase_completed", amount: 99.99, paymentId: "payment_123", currency: "USD") }
 ```
 
 <Warning>
