@@ -65,7 +65,7 @@ If you did not pass a `type` before, your payments were saved as `DEFAULT`. Use 
 
 ## Code examples
 
-Each example is from a sports booking app. It shows the old `capturePayment` call, then the same payment with `trackEvent`. The payment keeps the old `FIRST_PAYMENT` name, so the existing mappings keep working. Use your own values.
+Each example is from a sports booking app. It shows the old `capturePayment` call, then the same payment with `trackEvent`. The product keys in `eventData` are optional: Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`, and Google receives `content_ids` as item IDs. `amount` stays the order total. Leave them out if you do not use [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager) or [Google Commerce Manager](/ecommerce-manager/google-commerce-manager). The payment keeps the old `FIRST_PAYMENT` name, so the existing mappings keep working. Use your own values.
 
 <Tabs>
   <Tab title="Android">
@@ -95,7 +95,12 @@ Each example is from a sports booking app. It shows the old `capturePayment` cal
             "currency" to "INR", // new, required
             "userId" to "playo_u_8842",
             "status" to "PAYMENT_COMPLETED", // optional, the default
-            "venue_id" to "v_221" // other keys stay as event data
+            // product details for Meta and Google
+            "content_ids" to listOf("court_c2_1800"),
+            "contents" to listOf(mapOf("id" to "court_c2_1800", "quantity" to 1, "item_price" to 1200.0)),
+            "content_type" to "product",
+            "num_items" to 1,
+            "order_id" to "bk_10231"
         )
     )
     ```
@@ -127,7 +132,12 @@ Each example is from a sports booking app. It shows the old `capturePayment` cal
             "currency": "INR", // new, required
             "userId": "playo_u_8842",
             "status": "PAYMENT_COMPLETED", // optional, the default
-            "venue_id": "v_221" // other keys stay as event data
+            // product details for Meta and Google
+            "content_ids": ["court_c2_1800"],
+            "contents": [["id": "court_c2_1800", "quantity": 1, "item_price": 1200]],
+            "content_type": "product",
+            "num_items": 1,
+            "order_id": "bk_10231"
         ]
     )
     ```
@@ -157,7 +167,12 @@ Each example is from a sports booking app. It shows the old `capturePayment` cal
       currency: "INR", // new, required
       userId: "playo_u_8842",
       status: "PAYMENT_COMPLETED", // optional, the default
-      venue_id: "v_221", // other keys stay as event data
+      // product details for Meta and Google
+      content_ids: ["court_c2_1800"],
+      contents: [{ id: "court_c2_1800", quantity: 1, item_price: 1200 }],
+      content_type: "product",
+      num_items: 1,
+      order_id: "bk_10231",
     });
     ```
 
@@ -190,7 +205,14 @@ Each example is from a sports booking app. It shows the old `capturePayment` cal
         'currency': 'INR', // new, required
         'userId': 'playo_u_8842',
         'status': 'PAYMENT_COMPLETED', // optional, the default
-        'venue_id': 'v_221', // other keys stay as event data
+        // product details for Meta and Google
+        'content_ids': ['court_c2_1800'],
+        'contents': [
+          {'id': 'court_c2_1800', 'quantity': 1, 'item_price': 1200},
+        ],
+        'content_type': 'product',
+        'num_items': 1,
+        'order_id': 'bk_10231',
       },
     );
     ```
@@ -220,6 +242,12 @@ Each example is from a sports booking app. It shows the old `capturePayment` cal
       paymentId: "bk_10231",
       currency: "INR", // new, required
       userId: "playo_u_8842",
+      // product details for Meta and Google
+      content_ids: ["court_c2_1800"],
+      contents: [{ id: "court_c2_1800", quantity: 1, item_price: 1200 }],
+      content_type: "product",
+      num_items: 1,
+      order_id: "bk_10231",
     });
     ```
 
@@ -250,7 +278,12 @@ Each example is from a sports booking app. It shows the old `capturePayment` cal
             currency: "INR", // new, required
             userId: "playo_u_8842",
             status: "PAYMENT_COMPLETED", // optional, the default
-            venue_id: "v_221", // other keys stay as event data
+            // product details for Meta and Google
+            content_ids: ["court_c2_1800"],
+            contents: [{ id: "court_c2_1800", quantity: 1, item_price: 1200 }],
+            content_type: "product",
+            num_items: 1,
+            order_id: "bk_10231",
         },
     });
     ```
@@ -280,7 +313,12 @@ Each example is from a sports booking app. It shows the old `capturePayment` cal
         currency: "INR", // new, required
         userId: "playo_u_8842",
         status: "PAYMENT_COMPLETED", // optional, the default
-        venue_id: "v_221" // other keys stay as event data
+        // product details for Meta and Google
+        content_ids: ["court_c2_1800"],
+        contents: [{ id: "court_c2_1800", quantity: 1, item_price: 1200 }],
+        content_type: "product",
+        num_items: 1,
+        order_id: "bk_10231"
     }).catch(function (error) {
         console.error("Error tracking payment:", error);
     });
@@ -311,7 +349,10 @@ Each example is from a sports booking app. It shows the old `capturePayment` cal
         "\"currency\":\"INR\"," +           // new, required
         "\"userId\":\"playo_u_8842\"," +
         "\"status\":\"PAYMENT_COMPLETED\"," + // optional, the default
-        "\"venue_id\":\"v_221\"}";           // other keys stay as event data
+        // product details for Meta and Google
+        "\"content_ids\":[\"court_c2_1800\"]," +
+        "\"contents\":[{\"id\":\"court_c2_1800\",\"quantity\":1,\"item_price\":1200}]," +
+        "\"content_type\":\"product\",\"num_items\":1,\"order_id\":\"bk_10231\"}";
     LinkrunnerSDK.TrackEvent("FIRST_PAYMENT", eventDataJson); // was type, same spelling
     ```
 
