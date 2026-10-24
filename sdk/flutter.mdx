@@ -604,6 +604,7 @@ A payment is an in-app event with revenue. Send it with `trackEvent`, and put `a
 This example sends every payment key. `amount`, `paymentId`, `currency`, and `userId` are required for a payment.
 
 ```dart
+import 'package:flutter/services.dart';
 import 'package:linkrunner/main.dart';
 
 Future<void> trackPurchase() async {
@@ -628,8 +629,8 @@ Future<void> trackPurchase() async {
       },
       eventId: 'evt_order_123',          // Optional: your own ID for this event
     );
-  } on ArgumentError catch (e) {
-    // An invalid payment throws here, and nothing is sent
+  } on PlatformException catch (e) {
+    // On Android an invalid payment throws here (code TRACK_EVENT_FAILED), and nothing is sent
     print('Invalid payment: ${e.message}');
   } catch (e) {
     print('Error tracking payment: $e');
@@ -652,8 +653,8 @@ How `trackEvent` decides:
 
 - **`amount`, `paymentId`, and `currency` are all in `eventData`:** the event is a payment. The SDK checks the payment keys and sends them as payment fields.
 - **None of them, or `amount` or `currency` without `paymentId`:** the event is a normal custom event, exactly as before. An `amount` or `currency` key on its own is ordinary event data.
-- **`paymentId` with `amount` or `currency` missing:** `trackEvent` throws `ArgumentError` with `amount, paymentId and currency must be sent together`, and nothing is sent.
-- **A negative or non-numeric `amount`, a blank `paymentId`, a currency that is not 3 letters, or an unknown `status`:** `trackEvent` throws `ArgumentError`, and nothing is sent.
+- **`paymentId` with `amount` or `currency` missing:** on Android `trackEvent` throws `PlatformException` (code `TRACK_EVENT_FAILED`) with `amount, paymentId and currency must be sent together`; on iOS the payment is dropped and debug builds log the reason. Nothing is sent.
+- **A negative or non-numeric `amount`, a blank `paymentId`, a currency that is not 3 letters, or an unknown `status`:** on Android `trackEvent` throws `PlatformException` with the reason; on iOS the payment is dropped and debug builds log it. Nothing is sent.
 
 #### Payment status
 

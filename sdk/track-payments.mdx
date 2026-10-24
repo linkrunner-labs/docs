@@ -204,6 +204,7 @@ Use this when your app learns about a payment only after it succeeds. `status` i
   </Tab>
   <Tab title="Flutter">
     ```dart
+    import 'package:flutter/services.dart';
     import 'package:linkrunner/main.dart';
 
     Future<void> onPurchaseSucceeded(String orderId, String userId) async {
@@ -226,7 +227,7 @@ Use this when your app learns about a payment only after it succeeds. `status` i
             'order_id': orderId,
           },
         );
-      } on ArgumentError catch (e) {
+      } on PlatformException catch (e) {
         print('Payment not tracked: ${e.message}');
       }
     }
@@ -481,6 +482,7 @@ Use this when you want to see started, failed, and cancelled payments next to co
   </Tab>
   <Tab title="Flutter">
     ```dart
+    import 'package:flutter/services.dart';
     import 'package:linkrunner/main.dart';
 
     enum CheckoutResult { succeeded, failed, cancelled }
@@ -505,7 +507,7 @@ Use this when you want to see started, failed, and cancelled payments next to co
             'order_id': orderId,
           },
         );
-      } on ArgumentError catch (e) {
+      } on PlatformException catch (e) {
         print('Payment not tracked: ${e.message}');
       }
     }
@@ -769,6 +771,7 @@ Use this when you already have mappings or affiliate templates for an old paymen
   </Tab>
   <Tab title="Flutter">
     ```dart
+    import 'package:flutter/services.dart';
     import 'package:linkrunner/main.dart';
 
     Future<void> onSubscriptionRenewed(String transactionId, String userId) async {
@@ -790,7 +793,7 @@ Use this when you already have mappings or affiliate templates for an old paymen
             'order_id': transactionId,
           },
         );
-      } on ArgumentError catch (e) {
+      } on PlatformException catch (e) {
         print('Payment not tracked: ${e.message}');
       }
     }
@@ -900,11 +903,11 @@ The SDK validates every payment before sending it. A `paymentId` sent without `a
 | Android (Kotlin) | `trackEvent` returns a failed `Result` holding an `IllegalArgumentException`. It does not throw. Use `onFailure`. |
 | Android (Java) | `LinkrunnerJava.getInstance().trackEvent(...)` calls `onError` on the `LinkRunnerCallback` you pass. |
 | iOS | `trackEvent` does not throw. The payment is dropped, and debug builds print the reason to the console. |
-| React Native and Expo | `trackEvent` throws. Wrap it in `try`/`catch`. |
-| Flutter | `trackEvent` throws `ArgumentError`. |
-| Capacitor | The returned promise rejects. |
-| Cordova | The returned promise rejects. |
-| Unity | The native SDK rejects the payment, and `LinkrunnerSDK.OnEventTracked` reports `false` with the error. |
+| React Native and Expo | On Android, `trackEvent` rejects with the reason. Wrap it in `try`/`catch`. On iOS it does not throw: the payment is dropped and debug builds log the reason. |
+| Flutter | On Android, `trackEvent` throws `PlatformException` with code `TRACK_EVENT_FAILED` and the reason as the message. On iOS it does not throw: the payment is dropped and debug builds log the reason. |
+| Capacitor | On Android, the returned promise rejects with code `TRACK_EVENT_FAILED`. On iOS it resolves: the payment is dropped and debug builds log the reason. |
+| Cordova | On Android, the returned promise rejects. On iOS it resolves: the payment is dropped and debug builds log the reason. |
+| Unity | On Android, `LinkrunnerSDK.OnEventTracked` reports `false` with the error. On iOS the payment is dropped and debug builds log the reason. |
 
 Validation only proves the payment was well formed. Check the [Events Log](#verify-it-works) to confirm Linkrunner received it.
 
