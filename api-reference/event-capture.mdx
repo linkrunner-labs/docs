@@ -80,7 +80,7 @@ POST: /capture-event
 
 Send `amount`, `payment_id`, and `currency` at the top level of the request, next to `event_name`, when the event is a payment. Linkrunner then stores the event as revenue, and `event_name` becomes the payment type you see in reports. Without these fields, the request is a custom event.
 
-`event_name` is stored exactly as you send it. To keep existing event mappings, reports, and affiliate templates working, send an old payment type in uppercase, exactly as before, such as `FIRST_PAYMENT`, `SUBSCRIPTION_RENEWED`, or `DEFAULT`. A different spelling such as `first_payment` is a new payment type. Any other name is also stored exactly as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks. See [Choose the event name](/sdk/migrate-to-track-event#choose-the-event-name) for the full list.
+`event_name` is stored exactly as you send it. To keep existing event mappings, reports, and affiliate templates working, send an old payment type in uppercase, exactly as before, such as `FIRST_PAYMENT`, `SUBSCRIPTION_RENEWED`, or `DEFAULT`. A different spelling such as `first_payment` is a new payment type. Any other name is also stored exactly as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks. See [Old payment types](/sdk/migrate-to-track-event#old-payment-types) for the full list.
 
 ```json
 {
@@ -183,7 +183,7 @@ Put product details in `event_data`. Meta receives `content_ids`, `contents`, `c
 An `amount` inside `event_data` is not sent to ad networks as revenue. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
 
 <Note>
-  `POST /capture-payment` is deprecated. It keeps working for existing integrations, but new integrations should send payments through `/capture-event`. See [Migrate from capturePayment to trackPayment](/sdk/migrate-to-track-event).
+  `POST /capture-payment` is deprecated. It keeps working for existing integrations, but new integrations should send payments through `/capture-event`. See [Migrate payments to in-app events](/sdk/migrate-to-track-event).
 </Note>
 
 ## Best Practices

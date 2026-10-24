@@ -7,7 +7,7 @@ icon: "credit-card"
 
 Use `trackPayment` whenever a user pays you: a purchase, a subscription charge or renewal, a wallet top-up. Linkrunner stores it as revenue, links it to the user and their install attribution, and forwards completed payments to the ad networks you mapped.
 
-`trackPayment` needs these SDK versions or later. On an older version, see [Migrate from capturePayment to trackPayment](/sdk/migrate-to-track-event).
+`trackPayment` needs these SDK versions or later. On an older version, see [Migrate payments to in-app events](/sdk/migrate-to-track-event).
 
 | Platform | Package | Minimum version |
 | --- | --- | --- |
@@ -64,7 +64,7 @@ So a payment can be accepted but not yet in reports, in reports but not sent to 
 
 Linkrunner shows the event name as the payment type and matches it exactly, letter case included, against your mappings. Use one name per kind of payment, such as `purchase` for one-time orders and `SUBSCRIPTION_RENEWED` for renewals, and keep it the same across releases.
 
-The 14 old payment types, such as `FIRST_PAYMENT`, `SUBSCRIPTION_RENEWED`, and `DEFAULT`, match your existing mappings only when sent in uppercase, exactly as before. If you already have mappings, reports, or affiliate templates for an old type, keep that name and nothing changes in the dashboard. Every name is stored exactly as sent, so `first_payment` is a new payment type, and any new name needs its own mapping. See [Choose the event name](/sdk/migrate-to-track-event#choose-the-event-name) for the full list.
+The 14 old payment types, such as `FIRST_PAYMENT`, `SUBSCRIPTION_RENEWED`, and `DEFAULT`, match your existing mappings only when sent in uppercase, exactly as before. If you already have mappings, reports, or affiliate templates for an old type, keep that name and nothing changes in the dashboard. Every name is stored exactly as sent, so `first_payment` is a new payment type, and any new name needs its own mapping. See [Old payment types](/sdk/migrate-to-track-event#old-payment-types) for the full list.
 
 ## Payment status
 
@@ -1020,7 +1020,7 @@ Linkrunner keeps one payment per `paymentId`, event name, and status. Use this t
     No. Removing or reversing a payment is not supported. `removePayment` was removed in the SDK versions above and has no replacement.
   </Accordion>
   <Accordion title="I am on an older SDK that has capturePayment">
-    `capturePayment` keeps working on the older versions. When you upgrade, follow [Migrate from capturePayment to trackPayment](/sdk/migrate-to-track-event).
+    `capturePayment` keeps working on the older versions. When you upgrade, follow [Migrate payments to in-app events](/sdk/migrate-to-track-event).
   </Accordion>
   <Accordion title="Can I send payments from my backend?">
     Yes. Send them to `POST /api/v1/capture-event` with `amount`, `payment_id`, and `currency`. The same naming, status, and deduplication rules apply. See the [Revenue Tracking API](/api-reference/revenue-tracking).

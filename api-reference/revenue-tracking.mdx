@@ -32,7 +32,7 @@ linkrunner-key: YOUR-SERVER-KEY
 
 Send the payment to the [capture-event](/api-reference/event-capture) endpoint with `amount`, `payment_id`, and `currency` at the top level. `event_name` becomes the payment type you see in reports, so use a name that describes the payment, such as `purchase_completed` or `SUBSCRIPTION_RENEWED`.
 
-`event_name` is stored exactly as you send it. To keep existing event mappings, reports, and affiliate templates working, send an old payment type in uppercase, exactly as before, such as `FIRST_PAYMENT`, `SUBSCRIPTION_RENEWED`, or `DEFAULT`. A different spelling such as `first_payment` is a new payment type. Any other name is also stored exactly as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks. See [Choose the event name](/sdk/migrate-to-track-event#choose-the-event-name) for the full list.
+`event_name` is stored exactly as you send it. To keep existing event mappings, reports, and affiliate templates working, send an old payment type in uppercase, exactly as before, such as `FIRST_PAYMENT`, `SUBSCRIPTION_RENEWED`, or `DEFAULT`. A different spelling such as `first_payment` is a new payment type. Any other name is also stored exactly as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks. See [Old payment types](/sdk/migrate-to-track-event#old-payment-types) for the full list.
 
 ```
 POST: /capture-event
@@ -89,7 +89,7 @@ These calls come from your server, so Linkrunner never sends your server's IP to
 3. **401** Invalid server key
 
 <Note>
-  `POST /capture-payment` is deprecated for app payments. It keeps working for existing integrations, but new integrations should send app payments through `/capture-event`. Website payments still use `/capture-payment`, see [Website payments](#website-payments). See [Migrate from capturePayment to trackPayment](/sdk/migrate-to-track-event).
+  `POST /capture-payment` is deprecated for app payments. It keeps working for existing integrations, but new integrations should send app payments through `/capture-event`. Website payments still use `/capture-payment`, see [Website payments](#website-payments). See [Migrate payments to in-app events](/sdk/migrate-to-track-event).
 </Note>
 
 ## Website payments

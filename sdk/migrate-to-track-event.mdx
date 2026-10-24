@@ -1,15 +1,15 @@
 ---
-title: "Migrate from capturePayment to trackPayment"
-sidebarTitle: "Migrate to trackPayment"
-description: "Move payment tracking from capturePayment to trackPayment, and keep your reports and postback mappings working"
+title: "Migrate payments to in-app events"
+sidebarTitle: "Migrate to in-app events"
+description: "Move from capturePayment to trackPayment, which sends each payment as an in-app event with revenue"
 icon: "arrow-right-arrow-left"
 ---
 
-<Warning>
-    `capturePayment` and `removePayment` are deprecated and removed in the SDK versions below. Apps on older versions keep working unchanged. `removePayment` has no replacement: removing a payment is not supported in the new versions.
-</Warning>
+In the new SDK versions, a payment is an in-app event with revenue. You send it with `trackPayment`, and it goes to the same pipeline as your other in-app events. `capturePayment` and `removePayment` are removed.
 
-| Platform | Package | Last versions with `capturePayment` | `trackPayment` from |
+Apps on older SDK versions keep working with no change. Migrate when you upgrade.
+
+| Platform | Package | Old versions (`capturePayment`) | New versions (`trackPayment`) |
 | --- | --- | --- | --- |
 | Android | `io.linkrunner:android-sdk` | 4.x | 5.0.0 |
 | iOS | LinkrunnerKit | 4.x | 5.0.0 |
@@ -18,45 +18,49 @@ icon: "arrow-right-arrow-left"
 | Expo | `expo-linkrunner` | 3.x | 4.0.0, with `rn-linkrunner` 4.0.0 or later |
 | Capacitor | `capacitor-linkrunner` | 2.x | 3.0.0 |
 | Cordova | `cordova-linkrunner` | 1.x | 2.0.0 |
-| Unity | [Unity bridges](/sdk/unity#track-payments) | Bridges built on Android SDK 4.x or LinkrunnerKit 4.x | Bridges built on Android SDK 5.0.0 and LinkrunnerKit 5.0.0 |
+| Unity | [Unity bridges](/sdk/unity#track-payments) | Bridges on native 4.x | Bridges on native 5.0.0 |
 
-This page covers the code change. For how payments work, what each status does, and examples for every case, see [Track payments](/sdk/track-payments).
+<Warning>
+  **Use the exact same event name, with the same spelling and letter case.**
 
-## What changes
+  Your old payment `type` becomes the `eventName`. If you sent `FIRST_PAYMENT` before, send `"FIRST_PAYMENT"` now. Do not change it to `first_payment`, `First_Payment`, or `firstPayment`.
 
-- **`trackPayment` replaces `capturePayment`.** It takes the same fields, so the change is small.
-- **`type` becomes `eventName`.** The event name becomes the payment type. You are no longer limited to a fixed list of types.
-- **Currency is sent.** `currency` is now required with every payment. Older SDKs never sent a currency.
-- **`userId` stays.** Pass the same user ID you passed to `capturePayment`. If you pass an empty string, the SDK uses the user saved by `signup` or `setUserData`, as before.
+  Linkrunner matches the name exactly. A different spelling is treated as a new in-app event, so your existing Meta and Google mappings will not match it, and those payments will not be sent to Meta or Google.
+</Warning>
 
-## Choose the event name
+## How to migrate
 
-Linkrunner shows the event name as the payment type in reports and matches it exactly against your event mappings to ad networks and affiliate templates. Choose the name before you change any code.
+1. **Upgrade the SDK** to the new version in the table above.
+2. **Replace `capturePayment` with `trackPayment`.** Rename `type` to `eventName` and keep the same value.
+3. **Add `currency`.** It is required now, for example `"USD"` or `"INR"`.
+4. **Remove `removePayment` calls.** There is no replacement.
+5. **Test once** with a debug build and check the payment on the [Events](https://dashboard.linkrunner.io/dashboard/events) page under the same name as before.
 
-Linkrunner stores the name exactly as you send it, letter case included. If you used one of the old payment types, pass it in uppercase exactly as before, and your existing mappings, reports, and affiliate templates keep working with no dashboard change. A different spelling such as `first_payment` is a new payment type that matches none of them. The old types are `FIRST_PAYMENT`, `SECOND_PAYMENT`, `TRIAL_STARTED`, `TRIAL_CANCELLED`, `WALLET_TOPUP`, `FUNDS_WITHDRAWAL`, `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED`, `SUBSCRIPTION_REFUNDED`, `SUBSCRIPTION_BILLING_ISSUE`, `DEFAULT`, `ONE_TIME`, and `RECURRING`.
+## Old payment types
 
-Any other name needs its own mapping in the dashboard before it can reach ad networks.
+These are the old payment types. Send them exactly like this, in uppercase:
 
-| You called `capturePayment` with | Pass as `eventName` | Stored as | Mapping change |
-| --- | --- | --- | --- |
-| `type: FIRST_PAYMENT` (or any old type) | `"FIRST_PAYMENT"` | `FIRST_PAYMENT` | None |
-| No `type` (the default) | `"DEFAULT"` | `DEFAULT` | None |
-| Flutter `PaymentType.DEFAULT_PAYMENT` (the Flutter default) | `"DEFAULT"` | `DEFAULT` | None |
-| Any type, and you want a new name | `"purchase"` | `purchase` | Add a mapping for `purchase` |
+`FIRST_PAYMENT`, `SECOND_PAYMENT`, `TRIAL_STARTED`, `TRIAL_CANCELLED`, `WALLET_TOPUP`, `FUNDS_WITHDRAWAL`, `SUBSCRIPTION_CREATED`, `SUBSCRIPTION_RENEWED`, `SUBSCRIPTION_CANCELLED`, `SUBSCRIPTION_REFUNDED`, `SUBSCRIPTION_BILLING_ISSUE`, `DEFAULT`, `ONE_TIME`, `RECURRING`
 
-<Note>
-  In Flutter, `DEFAULT_PAYMENT` was always stored as `DEFAULT`. Pass `"DEFAULT"`, not `"DEFAULT_PAYMENT"`. `DEFAULT_PAYMENT` is not an old payment type, so it would be stored as a new name and would not match your existing mappings.
-</Note>
+If you did not pass a `type` before, your payments were saved as `DEFAULT`. Use `"DEFAULT"` as the event name. In Flutter, `PaymentType.DEFAULT_PAYMENT` was also saved as `DEFAULT`, so use `"DEFAULT"`, not `"DEFAULT_PAYMENT"`.
 
-A payment with the same `paymentId`, name, and status counts as one payment, so retries are safe. The same `paymentId` sent under two different names counts as two payments. Pick one name per payment and keep it.
+## What changes in the call
 
-## Update your code
+| `capturePayment` | `trackPayment` |
+| --- | --- |
+| `type` | `eventName`, same value and spelling |
+| `paymentId` | `paymentId` |
+| `userId` | `userId`, still required |
+| `amount` | `amount`, the order total |
+| `status` | `status`, optional, defaults to `PAYMENT_COMPLETED` |
+| `eventData` | `eventData` |
+| Not available | `currency`, new and required |
 
-The examples are fragments. Replace your `capturePayment` call with the `trackPayment` call in the same function, with the same coroutine or async context. They keep the old `FIRST_PAYMENT` type, so no mapping changes. Use your own amount, payment ID, user ID, currency, and products.
+Only `PAYMENT_COMPLETED` payments count as revenue and are sent to ad networks. See [Payment status](/sdk/track-payments#payment-status) for the other statuses.
 
-The **After** examples send product details in `eventData`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`, and Google receives `content_ids` as item IDs. `amount` stays the order total. If you do not use [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager) or [Google Commerce Manager](/ecommerce-manager/google-commerce-manager), you can leave `eventData` out.
+## Code examples
 
-In React Native, Expo, Capacitor, and Cordova, `PaymentStatus` is exported by the package. Plain strings such as `"PAYMENT_COMPLETED"` also work.
+Each example keeps the old `FIRST_PAYMENT` name, so your mappings keep working. `eventData` with product details is optional. Send it only if you use [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager) or [Google Commerce Manager](/ecommerce-manager/google-commerce-manager).
 
 <Tabs>
   <Tab title="Android">
@@ -98,20 +102,8 @@ In React Native, Expo, Capacitor, and Cordova, `PaymentStatus` is exported by th
     }
     ```
 
-    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
 
-    ```kotlin
-    LinkRunner.getInstance().trackPayment(
-        eventName = "FIRST_PAYMENT", // same name as the rest of this payment
-        paymentId = "payment_123", // same order ID as the rest of this payment
-        userId = "user123", // required, links the payment to your user
-        amount = 99.99, // order total the user tried to pay
-        currency = "USD", // required, 3-letter ISO 4217 code
-        status = PaymentStatus.PAYMENT_FAILED // stored, not revenue, not sent to ad networks
-    )
-    ```
-
-    An invalid value returns a failed `Result` instead of throwing. See [Tracking Payments](/sdk/android#tracking-payments) for the full reference.
+    See [Tracking Payments](/sdk/android#tracking-payments) for the full reference.
   </Tab>
   <Tab title="iOS">
     Before (LinkrunnerKit 4.x):
@@ -147,18 +139,6 @@ In React Native, Expo, Capacitor, and Cordova, `PaymentStatus` is exported by th
     )
     ```
 
-    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
-
-    ```swift
-    await LinkrunnerSDK.shared.trackPayment(
-        eventName: "FIRST_PAYMENT", // same name as the rest of this payment
-        paymentId: "payment456", // same order ID as the rest of this payment
-        userId: "user123", // required, links the payment to your user
-        amount: 99.99, // order total the user tried to pay
-        currency: "USD", // required, 3-letter ISO 4217 code
-        status: .failed // stored, not revenue, not sent to ad networks
-    )
-    ```
 
     See [Tracking Payments](/sdk/ios#tracking-payments) for the full reference.
   </Tab>
@@ -198,18 +178,6 @@ In React Native, Expo, Capacitor, and Cordova, `PaymentStatus` is exported by th
     });
     ```
 
-    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
-
-    ```javascript
-    await linkrunner.trackPayment({
-      eventName: "FIRST_PAYMENT", // same name as the rest of this payment
-      paymentId: "payment456", // same order ID as the rest of this payment
-      userId: "user123", // required, links the payment to your user
-      amount: 100, // order total the user tried to pay
-      currency: "USD", // required, 3-letter ISO 4217 code
-      status: PaymentStatus.PAYMENT_FAILED, // stored, not revenue, not sent to ad networks
-    });
-    ```
 
     See [Tracking Payments](/sdk/react-native#tracking-payments) for the full reference.
   </Tab>
@@ -251,18 +219,6 @@ In React Native, Expo, Capacitor, and Cordova, `PaymentStatus` is exported by th
     );
     ```
 
-    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
-
-    ```dart
-    await LinkRunner().trackPayment(
-      eventName: 'FIRST_PAYMENT', // same name as the rest of this payment
-      paymentId: 'payment456', // same order ID as the rest of this payment
-      userId: 'user123', // required, links the payment to your user
-      amount: 99.99, // order total the user tried to pay
-      currency: 'USD', // required, 3-letter ISO 4217 code
-      status: PaymentStatus.PAYMENT_FAILED, // stored, not revenue, not sent to ad networks
-    );
-    ```
 
     See [Tracking Payments](/sdk/flutter#tracking-payments) for the full reference.
   </Tab>
@@ -304,18 +260,6 @@ In React Native, Expo, Capacitor, and Cordova, `PaymentStatus` is exported by th
     });
     ```
 
-    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
-
-    ```javascript
-    await linkrunner.trackPayment({
-      eventName: "FIRST_PAYMENT", // same name as the rest of this payment
-      paymentId: "payment456", // same order ID as the rest of this payment
-      userId: "user123", // required, links the payment to your user
-      amount: 100, // order total the user tried to pay
-      currency: "USD", // required, 3-letter ISO 4217 code
-      status: PaymentStatus.PAYMENT_FAILED, // stored, not revenue, not sent to ad networks
-    });
-    ```
 
     See [Tracking Payments](/sdk/react-native#tracking-payments) for the full reference.
   </Tab>
@@ -355,18 +299,6 @@ In React Native, Expo, Capacitor, and Cordova, `PaymentStatus` is exported by th
     });
     ```
 
-    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
-
-    ```typescript
-    await linkrunner.trackPayment({
-        eventName: "FIRST_PAYMENT", // same name as the rest of this payment
-        paymentId: "payment456", // same order ID as the rest of this payment
-        userId: "user123", // required, links the payment to your user
-        amount: 100, // order total the user tried to pay
-        currency: "USD", // required, 3-letter ISO 4217 code
-        status: PaymentStatus.PAYMENT_FAILED, // stored, not revenue, not sent to ad networks
-    });
-    ```
 
     See [Tracking Payments](/sdk/capacitor#tracking-payments) for the full reference.
   </Tab>
@@ -406,20 +338,6 @@ In React Native, Expo, Capacitor, and Cordova, `PaymentStatus` is exported by th
     });
     ```
 
-    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
-
-    ```javascript
-    linkrunner.trackPayment({
-        eventName: "FIRST_PAYMENT", // same name as the rest of this payment
-        paymentId: "payment456", // same order ID as the rest of this payment
-        userId: "user123", // required, links the payment to your user
-        amount: 100, // order total the user tried to pay
-        currency: "USD", // required, 3-letter ISO 4217 code
-        status: linkrunner.PaymentStatus.PAYMENT_FAILED // stored, not revenue, not sent to ad networks
-    }).catch(function (error) {
-        console.error("Error tracking payment:", error);
-    });
-    ```
 
     See [Tracking Payments](/sdk/cordova#tracking-payments) for the full reference.
   </Tab>
@@ -456,78 +374,23 @@ In React Native, Expo, Capacitor, and Cordova, `PaymentStatus` is exported by th
     );
     ```
 
-    With a status. To record a payment that did not complete, pass another status with the same `paymentId`. Only `PAYMENT_COMPLETED` counts as revenue and reaches ad networks:
-
-    ```csharp
-    LinkrunnerSDK.TrackPayment(
-        eventName: "FIRST_PAYMENT", // same name as the rest of this payment
-        paymentId: "pay_abc123", // same order ID as the rest of this payment
-        userId: "user_123", // required, links the payment to your user
-        amount: 9.99, // order total the user tried to pay
-        currency: "USD", // required, 3-letter ISO 4217 code
-        status: PaymentStatus.PAYMENT_FAILED // stored, not revenue, not sent to ad networks
-    );
-    ```
 
     Update your Android and iOS bridge code and C# wrapper as shown in [Track Payments](/sdk/unity#track-payments).
   </Tab>
 </Tabs>
 
-### Field mapping
+## Using a new event name
 
-| `capturePayment` field | `trackPayment` field |
-| --- | --- |
-| `type` | `eventName`. See [Choose the event name](#choose-the-event-name) |
-| `paymentId` | `paymentId` |
-| `userId` | `userId`, still required. An empty string falls back to the user saved by `signup` or `setUserData` |
-| `amount` | `amount` |
-| `status` | `status`, optional. Defaults to `PAYMENT_COMPLETED` |
-| `eventData` | `eventData` |
-| Not available | `currency`, new and required |
+You can use a new name such as `purchase` instead of an old type. Before you release, add a mapping for that name in the dashboard for Meta, Google, and any other partner that should get it. Without a mapping, the payment is saved in Linkrunner but not sent to ad networks.
 
-### Alternative: `trackEvent` with a payment
+Keep one name per payment. The same `paymentId` sent under two names counts as two payments.
 
-If you already call `trackEvent` for the same action, you can attach the payment to it instead. Pass a payment object (`EventPayment` on Android, iOS, Flutter, and Unity) with `amount`, `paymentId`, `currency`, `userId`, and an optional `status`. It records the same payment as `trackPayment`. Each SDK page shows the call under **Tracking Payments**.
+## Already calling trackEvent?
 
-## Payment rules
+You can attach the payment to an existing `trackEvent` call instead of calling `trackPayment`. Pass a payment object with `amount`, `paymentId`, `currency`, `userId`, and an optional `status`. The same naming rule applies. Each SDK page shows this under **Tracking Payments**.
 
-Every field has a job. Leaving one out or getting it wrong breaks a specific part of your reporting.
+## Sending payments from your server
 
-- **`eventName`** is required because it is the payment type in reports and the key Linkrunner matches against your ad network and affiliate mappings.
-- **`paymentId`** is required because Linkrunner uses it to recognize a retried payment, so it must not be blank. Use your order or transaction ID.
-- **`userId`** is required because it links the payment to your user for paying users, cohorts, and user-level reports. An empty string uses the user saved by `signup` or `setUserData`.
-- **`amount`** is required because it is the revenue in reports and the value ad networks receive. It must be a finite number, 0 or greater. Send the order total.
-- **`currency`** is required because Linkrunner stores the payment in it and ad networks receive it with the value. It must be a 3-letter ISO 4217 code such as `USD` or `INR`.
-- **`status`** is optional and defaults to `PAYMENT_COMPLETED`. The values are `PAYMENT_INITIATED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, and `PAYMENT_CANCELLED`. Only `PAYMENT_COMPLETED` counts as revenue and is sent to ad networks, and only for event names that have a mapping. See [Payment status](/sdk/track-payments#payment-status).
-- **Validation.** The SDK rejects an invalid payment before sending it, so nothing reaches Linkrunner. See [Handle invalid payments](/sdk/track-payments#handle-invalid-payments) for how each SDK reports it.
-
-## Revenue sent to ad networks
-
-Meta and Google receive the value and currency from the payment `amount` and `currency`. Send the order total as `amount`. Linkrunner does not add up item prices.
-
-Product details come from `eventData`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`. Google receives `content_ids` as item IDs. See [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager) and [Google Commerce Manager](/ecommerce-manager/google-commerce-manager) for the fields.
-
-An `amount` inside `eventData` is not sent to ad networks as revenue. On iOS it still counts toward SKAN conversion values.
-
-Revenue is shared only when **Send Revenue** is turned on for the event's mapping. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
-
-## removePayment
-
-`removePayment` is removed in the new SDK versions and has no replacement. Removing a payment is not supported going forward.
-
-## Server-side API
-
-If you send payments from your backend, use `POST /api/v1/capture-event`. It accepts `amount`, `payment_id`, `currency`, and `status` next to `event_name` and `user_id`, and the same naming rule applies. See [Events Capture API](/api-reference/event-capture#payment-fields).
-
-`POST /api/v1/capture-payment` is deprecated. It keeps working for existing integrations, but new integrations should use `/capture-event`.
-
-## Checklist before upgrading
-
-1. Pick an event name for each payment type you send today. Keep the old type name if you want your mappings, reports, and affiliate templates to work with no change.
-2. For every new name, add a mapping in the dashboard for each ad network or affiliate that should receive it, and turn on **Send Revenue** where you share revenue.
-3. Send `currency` with every payment, and send the order total as `amount`.
-4. Remove `removePayment` calls.
-5. Decide which statuses you send. Leave `status` out for a one-step purchase, or follow the lifecycle in [Payment status](/sdk/track-payments#payment-status).
-6. Test with a debug build, then confirm the payment on the [Events](https://dashboard.linkrunner.io/dashboard/events) page under the expected name. Use [Verify it works](/sdk/track-payments#verify-it-works) and [Test Custom Events and Payments](/testing/event-and-revenue-testing) for the full check.
+Use `POST /api/v1/capture-event` with `amount`, `payment_id`, and `currency` next to `event_name` and `user_id`. The same naming rule applies. See [Events Capture API](/api-reference/event-capture#payment-fields). `POST /api/v1/capture-payment` is deprecated but keeps working.
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).
