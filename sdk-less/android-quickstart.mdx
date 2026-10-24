@@ -98,6 +98,7 @@ object LinkrunnerDeviceData {
         // Device info
         d.put("device_id", Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: "")
         d.put("device_name", "${Build.MANUFACTURER} ${Build.MODEL}")
+        d.put("device_model", Build.MODEL ?: "")
         d.put("manufacturer", Build.MANUFACTURER)
         d.put("brand", Build.BRAND)
         d.put("system_version", Build.VERSION.RELEASE ?: "")
