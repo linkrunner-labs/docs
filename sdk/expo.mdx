@@ -183,26 +183,27 @@ Since `expo-linkrunner` is a config plugin that prepares your project, the actua
 - Enhanced privacy controls
 
 <Note>
-    `capturePayment` and `removePayment` are deprecated and removed in `rn-linkrunner` 4.0.0. With `expo-linkrunner` 4.0.0, track payments with `trackPayment`. It takes the same fields as `capturePayment`, including `userId`, with `type` renamed to `eventName` and a new required `currency`. If the event name is one of the old payment types, such as `FIRST_PAYMENT` or `DEFAULT`, your existing mappings keep working. Any other name needs a new mapping in the dashboard. See [Migrate payments to in-app events](/sdk/migrate-to-track-event). For status, examples, and how payments reach ad networks, see [Track payments](/sdk/track-payments).
+    `capturePayment` and `removePayment` are deprecated and removed in `rn-linkrunner` 4.0.0. With `expo-linkrunner` 4.0.0, a payment is an in-app event: call `trackEvent` with the old payment type as the event name, and put `amount`, `paymentId`, `currency`, and `userId` in the event data. Keep the old type spelling exactly, such as `FIRST_PAYMENT`, so your existing mappings keep working. Any other name needs a new mapping in the dashboard. See [Migrate payments to in-app events](/sdk/migrate-to-track-event). For status, examples, and how payments reach ad networks, see [Track payments](/sdk/track-payments).
 </Note>
 
 ### Tracking Payments
 
-Expo apps call `trackPayment` from `rn-linkrunner`. This example sets every parameter. Only the first five are required. For the status values and the full parameter table, see [Tracking Payments](/sdk/react-native#tracking-payments) in the React Native guide.
+Expo apps call `trackEvent` from `rn-linkrunner`. When the event data has `amount`, `paymentId`, and `currency`, the event is a payment. For the full key table and status values, see [Tracking Payments](/sdk/react-native#tracking-payments) in the React Native guide.
 
 ```javascript
 import linkrunner, { PaymentStatus } from "rn-linkrunner";
 
 const trackPurchase = async () => {
   try {
-    await linkrunner.trackPayment({
-      eventName: "purchase",                   // Required: payment name, stored as the payment type in reports and mappings
-      paymentId: "order_123",                  // Required: your order or transaction ID, used to deduplicate
-      userId: "user_123",                      // Required: your user ID. "" uses the user saved by signup or setUserData
-      amount: 1499,                            // Required: total the user paid, a finite number >= 0
-      currency: "INR",                         // Required: 3-letter ISO 4217 code
-      status: PaymentStatus.PAYMENT_COMPLETED, // Optional: PAYMENT_INITIATED, PAYMENT_COMPLETED (default), PAYMENT_FAILED, or PAYMENT_CANCELLED
-      eventData: {                             // Optional: extra details. Meta and Google read these product fields
+    await linkrunner.trackEvent(
+      "purchase", // Payment name, stored as the payment type in reports and mappings
+      {
+        amount: 1499,                            // Required for a payment: total the user paid, a finite number >= 0
+        paymentId: "order_123",                  // Required for a payment: your order or transaction ID, used to deduplicate
+        currency: "INR",                         // Required for a payment: 3-letter ISO 4217 code
+        userId: "user_123",                      // Required for a payment: your user ID. "" uses the user saved by signup or setUserData
+        status: PaymentStatus.PAYMENT_COMPLETED, // Optional: PAYMENT_INITIATED, PAYMENT_COMPLETED (default), PAYMENT_FAILED, or PAYMENT_CANCELLED
+        // Optional: any other keys stay as event data. Meta and Google read these product fields
         content_ids: ["sku_1", "sku_2"],
         contents: [
           { id: "sku_1", quantity: 1, item_price: 999 },
@@ -212,9 +213,9 @@ const trackPurchase = async () => {
         num_items: 2,
         order_id: "order_123",
       },
-    });
+    );
   } catch (error) {
-    // An invalid value throws here, and nothing is sent
+    // An invalid payment throws here, and nothing is sent
     console.error("Error tracking payment:", error);
   }
 };
@@ -236,7 +237,7 @@ Expo uses the `rn-linkrunner` runtime. The function links below open the impleme
 | [`linkrunner.setAdditionalData`](/sdk/react-native#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
 | [`linkrunner.setUserData`](/sdk/react-native#setting-user-data) | Optional | App start, authentication or profile update logic | Right after `init` with your analytics IDs, and when user details become available |
 | [`linkrunner.trackEvent`](/sdk/react-native#tracking-custom-events) | Optional | Throughout app, including ecommerce flows | When specific user actions occur, including AddToCart or ViewContent events |
-| [`linkrunner.trackPayment`](/sdk/react-native#tracking-payments) | Optional | Payment processing, including ecommerce purchases | When user makes a payment, including Purchase events with ecommerce data |
+| [`linkrunner.trackEvent` with payment keys](/sdk/react-native#tracking-payments) | Optional | Payment processing, including ecommerce purchases | When user makes a payment, including Purchase events with ecommerce data |
 | [`linkrunner.setPushToken`](/sdk/react-native#uninstall-tracking) | Optional | Push notification setup | When FCM/APNs token is available |
 | [`linkrunner.setConsent`](/sdk/react-native#google-integrated-conversion-measurement-optional) | Optional | App initialization or consent flow | Before `init`, and again when consent changes |
 | [`linkrunner.enablePIIHashing`](/sdk/react-native#enhanced-privacy-controls) | Optional | Privacy configuration | When enabling PII hashing |

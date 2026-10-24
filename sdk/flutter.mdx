@@ -357,7 +357,7 @@ If the platform's identifier function is not called, you must provide a user ide
 -   posthogDistinctId for PostHog
 
 <Note>
-    The model classes (`LRUserData`, `LRConsent`, `EventPayment`, `PaymentStatus`) are not re-exported by `linkrunner.dart`. Import `package:linkrunner/main.dart`, which exports `linkrunner.dart` and all models, or import each model directly, for example `import 'package:linkrunner/models/lr_user_data.dart';`.
+    The model classes (`LRUserData`, `LRConsent`, `PaymentStatus`) are not re-exported by `linkrunner.dart`. Import `package:linkrunner/main.dart`, which exports `linkrunner.dart` and all models, or import each model directly, for example `import 'package:linkrunner/models/lr_user_data.dart';`.
 </Note>
 
 ```dart
@@ -599,23 +599,24 @@ This method allows you to connect user identities across different analytics and
 
 ### Tracking Payments
 
-Use `trackPayment` to record revenue. Linkrunner stores the payment under the event name you pass, so you can use any name, such as `purchase` or `SUBSCRIPTION_RENEWED`. Requires `linkrunner` 5.0.0 or later. For examples for every case and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
+A payment is an in-app event with revenue. Send it with `trackEvent`, and put `amount`, `paymentId`, and `currency` in `eventData`. The event name becomes the payment type in reports and mappings, so you can use any name, such as `purchase` or `SUBSCRIPTION_RENEWED`. Requires `linkrunner` 5.0.0 or later. For examples for every case and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
 
-This example sets every parameter. Only the first five are required.
+This example sends every payment key. `amount`, `paymentId`, `currency`, and `userId` are required for a payment.
 
 ```dart
 import 'package:linkrunner/main.dart';
 
 Future<void> trackPurchase() async {
   try {
-    await LinkRunner().trackPayment(
-      eventName: 'purchase',                   // Required: payment name, stored as the payment type in reports and mappings
-      paymentId: 'order_123',                  // Required: your order or transaction ID, used to deduplicate
-      userId: 'user_123',                      // Required: your user ID. '' uses the user saved by signup or setUserData
-      amount: 1499.0,                          // Required: total the user paid, a finite number >= 0
-      currency: 'INR',                         // Required: 3-letter ISO 4217 code
-      status: PaymentStatus.PAYMENT_COMPLETED, // Optional: defaults to PAYMENT_COMPLETED (see statuses below)
-      eventData: {                             // Optional: extra details. Meta and Google read these product fields
+    await LinkRunner().trackEvent(
+      eventName: 'purchase',             // Payment name, stored as the payment type in reports and mappings
+      eventData: {
+        'amount': 1499.0,                // Required for a payment: total the user paid, a finite number >= 0
+        'paymentId': 'order_123',        // Required for a payment: your order or transaction ID, used to deduplicate
+        'currency': 'INR',               // Required for a payment: 3-letter ISO 4217 code
+        'userId': 'user_123',            // Required for a payment: your user ID. '' uses the user saved by signup or setUserData
+        'status': 'PAYMENT_COMPLETED',   // Optional: defaults to PAYMENT_COMPLETED (see statuses below)
+        // Optional: any other keys stay as event data. Meta and Google read these product fields
         'content_ids': ['sku_1', 'sku_2'],
         'contents': [
           {'id': 'sku_1', 'quantity': 1, 'item_price': 999},
@@ -625,9 +626,10 @@ Future<void> trackPurchase() async {
         'num_items': 2,
         'order_id': 'order_123',
       },
+      eventId: 'evt_order_123',          // Optional: your own ID for this event
     );
   } on ArgumentError catch (e) {
-    // An invalid value throws here, and nothing is sent
+    // An invalid payment throws here, and nothing is sent
     print('Invalid payment: ${e.message}');
   } catch (e) {
     print('Error tracking payment: $e');
@@ -635,61 +637,40 @@ Future<void> trackPurchase() async {
 }
 ```
 
-#### `PaymentStatus`
+#### Payment keys in `eventData`
 
-`PaymentStatus` is a Dart enum exported by `package:linkrunner/main.dart`:
+| Key | Type | Required | Description |
+| --- | ---- | -------- | ----------- |
+| `amount` | `double` or `int` | Yes | Total the user paid. Must be a finite number, 0 or greater. This is the revenue value. |
+| `paymentId` | `String` | Yes | Your order or transaction ID. Must not be blank. Used to recognize the same payment when it arrives again. |
+| `currency` | `String` | Yes | 3-letter ISO 4217 currency code, such as `INR` or `USD`. Case-insensitive, sent in uppercase. |
+| `userId` | `String` | Yes | Your ID for the user who paid. If you pass an empty string, the SDK uses the user saved by `signup` or `setUserData`. |
+| `status` | `String` | No | `PAYMENT_INITIATED`, `PAYMENT_COMPLETED` (default), `PAYMENT_FAILED`, or `PAYMENT_CANCELLED`. |
+| Any other key | Any | No | Stays in the event data, such as product details for [ecommerce events](#ecommerce-events). |
 
-```dart
-enum PaymentStatus {
-  PAYMENT_INITIATED,
-  PAYMENT_COMPLETED, // default
-  PAYMENT_FAILED,
-  PAYMENT_CANCELLED,
-}
-```
+How `trackEvent` decides:
+
+- **`amount`, `paymentId`, and `currency` are all in `eventData`:** the event is a payment. The SDK checks the payment keys and sends them as payment fields.
+- **None of them, or `amount` or `currency` without `paymentId`:** the event is a normal custom event, exactly as before. An `amount` or `currency` key on its own is ordinary event data.
+- **`paymentId` with `amount` or `currency` missing:** `trackEvent` throws `ArgumentError` with `amount, paymentId and currency must be sent together`, and nothing is sent.
+- **A negative or non-numeric `amount`, a blank `paymentId`, a currency that is not 3 letters, or an unknown `status`:** `trackEvent` throws `ArgumentError`, and nothing is sent.
+
+#### Payment status
+
+`status` is a string. The `PaymentStatus` enum exported by `package:linkrunner/main.dart` has the same values, so `PaymentStatus.PAYMENT_CANCELLED.name` also works.
 
 | Status | Use it when | Effect |
 | ------ | ----------- | ------ |
-| `PaymentStatus.PAYMENT_INITIATED` | The user started paying, such as opening the checkout or payment sheet. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
-| `PaymentStatus.PAYMENT_COMPLETED` (default) | The charge succeeded. | Added to revenue and paying users. Sent to ad networks when the event name is mapped. |
-| `PaymentStatus.PAYMENT_FAILED` | The charge was declined or errored. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
-| `PaymentStatus.PAYMENT_CANCELLED` | The user backed out before paying. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_INITIATED` | The user started paying, such as opening the checkout or payment sheet. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_COMPLETED` (default) | The charge succeeded. | Added to revenue and paying users. Sent to ad networks when the event name is mapped. |
+| `PAYMENT_FAILED` | The charge was declined or errored. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_CANCELLED` | The user backed out before paying, or you refunded it. Send it with the same `paymentId` as the completed payment. | Stored for reports and analytics. The payment no longer counts as revenue and nothing is sent to ad networks. |
 
 Linkrunner keeps one payment per `paymentId`, event name, and status, so a retry with the same values is recorded once. See [Payment status](/sdk/track-payments#payment-status) for a full lifecycle example.
 
-#### `trackPayment` Parameters
-
-| Parameter | Type | Required | Default | Description |
-| --------- | ---- | -------- | ------- | ----------- |
-| `eventName` | `String` | Yes |  | Payment name, shown as the payment type in reports and matched against your event mappings. |
-| `paymentId` | `String` | Yes |  | Your order or transaction ID. Must not be blank. Used to recognize the same payment when it arrives again. |
-| `userId` | `String` | Yes |  | Your ID for the user who paid. If you pass an empty string, the SDK uses the user saved by `signup` or `setUserData`. |
-| `amount` | `double` | Yes |  | Total the user paid. Must be a finite number, 0 or greater. This is the revenue value. |
-| `currency` | `String` | Yes |  | 3-letter ISO 4217 currency code, such as `INR` or `USD`. Case-insensitive, sent in uppercase. |
-| `status` | `PaymentStatus` | No | `PaymentStatus.PAYMENT_COMPLETED` | Where the payment is in its lifecycle. See the statuses above. |
-| `eventData` | `Map<String, dynamic>?` | No | None | Extra details, such as product details for [ecommerce events](#ecommerce-events). An `amount` inside it is not revenue. |
-
-`trackPayment` throws `ArgumentError` when a value breaks these rules, and nothing is sent.
-
 <Note>
-    The event name is stored exactly as you send it. If you used one of the old payment types, pass it in uppercase exactly as before, such as `FIRST_PAYMENT` or `DEFAULT`, so your existing mappings and reports keep working. A different spelling such as `first_payment` is a new payment type. Any other name, such as `purchase`, is also stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks. If you called `capturePayment` with no type or with `PaymentType.DEFAULT_PAYMENT`, pass `'DEFAULT'`.
+    The event name is stored exactly as you send it. If you used one of the old payment types, pass it in uppercase exactly as before, such as `FIRST_PAYMENT` or `DEFAULT`, so your existing mappings and reports keep working. A different spelling such as `first_payment` is a new payment type. Any other name, such as `purchase`, is also stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
 </Note>
-
-#### Track a payment with `trackEvent`
-
-You can also pass an `EventPayment` to `trackEvent`. It takes the same `amount`, `paymentId`, `currency`, `userId`, and `status` fields and records the same payment. The `EventPayment` constructor throws `ArgumentError` for an invalid value.
-
-```dart
-await LinkRunner().trackEvent(
-  eventName: 'purchase', // Event name, used as the payment type
-  payment: EventPayment(
-    amount: 499.0,
-    paymentId: 'order_123',
-    currency: 'INR',
-    userId: 'user_123',
-  ),
-);
-```
 
 <Note>
     `capturePayment` is deprecated. Apps on `linkrunner` 4.x keep using it and continue to work unchanged. To move to 5.0.0, see [Migrate payments to in-app events](/sdk/migrate-to-track-event).
@@ -767,41 +748,28 @@ Future<void> trackViewContent() async {
 
 ### Payment / Purchase Example
 
-Use `trackEvent` with an [`EventPayment`](#tracking-payments) to send a `Purchase` event containing the ecommerce payload:
+Use `trackEvent` with the [payment keys](#tracking-payments) and the ecommerce fields in `eventData` to send a `Purchase` event:
 
 ```dart
-import 'package:linkrunner/main.dart';
-
 Future<void> trackPurchase() async {
   try {
     await LinkRunner().trackEvent(
-      eventName: 'purchase', // Map this event to "Purchase" (Meta) or "ecommerce_purchase" (Google) in the Linkrunner Dashboard. See: /ecommerce-manager/meta-commerce-manager, /ecommerce-manager/google-commerce-manager
+      eventName: 'purchase', // Map this event to "Purchase" (Meta) or "ecommerce_purchase" (Google) in the Linkrunner Dashboard
       eventData: {
-        'content_ids': ['product_123'],
-        'contents': [
-          {
-            'id': 'product_123', // Matches content_ids
-            'quantity': 1,
-            'item_price': 49.99
-          }
-        ],
-        'content_type': 'product',
+        'amount': 49.99, // Order total, sent to ad networks as the value
+        'paymentId': 'payment_456',
         'currency': 'USD',
-        'value': 49.99,
+        'userId': 'user_123',
+        'status': 'PAYMENT_COMPLETED', // Optional, the default
+        'content_ids': ['product_123'],
+        'contents': [{'id': 'product_123', 'quantity': 1, 'item_price': 49.99}],
+        'content_type': 'product',
         'num_items': 1,
-        'order_id': 'order_abc123' // Required for Purchase events
+        'order_id': 'order_abc123', // Required for Purchase events
       },
-      payment: EventPayment(
-        amount: 49.99,
-        paymentId: 'payment_456',
-        currency: 'USD',
-        userId: 'user_123',
-        status: PaymentStatus.PAYMENT_COMPLETED,
-      ),
     );
-    print('Purchase tracked successfully');
   } catch (e) {
-    print('Error tracking purchase: $e');
+    print('Error tracking payment: $e');
   }
 }
 ```
@@ -815,7 +783,7 @@ Future<void> trackPurchase() async {
 </Note>
 
 <Note>
-    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-identification-required) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, use [`trackPayment`](#tracking-payments).
+    Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-identification-required) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, add the [payment keys](#tracking-payments) to `eventData`.
 </Note>
 
 Track custom events in your app:
@@ -841,15 +809,14 @@ Future<void> trackEvent() async {
 #### Parameters for `LinkRunner().trackEvent`
 
 - `eventName`: `String` (required) - Name of the event to track
-- `eventData`: `Map<String, dynamic>` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties
+- `eventData`: `Map<String, dynamic>` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties. Add `amount`, `paymentId`, `currency`, and `userId` to make it a payment. See [Tracking Payments](#tracking-payments).
 - `eventId`: `Object` (optional) - Your own unique identifier for the event (`String` or `num`), useful for deduplication and correlating with your backend
-- `payment`: `EventPayment` (optional). Records revenue with the event. See [Tracking Payments](#tracking-payments).
 
 ### Revenue Sharing with Ad Networks
 
 Send revenue to ad networks such as Google Ads and Meta as a [payment](#tracking-payments). Meta and Google receive the value and currency from the payment `amount` and `currency`, so send the order total as `amount`. Linkrunner does not add up item prices.
 
-Put product details in `eventData`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`. Google receives `content_ids` as item IDs.
+Put the payment keys and the product details in `eventData`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`. Google receives `content_ids` as item IDs.
 
 ```dart
 Future<void> trackPurchase() async {
@@ -857,16 +824,14 @@ Future<void> trackPurchase() async {
     await LinkRunner().trackEvent(
       eventName: 'purchase',
       eventData: {
+        'amount': 149.99, // Order total, sent to ad networks as the value
+        'paymentId': 'order_12345',
+        'currency': 'USD',
+        'userId': 'user_123',
         'content_ids': ['product_123'],
         'num_items': 1,
         'order_id': 'order_12345',
       },
-      payment: EventPayment(
-        amount: 149.99, // Order total, sent to ad networks as the value
-        paymentId: 'order_12345',
-        currency: 'USD',
-        userId: 'user_123',
-      ),
     );
   } catch (e) {
     print('Error tracking payment: $e');
@@ -874,7 +839,7 @@ Future<void> trackPurchase() async {
 }
 ```
 
-An `amount` inside `eventData` is not sent to ad networks as revenue. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
+An `amount` in `eventData` is revenue only when `paymentId` and `currency` are there too. On its own it is ordinary event data. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
 
 ## Enhanced Privacy Controls
 
@@ -1096,7 +1061,7 @@ Connect APNs with Linkrunner
 | [`LinkRunner().setAdditionalData`](/sdk/flutter#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
 | [`LinkRunner().setUserData`](/sdk/flutter#setting-user-data) | Optional | App start, authentication or profile update logic | Right after `init` with your analytics IDs, and when user details become available |
 | [`LinkRunner().trackEvent`](/sdk/flutter#tracking-custom-events) | Optional | Throughout app | When specific user actions occur, including [ecommerce events](/sdk/flutter#ecommerce-events) |
-| [`LinkRunner().trackPayment`](/sdk/flutter#tracking-payments) | Optional | Payment processing | When user makes a payment, including [ecommerce purchases](/sdk/flutter#ecommerce-events) |
+| [`LinkRunner().trackEvent` with payment keys](/sdk/flutter#tracking-payments) | Optional | Payment processing | When user makes a payment, including [ecommerce purchases](/sdk/flutter#ecommerce-events) |
 | [`LinkRunner().setPushToken`](/sdk/flutter#uninstall-tracking) | Optional | Push notification setup | When FCM (Android) or APNs (iOS) token is available |
 | [`LinkRunner().setConsent`](/sdk/flutter#google-integrated-conversion-measurement-optional) | Optional | App initialization or consent flow | Before `init`, and again when consent changes |
 | [`LinkRunner().enablePIIHashing`](/sdk/flutter#enhanced-privacy-controls) | Optional | Privacy settings | When you want to enable PII hashing |

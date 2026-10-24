@@ -12,7 +12,7 @@ Use this guide after [SDK Integration Testing](/testing/integration-testing). It
 | What happened | App SDK | Server-side API |
 | --- | --- | --- |
 | A user action with no authoritative transaction | `trackEvent` | `POST /capture-event` |
-| A payment with an amount and unique transaction ID | `trackPayment` (`eventName`, `paymentId`, `userId`, `amount`, `currency`) | `POST /capture-event` with `amount`, `payment_id`, and `currency` |
+| A payment with an amount and unique transaction ID | `trackEvent` with `amount`, `paymentId`, `currency`, and `userId` in the event data | `POST /capture-event` with `amount`, `payment_id`, and `currency` |
 
 When you attach a payment, the event name becomes the payment type in reports. See [Payment fields](/api-reference/event-capture#payment-fields) for the rules. For SDK examples, payment status, and how payments reach ad networks, see [Track payments](/sdk/track-payments).
 
@@ -163,7 +163,7 @@ See [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understandi
   </Accordion>
 
   <Accordion title="The purchase appears as a custom event">
-    The app or backend sent it without the payment fields. Send `amount`, `payment_id`, and `currency` together with the event. An `amount` inside `event_data` does not make the event a payment.
+    The app or backend sent it without all three payment fields. From the SDK, put `amount`, `paymentId`, and `currency` in the event data. From your backend, send `amount`, `payment_id`, and `currency` at the top level of the request. An `amount` without the other two is a custom event property.
   </Accordion>
 
   <Accordion title="A new payment is missing">

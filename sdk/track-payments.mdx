@@ -1,13 +1,13 @@
 ---
-title: "Track payments"
+title: "Track payments with trackEvent"
 sidebarTitle: "Track payments"
-description: "Record revenue with trackPayment, use payment status correctly, and send completed payments to your ad networks"
+description: "Record revenue as an in-app event with trackEvent, use payment status correctly, and send completed payments to your ad networks"
 icon: "credit-card"
 ---
 
-Use `trackPayment` whenever a user pays you: a purchase, a subscription charge or renewal, a wallet top-up. Linkrunner stores it as revenue, links it to the user and their install attribution, and forwards completed payments to the ad networks you mapped.
+A payment is an in-app event with revenue. Send it with `trackEvent` whenever a user pays you: a purchase, a subscription charge or renewal, a wallet top-up. Put `amount`, `paymentId`, `currency`, and `userId` in `eventData`, and the SDK sends the event as a payment. Linkrunner stores it as revenue, links it to the user and their install attribution, and forwards completed payments to the ad networks you mapped.
 
-`trackPayment` needs these SDK versions or later. On an older version, see [Migrate payments to in-app events](/sdk/migrate-to-track-event).
+Payment keys in `trackEvent` need these SDK versions or later. On an older version, see [Migrate payments to in-app events](/sdk/migrate-to-track-event).
 
 | Platform | Package | Minimum version |
 | --- | --- | --- |
@@ -25,8 +25,8 @@ Initialize the SDK before you track payments. See your platform's SDK guide for 
 ## How it works
 
 <Steps>
-  <Step title="Your app calls trackPayment">
-    You pass the event name, payment ID, user ID, amount, currency, and optionally a status and product details.
+  <Step title="Your app calls trackEvent with payment keys">
+    You pass the event name, and in `eventData` the amount, payment ID, currency, user ID, and optionally a status and product details. Without `amount`, `paymentId`, and `currency` together, the call stays a normal custom event.
   </Step>
   <Step title="The SDK validates the payment">
     The SDK checks every required field before anything leaves the device. If a value is invalid, nothing is sent and your code gets an error (see [Handle invalid payments](#handle-invalid-payments)).
@@ -47,18 +47,20 @@ Initialize the SDK before you track payments. See your platform's SDK guide for 
 
 So a payment can be accepted but not yet in reports, in reports but not sent to an ad network (no mapping, or not completed), or sent without a value (**Send Revenue** off). [Verify it works](#verify-it-works) shows how to check each step.
 
-## Fields
+## Payment keys
+
+`eventName` and `eventId` are arguments of `trackEvent`. The other fields are keys in `eventData`.
 
 | Field | Required | What it is for | Why it matters | Example |
 | --- | --- | --- | --- | --- |
-| `eventName` | Yes | The name of this payment, such as `purchase` or `SUBSCRIPTION_RENEWED`. | It becomes the payment type in reports, and Linkrunner matches it exactly against your ad network and affiliate mappings. No mapping means the payment never reaches that network. | `"purchase"` |
+| `eventName` | Yes | The first argument of `trackEvent`: the name of this payment, such as `purchase` or `SUBSCRIPTION_RENEWED`. | It becomes the payment type in reports, and Linkrunner matches it exactly against your ad network and affiliate mappings. No mapping means the payment never reaches that network. | `"purchase"` |
 | `paymentId` | Yes | Your order or transaction ID. Must not be blank. | Linkrunner uses it to recognize the same payment when it arrives again, so retries do not double your revenue. | `"order_8f2k1"` |
 | `userId` | Yes | Your ID for the user who paid. | It links the payment to your user, so paying users, cohorts, and user-level reports are correct. If you pass an empty string, the SDK uses the user saved by `signup`, `setUserData`, or `setCustomerUserId`. | `"user_123"` |
 | `amount` | Yes | The total the user paid. A finite number, 0 or greater. | This is the revenue in your reports and the value ad networks receive. Linkrunner does not add up item prices, so send the order total. | `499.0` |
 | `currency` | Yes | The 3-letter ISO 4217 code of `amount`. Case-insensitive, sent in uppercase. | Linkrunner stores the payment in this currency, and ad networks receive it with the value. A wrong code makes the revenue wrong everywhere. | `"INR"` |
 | `status` | No | Where the payment is in its lifecycle. Defaults to `PAYMENT_COMPLETED`. | Only completed payments count as revenue and reach ad networks. See [Payment status](#payment-status). | `PAYMENT_COMPLETED` |
-| `eventData` | No | Extra details, such as the products in the order. | Meta and Google read product fields from it. An `amount` inside `eventData` is not revenue. | `{ "content_ids": ["sku_1"] }` |
-| `eventId` | No | Your own identifier for the event. Android (Kotlin), iOS, and Capacitor only. | Use it when your own systems need an event-level reference. | `"evt_123"` |
+| Other `eventData` keys | No | Extra details, such as the products in the order. | Meta and Google read product fields from them. They stay in the event data. | `"content_ids": ["sku_1"]` |
+| `eventId` | No | Your own identifier for the event. This is the third argument of `trackEvent`, not a key in `eventData`. | Use it when your own systems need an event-level reference. | `"evt_123"` |
 
 ## Choose the event name
 
@@ -101,7 +103,7 @@ All examples use synthetic values. Replace them with your own order ID, user ID,
 
 Every example sends product details in `eventData`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id` for [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event_data), and Google receives `content_ids` as item IDs for [Google Commerce Manager](/ecommerce-manager/google-commerce-manager). `amount` stays the order total.
 
-In React Native, Expo, Capacitor, and Cordova, `PaymentStatus` is exported by the package. Plain strings such as `"PAYMENT_COMPLETED"` also work.
+`status` is a string such as `"PAYMENT_COMPLETED"`. In React Native, Expo, Capacitor, and Cordova, `PaymentStatus` is exported by the package with the same strings. On Android and Flutter, `PaymentStatus.X.name` gives the string, and on iOS `PaymentStatus.x.rawValue` does.
 
 ### One-step purchase with products
 
@@ -109,7 +111,7 @@ Use this when your app learns about a payment only after it succeeds. `status` i
 
 <Tabs>
   <Tab title="Android">
-    Call it from your purchase success handler. `trackPayment` is a `suspend` function, so run it in a coroutine.
+    Call it from your purchase success handler. `trackEvent` is a `suspend` function, so run it in a coroutine.
 
     ```kotlin
     import io.linkrunner.sdk.LinkRunner
@@ -119,14 +121,14 @@ Use this when your app learns about a payment only after it succeeds. `status` i
 
     fun onPurchaseSucceeded(orderId: String, userId: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            LinkRunner.getInstance().trackPayment(
+            LinkRunner.getInstance().trackEvent(
                 eventName = "purchase", // becomes the payment type in reports and mappings
-                paymentId = orderId, // your order ID, used to deduplicate
-                userId = userId, // required, links the payment to your user
-                amount = 2298.0, // order total the user paid
-                currency = "INR", // required, 3-letter ISO 4217 code
-                // Product details: Meta receives these fields, Google receives content_ids as item IDs
                 eventData = mapOf(
+                    "paymentId" to orderId, // your order ID, used to deduplicate
+                    "userId" to userId, // required, links the payment to your user
+                    "amount" to 2298.0, // order total the user paid
+                    "currency" to "INR", // required, 3-letter ISO 4217 code
+                    // Product details: Meta receives these fields, Google receives content_ids as item IDs
                     "content_ids" to listOf("sku_blue_tshirt_m", "sku_black_jeans_32"),
                     "contents" to listOf(
                         mapOf("id" to "sku_blue_tshirt_m", "quantity" to 1, "item_price" to 799),
@@ -143,7 +145,7 @@ Use this when your app learns about a payment only after it succeeds. `status` i
     }
     ```
 
-    From Java, use `LinkrunnerJava.getInstance().trackPayment(...)` with the same arguments and a `LinkRunnerCallback<Void>` as the last argument.
+    From Java, use `LinkrunnerJava.getInstance().trackEvent(eventName, eventData, eventId, callback)` with the same `eventData` keys and a `LinkRunnerCallback<Void>`.
   </Tab>
   <Tab title="iOS">
     Call it from your purchase success handler inside an `async` context.
@@ -152,14 +154,14 @@ Use this when your app learns about a payment only after it succeeds. `status` i
     import LinkrunnerKit
 
     func onPurchaseSucceeded(orderId: String, userId: String) async {
-        await LinkrunnerSDK.shared.trackPayment(
+        await LinkrunnerSDK.shared.trackEvent(
             eventName: "purchase", // becomes the payment type in reports and mappings
-            paymentId: orderId, // your order ID, used to deduplicate
-            userId: userId, // required, links the payment to your user
-            amount: 2298.0, // order total the user paid
-            currency: "INR", // required, 3-letter ISO 4217 code
-            // Product details: Meta receives these fields, Google receives content_ids as item IDs
             eventData: [
+                "paymentId": orderId, // your order ID, used to deduplicate
+                "userId": userId, // required, links the payment to your user
+                "amount": 2298.0, // order total the user paid
+                "currency": "INR", // required, 3-letter ISO 4217 code
+                // Product details: Meta receives these fields, Google receives content_ids as item IDs
                 "content_ids": ["sku_blue_tshirt_m", "sku_black_jeans_32"],
                 "contents": [
                     ["id": "sku_blue_tshirt_m", "quantity": 1, "item_price": 799],
@@ -179,23 +181,20 @@ Use this when your app learns about a payment only after it succeeds. `status` i
 
     export async function onPurchaseSucceeded(orderId, userId) {
       try {
-        await linkrunner.trackPayment({
-          eventName: "purchase", // becomes the payment type in reports and mappings
+        await linkrunner.trackEvent("purchase", { // becomes the payment type in reports and mappings
           paymentId: orderId, // your order ID, used to deduplicate
-          userId, // required, links the payment to your user
+          userId: userId, // required, links the payment to your user
           amount: 2298, // order total the user paid
           currency: "INR", // required, 3-letter ISO 4217 code
           // Product details: Meta receives these fields, Google receives content_ids as item IDs
-          eventData: {
-            content_ids: ["sku_blue_tshirt_m", "sku_black_jeans_32"],
-            contents: [
-              { id: "sku_blue_tshirt_m", quantity: 1, item_price: 799 },
-              { id: "sku_black_jeans_32", quantity: 1, item_price: 1499 },
-            ],
-            content_type: "product",
-            num_items: 2,
-            order_id: orderId,
-          },
+          content_ids: ["sku_blue_tshirt_m", "sku_black_jeans_32"],
+          contents: [
+            { id: "sku_blue_tshirt_m", quantity: 1, item_price: 799 },
+            { id: "sku_black_jeans_32", quantity: 1, item_price: 1499 },
+          ],
+          content_type: "product",
+          num_items: 2,
+          order_id: orderId,
         });
       } catch (error) {
         console.error("Payment not tracked:", error);
@@ -209,14 +208,14 @@ Use this when your app learns about a payment only after it succeeds. `status` i
 
     Future<void> onPurchaseSucceeded(String orderId, String userId) async {
       try {
-        await LinkRunner().trackPayment(
+        await LinkRunner().trackEvent(
           eventName: 'purchase', // becomes the payment type in reports and mappings
-          paymentId: orderId, // your order ID, used to deduplicate
-          userId: userId, // required, links the payment to your user
-          amount: 2298.0, // order total the user paid
-          currency: 'INR', // required, 3-letter ISO 4217 code
-          // Product details: Meta receives these fields, Google receives content_ids as item IDs
           eventData: {
+            'paymentId': orderId, // your order ID, used to deduplicate
+            'userId': userId, // required, links the payment to your user
+            'amount': 2298.0, // order total the user paid
+            'currency': 'INR', // required, 3-letter ISO 4217 code
+            // Product details: Meta receives these fields, Google receives content_ids as item IDs
             'content_ids': ['sku_blue_tshirt_m', 'sku_black_jeans_32'],
             'contents': [
               {'id': 'sku_blue_tshirt_m', 'quantity': 1, 'item_price': 799},
@@ -241,23 +240,20 @@ Use this when your app learns about a payment only after it succeeds. `status` i
 
     export async function onPurchaseSucceeded(orderId, userId) {
       try {
-        await linkrunner.trackPayment({
-          eventName: "purchase", // becomes the payment type in reports and mappings
+        await linkrunner.trackEvent("purchase", { // becomes the payment type in reports and mappings
           paymentId: orderId, // your order ID, used to deduplicate
-          userId, // required, links the payment to your user
+          userId: userId, // required, links the payment to your user
           amount: 2298, // order total the user paid
           currency: "INR", // required, 3-letter ISO 4217 code
           // Product details: Meta receives these fields, Google receives content_ids as item IDs
-          eventData: {
-            content_ids: ["sku_blue_tshirt_m", "sku_black_jeans_32"],
-            contents: [
-              { id: "sku_blue_tshirt_m", quantity: 1, item_price: 799 },
-              { id: "sku_black_jeans_32", quantity: 1, item_price: 1499 },
-            ],
-            content_type: "product",
-            num_items: 2,
-            order_id: orderId,
-          },
+          content_ids: ["sku_blue_tshirt_m", "sku_black_jeans_32"],
+          contents: [
+            { id: "sku_blue_tshirt_m", quantity: 1, item_price: 799 },
+            { id: "sku_black_jeans_32", quantity: 1, item_price: 1499 },
+          ],
+          content_type: "product",
+          num_items: 2,
+          order_id: orderId,
         });
       } catch (error) {
         console.error("Payment not tracked:", error);
@@ -271,14 +267,14 @@ Use this when your app learns about a payment only after it succeeds. `status` i
 
     export async function onPurchaseSucceeded(orderId: string, userId: string) {
         try {
-            await linkrunner.trackPayment({
+            await linkrunner.trackEvent({
                 eventName: "purchase", // becomes the payment type in reports and mappings
-                paymentId: orderId, // your order ID, used to deduplicate
-                userId, // required, links the payment to your user
-                amount: 2298, // order total the user paid
-                currency: "INR", // required, 3-letter ISO 4217 code
-                // Product details: Meta receives these fields, Google receives content_ids as item IDs
                 eventData: {
+                    paymentId: orderId, // your order ID, used to deduplicate
+                    userId: userId, // required, links the payment to your user
+                    amount: 2298, // order total the user paid
+                    currency: "INR", // required, 3-letter ISO 4217 code
+                    // Product details: Meta receives these fields, Google receives content_ids as item IDs
                     content_ids: ["sku_blue_tshirt_m", "sku_black_jeans_32"],
                     contents: [
                         { id: "sku_blue_tshirt_m", quantity: 1, item_price: 799 },
@@ -300,23 +296,20 @@ Use this when your app learns about a payment only after it succeeds. `status` i
 
     ```javascript
     function onPurchaseSucceeded(orderId, userId) {
-        return linkrunner.trackPayment({
-            eventName: "purchase", // becomes the payment type in reports and mappings
+        return linkrunner.trackEvent("purchase", { // becomes the payment type in reports and mappings
             paymentId: orderId, // your order ID, used to deduplicate
             userId: userId, // required, links the payment to your user
             amount: 2298, // order total the user paid
             currency: "INR", // required, 3-letter ISO 4217 code
             // Product details: Meta receives these fields, Google receives content_ids as item IDs
-            eventData: {
-                content_ids: ["sku_blue_tshirt_m", "sku_black_jeans_32"],
-                contents: [
-                    { id: "sku_blue_tshirt_m", quantity: 1, item_price: 799 },
-                    { id: "sku_black_jeans_32", quantity: 1, item_price: 1499 }
-                ],
-                content_type: "product",
-                num_items: 2,
-                order_id: orderId
-            }
+            content_ids: ["sku_blue_tshirt_m", "sku_black_jeans_32"],
+            contents: [
+                { id: "sku_blue_tshirt_m", quantity: 1, item_price: 799 },
+                { id: "sku_black_jeans_32", quantity: 1, item_price: 1499 }
+            ],
+            content_type: "product",
+            num_items: 2,
+            order_id: orderId
         }).catch(function (error) {
             console.error("Payment not tracked:", error);
         });
@@ -333,21 +326,18 @@ Use this when your app learns about a payment only after it succeeds. `status` i
     {
         public void OnPurchaseSucceeded(string orderId, string userId)
         {
-            // Product details: Meta receives these fields, Google receives content_ids as item IDs
+            // Payment keys, then product details: Meta receives these fields, Google receives content_ids as item IDs
             string eventDataJson =
-                "{\"content_ids\":[\"sku_blue_tshirt_m\",\"sku_black_jeans_32\"]," +
+                "{\"amount\":2298.0," + // order total the user paid
+                "\"paymentId\":\"" + orderId + "\"," + // your order ID, used to deduplicate
+                "\"currency\":\"INR\"," + // required, 3-letter ISO 4217 code
+                "\"userId\":\"" + userId + "\"," + // required, links the payment to your user
+                "\"content_ids\":[\"sku_blue_tshirt_m\",\"sku_black_jeans_32\"]," +
                 "\"contents\":[{\"id\":\"sku_blue_tshirt_m\",\"quantity\":1,\"item_price\":799}," +
                 "{\"id\":\"sku_black_jeans_32\",\"quantity\":1,\"item_price\":1499}]," +
                 "\"content_type\":\"product\",\"num_items\":2,\"order_id\":\"" + orderId + "\"}";
 
-            LinkrunnerSDK.TrackPayment(
-                eventName: "purchase", // becomes the payment type in reports and mappings
-                paymentId: orderId, // your order ID, used to deduplicate
-                userId: userId, // required, links the payment to your user
-                amount: 2298.0, // order total the user paid
-                currency: "INR", // required, 3-letter ISO 4217 code
-                eventDataJson: eventDataJson
-            );
+            LinkrunnerSDK.TrackEvent("purchase", eventDataJson); // becomes the payment type in reports and mappings
         }
     }
     ```
@@ -371,15 +361,15 @@ Use this when you want to see started, failed, and cancelled payments next to co
 
     fun trackCheckout(orderId: String, userId: String, status: PaymentStatus) {
         CoroutineScope(Dispatchers.IO).launch {
-            LinkRunner.getInstance().trackPayment(
+            LinkRunner.getInstance().trackEvent(
                 eventName = "purchase", // same name for every status of this payment
-                paymentId = orderId, // same ID for every status of this payment
-                userId = userId, // required, links the payment to your user
-                amount = 499.0, // order total the user pays
-                currency = "INR", // required, 3-letter ISO 4217 code
-                status = status, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
-                // Product details: Meta receives these fields, Google receives content_ids as item IDs
                 eventData = mapOf(
+                    "paymentId" to orderId, // same ID for every status of this payment
+                    "userId" to userId, // required, links the payment to your user
+                    "amount" to 499.0, // order total the user pays
+                    "currency" to "INR", // required, 3-letter ISO 4217 code
+                    "status" to status.name, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
+                    // Product details: Meta receives these fields, Google receives content_ids as item IDs
                     "content_ids" to listOf("sku_blue_tshirt_m"),
                     "contents" to listOf(mapOf("id" to "sku_blue_tshirt_m", "quantity" to 1, "item_price" to 499)),
                     "content_type" to "product",
@@ -416,15 +406,15 @@ Use this when you want to see started, failed, and cancelled payments next to co
     enum CheckoutResult { case succeeded, failed, cancelled }
 
     func trackCheckout(orderId: String, userId: String, status: PaymentStatus) async {
-        await LinkrunnerSDK.shared.trackPayment(
+        await LinkrunnerSDK.shared.trackEvent(
             eventName: "purchase", // same name for every status of this payment
-            paymentId: orderId, // same ID for every status of this payment
-            userId: userId, // required, links the payment to your user
-            amount: 499.0, // order total the user pays
-            currency: "INR", // required, 3-letter ISO 4217 code
-            status: status, // only .completed counts as revenue and goes to ad networks
-            // Product details: Meta receives these fields, Google receives content_ids as item IDs
             eventData: [
+                "paymentId": orderId, // same ID for every status of this payment
+                "userId": userId, // required, links the payment to your user
+                "amount": 499.0, // order total the user pays
+                "currency": "INR", // required, 3-letter ISO 4217 code
+                "status": status.rawValue, // only .completed counts as revenue and goes to ad networks
+                // Product details: Meta receives these fields, Google receives content_ids as item IDs
                 "content_ids": ["sku_blue_tshirt_m"],
                 "contents": [["id": "sku_blue_tshirt_m", "quantity": 1, "item_price": 499]],
                 "content_type": "product",
@@ -457,21 +447,18 @@ Use this when you want to see started, failed, and cancelled payments next to co
 
     async function trackCheckout(orderId, userId, status) {
       try {
-        await linkrunner.trackPayment({
-          eventName: "purchase", // same name for every status of this payment
+        await linkrunner.trackEvent("purchase", { // same name for every status of this payment
           paymentId: orderId, // same ID for every status of this payment
-          userId, // required, links the payment to your user
+          userId: userId, // required, links the payment to your user
           amount: 499, // order total the user pays
           currency: "INR", // required, 3-letter ISO 4217 code
-          status, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
+          status: status, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
           // Product details: Meta receives these fields, Google receives content_ids as item IDs
-          eventData: {
-            content_ids: ["sku_blue_tshirt_m"],
-            contents: [{ id: "sku_blue_tshirt_m", quantity: 1, item_price: 499 }],
-            content_type: "product",
-            num_items: 1,
-            order_id: orderId,
-          },
+          content_ids: ["sku_blue_tshirt_m"],
+          contents: [{ id: "sku_blue_tshirt_m", quantity: 1, item_price: 499 }],
+          content_type: "product",
+          num_items: 1,
+          order_id: orderId,
         });
       } catch (error) {
         console.error("Payment not tracked:", error);
@@ -503,15 +490,15 @@ Use this when you want to see started, failed, and cancelled payments next to co
 
     Future<void> trackCheckout(String orderId, String userId, PaymentStatus status) async {
       try {
-        await LinkRunner().trackPayment(
+        await LinkRunner().trackEvent(
           eventName: 'purchase', // same name for every status of this payment
-          paymentId: orderId, // same ID for every status of this payment
-          userId: userId, // required, links the payment to your user
-          amount: 499.0, // order total the user pays
-          currency: 'INR', // required, 3-letter ISO 4217 code
-          status: status, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
-          // Product details: Meta receives these fields, Google receives content_ids as item IDs
           eventData: {
+            'paymentId': orderId, // same ID for every status of this payment
+            'userId': userId, // required, links the payment to your user
+            'amount': 499.0, // order total the user pays
+            'currency': 'INR', // required, 3-letter ISO 4217 code
+            'status': status.name, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
+            // Product details: Meta receives these fields, Google receives content_ids as item IDs
             'content_ids': ['sku_blue_tshirt_m'],
             'contents': [
               {'id': 'sku_blue_tshirt_m', 'quantity': 1, 'item_price': 499},
@@ -547,21 +534,18 @@ Use this when you want to see started, failed, and cancelled payments next to co
 
     async function trackCheckout(orderId, userId, status) {
       try {
-        await linkrunner.trackPayment({
-          eventName: "purchase", // same name for every status of this payment
+        await linkrunner.trackEvent("purchase", { // same name for every status of this payment
           paymentId: orderId, // same ID for every status of this payment
-          userId, // required, links the payment to your user
+          userId: userId, // required, links the payment to your user
           amount: 499, // order total the user pays
           currency: "INR", // required, 3-letter ISO 4217 code
-          status, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
+          status: status, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
           // Product details: Meta receives these fields, Google receives content_ids as item IDs
-          eventData: {
-            content_ids: ["sku_blue_tshirt_m"],
-            contents: [{ id: "sku_blue_tshirt_m", quantity: 1, item_price: 499 }],
-            content_type: "product",
-            num_items: 1,
-            order_id: orderId,
-          },
+          content_ids: ["sku_blue_tshirt_m"],
+          contents: [{ id: "sku_blue_tshirt_m", quantity: 1, item_price: 499 }],
+          content_type: "product",
+          num_items: 1,
+          order_id: orderId,
         });
       } catch (error) {
         console.error("Payment not tracked:", error);
@@ -593,15 +577,15 @@ Use this when you want to see started, failed, and cancelled payments next to co
 
     async function trackCheckout(orderId: string, userId: string, status: PaymentStatus) {
         try {
-            await linkrunner.trackPayment({
+            await linkrunner.trackEvent({
                 eventName: "purchase", // same name for every status of this payment
-                paymentId: orderId, // same ID for every status of this payment
-                userId, // required, links the payment to your user
-                amount: 499, // order total the user pays
-                currency: "INR", // required, 3-letter ISO 4217 code
-                status, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
-                // Product details: Meta receives these fields, Google receives content_ids as item IDs
                 eventData: {
+                    paymentId: orderId, // same ID for every status of this payment
+                    userId: userId, // required, links the payment to your user
+                    amount: 499, // order total the user pays
+                    currency: "INR", // required, 3-letter ISO 4217 code
+                    status: status, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
+                    // Product details: Meta receives these fields, Google receives content_ids as item IDs
                     content_ids: ["sku_blue_tshirt_m"],
                     contents: [{ id: "sku_blue_tshirt_m", quantity: 1, item_price: 499 }],
                     content_type: "product",
@@ -630,21 +614,18 @@ Use this when you want to see started, failed, and cancelled payments next to co
   <Tab title="Cordova">
     ```javascript
     function trackCheckout(orderId, userId, status) {
-        return linkrunner.trackPayment({
-            eventName: "purchase", // same name for every status of this payment
+        return linkrunner.trackEvent("purchase", { // same name for every status of this payment
             paymentId: orderId, // same ID for every status of this payment
             userId: userId, // required, links the payment to your user
             amount: 499, // order total the user pays
             currency: "INR", // required, 3-letter ISO 4217 code
             status: status, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
             // Product details: Meta receives these fields, Google receives content_ids as item IDs
-            eventData: {
-                content_ids: ["sku_blue_tshirt_m"],
-                contents: [{ id: "sku_blue_tshirt_m", quantity: 1, item_price: 499 }],
-                content_type: "product",
-                num_items: 1,
-                order_id: orderId
-            }
+            content_ids: ["sku_blue_tshirt_m"],
+            contents: [{ id: "sku_blue_tshirt_m", quantity: 1, item_price: 499 }],
+            content_type: "product",
+            num_items: 1,
+            order_id: orderId
         }).catch(function (error) {
             console.error("Payment not tracked:", error);
         });
@@ -674,37 +655,34 @@ Use this when you want to see started, failed, and cancelled payments next to co
 
     public class Checkout : MonoBehaviour
     {
-        void TrackCheckout(string orderId, string userId, PaymentStatus status)
+        void TrackCheckout(string orderId, string userId, string status)
         {
-            // Product details: Meta receives these fields, Google receives content_ids as item IDs
+            // Payment keys, then product details: Meta receives these fields, Google receives content_ids as item IDs
             string eventDataJson =
-                "{\"content_ids\":[\"sku_blue_tshirt_m\"]," +
+                "{\"amount\":499.0," + // order total the user pays
+                "\"paymentId\":\"" + orderId + "\"," + // same ID for every status of this payment
+                "\"currency\":\"INR\"," + // required, 3-letter ISO 4217 code
+                "\"userId\":\"" + userId + "\"," + // required, links the payment to your user
+                "\"status\":\"" + status + "\"," + // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
+                "\"content_ids\":[\"sku_blue_tshirt_m\"]," +
                 "\"contents\":[{\"id\":\"sku_blue_tshirt_m\",\"quantity\":1,\"item_price\":499}]," +
                 "\"content_type\":\"product\",\"num_items\":1,\"order_id\":\"" + orderId + "\"}";
 
-            LinkrunnerSDK.TrackPayment(
-                eventName: "purchase", // same name for every status of this payment
-                paymentId: orderId, // same ID for every status of this payment
-                userId: userId, // required, links the payment to your user
-                amount: 499.0, // order total the user pays
-                currency: "INR", // required, 3-letter ISO 4217 code
-                status: status, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
-                eventDataJson: eventDataJson
-            );
+            LinkrunnerSDK.TrackEvent("purchase", eventDataJson); // same name for every status of this payment
         }
 
         // When the user taps Pay
         public void OnCheckoutStarted(string orderId, string userId) =>
-            TrackCheckout(orderId, userId, PaymentStatus.PAYMENT_INITIATED);
+            TrackCheckout(orderId, userId, "PAYMENT_INITIATED");
 
         // When your payment provider returns a result
         public void OnCheckoutFinished(string orderId, string userId, CheckoutResult result)
         {
-            PaymentStatus status = result switch
+            string status = result switch
             {
-                CheckoutResult.Succeeded => PaymentStatus.PAYMENT_COMPLETED,
-                CheckoutResult.Failed => PaymentStatus.PAYMENT_FAILED,
-                _ => PaymentStatus.PAYMENT_CANCELLED,
+                CheckoutResult.Succeeded => "PAYMENT_COMPLETED",
+                CheckoutResult.Failed => "PAYMENT_FAILED",
+                _ => "PAYMENT_CANCELLED",
             };
             TrackCheckout(orderId, userId, status);
         }
@@ -727,14 +705,14 @@ Use this when you already have mappings or affiliate templates for an old paymen
 
     fun onSubscriptionRenewed(transactionId: String, userId: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            LinkRunner.getInstance().trackPayment(
+            LinkRunner.getInstance().trackEvent(
                 eventName = "SUBSCRIPTION_RENEWED", // old type name, keeps your existing mappings
-                paymentId = transactionId, // a new ID for every renewal, used to deduplicate
-                userId = userId, // required, links the payment to your user
-                amount = 4.99, // total the user paid for this renewal
-                currency = "USD", // required, 3-letter ISO 4217 code
-                // Product details: Meta receives these fields, Google receives content_ids as item IDs
                 eventData = mapOf(
+                    "paymentId" to transactionId, // a new ID for every renewal, used to deduplicate
+                    "userId" to userId, // required, links the payment to your user
+                    "amount" to 4.99, // total the user paid for this renewal
+                    "currency" to "USD", // required, 3-letter ISO 4217 code
+                    // Product details: Meta receives these fields, Google receives content_ids as item IDs
                     "content_ids" to listOf("pro_monthly"),
                     "contents" to listOf(mapOf("id" to "pro_monthly", "quantity" to 1, "item_price" to 4.99)),
                     "content_type" to "product",
@@ -753,14 +731,14 @@ Use this when you already have mappings or affiliate templates for an old paymen
     import LinkrunnerKit
 
     func onSubscriptionRenewed(transactionId: String, userId: String) async {
-        await LinkrunnerSDK.shared.trackPayment(
+        await LinkrunnerSDK.shared.trackEvent(
             eventName: "SUBSCRIPTION_RENEWED", // old type name, keeps your existing mappings
-            paymentId: transactionId, // a new ID for every renewal, used to deduplicate
-            userId: userId, // required, links the payment to your user
-            amount: 4.99, // total the user paid for this renewal
-            currency: "USD", // required, 3-letter ISO 4217 code
-            // Product details: Meta receives these fields, Google receives content_ids as item IDs
             eventData: [
+                "paymentId": transactionId, // a new ID for every renewal, used to deduplicate
+                "userId": userId, // required, links the payment to your user
+                "amount": 4.99, // total the user paid for this renewal
+                "currency": "USD", // required, 3-letter ISO 4217 code
+                // Product details: Meta receives these fields, Google receives content_ids as item IDs
                 "content_ids": ["pro_monthly"],
                 "contents": [["id": "pro_monthly", "quantity": 1, "item_price": 4.99]],
                 "content_type": "product",
@@ -777,20 +755,17 @@ Use this when you already have mappings or affiliate templates for an old paymen
 
     export async function onSubscriptionRenewed(transactionId, userId) {
       try {
-        await linkrunner.trackPayment({
-          eventName: "SUBSCRIPTION_RENEWED", // old type name, keeps your existing mappings
+        await linkrunner.trackEvent("SUBSCRIPTION_RENEWED", { // old type name, keeps your existing mappings
           paymentId: transactionId, // a new ID for every renewal, used to deduplicate
-          userId, // required, links the payment to your user
+          userId: userId, // required, links the payment to your user
           amount: 4.99, // total the user paid for this renewal
           currency: "USD", // required, 3-letter ISO 4217 code
           // Product details: Meta receives these fields, Google receives content_ids as item IDs
-          eventData: {
-            content_ids: ["pro_monthly"],
-            contents: [{ id: "pro_monthly", quantity: 1, item_price: 4.99 }],
-            content_type: "product",
-            num_items: 1,
-            order_id: transactionId,
-          },
+          content_ids: ["pro_monthly"],
+          contents: [{ id: "pro_monthly", quantity: 1, item_price: 4.99 }],
+          content_type: "product",
+          num_items: 1,
+          order_id: transactionId,
         });
       } catch (error) {
         console.error("Payment not tracked:", error);
@@ -804,14 +779,14 @@ Use this when you already have mappings or affiliate templates for an old paymen
 
     Future<void> onSubscriptionRenewed(String transactionId, String userId) async {
       try {
-        await LinkRunner().trackPayment(
+        await LinkRunner().trackEvent(
           eventName: 'SUBSCRIPTION_RENEWED', // old type name, keeps your existing mappings
-          paymentId: transactionId, // a new ID for every renewal, used to deduplicate
-          userId: userId, // required, links the payment to your user
-          amount: 4.99, // total the user paid for this renewal
-          currency: 'USD', // required, 3-letter ISO 4217 code
-          // Product details: Meta receives these fields, Google receives content_ids as item IDs
           eventData: {
+            'paymentId': transactionId, // a new ID for every renewal, used to deduplicate
+            'userId': userId, // required, links the payment to your user
+            'amount': 4.99, // total the user paid for this renewal
+            'currency': 'USD', // required, 3-letter ISO 4217 code
+            // Product details: Meta receives these fields, Google receives content_ids as item IDs
             'content_ids': ['pro_monthly'],
             'contents': [
               {'id': 'pro_monthly', 'quantity': 1, 'item_price': 4.99},
@@ -835,20 +810,17 @@ Use this when you already have mappings or affiliate templates for an old paymen
 
     export async function onSubscriptionRenewed(transactionId, userId) {
       try {
-        await linkrunner.trackPayment({
-          eventName: "SUBSCRIPTION_RENEWED", // old type name, keeps your existing mappings
+        await linkrunner.trackEvent("SUBSCRIPTION_RENEWED", { // old type name, keeps your existing mappings
           paymentId: transactionId, // a new ID for every renewal, used to deduplicate
-          userId, // required, links the payment to your user
+          userId: userId, // required, links the payment to your user
           amount: 4.99, // total the user paid for this renewal
           currency: "USD", // required, 3-letter ISO 4217 code
           // Product details: Meta receives these fields, Google receives content_ids as item IDs
-          eventData: {
-            content_ids: ["pro_monthly"],
-            contents: [{ id: "pro_monthly", quantity: 1, item_price: 4.99 }],
-            content_type: "product",
-            num_items: 1,
-            order_id: transactionId,
-          },
+          content_ids: ["pro_monthly"],
+          contents: [{ id: "pro_monthly", quantity: 1, item_price: 4.99 }],
+          content_type: "product",
+          num_items: 1,
+          order_id: transactionId,
         });
       } catch (error) {
         console.error("Payment not tracked:", error);
@@ -862,14 +834,14 @@ Use this when you already have mappings or affiliate templates for an old paymen
 
     export async function onSubscriptionRenewed(transactionId: string, userId: string) {
         try {
-            await linkrunner.trackPayment({
+            await linkrunner.trackEvent({
                 eventName: "SUBSCRIPTION_RENEWED", // old type name, keeps your existing mappings
-                paymentId: transactionId, // a new ID for every renewal, used to deduplicate
-                userId, // required, links the payment to your user
-                amount: 4.99, // total the user paid for this renewal
-                currency: "USD", // required, 3-letter ISO 4217 code
-                // Product details: Meta receives these fields, Google receives content_ids as item IDs
                 eventData: {
+                    paymentId: transactionId, // a new ID for every renewal, used to deduplicate
+                    userId: userId, // required, links the payment to your user
+                    amount: 4.99, // total the user paid for this renewal
+                    currency: "USD", // required, 3-letter ISO 4217 code
+                    // Product details: Meta receives these fields, Google receives content_ids as item IDs
                     content_ids: ["pro_monthly"],
                     contents: [{ id: "pro_monthly", quantity: 1, item_price: 4.99 }],
                     content_type: "product",
@@ -886,20 +858,17 @@ Use this when you already have mappings or affiliate templates for an old paymen
   <Tab title="Cordova">
     ```javascript
     function onSubscriptionRenewed(transactionId, userId) {
-        return linkrunner.trackPayment({
-            eventName: "SUBSCRIPTION_RENEWED", // old type name, keeps your existing mappings
+        return linkrunner.trackEvent("SUBSCRIPTION_RENEWED", { // old type name, keeps your existing mappings
             paymentId: transactionId, // a new ID for every renewal, used to deduplicate
             userId: userId, // required, links the payment to your user
             amount: 4.99, // total the user paid for this renewal
             currency: "USD", // required, 3-letter ISO 4217 code
             // Product details: Meta receives these fields, Google receives content_ids as item IDs
-            eventData: {
-                content_ids: ["pro_monthly"],
-                contents: [{ id: "pro_monthly", quantity: 1, item_price: 4.99 }],
-                content_type: "product",
-                num_items: 1,
-                order_id: transactionId
-            }
+            content_ids: ["pro_monthly"],
+            contents: [{ id: "pro_monthly", quantity: 1, item_price: 4.99 }],
+            content_type: "product",
+            num_items: 1,
+            order_id: transactionId
         }).catch(function (error) {
             console.error("Payment not tracked:", error);
         });
@@ -914,20 +883,17 @@ Use this when you already have mappings or affiliate templates for an old paymen
     {
         public void OnSubscriptionRenewed(string transactionId, string userId)
         {
-            // Product details: Meta receives these fields, Google receives content_ids as item IDs
+            // Payment keys, then product details: Meta receives these fields, Google receives content_ids as item IDs
             string eventDataJson =
-                "{\"content_ids\":[\"pro_monthly\"]," +
+                "{\"amount\":4.99," + // total the user paid for this renewal
+                "\"paymentId\":\"" + transactionId + "\"," + // a new ID for every renewal, used to deduplicate
+                "\"currency\":\"USD\"," + // required, 3-letter ISO 4217 code
+                "\"userId\":\"" + userId + "\"," + // required, links the payment to your user
+                "\"content_ids\":[\"pro_monthly\"]," +
                 "\"contents\":[{\"id\":\"pro_monthly\",\"quantity\":1,\"item_price\":4.99}]," +
                 "\"content_type\":\"product\",\"num_items\":1,\"order_id\":\"" + transactionId + "\"}";
 
-            LinkrunnerSDK.TrackPayment(
-                eventName: "SUBSCRIPTION_RENEWED", // old type name, keeps your existing mappings
-                paymentId: transactionId, // a new ID for every renewal, used to deduplicate
-                userId: userId, // required, links the payment to your user
-                amount: 4.99, // total the user paid for this renewal
-                currency: "USD", // required, 3-letter ISO 4217 code
-                eventDataJson: eventDataJson
-            );
+            LinkrunnerSDK.TrackEvent("SUBSCRIPTION_RENEWED", eventDataJson); // old type name, keeps your existing mappings
         }
     }
     ```
@@ -936,15 +902,15 @@ Use this when you already have mappings or affiliate templates for an old paymen
 
 ### Handle invalid payments
 
-The SDK validates every payment before sending it. A blank `eventName` or `paymentId`, a negative or non-finite `amount`, or a `currency` that is not a 3-letter code stops the payment on the device, and nothing reaches Linkrunner. How your code finds out depends on the SDK:
+The SDK validates every payment before sending it. A `paymentId` sent without `amount` or `currency`, a blank `eventName` or `paymentId`, a negative or non-finite `amount`, a `currency` that is not a 3-letter code, or an unknown `status` stops the payment on the device, and nothing reaches Linkrunner. An `amount` or `currency` without `paymentId` is not an error: the event is sent as a normal custom event. How your code finds out depends on the SDK:
 
 | Platform | What happens on an invalid payment |
 | --- | --- |
-| Android (Kotlin) | `trackPayment` returns a failed `Result` holding an `IllegalArgumentException`. It does not throw. Use `onFailure`. |
-| Android (Java) | `LinkrunnerJava.getInstance().trackPayment(...)` calls `onError` on the `LinkRunnerCallback` you pass. |
-| iOS | `trackPayment` does not throw. The payment is dropped, and debug builds print the reason to the console. |
-| React Native and Expo | `trackPayment` throws. Wrap it in `try`/`catch`. |
-| Flutter | `trackPayment` throws `ArgumentError`. |
+| Android (Kotlin) | `trackEvent` returns a failed `Result` holding an `IllegalArgumentException`. It does not throw. Use `onFailure`. |
+| Android (Java) | `LinkrunnerJava.getInstance().trackEvent(...)` calls `onError` on the `LinkRunnerCallback` you pass. |
+| iOS | `trackEvent` does not throw. The payment is dropped, and debug builds print the reason to the console. |
+| React Native and Expo | `trackEvent` throws. Wrap it in `try`/`catch`. |
+| Flutter | `trackEvent` throws `ArgumentError`. |
 | Capacitor | The returned promise rejects. |
 | Cordova | The returned promise rejects. |
 | Unity | The native SDK rejects the payment, and `LinkrunnerSDK.OnEventTracked` reports `false` with the error. |
@@ -964,7 +930,7 @@ The value and currency are sent only when **Send Revenue** is turned on for that
 
 What the networks receive:
 
-- **Value and currency** come from the top-level `amount` and `currency`. Send the order total as `amount`. Linkrunner does not add up item prices, and an `amount` inside `eventData` is not sent as revenue. On iOS, an `amount` inside `eventData` still counts toward SKAN conversion values.
+- **Value and currency** come from the payment `amount` and `currency`. Send the order total as `amount`. Linkrunner does not add up item prices. An `amount` without `paymentId` and `currency` is ordinary event data and is not sent as revenue. On iOS, it still counts toward SKAN conversion values.
 - **Meta** receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id` from `eventData`. See [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager).
 - **Google** receives `content_ids` from `eventData` as item IDs. See [Google Commerce Manager](/ecommerce-manager/google-commerce-manager).
 
@@ -1000,7 +966,7 @@ Linkrunner keeps one payment per `paymentId`, event name, and status. Use this t
     Check that the status is `PAYMENT_COMPLETED` and that the event name has a mapping for that network with the exact same name. If the install was attributed only after the payment arrived, the payment is sent once attribution completes.
   </Accordion>
   <Accordion title="The ad network gets the conversion without a value">
-    Turn on **Send Revenue** for that event's mapping, and send the total as the top-level `amount`, not inside `eventData`.
+    Turn on **Send Revenue** for that event's mapping, and send the order total as `amount` together with `paymentId` and `currency`.
   </Accordion>
   <Accordion title="Revenue looks wrong">
     Open the payment in the Events Log and compare **Amount** and **Currency** with what you meant to send. A wrong `currency` code, or an amount in the wrong unit, such as cents instead of dollars, makes the revenue wrong in reports and on ad networks.
@@ -1017,7 +983,7 @@ Linkrunner keeps one payment per `paymentId`, event name, and status. Use this t
 
 <AccordionGroup>
   <Accordion title="Can I refund or remove a payment?">
-    No. Removing or reversing a payment is not supported. `removePayment` was removed in the SDK versions above and has no replacement.
+    `removePayment` was removed in the SDK versions above. To record a refund or a cancellation, send the same event name and `paymentId` again with `status` set to `PAYMENT_CANCELLED`. That payment no longer counts as revenue.
   </Accordion>
   <Accordion title="I am on an older SDK that has capturePayment">
     `capturePayment` keeps working on the older versions. When you upgrade, follow [Migrate payments to in-app events](/sdk/migrate-to-track-event).
@@ -1025,8 +991,8 @@ Linkrunner keeps one payment per `paymentId`, event name, and status. Use this t
   <Accordion title="Can I send payments from my backend?">
     Yes. Send them to `POST /api/v1/capture-event` with `amount`, `payment_id`, and `currency`. The same naming, status, and deduplication rules apply. See the [Revenue Tracking API](/api-reference/revenue-tracking).
   </Accordion>
-  <Accordion title="Can I attach a payment to trackEvent instead?">
-    Yes. Pass a payment object to `trackEvent` with the same fields. It records the same payment as `trackPayment`. Each SDK guide shows it under **Tracking Payments**.
+  <Accordion title="Is there a separate payment method?">
+    No. `trackEvent` is the only method. Add `amount`, `paymentId`, `currency`, and `userId` to `eventData` and the event is a payment. Leave them out and it is a custom event.
   </Accordion>
 </AccordionGroup>
 

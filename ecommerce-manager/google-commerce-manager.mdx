@@ -169,7 +169,7 @@ await linkrunner.trackEvent(
 
 ### ecommerce_purchase
 
-Fired when a user completes a purchase. Send it as a payment: pass `amount`, `paymentId`, `currency`, and `userId` with the event so Linkrunner records the revenue.
+Fired when a user completes a purchase. Send it as a payment: put `amount`, `paymentId`, `currency`, and `userId` in the event data so Linkrunner records the revenue.
 
 <CodeGroup>
 
@@ -177,18 +177,13 @@ Fired when a user completes a purchase. Send it as a payment: pass `amount`, `pa
 await linkrunner.trackEvent(
   "purchase_completed", // Map this event to "ecommerce_purchase" in the Linkrunner Dashboard
   {
-    content_ids: ["sku_blue_tshirt", "sku_red_shoes"], // Must match Merchant Center ID (offer_id)
-    value: 2298,               // Required
+    amount: 2298.0,            // Required: order total, sent as the value
+    paymentId: "order_98765",  // Required for a payment
     currency: "INR",           // Required
+    userId: "user_456",        // Required for a payment
+    content_ids: ["sku_blue_tshirt", "sku_red_shoes"], // Must match Merchant Center ID (offer_id)
     num_items: 2,              // Required
     order_id: "order_98765",   // Required for purchase events
-  },
-  undefined, // eventId
-  {
-    amount: 2298.0,
-    paymentId: "order_98765",
-    currency: "INR",
-    userId: "user_456",
   },
 );
 ```
