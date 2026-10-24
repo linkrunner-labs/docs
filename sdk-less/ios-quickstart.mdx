@@ -273,7 +273,20 @@ final class LinkrunnerClient {
             ]
         ]
         if let idfv = device.identifierForVendor?.uuidString { d["idfv"] = idfv }
+        if let model = deviceModelIdentifier() { d["device_model"] = model }
         return d
+    }
+
+    private func deviceModelIdentifier() -> String? {
+        if let sim = ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"], !sim.isEmpty {
+            return sim
+        }
+        var systemInfo = utsname()
+        guard uname(&systemInfo) == 0 else { return nil }
+        let id = withUnsafeBytes(of: &systemInfo.machine) { raw in
+            String(bytes: raw.prefix { $0 != 0 }, encoding: .utf8)
+        }
+        return (id?.isEmpty ?? true) ? nil : id
     }
 
     private func idfa() -> String? {
