@@ -224,21 +224,18 @@ The old `capturePayment` call, then the same payment with `trackEvent`. The prod
 
     ```typescript
     // Payment: same trackEvent, payment fields in eventData
-    await linkrunner.trackEvent({
-        eventName: "FIRST_PAYMENT", // was type, same spelling
-        eventData: {
-            amount: 1200,
-            paymentId: "bk_10231",
-            currency: "INR", // new, required
-            userId: "playo_u_8842",
-            status: "PAYMENT_COMPLETED", // optional, the default
-            // product details for Meta and Google
-            content_ids: ["court_c2_1800"],
-            contents: [{ id: "court_c2_1800", quantity: 1, item_price: 1200 }],
-            content_type: "product",
-            num_items: 1,
-            order_id: "bk_10231",
-        },
+    await linkrunner.trackEvent("FIRST_PAYMENT", { // was type, same spelling
+        amount: 1200,
+        paymentId: "bk_10231",
+        currency: "INR", // new, required
+        userId: "playo_u_8842",
+        status: "PAYMENT_COMPLETED", // optional, the default
+        // product details for Meta and Google
+        content_ids: ["court_c2_1800"],
+        contents: [{ id: "court_c2_1800", quantity: 1, item_price: 1200 }],
+        content_type: "product",
+        num_items: 1,
+        order_id: "bk_10231",
     });
     ```
 

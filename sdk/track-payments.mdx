@@ -267,23 +267,20 @@ Use this when your app learns about a payment only after it succeeds. `status` i
 
     export async function onPurchaseSucceeded(orderId: string, userId: string) {
         try {
-            await linkrunner.trackEvent({
-                eventName: "purchase", // becomes the payment type in reports and mappings
-                eventData: {
-                    paymentId: orderId, // your order ID, used to deduplicate
-                    userId: userId, // required, links the payment to your user
-                    amount: 2298, // order total the user paid
-                    currency: "INR", // required, 3-letter ISO 4217 code
-                    // Product details: Meta receives these fields, Google receives content_ids as item IDs
-                    content_ids: ["sku_blue_tshirt_m", "sku_black_jeans_32"],
-                    contents: [
-                        { id: "sku_blue_tshirt_m", quantity: 1, item_price: 799 },
-                        { id: "sku_black_jeans_32", quantity: 1, item_price: 1499 },
-                    ],
-                    content_type: "product",
-                    num_items: 2,
-                    order_id: orderId,
-                },
+            await linkrunner.trackEvent("purchase", { // becomes the payment type in reports and mappings
+                paymentId: orderId, // your order ID, used to deduplicate
+                userId: userId, // required, links the payment to your user
+                amount: 2298, // order total the user paid
+                currency: "INR", // required, 3-letter ISO 4217 code
+                // Product details: Meta receives these fields, Google receives content_ids as item IDs
+                content_ids: ["sku_blue_tshirt_m", "sku_black_jeans_32"],
+                contents: [
+                    { id: "sku_blue_tshirt_m", quantity: 1, item_price: 799 },
+                    { id: "sku_black_jeans_32", quantity: 1, item_price: 1499 },
+                ],
+                content_type: "product",
+                num_items: 2,
+                order_id: orderId,
             });
         } catch (error) {
             console.error("Payment not tracked:", error);
@@ -577,21 +574,18 @@ Use this when you want to see started, failed, and cancelled payments next to co
 
     async function trackCheckout(orderId: string, userId: string, status: PaymentStatus) {
         try {
-            await linkrunner.trackEvent({
-                eventName: "purchase", // same name for every status of this payment
-                eventData: {
-                    paymentId: orderId, // same ID for every status of this payment
-                    userId: userId, // required, links the payment to your user
-                    amount: 499, // order total the user pays
-                    currency: "INR", // required, 3-letter ISO 4217 code
-                    status: status, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
-                    // Product details: Meta receives these fields, Google receives content_ids as item IDs
-                    content_ids: ["sku_blue_tshirt_m"],
-                    contents: [{ id: "sku_blue_tshirt_m", quantity: 1, item_price: 499 }],
-                    content_type: "product",
-                    num_items: 1,
-                    order_id: orderId,
-                },
+            await linkrunner.trackEvent("purchase", { // same name for every status of this payment
+                paymentId: orderId, // same ID for every status of this payment
+                userId: userId, // required, links the payment to your user
+                amount: 499, // order total the user pays
+                currency: "INR", // required, 3-letter ISO 4217 code
+                status: status, // only PAYMENT_COMPLETED counts as revenue and goes to ad networks
+                // Product details: Meta receives these fields, Google receives content_ids as item IDs
+                content_ids: ["sku_blue_tshirt_m"],
+                contents: [{ id: "sku_blue_tshirt_m", quantity: 1, item_price: 499 }],
+                content_type: "product",
+                num_items: 1,
+                order_id: orderId,
             });
         } catch (error) {
             console.error("Payment not tracked:", error);
@@ -834,20 +828,17 @@ Use this when you already have mappings or affiliate templates for an old paymen
 
     export async function onSubscriptionRenewed(transactionId: string, userId: string) {
         try {
-            await linkrunner.trackEvent({
-                eventName: "SUBSCRIPTION_RENEWED", // old type name, keeps your existing mappings
-                eventData: {
-                    paymentId: transactionId, // a new ID for every renewal, used to deduplicate
-                    userId: userId, // required, links the payment to your user
-                    amount: 4.99, // total the user paid for this renewal
-                    currency: "USD", // required, 3-letter ISO 4217 code
-                    // Product details: Meta receives these fields, Google receives content_ids as item IDs
-                    content_ids: ["pro_monthly"],
-                    contents: [{ id: "pro_monthly", quantity: 1, item_price: 4.99 }],
-                    content_type: "product",
-                    num_items: 1,
-                    order_id: transactionId,
-                },
+            await linkrunner.trackEvent("SUBSCRIPTION_RENEWED", { // old type name, keeps your existing mappings
+                paymentId: transactionId, // a new ID for every renewal, used to deduplicate
+                userId: userId, // required, links the payment to your user
+                amount: 4.99, // total the user paid for this renewal
+                currency: "USD", // required, 3-letter ISO 4217 code
+                // Product details: Meta receives these fields, Google receives content_ids as item IDs
+                content_ids: ["pro_monthly"],
+                contents: [{ id: "pro_monthly", quantity: 1, item_price: 4.99 }],
+                content_type: "product",
+                num_items: 1,
+                order_id: transactionId,
             });
         } catch (error) {
             console.error("Payment not tracked:", error);
