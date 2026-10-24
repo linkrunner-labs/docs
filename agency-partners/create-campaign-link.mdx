@@ -102,9 +102,33 @@ The campaign is credited to your agency. It appears in your workspace, and the c
 2. Install the app from the link and open it.
 3. Check that the click and install appear under the campaign in **All Campaigns**.
 
+## Run both an agency and an affiliate account
+
+If you work with customers both as an agency and as an affiliate, each role has its own workspace. Links you make here are agency links and carry no click ID, unless you pick an affiliate network as the **Ad Channel**. Links for your own network's traffic must come from the **affiliate** workspace.
+
+To see which workspace you are in, look at the project picker at the top of the sidebar. When your login has more than one role, the picker button and each project row are tagged **Affiliate** or **Agency**. At the bottom of the picker, **Partner accounts** lists your accounts with the subtitle **Affiliate account** or **Agency account**.
+
+If one login has both, pick the project row with the tag you need. If they are on different logins, use the affiliate login for these links, or ask the affiliate account owner to invite you from **Settings → Members → Invite**. Open the link in the invitation email while signed in with the invited email.
+
+To add the other account to your login, see [Add an affiliate account](/agency-partners/add-affiliate-account) or [Add an agency account](/affiliate-partners/add-agency-account).
+
 ## Troubleshooting
 
 <AccordionGroup>
+  <Accordion
+    title="Create Link gives a link without parameters"
+    description="Agency links carry no click ID. Affiliate links come from your affiliate workspace."
+  >
+    A link like `https://app.example.com/?c=Campaign` with no `tid` is a normal agency link. It carries no click ID, so affiliate postbacks will not fire, unless you picked an affiliate network as the **Ad Channel**.
+
+    If you need links for your own network's traffic, switch to your **affiliate** workspace:
+
+    1. Open the project picker at the top of the sidebar and pick the project row tagged **Affiliate**. You can also pick **Affiliate account** under **Partner accounts**, then open the project.
+    2. Create the link again from **All Campaigns → Create Link**.
+
+    If you do not see an **Affiliate account** row, your affiliate account is under a different login. Ask the owner of that account to invite you from **Settings → Members → Invite**, then open the link in the invitation email while signed in with that email. The invite needs an approved affiliate account. See [Run both an agency and an affiliate account](#run-both-an-agency-and-an-affiliate-account).
+  </Accordion>
+
   <Accordion
     title="The Create Link button is missing"
     description="The customer has not let your agency create campaigns."
