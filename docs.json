@@ -191,6 +191,7 @@
                         "group": "Ad Networks",
                         "pages": [
                             "ad-networks/google-ads",
+                            "ad-networks/google-tv-campaigns",
                             "features/google-icm",
                             "ad-networks/meta-ads",
                             "ad-networks/tiktok",
