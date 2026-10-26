@@ -168,13 +168,15 @@ Appbrew's push module routes a tap from the notification's `data.link` without g
 
 ### Handling deep links yourself
 
-Links that reach the app through some other channel, such as an in-app banner, can be reported by hand. The result says whether Linkrunner recognised the link:
+Links that reach the app through some other channel, such as an in-app banner, can be reported by hand. The result says whether Linkrunner recognised the link. It is `undefined` when the tracker is not running, the url is empty, or the call fails:
 
 ```typescript
 import { handleDeeplink } from '@linkrunner/appbrew'
 
 const result = await handleDeeplink(url)
-// { deeplink?: string, isLinkrunner: boolean, processing?: boolean }
+if (result?.isLinkrunner) {
+  // result.deeplink is the link's destination
+}
 ```
 
 ### Extra user fields
