@@ -15,16 +15,6 @@ If you buy ads through a demand-side platform (DSP), you paste one Linkrunner im
 
 For Samsung Ads you can also paste a [click tag](#samsung-ads-click-tag). Linkrunner then records each click on the same campaign and matches installs to it by device ID, like any other click.
 
-Three DSPs are supported:
-
-| | Samsung Ads | The Trade Desk | Google DV360 |
-| --- | --- | --- | --- |
-| Counts impressions | Yes | Yes | Yes |
-| Matches installs by device ID | No | Yes, mobile in-app inventory | No |
-| Matches installs by household IP (CTV) | Yes, when Samsung fills in the IP | No | No |
-| Click tag | Yes, see [Samsung Ads click tag](#samsung-ads-click-tag) | No, no click macro is published | No, no click macro is published |
-| Tag URL | `/v1/ctv/impression` | `/v1/impression` | `/v1/impression` |
-
 <Warning>
   This integration brings in impressions, Samsung Ads clicks and, where possible, installs. It does not sync your spend from the DSP and does not send postbacks to the DSP.
 </Warning>
