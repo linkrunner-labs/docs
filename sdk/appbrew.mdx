@@ -4,7 +4,7 @@ description: "Add Linkrunner attribution to an Appbrew Shopify app with the @lin
 icon: "store"
 ---
 
-[Appbrew](https://appbrew.tech) builds Shopify mobile apps from config. `@linkrunner/appbrew` plugs Linkrunner into that system as an analytics tracker, so installs, events, revenue, identity, deep links and uninstalls are attributed without per-event code.
+[Appbrew](https://appbrew.tech) builds Shopify mobile apps from config. `@linkrunner/appbrew` plugs Linkrunner into that system as an analytics tracker, so installs, events, revenue, identity, deep links, push opens and uninstalls are attributed without per-event code.
 
 The package is an adapter over the [React Native SDK](/sdk/react-native). `rn-linkrunner` does the work; `@linkrunner/appbrew` translates Appbrew's events and lifecycle into SDK calls.
 
@@ -16,7 +16,7 @@ The package is an adapter over the [React Native SDK](/sdk/react-native). `rn-li
 ## Requirements
 
 - An Appbrew app built on the `@gauntlet/*` packages
-- `@linkrunner/appbrew` 0.2.0 or higher and `rn-linkrunner` 3.1.0 or higher
+- `@linkrunner/appbrew` 0.3.0 or higher and `rn-linkrunner` 3.4.1 or higher
 - iOS 15.0 or higher, Android minSdk 24
 - A Linkrunner project token from [Project Settings](https://dashboard.linkrunner.io/dashboard/settings/project-details)
 
@@ -62,6 +62,7 @@ The Appbrew team enters the settings per store. They reach the app as `config.in
 | `trackScreenViews` | `false` | Forward `screen_view` and `page_view`. Off because they are the highest-volume events. |
 | `deeplinkRouting` | `true` | Route the resolved deferred deep link into Appbrew's router. |
 | `uninstallTracking` | `true` | Register the push token for [uninstall tracking](/sdk/react-native#uninstall-tracking). |
+| `pushOpenAttribution` | `true` | Report push notification taps as re-engagements. See [Push notifications](#push-notifications). |
 | `enableRefunds` | `false` | Forward `refund` as `removePayment`. Verify order id mapping for your store first. |
 | `consentIsEEA`, `consentAdUserData`, `consentAdPersonalization` | unset | Google Ads consent, each `granted`, `denied` or `unknown`. Sent before `init`. See [Consent](#consent). |
 | `enableTCFConsentCollection` | `false` | Let the SDK read TCF consent from the device CMP on Android. |
@@ -107,6 +108,7 @@ Deep links need your Linkrunner domain in the iOS Associated Domains entitlement
 | `logout` | Identity reset to the device id |
 | Every other event | `trackEvent` with the Appbrew name unchanged and Meta catalog fields added from `items[]` |
 | Link opened with the app installed | `handleDeeplink`. Appbrew routes it |
+| Push notification tapped | `handleDeeplink` with the push's `data.link`. Appbrew routes it |
 | First open after install | `getAttributionData`, and the deferred link is routed once per install |
 | Push token | `setPushToken` for uninstall tracking |
 | CleverTap installed | `setAdditionalData` with the CleverTap ID |
@@ -149,19 +151,30 @@ setConsent({
 
 Leave a signal out rather than sending `unknown` as a denial. See [Google Integrated Conversion Measurement](/features/google-icm).
 
+### Push notifications
+
+Put a Linkrunner campaign link in the push and the tap is recorded as a re-engagement on that campaign. Nothing to add in your app.
+
+Appbrew's push module routes a tap from the notification's `data.link` without going through React Native's `Linking`, so the tracker listens for push taps itself. It covers taps while the app is closed, in the background and open. A link that also comes back through `Linking` is reported once.
+
+- Use the full campaign link as the push link, for example `https://links.yourstore.com/collections/joggers?c=AbC123`.
+- A push that points at a screen instead of a url has no link to attribute.
+- If your app calls `handleDeeplink` from its own push handlers (needed before 0.3.0), remove that code.
+- Set `pushOpenAttribution` to `false` to turn it off.
+
+<Note>
+  On Android, a tap is not reported when the system killed the app's process but kept it in recents. React Native Firebase drops that tap before the app loads, so Appbrew does not open the push link either.
+</Note>
+
 ### Handling deep links yourself
 
-The tracker reports every link that arrives through React Native's `Linking`. Push taps do not: Appbrew's push module navigates from the notification payload directly. Report those so a push campaign shows as a re-engagement:
+Links that reach the app through some other channel, such as an in-app banner, can be reported by hand. The result says whether Linkrunner recognised the link:
 
 ```typescript
 import { handleDeeplink } from '@linkrunner/appbrew'
 
-messaging().onNotificationOpenedApp(async (message) => {
-  const link = message.data?.link
-  if (typeof link === 'string' && link.startsWith('http')) {
-    await handleDeeplink(link)
-  }
-})
+const result = await handleDeeplink(url)
+// { deeplink?: string, isLinkrunner: boolean, processing?: boolean }
 ```
 
 ### Extra user fields
@@ -179,14 +192,14 @@ The same five calls exist as methods on the `LinkrunnerTrackerV2` instance.
 
 ## Function Placement Guide
 
-Register `LinkrunnerTrackerV2` once. The tracker handles the required React Native SDK calls below through Appbrew's lifecycle; do not duplicate them in your app. Call the exported `handleDeeplink` helper only for links that bypass the tracker, such as push notification taps.
+Register `LinkrunnerTrackerV2` once. The tracker handles the required React Native SDK calls below through Appbrew's lifecycle; do not duplicate them in your app. Incoming links and push notification taps are reported automatically. Call the exported `handleDeeplink` helper only for links that reach the app some other way.
 
 | Function | Requirement | Where to Place | When to Call |
 | --- | --- | --- | --- |
 | [`linkrunner.init`](/sdk/appbrew#2-register-the-tracker) | Required | Appbrew tracker lifecycle (automatic) | When the app opens with a configured token |
 | [`linkrunner.signup`](/sdk/appbrew#what-the-tracker-does-on-its-own) | Required | Appbrew identity lifecycle (automatic) | Once per install and customer |
 | [`linkrunner.setCustomerUserId`](/sdk/appbrew#what-the-tracker-does-on-its-own) | Required | Appbrew identity lifecycle (automatic) | At app open and when the customer identity changes |
-| [`handleDeeplink`](/sdk/appbrew#handling-deep-links-yourself) | Required | Automatic for incoming links; push notification handlers for links that bypass the tracker | When the app opens through a deep link |
+| [`handleDeeplink`](/sdk/appbrew#handling-deep-links-yourself) | Required | Automatic for incoming links and push taps; your own code only for other channels | When the app opens through a deep link or a push |
 | [`getAttributionData`](/sdk/appbrew#getting-attribution-data) | Optional | Campaign-specific onboarding or referral flow | When your app needs install attribution |
 | [`setUserData`](/sdk/appbrew#extra-user-fields) | Optional | User data or analytics integration flow | When you add fields to the current user |
 | [`setAdditionalData`](/sdk/appbrew#extra-user-fields) | Optional | Third-party integration setup | When the CleverTap ID is available |
@@ -202,6 +215,7 @@ Register `LinkrunnerTrackerV2` once. The tracker handles the required React Nati
 2. Open [Events Settings](https://dashboard.linkrunner.io/dashboard/settings/events). The install and events appear as you use the app.
 3. Place an order and confirm one payment appears. Relaunch and confirm it is not duplicated.
 4. Install through a campaign link on a fresh device and confirm `getAttributionData()` returns the `deeplink`.
+5. Send a push with a campaign link as `data.link`, tap it with the app closed, and confirm a re-engagement on that campaign.
 
 See [Integration Testing](/testing/integration-testing) for the full checklist.
 
@@ -216,5 +230,6 @@ See [Integration Testing](/testing/integration-testing) for the full checklist.
 | Deep link opens the app but does not navigate | Domain verification incomplete. See [Deep Linking Setup](/features/deep-linking-setup) |
 | Duplicate payments | `capturePayment` also called from a Shopify webhook with a different payment id |
 | `getAttributionData()` returns `undefined` | No token, or the app was installed directly from the store |
+| Push taps show no re-engagement | The push link is a screen, not a campaign url, or the app is on `@linkrunner/appbrew` older than 0.3.0 |
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
