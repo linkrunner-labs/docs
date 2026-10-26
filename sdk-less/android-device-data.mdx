@@ -51,6 +51,7 @@ dependencies {
 | `device_ip` | Network interfaces | Recommended. IP matching fallback. |
 | `user_agent` | `WebSettings.getDefaultUserAgent` | Recommended. Fingerprint matching. |
 | `app_version`, `build_number`, `bundle_id`, `application_name` | `PackageManager` | Recommended. |
+| `device_model` | `Build.MODEL` | Recommended. Shown as Device Model on the dashboard. |
 | `manufacturer`, `brand`, `device_name`, `system_version` | `Build` | Recommended. |
 | `connectivity`, `carrier` | System services | Optional. |
 | `appsetid`, `appsetid_scope` | `AppSet` | Optional. |
@@ -170,7 +171,9 @@ These are plain system lookups. The [full client](/sdk-less/android-quickstart) 
 - `device_id`: `Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)`
 - `device_ip`: first non-loopback IPv4 from `NetworkInterface.getNetworkInterfaces()`
 - `user_agent`: `WebSettings.getDefaultUserAgent(context)`
-- `manufacturer`, `brand`, `device_name`, `system_version`: `Build.MANUFACTURER`, `Build.BRAND`, `Build.MODEL`, `Build.VERSION.RELEASE`
+- `device_model`: `Build.MODEL` (for example `SM-S936B`)
+- `device_name`: `"${Build.MANUFACTURER} ${Build.MODEL}"` (for example `samsung SM-S936B`)
+- `manufacturer`, `brand`, `system_version`: `Build.MANUFACTURER`, `Build.BRAND`, `Build.VERSION.RELEASE`
 - App info: `PackageManager.getPackageInfo` for `app_version` and `build_number`, `context.packageName` for `bundle_id`
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

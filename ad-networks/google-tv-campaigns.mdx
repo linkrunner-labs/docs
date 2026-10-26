@@ -1,0 +1,122 @@
+---
+title: "Run Google Ads on connected TV"
+sidebarTitle: "Google TV campaigns"
+description: "Create a Google Ads campaign that runs on TV screens, see its results in Linkrunner, and credit installs from viewers who scan the TV QR code."
+keywords: ["google tv", "google ads connected tv", "youtube ctv", "google ads tv screens", "demand gen ctv", "ctv qr code", "connected tv campaign"]
+icon: "tv"
+---
+
+Google Ads shows your video ads on TV screens through YouTube. What Linkrunner can do with those ads depends on the campaign type you pick.
+
+| Campaign type | Linkrunner shows | Installs credited | Postbacks |
+| --- | --- | --- | --- |
+| Video (reach or views) | Google's TV impressions, clicks and spend | No | No |
+| Demand Gen, with a Linkrunner link as the Final URL | Google's TV impressions, clicks and spend | Yes, when a scan of the TV QR code or a tap reaches your link with Google's click parameters | Yes, as for any Google click |
+
+A TV ad has no click of its own. Only the Demand Gen route gives a viewer something to open on their phone.
+
+## Before you start
+
+- Connect your Google Ads account in [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads). Follow [Google Ads](/ad-networks/google-ads) if you have not.
+- You need a YouTube video to use as the ad.
+- For the Demand Gen route, you also need a Linkrunner link for your app.
+
+## Option 1: Video campaign (reporting only)
+
+These steps follow the **Video views** goal. Google changes its screens often, so labels can differ slightly in your account.
+
+<Steps>
+  <Step title="Choose the objective">
+    In Google Ads, click **New campaign** and choose **YouTube reach, views and engagements**. Pick a goal such as **Video views** or **Reach**, then pick the **Video** campaign type and click **Continue**.
+  </Step>
+  <Step title="Set the basics">
+    Enter a campaign name, choose the ad formats and bid strategy, and enter a budget and dates. Set **Locations** and **Languages** for the audience you want.
+  </Step>
+  <Step title="Target TV screens">
+    Open **Additional settings**, then **Devices**. **Show on all eligible devices** already includes TV screens.
+
+    To run on TV only, choose **Set specific targeting for devices**, clear **Computers**, **Mobile Phones** and **Tablets**, and keep **TV screens** selected.
+  </Step>
+  <Step title="Leave third-party measurement empty">
+    Leave **Third-party measurement** as **None**. Linkrunner is not one of the measurement vendors Google offers there.
+  </Step>
+  <Step title="Add your ad and publish">
+    Create the ad group, add your YouTube video ad, and publish the campaign.
+  </Step>
+</Steps>
+
+## Option 2: Demand Gen campaign with a Linkrunner link
+
+Google can show a QR code on connected TVs for Demand Gen and Performance Max ads. The QR code opens the ad's Final URL on the viewer's phone. Google creates the code for you from the Final URL. QR codes appear only on connected TV, and not on YouTube TV or Google TV inventory. See [About QR codes for Connected TV](https://support.google.com/google-ads/answer/16903036).
+
+<Steps>
+  <Step title="Turn on auto-tagging">
+    In Google Ads, open **Admin → Account settings**, expand **Auto-tagging**, and check that **Tag the URL that people click through from my ad** is on. Linkrunner reads the click parameters Google adds to your URL, so the link must receive them.
+  </Step>
+  <Step title="Start a Demand Gen campaign">
+    Click **New campaign**, choose an objective such as **Website traffic**, then choose the **Demand Gen** campaign type and click **Continue**. Choose a campaign goal and set your budget.
+  </Step>
+  <Step title="Keep TV screens on">
+    In the ad group, the **Devices** setting defaults to all eligible devices, which includes TV screens. QR codes need TV screens included, so do not turn them off.
+  </Step>
+  <Step title="Create a video ad with your Linkrunner link">
+    In the ad, choose **Video ad**, add your YouTube video, and fill in the headlines, descriptions and business name. Under **Final URL**, enter your Linkrunner link. That is the page the QR code opens.
+  </Step>
+  <Step title="Add the Final URL suffix (optional)">
+    To see the ad group and ad in Linkrunner, open **URL and other options** in the ad, or **Ad group URL options** in the ad group, and set **Final URL suffix** to:
+
+    ```
+    adset_id={adgroupid}&ad_id={creative}
+    ```
+
+    You can also set a **Tracking template** or **Final URL suffix** for the whole account in **Admin → Account settings**, under **Tracking**.
+  </Step>
+  <Step title="Publish and test a scan">
+    Publish the campaign. When it serves on a TV, scan the code with a phone and check that the click shows up in your Linkrunner campaigns.
+  </Step>
+</Steps>
+
+<Note>
+Google's documentation does not say which click parameters it adds to a scan of the TV QR code. Linkrunner credits the install when the click reaches your Linkrunner link with Google's click parameters, so check the first scans before you rely on the numbers.
+</Note>
+
+## See the results in Linkrunner
+
+Open the [Connected TV page](https://dashboard.linkrunner.io/dashboard/connected-tv) and scroll to **Google TV**. You see **Impressions**, **Clicks** and **Spend** from Google Ads, a daily trend, and one row per campaign. The section updates once a day. See [Google TV](/features/ctv-attribution#google-tv) for how the numbers are shown.
+
+Clicks on your Linkrunner link, and the installs they lead to, are counted in your campaign table, not in the Google TV section.
+
+## Installs and postbacks
+
+Linkrunner credits an install to a Google campaign in two ways:
+
+- **From a click.** The install is matched to a click on your Linkrunner link that carried Google's click ID. Linkrunner then sends postbacks to Google for that install's events, as for any other Google click. See [Google Ads](/ad-networks/google-ads) for the event setup.
+- **From Google.** Linkrunner asks Google Ads about installs that carry a Google click ID, or, on iOS, the on-device click context that [Google ICM](/features/google-icm) reads.
+
+A viewer who only watches the TV ad does neither. Nothing is left on their phone, Linkrunner receives no impression records for the ad, and Google does not accept third-party tracking pixels for YouTube. See [Third-party measurement on YouTube](https://support.google.com/google-ads/answer/9741375). That install is not credited to the Google campaign, and no postback is sent for it.
+
+The Google TV numbers are Google's own. They never change your CTV installs, conversion rate or revenue from [CTV attribution](/features/ctv-attribution).
+
+To credit installs from viewers who never scan or tap, have a partner report each TV impression from its server. See [CTV attribution](/features/ctv-attribution).
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="I don't see the Google TV section">
+    The section appears once your project has a connected Google Ads account and Linkrunner has collected connected TV data for it. Check the connection in [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads), and look again after a day.
+  </Accordion>
+  <Accordion title="My campaign is not in the table">
+    Check that the campaign has served on TV screens in the date range, and that it appears in your Linkrunner campaign list. Linkrunner shows only campaigns it has already synced from your Google Ads account.
+  </Accordion>
+  <Accordion title="The numbers differ from Google Ads">
+    Linkrunner updates Google TV once a day, so today's activity is missing. Spend is shown in your project currency, so it can differ from the amount in your Google Ads account currency.
+  </Accordion>
+  <Accordion title="A scan does not show up as a click">
+    Check that the ad's Final URL is your Linkrunner link, and that auto-tagging is on in **Admin → Account settings**. Without Google's click parameters on the URL, Linkrunner cannot tie the click to the Google campaign.
+  </Accordion>
+  <Accordion title="Installs are not credited to my Video campaign">
+    That is expected. A Video campaign has no click for Linkrunner to match. See [Installs and postbacks](#installs-and-postbacks).
+  </Accordion>
+</AccordionGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
