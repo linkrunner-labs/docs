@@ -24,6 +24,7 @@ To collect the IDFA, add a tracking usage description. Nothing else here needs a
 | `adservices_attribution_token` | `AAAttribution.attributionToken()` | **High**. Apple Search Ads attribution. |
 | `idfa` | `ASIdentifierManager`, after ATT consent | **High**, when the user allows tracking. |
 | `idfv` | `UIDevice.identifierForVendor` | Recommended. Matching fallback. |
+| `device_model` | `uname()` hardware identifier | Recommended. Shown as Device Model on the dashboard. |
 | `device`, `device_name`, `system_version` | `UIDevice` | Recommended. |
 | `brand`, `manufacturer` | Always `"Apple"` | Recommended. |
 | `version`, `build_number`, `bundle_id` | `Bundle.main` | Recommended. |
@@ -105,6 +106,7 @@ Apply it with `SKAdNetwork.updatePostbackConversionValue`. The [full client](/sd
 
 Plain framework lookups. The [full client](/sdk-less/ios-quickstart) includes them.
 
+- `device_model`: the hardware identifier from `uname()` `machine` (for example `iPhone17,3`). On the simulator, read `SIMULATOR_MODEL_IDENTIFIER` from the environment. Linkrunner uses only this field for Device Model on iOS, because `device_name` can be the name the user gave the phone.
 - `device`, `device_name`, `system_version`: `UIDevice.current`
 - `device_display`: `UIScreen.main.bounds` and `scale`
 - `locale`, `language`, `country`: `Locale.current`
