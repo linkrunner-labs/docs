@@ -183,7 +183,7 @@ Since `expo-linkrunner` is a config plugin that prepares your project, the actua
 - Enhanced privacy controls
 
 <Note>
-    `capturePayment` and `removePayment` are deprecated and removed in `rn-linkrunner` 4.0.0. With `expo-linkrunner` 4.0.0, a payment is an in-app event: call `trackEvent` with the old payment type as the event name, and put `amount`, `paymentId`, `currency`, and `userId` in the event data. Keep the old type spelling exactly, such as `FIRST_PAYMENT`, so your existing mappings keep working. Any other name needs a new mapping in the dashboard. See [Migrate payments to in-app events](/sdk/migrate-to-track-event). For status, examples, and how payments reach ad networks, see [Track payments](/sdk/track-payments).
+    `capturePayment` and `removePayment` are deprecated in `rn-linkrunner` 4.0.0. They still work and show a deprecation warning, and they will be removed in a future major version. With `expo-linkrunner` 4.0.0, send a payment as an in-app event: call `trackEvent` with the old payment type as the event name, and put `amount`, `paymentId`, `currency`, and `userId` in the event data. Keep the old type spelling exactly, such as `FIRST_PAYMENT`, so your existing mappings keep working. Any other name needs a new mapping in the dashboard. See [Migrate payments to in-app events](/sdk/migrate-to-track-event). For status, examples, and how payments reach ad networks, see [Track payments](/sdk/track-payments).
 </Note>
 
 ### Tracking Payments

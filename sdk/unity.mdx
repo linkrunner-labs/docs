@@ -1351,7 +1351,7 @@ The event name is stored exactly as you send it. If you used one of the old paym
 </Note>
 
 <Note>
-`capturePayment` is deprecated. Bridges built against Android SDK 4.x or LinkrunnerKit 4.x keep using it and continue to work unchanged. To move to 5.0.0, see [Migrate payments to in-app events](/sdk/migrate-to-track-event).
+`capturePayment` and `removePayment` are deprecated. They still work with the native 5.0.0 SDKs and show a deprecation warning, and they will be removed in a future major version. Use `trackEvent` with the payment keys instead. Bridges built against Android SDK 4.x or LinkrunnerKit 4.x keep working unchanged. To move, see [Migrate payments to in-app events](/sdk/migrate-to-track-event).
 </Note>
 
 ### Push Token

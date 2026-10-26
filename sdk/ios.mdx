@@ -614,7 +614,7 @@ Linkrunner keeps one payment per `paymentId`, event name, and status, so a retry
 </Note>
 
 <Note>
-    `capturePayment` is deprecated. Apps on LinkrunnerKit 4.x keep using it and continue to work unchanged. To move to 5.0.0, see [Migrate payments to in-app events](/sdk/migrate-to-track-event).
+    `capturePayment` and `removePayment` are deprecated. They still work in 5.0.0 and show a deprecation warning, and they will be removed in a future major version. Use `trackEvent` with the payment keys instead. Apps on LinkrunnerKit 4.x keep working unchanged. To move, see [Migrate payments to in-app events](/sdk/migrate-to-track-event).
 </Note>
 
 ## Tracking Custom Events

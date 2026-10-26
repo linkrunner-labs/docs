@@ -977,10 +977,10 @@ Linkrunner keeps one payment per `paymentId`, event name, and status. Use this t
 
 <AccordionGroup>
   <Accordion title="Can I refund or remove a payment?">
-    `removePayment` was removed in the SDK versions above. To record a refund or a cancellation, send the same event name and `paymentId` again with `status` set to `PAYMENT_CANCELLED`. That payment no longer counts as revenue.
+    `removePayment` is deprecated in the SDK versions above. It still works and shows a deprecation warning, and it will be removed in a future major version. To record a refund or a cancellation, call `trackEvent` with the same event name and `paymentId` and `status` set to `PAYMENT_CANCELLED`. That payment no longer counts as revenue.
   </Accordion>
-  <Accordion title="I am on an older SDK that has capturePayment">
-    `capturePayment` keeps working on the older versions. When you upgrade, follow [Migrate payments to in-app events](/sdk/migrate-to-track-event).
+  <Accordion title="I still call capturePayment">
+    `capturePayment` keeps working on the older versions, and it is deprecated in the versions above: it still works and shows a deprecation warning, and it will be removed in a future major version. Move to `trackEvent` by following [Migrate payments to in-app events](/sdk/migrate-to-track-event).
   </Accordion>
   <Accordion title="Can I send payments from my backend?">
     Yes. Send them to `POST /api/v1/capture-event` with `amount`, `payment_id`, and `currency`. The same naming, status, and deduplication rules apply. See the [Revenue Tracking API](/api-reference/revenue-tracking).
