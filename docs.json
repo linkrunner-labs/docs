@@ -415,6 +415,10 @@
         {
             "source": "/ecommerce-manager/google-merchant-center",
             "destination": "/ecommerce-manager/google-commerce-manager"
+        },
+        {
+            "source": "/api-reference/introduction",
+            "destination": "/api-reference/data-apis"
         }
     ]
 }
