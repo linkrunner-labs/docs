@@ -4,7 +4,7 @@ description: "Report affiliate clicks server-to-server"
 icon: "server"
 ---
 
-Affiliate partners use this endpoint to report a click from their server when the user never opens a Linkrunner tracking link. For the setup guide, see [Server-to-Server Clicks](/affiliate-partners/s2s-clicks).
+Affiliate partners use this endpoint to report a click from their server when the user never opens a Linkrunner tracking link. Advertisers can also use it for [DSP clicks](#dsp-mode-lr_key). For the setup guide, see [Server-to-Server Clicks](/affiliate-partners/s2s-clicks).
 
 ## Endpoint
 
@@ -27,6 +27,20 @@ X-Linkrunner-Token: <your_token>
 If your ad server can only fire URLs, send it as the `lr_token` query parameter instead: `&lr_token=<your_token>`. Linkrunner removes `lr_token` before it stores the click, so it never appears in reports or postbacks.
 
 Generate the token in your affiliate dashboard under [**Settings → S2S Credentials**](https://dashboard.linkrunner.io/affiliate/settings?tab=s2s). It is shown once, so store it as a secret. One token covers every app you're connected to, for both S2S clicks and impressions. A request without a valid token is rejected with `401`. For rotation and revocation, see [Authenticate your requests](/affiliate-partners/s2s-clicks#authenticate-your-requests).
+
+## DSP mode (lr_key)
+
+An advertiser can also send clicks from a DSP, today Samsung Ads, with a Linkrunner DSP key. Add `lr_key=<your key>` to `GET https://s2s.linkrunner.io/v1/click` and the request is handled as a DSP click instead of a partner click. Without `lr_key`, everything on this page applies unchanged.
+
+| Difference | DSP click |
+|---|---|
+| Identity | The key replaces the partner token, `app_id`, `d` and `c`. The campaign is created from `li`, the same campaign as the impressions of that line item. |
+| Switch | The advertiser must turn on **Clicks** for that DSP. It is off by default and separate from the CTV switch and view-through. Otherwise the request is rejected with `403 clicks_disabled`. |
+| Device ID | At least one of `gaid`, `idfa` or `sha1_advertising_id` (40 hexadecimal characters) must be filled. A click with only an IP address is rejected with `400 missing_device_id`. |
+| Parameters | `lr_key`, `li`, `li_name`, `tid`, `sha1_advertising_id`, `gaid`, `idfa`, `ua` and `click_time`. Values that are empty or still a literal macro such as `__TXN_ID__` are ignored. Each value is limited to 256 characters. In DSP mode a `click_time` that is missing, not a timestamp or more than 24 hours old is replaced with the time of the request instead of being rejected. |
+| Errors | `401 missing_key`, `401 invalid_key`, `403 clicks_disabled`, `400 missing_device_id` and `429 rate_limited` when the key sends too many clicks per second. |
+
+A successful request answers `{"status":"accepted","click_id":"..."}`, never a redirect. A click beats an impression when Linkrunner credits an install. The Samsung Ads click tag, its macros and caveats, and the switch are described on [DSP Sources](/ad-networks/dsps#samsung-ads-click-tag).
 
 ## Parameters
 

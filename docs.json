@@ -191,6 +191,7 @@
                         "group": "Ad Networks",
                         "pages": [
                             "ad-networks/google-ads",
+                            "ad-networks/google-tv-campaigns",
                             "features/google-icm",
                             "ad-networks/meta-ads",
                             "ad-networks/tiktok",
@@ -198,7 +199,9 @@
                             "ad-networks/reddit-ads",
                             "ad-networks/chatgpt-ads",
                             "ad-networks/sharechat-ads",
+                            "ad-networks/roku-ads",
                             "ad-networks/linkedin-ads",
+                            "ad-networks/dsps",
                             "ad-networks/meta-web-to-app"
                         ]
                     },

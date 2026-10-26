@@ -74,7 +74,39 @@ The partner replaces the macros in braces with its own values, including the TV'
 
 ## See your results
 
-CTV installs appear in your campaign table as installs and as **View Through Attribution** installs. Accepted impressions appear in the **Impressions** column.
+### Connected TV page
+
+The [Connected TV page](https://dashboard.linkrunner.io/dashboard/connected-tv) shows only your CTV traffic: the impressions your partners reported and the installs credited to them. It appears in the sidebar once a connected partner has **Connected TV (CTV) impressions** on, for admins and members of your project. Pick a date range at the top right. Until a partner sends CTV traffic, the page shows **No CTV activity in this period**.
+
+- **CTV overview.** Tiles for **Impressions**, **CTV installs**, **Impression conversion rate** and **Revenue**, with a daily trend as a chart or a table. Use **Breakdown** to split the trend by **Partner**, **Campaign** or **Country**.
+- **CTV performance.** A ranked bar chart. Choose **Top 5**, **Top 10**, **Bottom 5** or **Bottom 10** under **Ranking**, then a **Group by** and a **Metric** (**Installs** or **Impressions**).
+- **Performance table.** One row per partner, campaign or country, with **Impressions**, **Installs**, **Conversion rate** and **Revenue**. Click a column heading to sort.
+
+How the numbers are counted:
+
+- **CTV installs** are installs credited to a CTV impression, counted on the day of the install.
+- **Impression conversion rate** is CTV installs as a percentage of impressions. It can pass 100%, because a day's installs need not come from that day's impressions.
+- **Revenue** is the revenue from CTV installs, with the same rules as the campaign table, in your display currency. Only people who can see financial data see it.
+- **Country** shows installs only. Impressions, conversion rate and revenue are not available by country.
+- Linkrunner keeps CTV impressions for 90 days. If your range starts earlier, the page says so, and the earlier days show 0 impressions.
+
+### Google TV
+
+If your project has a connected Google Ads account, the Connected TV page has a **Google TV** section below the CTV results. It shows what Google Ads reports for your ads that ran on connected TV devices. Google counts smart TVs and game consoles as connected TV.
+
+- **What you see.** Tiles for **Impressions**, **Clicks** and **Spend**, a daily trend, and a table with one row per campaign.
+- **Reporting only.** The numbers come from Google Ads and are not matched to installs. They are not part of the household IP address numbers above, so they never change your CTV installs, conversion rate or revenue.
+- **Updates once a day.** The section follows your date range, using the days Linkrunner has already collected from Google Ads.
+- **Spend** is shown in your project currency, and only to people who can see financial data.
+- **No impression matching.** Google TV ads give Linkrunner no impression record, so an install after a viewer only watches the ad is not credited to it. A viewer who scans a Demand Gen TV QR code and reaches your Linkrunner link is counted as a click in your campaign table.
+
+To create a Google Ads campaign that runs on TV screens, see [Run Google Ads on connected TV](/ad-networks/google-tv-campaigns).
+
+The section appears only for projects with a connected Google Ads account. You connect Google Ads at [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads). The section shows up once Linkrunner has collected data from it.
+
+### Campaign table
+
+CTV installs also appear in your campaign table as installs and as **View Through Attribution** installs. Accepted impressions appear in the **Impressions** column.
 
 - The **Impressions** column is off by default. Click the **Edit Columns** icon in the table toolbar, tick **Impressions**, and click **Save**.
 
@@ -111,6 +143,12 @@ You can also turn off view-through for the partner in **Settings → Attribution
     - The impression carries the TV's real public IP address, not the partner's ad server address.
     - No click or device-ID impression was available to credit instead. Those always win.
     - The home IP address did not trigger the shared-network limit of more than 4 installs in about a day.
+  </Accordion>
+  <Accordion title="Connected TV is missing from the sidebar, or the page is empty">
+    The sidebar entry shows once a connected partner has **Connected TV (CTV) impressions** on, and only for admins and members. Partner, agency and influencer logins don't see it. If the entry is there but the page says **No CTV activity in this period**, no partner has sent an accepted impression or received a CTV install in that date range. Widen the range or check the partner's requests as described above.
+  </Accordion>
+  <Accordion title="I see no Google TV section">
+    The **Google TV** section appears only when your project has a connected Google Ads account and Linkrunner has collected Google Ads connected TV data for it. Check that Google Ads is connected in [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads) and that you are on the **Connected TV** page. The section updates once a day, so data for a newly connected account may not be there yet. If the section is there but says **No Google TV traffic in this period**, Google Ads reported no connected TV activity in that date range. Widen the range.
   </Accordion>
   <Accordion title="I don't see a CTV impression URL">
     The URL shows only for a partner's campaigns once CTV is on. Check that **S2S clicks and impressions** and **Connected TV (CTV) impressions** are both on for that partner, and that the partner is connected in **Integrations → Affiliate Partners**.
