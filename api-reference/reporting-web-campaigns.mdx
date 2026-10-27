@@ -148,6 +148,8 @@ Send each parameter once. A repeated parameter, such as `limit=5&limit=50`, retu
 
 `network_campaign`, `ad_set` and `ad` answer for one network at a time, so `network` is required with them. A `channel` or `source` from a different network, such as `network=meta&source=google`, returns `400`.
 
+With `network=google`, a `network_campaign` row's `id` is not always a numeric Google Ads campaign ID. Clicks that reached your site with no Google campaign ID are listed under their `utm_id`, else their `utm_campaign`, the same rows the dashboard shows, so `id` can be text such as `BOF-Search-Brand`. Do not parse `id` as a number, and match it to a Google Ads campaign only when it is numeric.
+
 Some rows collect traffic that has no key, such as visits without a `utm_id`. Their `id` is `null` and their `name` describes the bucket, for example `(no campaign ID)`.
 
 ### Row fields
@@ -207,6 +209,8 @@ curl 'https://api.linkrunner.io/api/v1/reporting/web-campaigns?group_by=ad_set&n
 ```
 
 Use `ad_set_id` the same way with `group_by=ad`.
+
+`network_campaign_id` and `ad_set_id` must equal the parent row's `id` exactly, spaces included. Some ids come from your links' UTM values, such as a `utm_campaign` that ends in a space. Send the `id` as the API returned it: a trimmed value no longer matches that row.
 
 ### Errors
 
