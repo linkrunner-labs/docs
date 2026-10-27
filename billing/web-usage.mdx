@@ -1,0 +1,52 @@
+---
+title: "Web Usage Billing"
+description: "How the users and events on your website are counted and billed"
+icon: "globe"
+sidebarTitle: "Web Usage Billing"
+---
+
+Web usage billing applies to accounts that track a website with the [Web SDK](/sdk/web) and have web billing turned on for their billing account. Installs from your apps are billed as described in [Billing Overview](/billing/overview) and are not affected.
+
+## What counts as a tracked user
+
+The billing unit for web usage is the **tracked user**: one person who sent at least one accepted web event in the calendar month. Bot traffic is not counted.
+
+- **Each person counts once per month**, however many pages they view or events they send.
+- **Identified visitors count as one user.** When you call [`lr.identify`](/sdk/web#2-identify-users-and-track-events) for a visitor, that visitor and the identified user are the same person, not two.
+- **Visitors you never identify count once each.**
+- **Usage is added up across projects.** It is counted per project and summed across the projects on your billing account. A person who visits two of your projects in the same month counts once in each.
+
+Months follow your billing account's time zone.
+
+## What is not billed separately
+
+Pageviews, sessions, `identify` calls, and custom events do not add to your bill. By default, only tracked users are billed.
+
+## Allowance and bands
+
+Your rate card is on your [billing page](https://dashboard.linkrunner.io/dashboard/billing). For web usage it can include:
+
+- **A monthly allowance** of tracked users. It resets every month and is separate from the one-time free install pool in [Billing Overview](/billing/overview).
+- **Bands of users, each with its own rate.** Only the users inside a band are charged at that band's rate. For example, if your first 25,000 users fall in a free band and the next 75,000 fall in a second band, only those 75,000 are charged at the second band's rate. This differs from installs, where one tier rate applies to every install.
+- **A monthly platform fee, a minimum or maximum monthly charge, or a discount**, if your account has them.
+
+Whatever applies to your account is listed on your rate card.
+
+## Trial period before billing starts
+
+Web usage billing can be set up in a trial state first. During the trial, nothing for web usage is invoiced, and it does not appear on your **Usage & Billing** page or your invoices. Billing starts from a date agreed with you.
+
+## Where you see it
+
+Once web usage billing is active for your account:
+
+- **Usage & Billing** shows a section for tracked users with this month's count, your allowance, and the users that are billed. Project admins also see the estimated amount.
+- **Your monthly invoice** lists web usage as its own line next to installs. You get one invoice per month for the whole billing account, with the same schedule and payment options as installs. See [Billing Overview](/billing/overview).
+
+## Custom event billing
+
+If custom event billing is turned on for your account, events are counted instead of users. Each accepted custom event in the month counts once, and Linkrunner sets up with you which event names count. Events from your website and events from your app can each be billed as their own line.
+
+It appears in the same places as web usage: the **Usage & Billing** page and your invoice.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
