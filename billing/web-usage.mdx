@@ -1,0 +1,55 @@
+---
+title: "Web and Event Usage Billing"
+description: "How the visitors and page views on your website, and the events in your app, are counted and billed"
+icon: "globe"
+sidebarTitle: "Web and Event Usage"
+---
+
+Some billing accounts are billed on more than installs. A **web rate card** covers the visitors and page views on a website tracked with the [Web SDK](/sdk/web), and an in-app events rate card covers the events your app sends. Installs from your apps are billed as described in [Billing Overview](/billing/overview) and are not affected.
+
+Each item below is billed only if it is set up on your account. Anything that is set up is billed in full: every number counted for the month is on your invoice.
+
+## Web rate card
+
+The web rate card bills your website on one of two measures. Your agreement decides which.
+
+### Unique visitors
+
+A **unique visitor** is one person who sent at least one accepted web event in the calendar month. Bot traffic is not counted.
+
+- **Each person counts once per month**, however many pages they view or events they send.
+- **Identified visitors count once.** When you call [`lr.identify`](/sdk/web#2-identify-users-and-track-events) for a visitor, that visitor and the identified user are the same person, not two.
+- **Visitors you never identify count once each.**
+- **Usage is added up across projects.** It is counted per project and summed across the projects on your billing account. A person who visits two of your projects in the same month counts once in each.
+
+### Page views
+
+Every page view your website records counts once. Custom events and `identify` calls are not page views and are not counted. Bot traffic is not counted. Page views are a different measure from unique visitors: they grow with how much each person browses, not with how many people visit.
+
+Months follow your billing account's time zone.
+
+## In-app events
+
+In-app events are the events your app sends through the Linkrunner SDK, for example with `trackEvent`. Each event counts once in the calendar month. Install events and payment events are not counted as in-app events. In-app events have their own rate card, priced the same two ways as the web rate card.
+
+## How it is priced
+
+Your rate card is on your [billing page](https://dashboard.linkrunner.io/dashboard/billing). It uses one of two pricing types:
+
+- **Ranges.** The range your month's total falls in sets one price, and that price applies to every unit, the same as for installs. For example, if the range of 25,001 to 100,000 is priced at ₹0.15 and you have 40,000 units, all 40,000 are charged at ₹0.15.
+- **Fixed.** One price for every block of units, for example $100 for every 100,000 events. A partial block is billed as a whole block, so 150,000 events is two blocks.
+
+Whatever applies to your account is listed on your rate card.
+
+## When billing starts
+
+Billing for each item starts on the date agreed with you. Nothing is invoiced for it before that date.
+
+## Where you see it
+
+Once an item is set up for your account:
+
+- **Usage & Billing** shows it in the invoices table, in columns next to installs. The current month appears as an estimate row with the quantity so far. Project admins also see the billable units, the rate and the amount.
+- **Your monthly invoice** is one invoice per month for the whole billing account, with the same schedule and payment options as installs. See [Billing Overview](/billing/overview).
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)

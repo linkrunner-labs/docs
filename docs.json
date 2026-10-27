@@ -144,7 +144,7 @@
                     },
                     {
                         "group": "Billing",
-                        "pages": ["billing/overview", "billing/wallet", "billing/finance-role"]
+                        "pages": ["billing/overview", "billing/web-usage", "billing/wallet", "billing/finance-role"]
                     },
                     {
                         "group": "Troubleshooting",
