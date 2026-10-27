@@ -208,6 +208,8 @@ curl 'https://api.linkrunner.io/api/v1/reporting/web-campaigns?group_by=ad_set&n
 
 Use `ad_set_id` the same way with `group_by=ad`.
 
+`network_campaign_id` and `ad_set_id` must equal the parent row's `id` exactly, spaces included. Some ids come from your links' UTM values, such as a `utm_campaign` that ends in a space. Send the `id` as the API returned it: a trimmed value no longer matches that row.
+
 ### Errors
 
 | Status | When |
