@@ -181,7 +181,10 @@ that brought the shopper in.
                 var ctx = await context();
                 var fields = Object.assign({}, ctx.fields);
 
-                if (!ctx.t || Date.now() - ctx.t > LAST_TOUCH_MS) {
+                // utm_t is when the SDK recorded the campaign (the ad click); SDK versions
+                // before 0.1.19 save only t, the shopper's last storefront page.
+                var utmTime = ctx.utm_t || ctx.t;
+                if (!utmTime || Date.now() - utmTime > LAST_TOUCH_MS) {
                     UTM_KEYS.forEach(function (k) { delete fields[k]; });
                 }
 
