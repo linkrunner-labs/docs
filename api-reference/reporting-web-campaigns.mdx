@@ -146,9 +146,9 @@ Send each parameter once. A repeated parameter, such as `limit=5&limit=50`, retu
 | `ad_set`           | A Meta ad set or Google Ads ad group               | The ad set or ad group ID. |
 | `ad`               | A Meta or Google Ads ad                            | The ad ID. |
 
-`network_campaign`, `ad_set` and `ad` answer for one network at a time, so `network` is required with them.
+`network_campaign`, `ad_set` and `ad` answer for one network at a time, so `network` is required with them. A `channel` or `source` from a different network, such as `network=meta&source=google`, returns `400`.
 
-With `network=google`, a `network_campaign` row's `id` is not always a numeric Google Ads campaign ID. Clicks that reached your site with no Google campaign ID are listed under their `utm_id`, else their `utm_campaign`, the same rows the dashboard shows, so `id` can be text such as `BOF-Search-Brand`. Do not parse `id` as a number, and match it to a Google Ads campaign only when it is numeric. A `channel` or `source` from a different network, such as `network=meta&source=google`, returns `400`.
+With `network=google`, a `network_campaign` row's `id` is not always a numeric Google Ads campaign ID. Clicks that reached your site with no Google campaign ID are listed under their `utm_id`, else their `utm_campaign`, the same rows the dashboard shows, so `id` can be text such as `BOF-Search-Brand`. Do not parse `id` as a number, and match it to a Google Ads campaign only when it is numeric.
 
 Some rows collect traffic that has no key, such as visits without a `utm_id`. Their `id` is `null` and their `name` describes the bucket, for example `(no campaign ID)`.
 
