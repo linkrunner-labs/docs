@@ -124,7 +124,7 @@ Numbers are plain JSON numbers, not formatted strings. `from` and `to` in the re
 | `ad_set_id`                  | string | (none)           | With the network groupings only: keep rows under this ad set or ad group. |
 | `attribution`                | string | `last_touch`     | `last_touch` or `first_touch`. |
 | `channel`                    | string | (all)            | A value returned in `channel` when `group_by=channel`, for example `meta`, `google`, `chatgpt`, `paid_social`, `organic_search` or `direct`. `meta`, `google` and `chatgpt` are those networks' paid traffic; `paid_social` and `paid_search` hold the other networks' paid traffic. |
-| `source`                     | string | (all)            | A traffic source, for example `facebook` or `google`. |
+| `source`                     | string | (all)            | A traffic source, for example `facebook` or `google`. With no `channel`, a Meta, Google or ChatGPT spelling (`facebook`, `instagram`, `google_ads`, `openai` and so on) means that network's paid traffic. Pass `channel` for other traffic: `channel=organic_search&source=google` is organic Google, and `channel=ai_search&source=chatgpt` is ChatGPT referrals. |
 | `utm_source`, `utm_medium`, `utm_campaign`, `utm_id`, `utm_content`, `utm_term` | string | (all) | Exact match on the UTM value. |
 | `search`                     | string | (none)           | Partial match on the row `id`. |
 | `events`                     | string | (none)           | Comma-separated custom event names to count. See [Custom events](#custom-events). |
