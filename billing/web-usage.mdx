@@ -1,11 +1,11 @@
 ---
 title: "Web and Event Usage Billing"
-description: "How the users and events on your website, and the events in your app, are counted and billed"
+description: "How the visitors and page views on your website, and the events in your app, are counted and billed"
 icon: "globe"
 sidebarTitle: "Web and Event Usage"
 ---
 
-Some billing accounts are billed on more than installs. A **web rate card** covers the users and events on a website tracked with the [Web SDK](/sdk/web), and an in-app events rate card covers the events your app sends. Installs from your apps are billed as described in [Billing Overview](/billing/overview) and are not affected.
+Some billing accounts are billed on more than installs. A **web rate card** covers the visitors and page views on a website tracked with the [Web SDK](/sdk/web), and an in-app events rate card covers the events your app sends. Installs from your apps are billed as described in [Billing Overview](/billing/overview) and are not affected.
 
 Each item below is billed only if it is set up on your account. Anything that is set up is billed in full: every number counted for the month is on your invoice.
 
@@ -13,18 +13,18 @@ Each item below is billed only if it is set up on your account. Anything that is
 
 The web rate card bills your website on one of two measures. Your agreement decides which.
 
-### Distinct users
+### Unique visitors
 
-A **distinct user** is one person who sent at least one accepted web event in the calendar month. Bot traffic is not counted.
+A **unique visitor** is one person who sent at least one accepted web event in the calendar month. Bot traffic is not counted.
 
 - **Each person counts once per month**, however many pages they view or events they send.
-- **Identified visitors count as one user.** When you call [`lr.identify`](/sdk/web#2-identify-users-and-track-events) for a visitor, that visitor and the identified user are the same person, not two.
+- **Identified visitors count once.** When you call [`lr.identify`](/sdk/web#2-identify-users-and-track-events) for a visitor, that visitor and the identified user are the same person, not two.
 - **Visitors you never identify count once each.**
 - **Usage is added up across projects.** It is counted per project and summed across the projects on your billing account. A person who visits two of your projects in the same month counts once in each.
 
-### Web events
+### Page views
 
-Every accepted event your website sends counts once, whatever its type: pageviews, `identify` calls and the events you track yourself. Bot traffic is not counted. Web events are a different measure from distinct users: they grow with how much each person does, not with how many people visit.
+Every page view your website records counts once. Custom events and `identify` calls are not page views and are not counted. Bot traffic is not counted. Page views are a different measure from unique visitors: they grow with how much each person browses, not with how many people visit.
 
 Months follow your billing account's time zone.
 
