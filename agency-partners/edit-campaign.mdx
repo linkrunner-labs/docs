@@ -1,0 +1,98 @@
+---
+title: "Edit an Agency Campaign"
+description: "Change the name, deep link and link settings of a campaign in a customer's project"
+icon: "pen-to-square"
+---
+
+You can change a campaign's name, deep link, link preview, redirects and link options from your agency workspace. The changes apply to the campaign straight away.
+
+## Before you start
+
+You need:
+
+- **Campaigns → Edit** turned on for your agency. It is the same switch that lets you create links. See [Ask the customer to turn on link creation](/agency-partners/create-campaign-link#1-ask-the-customer-to-turn-on-link-creation).
+- A campaign you can see in **All Campaigns**. By default that is only the campaigns your agency created. If the customer limited you to certain networks, it is only campaigns on those networks.
+
+## 1. Open the campaign
+
+<Steps>
+  <Step title="Open the customer's project">
+    Sign in to [Linkrunner Dashboard](https://dashboard.linkrunner.io) and pick the customer's project from the project picker.
+  </Step>
+  <Step title="Open the campaign">
+    Open **All Campaigns** and click the campaign row.
+  </Step>
+  <Step title="Click Edit">
+    **Edit** is at the top right of the campaign panel.
+
+    ![The campaign panel with the Edit button at the top right](/images/agency-partners/edit-campaign-open.webp)
+  </Step>
+</Steps>
+
+## 2. Change the details
+
+![The Edit campaign form for an agency, with the name, deep link and three collapsed sections](/images/agency-partners/edit-campaign-form.webp)
+
+| Field | What it changes |
+|---|---|
+| **Campaign Name** | The name you and the customer see. The link stays the same. |
+| **Deeplink Destination** | The app screen people land on, even after they install. To remove it, replace the path with `/`. |
+| **Link Preview** | The title, description and image shown when the link is shared in chat apps. |
+| **Custom Redirection** | A web page for desktop, Android or iOS users, instead of the normal route. |
+| **Advanced Options** | **Shorten link**, **Open in app**, custom store listings, and a custom channel for links with no ad channel. |
+
+The form uses the same fields as Create Link. See [Create a trackable link](/features/create-trackable-link) for what each one does.
+
+<Warning>
+The deep link path is part of the campaign link. After you change **Deeplink Destination**, copy the updated link from the campaign panel before you share it again.
+</Warning>
+
+## 3. Save
+
+Click **Update**. You see **Campaign updated successfully**.
+
+## What you can't change
+
+| Setting | Why |
+|---|---|
+| **Domain** | Fixed after creation. Changing it would break every link already shared on it. **Advanced Options** shows it greyed out. |
+| **Ad Channel** | Fixed after creation. To credit a different partner, create a new link. |
+| Turning the link off, deleting the campaign | Only the customer's team, and only for links with no ad channel. A link credited to a partner can't be turned off or deleted. |
+
+![Advanced Options open, with the domain greyed out and the link options below it](/images/agency-partners/edit-campaign-advanced.webp)
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion
+    title="&quot;You can't make this change&quot;"
+    description="The customer has not let your agency edit this campaign."
+  >
+    Either **Campaigns → Edit** is off for your agency, or the campaign is outside the networks or campaigns the customer shares with you. Ask the customer to check your agency's access in **Settings → Members**. See [Control agency access](/agency-partners/control-agency-access).
+  </Accordion>
+
+  <Accordion
+    title="The campaign is not in your list"
+    description="It is outside what the customer shares with you."
+  >
+    By default you only see campaigns your agency created. Ask the customer to turn off **Only campaigns they built** if you need to edit their other campaigns.
+  </Accordion>
+
+  <Accordion
+    title="&quot;Deep Link Error&quot;"
+    description="Linkrunner could not read the destination."
+  >
+    Enter only the path, for example `/offers/credit-card`, with no spaces. The domain in front of it is fixed.
+  </Accordion>
+
+  <Accordion
+    title="You need to switch off or delete the campaign"
+    description="Only the customer's team can do this."
+  >
+    You may see **Delete** or **Link status** in the form, but they don't work for an agency. Ask the customer to do it from their own dashboard. See [Deactivate a campaign link](/features/deactivate-campaign-link).
+
+    A link with an ad channel, such as one built for an affiliate, can't be turned off or deleted by anyone. Stop sending traffic to it instead.
+  </Accordion>
+</AccordionGroup>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
