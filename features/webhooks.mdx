@@ -423,7 +423,7 @@ Projects with [Web Campaigns](/features/website-projects) can also receive websi
 |-------|-----------|
 | `web_signup` | The Web SDK records `signup`, `sign_up`, `register` or `o2_sign_up_complete`. Sent once per user in any 90 days, so a later login or a repeated sign-up does not send it again. |
 
-Website events use the same `linkrunner-key` header and retries as app webhooks. **Send webhooks for organic users** works the same way: without it, only visitors who arrived from a paid ad or a tagged link are sent.
+Website events use the same `linkrunner-key` header, retries and IP addresses as app webhooks. **Send webhooks for organic users** works the same way: without it, only visitors who arrived from a paid ad or a tagged link are sent.
 
 ### Website Payload
 
