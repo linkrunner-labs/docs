@@ -121,6 +121,7 @@ All webhooks are sent as POST requests with a JSON body.
 | Field | Type | Description |
 |-------|------|-------------|
 | `event_type` | `"install"` \| `"signup"` | The type of attribution event |
+| `source` | `"app"` | Always `app` for these events. Website events send `web`, so one endpoint can handle both |
 | `lr_install_id` | `string` | Linkrunner's unique ID for the install |
 | `user_id` | `string` \| `null` | Customer user ID for signup webhooks |
 | `campaign_id` | `string` | Unique identifier for the campaign |
@@ -272,6 +273,7 @@ Example:
 ```json
 {
   "event_type": "install",
+  "source": "app",
   "lr_install_id": "e1c0f4a2-5b7d-4c19-9a3f-2d8e6b1c7a04",
   "campaign_id": "camp_XYZ123",
   "ad_channel": "META",
@@ -325,6 +327,7 @@ Sent only when **Send webhooks for organic users** is enabled:
 ```json
 {
   "event_type": "install",
+  "source": "app",
   "lr_install_id": "7f3b9d61-24ae-4f08-b512-c9a70e3d8b45",
   "campaign_id": "",
   "ad_channel": null,
@@ -364,6 +367,7 @@ Sent only when **Send webhooks for organic users** is enabled:
 ```json
 {
   "event_type": "signup",
+  "source": "app",
   "lr_install_id": "a48d2c07-6e91-4b33-8f5a-1b0c9de74265",
   "user_id": "test_user_webhook_002",
   "campaign_id": "OgWmhiSXhG",
