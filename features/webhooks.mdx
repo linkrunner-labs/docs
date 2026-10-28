@@ -71,6 +71,7 @@ Linkrunner sends webhooks for the following events:
 |-------|-------------|
 | `install` | Triggered when an app install is attributed to a campaign or organic source |
 | `signup` | Triggered when a user signup event is recorded via the SDK |
+| `web_signup` | Website sign-ups, when **Send web events** is on. See [Website Events](#website-events) |
 
 ### Install Webhook
 
@@ -406,6 +407,117 @@ Sent only when **Send webhooks for organic users** is enabled:
     "country": "India",
     "state": "Delhi",
     "city": "New Delhi"
+  }
+}
+```
+
+## Website Events
+
+Projects with [Web Campaigns](/features/website-projects) can also receive website sign-ups at the same webhook URL. Turn on **Send web events** in [Settings → Data Export → Webhooks](https://dashboard.linkrunner.io/dashboard/settings/data-export?tab=webhooks). A website project has this on by default for a new webhook.
+
+| Event | Sent when |
+|-------|-----------|
+| `web_signup` | The Web SDK records `signup`, `sign_up`, `register` or `o2_sign_up_complete`. Sent once per user in any 90 days, so a later login or a repeated sign-up does not send it again. |
+
+Website events use the same `linkrunner-key` header and retries as app webhooks. **Send webhooks for organic users** works the same way: without it, only visitors who arrived from a paid ad or a tagged link are sent.
+
+### Website Payload
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `event_type` | `"web_signup"` | Always `web_signup` |
+| `source` | `"web"` | Always `web`, so one endpoint can handle app and website events |
+| `event_id` | `string` | Unique ID of the event |
+| `event_name` | `string` | The event name your website sent |
+| `occurred_at` | `ISO 8601 date` | When Linkrunner received the event |
+| `user_id` | `string` \| `null` | The ID you passed to `lr.identify` |
+| `visitor_id` / `session_id` | `string` \| `null` | The Web SDK's visitor and session |
+| `name` / `email` / `phone` | `string` \| `null` | From the event's data, when you sent them |
+| `attributed` | `boolean` | `true` when the visitor came from a paid ad or a tagged link |
+| `attribution` | `object` | The visit that led to the event (last touch): `channel`, `network_name`, `utm`, `web_campaign` (your Linkrunner web link, when the `utm_id` is one), `click_ids` and `gad_campaignid` |
+| `first_touch` | `object` | The same fields for the visitor's first visit |
+| `page` | `object` | `url`, `entry_page` and `referring_domain` |
+| `device` | `object` | `user_agent`, `language` and `timezone` |
+| `additional_data` | `object` \| `null` | The event's data as your website sent it |
+
+<Note>
+The campaign in a website webhook is the one known when the event happens. For a Google Performance Max click, Linkrunner learns the exact campaign from Google later, so the Web Campaigns page may later show the visit under that campaign while the webhook carried the click's `gclid` and `gad_campaignid`.
+</Note>
+
+### Website Sign-up Example
+
+```json
+{
+  "event_type": "web_signup",
+  "source": "web",
+  "event_id": "evt_sample_123",
+  "event_name": "signup",
+  "occurred_at": "2026-10-28T10:15:00.000Z",
+  "user_id": "user_12345",
+  "visitor_id": "vis_6f1c2a",
+  "session_id": "ses_91d0b4",
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "phone": "+919999999999",
+  "attributed": true,
+  "attribution": {
+    "model": "last_touch",
+    "channel": "google",
+    "channel_label": "Google",
+    "traffic_source_type": "paid_search",
+    "traffic_source_name": "google",
+    "network_name": "GOOGLE",
+    "utm": {
+      "source": "google",
+      "medium": "cpc",
+      "campaign": "diwali_sale",
+      "id": "lr_sample_utm",
+      "term": null,
+      "content": null
+    },
+    "web_campaign": {
+      "name": "Diwali sale (Search)",
+      "link": "https://example.com/?utm_id=lr_sample_utm"
+    },
+    "click_ids": {
+      "gclid": "Cj0KCQjw_sample"
+    },
+    "gad_campaignid": "21234567890"
+  },
+  "first_touch": {
+    "channel": "meta",
+    "channel_label": "Meta",
+    "traffic_source_type": "paid_social",
+    "traffic_source_name": "meta",
+    "network_name": "META",
+    "utm": {
+      "source": "facebook",
+      "medium": "paid_social",
+      "campaign": "launch_week",
+      "id": null,
+      "term": null,
+      "content": null
+    },
+    "web_campaign": null,
+    "click_ids": {
+      "fbclid": "IwAR_sample"
+    },
+    "gad_campaignid": null
+  },
+  "page": {
+    "url": "https://example.com/signup?utm_source=google",
+    "entry_page": "/pricing",
+    "referring_domain": "google.com"
+  },
+  "device": {
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)",
+    "language": "en-IN",
+    "timezone": "Asia/Kolkata"
+  },
+  "additional_data": {
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "phone": "+919999999999"
   }
 }
 ```
