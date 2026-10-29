@@ -131,6 +131,7 @@ All webhooks are sent as POST requests with a JSON body.
 | `attributed_on` | `ISO 8601 date` | Timestamp when attribution occurred |
 | `installed_at` | `ISO 8601 date` \| `null` | Timestamp of app installation |
 | `store_click_at` | `ISO 8601 date` \| `null` | Timestamp of store redirect click |
+| `onboarded_at` | `ISO 8601 date` \| `null` | Signup webhooks only. When the user first signed up in your project. On a user's first signup this is that signup's time. If the same `user_id` signed up before, for example on another device, it is the earliest signup |
 | `link` | `string` | The campaign link URL |
 | `app_version` | `string` \| `null` | Installed app version |
 | `gaid` | `string` \| `null` | Google Advertising ID (Android) |
@@ -378,6 +379,7 @@ Sent only when **Send webhooks for organic users** is enabled:
   "attributed_on": "2026-03-25T15:52:00.007Z",
   "installed_at": "2025-12-30T12:34:29.742Z",
   "store_click_at": null,
+  "onboarded_at": "2026-03-25T15:52:00.007Z",
   "link": "https://dl.linkrunner.io/?c=OgWmhiSXhG&utm_source=meta_ads",
   "meta_campaign_details": null,
   "google_campaign_details": null,
