@@ -20,6 +20,10 @@ Measure how well your push notifications perform by attributing app opens to a L
 - `handleDeeplink` implemented in your app. Refer to your SDK guide ([Android](/sdk/android#handle-deeplink), [iOS](/sdk/ios#handle-deeplink), [React Native](/sdk/react-native#handle-deeplink), [Flutter](/sdk/flutter#handle-deeplink)) for the base setup.
 - A push notification provider (Firebase Cloud Messaging, OneSignal, Braze, CleverTap, etc.) already sending notifications to your app.
 
+<Note>
+  Building on Appbrew? `@linkrunner/appbrew` 0.3.0 or higher reports push taps for you. Create the campaign and put its link in the push's `data.link`, then skip the `handleDeeplink` step. Calling it from your own push handlers reports every tap twice. See [Appbrew push notifications](/sdk/appbrew#push-notifications).
+</Note>
+
 ## Setup
 
 <Steps>
