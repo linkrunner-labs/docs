@@ -33,14 +33,16 @@ cd ios && pod install
 
 ## 2. Register the tracker
 
-In `src/app/App.tsx`, alongside Appbrew's own trackers:
+In `src/app/App.tsx`, on the same provider as Appbrew's own trackers:
 
 ```typescript
-import { AnalyticsProvider } from '@gauntlet/analytics'
+import { AnalyticsProviderV2 } from '@gauntlet/analytics'
 import { LinkrunnerTrackerV2 } from '@linkrunner/appbrew'
 
-AnalyticsProvider.getInstance().addTracker(new LinkrunnerTrackerV2())
+AnalyticsProviderV2.getInstance().addTracker(new LinkrunnerTrackerV2())
 ```
+
+Apps on gauntlet 0.30 or higher use `AnalyticsProviderV2` as their `analytics` module. If your app still uses `AnalyticsProvider` there, register the tracker on `AnalyticsProvider` instead. The tracker only receives events from the provider your app sends them through.
 
 Do not put the token in code. It arrives at runtime from the Appbrew dashboard.
 
