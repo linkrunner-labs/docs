@@ -141,9 +141,11 @@ POST: /remove-payment
 
 **NOTE:** `user_id` or `payment_id` is required in order to remove a payment entry. If you pass `user_id`, all the payments attributed to that user will be removed!
 
+Use this for refunds and cancellations. It marks the matching payments as removed, so they stop counting in your revenue reports. The payment records themselves are kept, so this is not a way to erase a user's data. For a data deletion request, contact [support@linkrunner.io](mailto:support@linkrunner.io).
+
 ### Responses
 
-1. **200** Payment entry/entries deleted
+1. **200** Payment entry/entries marked as removed
 2. **400** No payment found with the given payment id or user id
 3. **401** Invalid server key
 

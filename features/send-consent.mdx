@@ -11,9 +11,13 @@ Google's [EU User Consent Policy](https://www.google.com/about/company/user-cons
 
 It applies to end users located in the **European Economic Area** (the 27 EU states plus Iceland, Liechtenstein, and Norway), the **United Kingdom**, and **Switzerland**. It follows the user's location, not where your company is based.
 
-Linkrunner forwards these values with every install and event it sends to Google. Report nothing for an in-scope user and Google has less to match on, so conversions can be dropped and campaign performance suffers.
+Linkrunner forwards these values with every install and event it sends to Google (on iOS today, see the Android note below). Report nothing for an in-scope user and Google has less to match on, so conversions can be dropped and campaign performance suffers.
 
-**By default Linkrunner sends nothing.** Every signal starts as `unknown` until you set it, and unknown signals are left out of the request entirely. Linkrunner never fills in a default on your behalf, in either direction, so a user's consent state is only ever what your app reported.
+**By default Linkrunner sends nothing.** Every signal starts as `unknown` until you set it, and unknown signals are left out of the request entirely. Linkrunner never fills in a default on your behalf, in either direction, so a user's consent state is only ever what your app reported. Android is the one exception for now:
+
+<Warning>
+    **Android installs do not carry your consent values yet.** Forwarding SDK consent to Google is on for iOS. For Android it stays off while apps move to Android SDK 4.1.0 or later. Until it is switched on, Linkrunner sends Google its previous fixed values for every Android install (`eea=0`, `ad_user_data=1`, `ad_personalization=1`), whatever your app reported. Call `setConsent` on Android now anyway, so your users' real choices are used as soon as forwarding is switched on.
+</Warning>
 
 <Note>
     Other privacy laws (India's DPDP Act, Brazil's LGPD, and so on) are separate frameworks with no Google conversion parameter. For a user outside the EEA, the UK, and Switzerland, report `isEEA` as denied and leave the other two unset.
