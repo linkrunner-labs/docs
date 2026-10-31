@@ -122,6 +122,81 @@ Upon successful event capture, the API returns:
 
 `processing_id` identifies this request. Log it on your side and share it with Linkrunner support if an event does not show up. If you did not send an `event_id`, Linkrunner also uses `processing_id` as the event's ID.
 
+## Capture Events in a Batch
+
+Use the batch endpoint when your backend sends many events, for example from a queue or an event pipeline. One request carries up to 100 events, and each event is processed exactly as if you had sent it to `/capture-event` on its own.
+
+```
+POST: /capture-event/batch
+```
+
+### Request Body
+
+Put each event, in the same format as the [Capture Event](#capture-event) request body, in an `events` array:
+
+```json
+{
+  "events": [
+    {
+      "event_name": "product_viewed",
+      "event_data": { "product_id": "ABC123" },
+      "user_id": "user_12345",
+      "event_id": "evt_12345"
+    },
+    {
+      "event_name": "cart_added",
+      "install_instance_id": "f2b1c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+      "event_id": "evt_12346"
+    }
+  ]
+}
+```
+
+- Send between 1 and 100 events. The whole request body must be at most 1 MB (1,048,576 bytes).
+- Events are processed in the order you send them.
+- A batch counts as one request towards the rate limit.
+
+### Responses
+
+1. **200** The batch was processed. Check each event's result, because some events can be rejected while others are captured.
+2. **400** The body is not valid JSON, `events` is missing or empty, or it has more than 100 events. No event in the batch was captured.
+3. **401** Invalid server key
+4. **413** The request body is larger than 1 MB
+5. **429** Too many requests, see [Error Handling](#error-handling)
+
+#### Sample Response
+
+```json
+{
+  "msg": "Event batch processed!",
+  "status": 200,
+  "processing_id": "0d9b8f1e-6a2c-4d3b-9e7f-1c2b3a4d5e6f",
+  "data": {
+    "accepted": 1,
+    "rejected": 1,
+    "results": [
+      {
+        "index": 0,
+        "status": 200,
+        "msg": "Event capture request received!",
+        "processing_id": "6f1c2a9e-3b7d-4c55-9a0e-2f8d1b4e7c10",
+        "data": { "message": "Event capture request received!" }
+      },
+      {
+        "index": 1,
+        "status": 400,
+        "msg": "Event name is required!"
+      }
+    ]
+  }
+}
+```
+
+- `results` has one entry per event, in request order. `index` is the event's position in `events`, starting at 0.
+- Each result has the same `status` and `msg` that `/capture-event` returns for that event. A captured event has its own `processing_id`, which works the same as on a single request.
+- The top-level `processing_id` identifies the batch request. Share it with Linkrunner support together with the event's own `processing_id` if an event does not show up.
+- **Retrying.** Do not resend events with a 400 result without fixing them. A 500 result can be retried. Send your own `event_id` on every event, so a resent event carries the same ID as the first attempt.
+
 ## Common Event Names
 
 Here are some common event names you might want to track:
