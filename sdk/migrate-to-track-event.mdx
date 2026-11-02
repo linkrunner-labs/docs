@@ -17,6 +17,22 @@ In the new SDK versions, a payment is an in-app event with revenue. You send it 
   Linkrunner matches the name exactly. A different spelling is treated as a new in-app event, so your existing Meta and Google mappings will not match it, and those payments will not be sent to Meta or Google.
 </Warning>
 
+## Migrate with your AI coding agent
+
+If you use Claude Code, Cursor, GitHub Copilot, or Windsurf, install the migration skill in your app's repo:
+
+```bash
+npx @linkrunner/skills add migrate-payments
+```
+
+Then ask your agent:
+
+```text
+Migrate my Linkrunner capturePayment and removePayment calls to trackEvent.
+```
+
+The agent finds every payment call, upgrades the SDK to the right version, keeps each payment name exactly as before, and asks you for the currency of your payments. Review its changes and test one payment on a debug build, as in [How to migrate](#how-to-migrate). See [Linkrunner Agent Skills](/ai-agent-skills) for setup.
+
 ## Before and after
 
 The old `capturePayment` call, then the same payment with `trackEvent`. The product keys are optional: Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`, and Google receives `content_ids` as item IDs. `amount` stays the order total.
