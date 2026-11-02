@@ -377,7 +377,7 @@ If you did not pass a `type` before, your payments were saved as `DEFAULT`. Use 
 
 ## Refunds and removePayment
 
-`removePayment` is deprecated. It still works in the new versions and shows a deprecation warning, and it will be removed in a future major version. To record a refund or a cancelled booking, call `trackEvent` with the same event name and `paymentId` and `status` set to `PAYMENT_CANCELLED`. That payment no longer counts as revenue, and nothing is sent to ad networks.
+`removePayment` is deprecated. It still works in the new versions and shows a deprecation warning, and it will be removed in a future major version. To record a refund or a cancelled booking, call `trackEvent` with the same event name, `paymentId`, `amount`, and `currency` as the original payment, and `status` set to `PAYMENT_CANCELLED`. All three payment fields are needed, or the SDK rejects the call. That payment no longer counts as revenue, and nothing is sent to ad networks.
 
 ## Using a new event name
 

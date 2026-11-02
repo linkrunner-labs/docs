@@ -665,7 +665,7 @@ How `trackEvent` decides:
 | `PAYMENT_INITIATED` | The user started paying, such as opening the checkout or payment sheet. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
 | `PAYMENT_COMPLETED` (default) | The charge succeeded. | Added to revenue and paying users. Sent to ad networks when the event name is mapped. |
 | `PAYMENT_FAILED` | The charge was declined or errored. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
-| `PAYMENT_CANCELLED` | The user backed out before paying, or you refunded it. Send it with the same `paymentId` as the completed payment. | Stored for reports and analytics. The payment no longer counts as revenue and nothing is sent to ad networks. |
+| `PAYMENT_CANCELLED` | The user backed out before paying, or you refunded it. Send it with the same event name, `paymentId`, `amount`, and `currency` as the completed payment. | Stored for reports and analytics. The payment no longer counts as revenue and nothing is sent to ad networks. |
 
 Linkrunner keeps one payment per `paymentId`, event name, and status, so a retry with the same values is recorded once. See [Payment status](/sdk/track-payments#payment-status) for a full lifecycle example.
 
