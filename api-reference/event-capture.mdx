@@ -95,7 +95,7 @@ Send `amount`, `payment_id`, and `currency` at the top level of the request, nex
 }
 ```
 
-- **Send all three or none.** If you send only one or two of `amount`, `payment_id`, and `currency`, the request fails with `400` and the message `amount, payment_id and currency must be sent together`.
+- **Send all three.** If you send only one or two of `amount`, `payment_id`, and `currency`, the request is stored as a normal custom event, not a payment, and the API returns `200`.
 - **`amount`** must be a number of zero or more. A numeric string such as `"149.99"` is also accepted.
 - **`payment_id`** must be a non-empty string. Use a unique value for each transaction. Retrying a request with the same `payment_id`, `event_name`, and `status` does not create a second payment, and the API still returns `200`.
 - **`currency`** must be a 3-letter ISO 4217 code. Lowercase is accepted and stored in uppercase.
@@ -137,7 +137,7 @@ If the event comes from a user of your website rather than your app, send `"sour
 ### Responses
 
 1. **200** Event or payment captured successfully
-2. **400** Missing required parameters, neither `user_id` nor `install_instance_id` was sent, the payment fields are incomplete or invalid, `source` is not `app` or `web`, or `source` is `web` and `user_id` is missing or website tracking is not enabled for the project
+2. **400** Missing required parameters, neither `user_id` nor `install_instance_id` was sent, all three payment fields are sent but one is invalid, `source` is not `app` or `web`, or `source` is `web` and `user_id` is missing or website tracking is not enabled for the project
 3. **401** Invalid server key
 
 #### Sample Response

@@ -205,7 +205,7 @@ Tracks a custom event or a payment. Events are stored for all users, including o
 | `currency` | string | Payment only. 3-letter ISO 4217 code, for example `"USD"`. |
 | `status` | string | Optional, payment only. Defaults to `PAYMENT_COMPLETED`. |
 
-To record a payment, send `amount`, `payment_id`, and `currency` together at the top level. Sending only one or two of them returns `400` with `amount, payment_id and currency must be sent together`. Without them, the request is a custom event. An `amount` inside `event_data` does not make the request a payment.
+To record a payment, send `amount`, `payment_id`, and `currency` together at the top level. With only one or two of them, or none, the request is a custom event. An `amount` inside `event_data` does not make the request a payment.
 
 Retrying with the same `payment_id`, `event_name`, and `status` does not create a second payment and still returns `200`. Only `PAYMENT_COMPLETED` payments are sent to ad networks.
 
@@ -285,7 +285,7 @@ Reports a deeplink open for remarketing and reattribution. Call when your app op
 
 | Code | Meaning |
 | --- | --- |
-| `400` | Missing required field, invalid token, or incomplete payment fields. |
+| `400` | Missing required field, invalid token, or an invalid payment field when all three are sent. |
 | `401` | Invalid token (on `attribution-data`). |
 | `429` | Rate limit exceeded (25 req/s per token). |
 | `500` | Server error. Retry with backoff. |

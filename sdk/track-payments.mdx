@@ -968,8 +968,8 @@ Linkrunner keeps one payment per `paymentId`, event name, and status. Use this t
   <Accordion title="Revenue is missing for some payments">
     Only `PAYMENT_COMPLETED` payments count as revenue. Check **Payment Status** on the missing rows. Also check that a second payment did not reuse the `paymentId`, event name, and status of an earlier one.
   </Accordion>
-  <Accordion title="The server-side API returns 400">
-    `amount, payment_id and currency must be sent together` means the request had only one or two of the three payment fields. Send all three. See [Payment fields](/api-reference/event-capture#payment-fields).
+  <Accordion title="A server-side payment shows up as a custom event">
+    The request had only one or two of `amount`, `payment_id`, and `currency`. Linkrunner stores it as a custom event and returns `200`. Send all three. See [Payment fields](/api-reference/event-capture#payment-fields).
   </Accordion>
 </AccordionGroup>
 

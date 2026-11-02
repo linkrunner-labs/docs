@@ -102,7 +102,7 @@ If you record a failed or cancelled payment, send its final state once. Linkrunn
       }'
     ```
 
-    A successful API request returns HTTP `200` with `Event capture request received!`. A `400` with `amount, payment_id and currency must be sent together` means one of the three payment fields is missing.
+    A successful API request returns HTTP `200` with `Event capture request received!`. If a payment shows up as a custom event, one of the three payment fields is missing.
   </Step>
 
   <Step title="Verify both records in Linkrunner">

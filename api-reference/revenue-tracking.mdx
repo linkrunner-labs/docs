@@ -62,7 +62,7 @@ POST: /capture-event
 | event_data | object | **Optional**. Additional data, such as ecommerce fields |
 | client_ip_address | string | **Optional**. See [End-user IP address](#end-user-ip-address) |
 
-Send `amount`, `payment_id`, and `currency` together. If you send only one or two of them, the request fails with `400` and the message `amount, payment_id and currency must be sent together`. If you send none of them, the request is stored as a custom event, not a payment. An `amount` inside `event_data` does not make the event a payment.
+Send `amount`, `payment_id`, and `currency` together. If you send none of them, or only one or two, the request is stored as a custom event, not a payment. An `amount` inside `event_data` does not make the event a payment.
 
 **Deduplication:** Use a unique `payment_id` for each transaction. Retrying a request with the same `payment_id`, `event_name`, and `status` does not create a second payment, and the API still returns `200`.
 
@@ -85,7 +85,7 @@ These calls come from your server, so Linkrunner never sends your server's IP to
 ### Responses
 
 1. **200** Payment captured. The response is the same as for a [custom event](/api-reference/event-capture#sample-response), including `processing_id`
-2. **400** Missing or invalid fields, or the payment fields were not sent together
+2. **400** Missing fields, or all three payment fields were sent but one is invalid
 3. **401** Invalid server key
 
 <Note>
