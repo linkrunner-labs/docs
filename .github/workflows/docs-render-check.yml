@@ -6,14 +6,16 @@ name: Docs render check
 # internal link) has to be caught here, before merge.
 #
 # `mint validate` runs Mintlify's content checks and then a strict build; it exits 1 on any
-# error. `mint broken-links` checks every internal link and anchor. The CLI is pinned so a new
-# Mintlify release can't change the result of an unchanged PR; bump MINT_VERSION on purpose.
+# error. `mint broken-links` checks every internal link and anchor. The CLI is pinned (bump
+# MINT_VERSION on purpose); the strict build still uses Mintlify's current page renderer, the
+# same one docs.linkrunner.io is deployed with, so a Mintlify release can change a result.
 #
 # Runs on every PR (no path filter) so it can be a required check, and on pushes to main so a
 # direct push that breaks rendering still shows a red X.
 
 on:
   pull_request:
+  merge_group:
   push:
     branches: [main]
   workflow_dispatch:
@@ -27,6 +29,8 @@ concurrency:
 
 env:
   MINT_VERSION: "4.2.1184"
+  MINTLIFY_TELEMETRY_DISABLED: "1"
+  DO_NOT_TRACK: "1"
 
 jobs:
   render:
@@ -41,6 +45,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "24"
+
+      # The CLI is about 380 MB; reuse it across runs of the same version.
+      - name: Cache the Mintlify CLI
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm/_npx
+          key: mint-${{ runner.os }}-${{ env.MINT_VERSION }}
 
       - name: Validate content and build (mint validate)
         run: npx --yes "mint@${MINT_VERSION}" validate
