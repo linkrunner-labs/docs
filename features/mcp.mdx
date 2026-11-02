@@ -144,6 +144,7 @@ Your assistant picks the right tool for your question. Some examples:
 - "Which campaigns should I cut based on ROAS?"
 - "Why did installs drop yesterday?"
 - "How much of my growth is organic?"
+- "What is our D7 and D30 LTV for September installs, and when did they pay back?"
 - "Where do users drop off between install and checkout?"
 - "Is my iOS link setup right? The link opens the App Store instead of my app."
 - "Is Meta receiving my purchase events?"
@@ -167,6 +168,13 @@ show them in their prompt picker:
 These are shortcuts. You can always ask the same questions in your own words.
 
 ## Tool reference
+
+A sign-in connection offers 45 tools: 28 that read and 17 that make changes.
+A token connection with **Make changes in Linkrunner** turned on offers the
+same tools except the overview, account, and `create_project` tools (40), plus
+7 read-only
+[ad-account tools](#what-the-connector-can-read-from-your-ad-accounts) when the
+token has **Read connected ad accounts**.
 
 Your assistant reads each tool's description and decides which to call. You
 don't need to call tools yourself. Tools that change your project are listed
@@ -207,6 +215,7 @@ token decides the project, and the overview and account tools are not offered.
 | `get_campaign_details` | One named campaign day by day, over any date range. |
 | `get_channel_performance` | One row per acquisition channel (Meta, Google, TikTok, Snapchat, Apple Search Ads, Linkrunner Links, Organic). |
 | `get_organic_performance` | Installs, sign-ups, and revenue carrying no campaign, as a single organic total. |
+| `get_cohort_ltv` | LTV, ROAS, and payback day for a cohort of installs at day-since-install marks (D0, D1, D7, D14, D30 by default), for all installs or only those that did an event, in total or by campaign. A mark the cohort has not reached yet is reported as not reached, not as zero. |
 | `list_event_names` | Custom and revenue event names you've defined. |
 | `search_event_log` | Individual event rows with timestamp, user, campaign, platform, and device. |
 | `list_funnels` | Names and step definitions of the funnels saved in your dashboard. |

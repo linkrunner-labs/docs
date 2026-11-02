@@ -88,6 +88,8 @@ If your dataset is not in the list, click **Enter a Dataset ID instead** and pas
 
 <img src="/images/meta/configure-capi-dataset-picker.png" alt="Configure CAPI modal with the token pasted and the matching dataset selected" />
 
+After you save, the **Conversions API** column for the ad account shows **Waiting for first event**. It changes to **Sending** once Meta accepts your next conversion event. If it shows **Paused**, see [CAPI delivery paused](#capi-delivery-paused).
+
 ## 2. Set Up Event Mapping
 
 Map your app events to Meta events so Linkrunner can send postback conversions.
@@ -364,6 +366,37 @@ If your datasets do not load, your Meta login may not have access to them. Enter
 **Conversions API is set up** means the token matches the dataset. Delivery is confirmed only when Meta accepts a live event, so continue with [event mapping](#2-set-up-event-mapping) and check **Test Events** or **Overview** in Meta Events Manager.
 
 If the error persists, contact [support@linkrunner.io](mailto:support@linkrunner.io) with the dataset ID, ad account ID, exact error, and a screenshot with the token masked. Never send access tokens, app secrets, or referrer decryption keys in WhatsApp, email, or screenshots.
+
+### CAPI delivery paused
+
+If Meta rejects the events we send to a dataset because of its access token or the dataset itself, Linkrunner stops sending to that dataset and marks it **Paused**. Other datasets, ad accounts and ad networks keep sending as usual.
+
+In [Meta Ads → Ad Account Integration](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=ad_account), an alert above your ad accounts shows which dataset is paused, why, and since when. The **Conversions API** column shows the status of every ad account.
+
+<img src="/images/meta/capi-delivery-status.png" alt="Meta ad accounts table with a paused-dataset alert and Conversions API statuses: Sending, Paused, Waiting for first event, Turned off and Retrying" />
+
+To fix a paused dataset:
+
+1. Read the reason in the alert:
+   - **Meta says the access token is invalid or has expired:** generate a new token in Meta Events Manager under **Settings → Conversions API** for the same dataset.
+   - **Meta can't find this dataset, or the token no longer has access to it:** check that the dataset still exists in Events Manager and that the token was generated from it. If the dataset moved to another business, generate a token from the dataset you now use.
+2. Click **Update token** in the alert, paste the token, choose the dataset and click **Save**. Project admins and members see this button.
+3. The status changes to **Waiting for first event**, then to **Sending** when Meta accepts your next conversion event.
+
+Reconnecting the ad account with **Add Meta Account** does not fix a paused dataset. Only a new token or dataset does.
+
+<Warning>
+    Events are not sent to Meta while a dataset is paused, and they are not resent after it is fixed. Fix a paused dataset as soon as you see it.
+</Warning>
+
+Other statuses:
+
+- **Retrying:** 30 minutes after a pause, Linkrunner starts sending your conversion events again. If Meta accepts one, the dataset goes back to **Sending**. If Meta rejects them for the same reason, it is paused again and retried 30 minutes later.
+- **Turned off:** Linkrunner support turned off delivery to this dataset. Email [support@linkrunner.io](mailto:support@linkrunner.io) to turn it back on.
+
+Click **View history** in the alert, or **Delivery history** in the ad account's ⋮ menu, to see every status change with the date and reason.
+
+<img src="/images/meta/capi-delivery-paused-history.png" alt="Delivery history of a paused dataset, showing when it started sending and when it was paused" />
 
 ### Events Not Showing Up in Meta
 

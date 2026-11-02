@@ -146,7 +146,7 @@
                     },
                     {
                         "group": "Billing",
-                        "pages": ["billing/overview", "billing/wallet"]
+                        "pages": ["billing/overview", "billing/wallet", "billing/finance-role"]
                     },
                     {
                         "group": "Troubleshooting",
@@ -264,6 +264,7 @@
                             "affiliate-partners/create-account",
                             "affiliate-partners/add-agency-account",
                             "affiliate-partners/create-campaign-link",
+                            "affiliate-partners/edit-campaign",
                             "affiliate-partners/tracking-links",
                             "affiliate-partners/s2s-clicks",
                             "affiliate-partners/s2s-impressions",
@@ -295,6 +296,7 @@
                             "agency-partners/add-affiliate-account",
                             "agency-partners/manage-workspace",
                             "agency-partners/create-campaign-link",
+                            "agency-partners/edit-campaign",
                             "agency-partners/campaigns-for-affiliates",
                             "agency-partners/invite-an-agency",
                             "agency-partners/control-agency-access"
@@ -417,6 +419,10 @@
         {
             "source": "/ecommerce-manager/google-merchant-center",
             "destination": "/ecommerce-manager/google-commerce-manager"
+        },
+        {
+            "source": "/api-reference/introduction",
+            "destination": "/api-reference/data-apis"
         }
     ]
 }

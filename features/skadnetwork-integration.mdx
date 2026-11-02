@@ -31,30 +31,31 @@ Make sure your app is using at least these SDK versions before enabling SKAN. Li
 
 <CardGroup cols={2}>
     <Card title="Native iOS" icon="swift">
-        **linkrunner-ios >=3.1.0**
+        **linkrunner-ios >=4.3.2**
     </Card>
     <Card title="React Native" icon="react">
-        **rn-linkrunner >=2.3.0**
+        **rn-linkrunner >=3.4.2**
     </Card>
 </CardGroup>
 
 <CardGroup cols={2}>
     <Card title="Flutter" icon="flutter">
-        **linkrunner >=3.1.1**
+        **linkrunner >=4.4.2**
     </Card>
     <Card title="Expo" icon="rocket">
-        **expo-linkrunner >=3.2.0**
+        **expo-linkrunner >=3.6.5**
     </Card>
 </CardGroup>
 
 <Note>
     Capacitor, Cordova, and Unity apps use the native iOS SDK (LinkrunnerKit) under the hood, so the **linkrunner-ios
-    >=3.1.0** requirement applies to them as well.
+    >=4.3.2** requirement applies to them as well (**capacitor-linkrunner >=2.4.2**, **cordova-linkrunner >=1.5.4**).
+    Older versions leave the conversion value empty on SKAdNetwork postbacks from devices on iOS 17.4 and above.
 </Note>
 
 ### How the SDK updates conversion values
 
-You don't need to call any SKAN APIs yourself. On first launch the SDK registers an initial conversion value (0/low), and every `trackEvent` (including payments) and `signup` call returns the updated conversion value from Linkrunner, which the SDK applies automatically. On iOS 17.4+ the SDK uses Apple's AdAttributionKit; on iOS 14.0–17.3 it falls back to SKAdNetwork.
+You don't need to call any SKAN APIs yourself. On first launch the SDK registers an initial conversion value (0/low), and every `trackEvent` (including payments) and `signup` call returns the updated conversion value from Linkrunner, which the SDK applies automatically. On iOS 17.4+ the SDK updates both AdAttributionKit and SKAdNetwork, so networks on either framework (Meta and Google sign with SKAdNetwork) receive the value. On iOS 14.0 to 17.3 it uses SKAdNetwork.
 
 ### Add Ad Network Identifiers
 

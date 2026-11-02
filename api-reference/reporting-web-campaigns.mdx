@@ -123,8 +123,8 @@ Numbers are plain JSON numbers, not formatted strings. `from` and `to` in the re
 | `network_campaign_id`        | string | (none)           | With the network groupings only: keep rows under this ad network campaign. |
 | `ad_set_id`                  | string | (none)           | With the network groupings only: keep rows under this ad set or ad group. |
 | `attribution`                | string | `last_touch`     | `last_touch` or `first_touch`. |
-| `channel`                    | string | (all)            | A value returned in `channel` when `group_by=channel`, for example `meta`, `google`, `paid_social`, `organic_search` or `direct`. |
-| `source`                     | string | (all)            | A traffic source, for example `facebook` or `google`. |
+| `channel`                    | string | (all)            | A value returned in `channel` when `group_by=channel`, for example `meta`, `google`, `chatgpt`, `paid_social`, `organic_search` or `direct`. `meta`, `google` and `chatgpt` are those networks' paid traffic; `paid_social` and `paid_search` hold the other networks' paid traffic. |
+| `source`                     | string | (all)            | A traffic source, for example `facebook` or `google`. With no `channel`, a Meta, Google or ChatGPT spelling (`facebook`, `instagram`, `google_ads`, `openai` and so on) means that network's paid traffic. Pass `channel` for other traffic: `channel=organic_search&source=google` is organic Google, and `channel=ai_search&source=chatgpt` is ChatGPT referrals. |
 | `utm_source`, `utm_medium`, `utm_campaign`, `utm_id`, `utm_content`, `utm_term` | string | (all) | Exact match on the UTM value. |
 | `search`                     | string | (none)           | Partial match on the row `id`. |
 | `events`                     | string | (none)           | Comma-separated custom event names to count. See [Custom events](#custom-events). |
@@ -147,6 +147,8 @@ Send each parameter once. A repeated parameter, such as `limit=5&limit=50`, retu
 | `ad`               | A Meta or Google Ads ad                            | The ad ID. |
 
 `network_campaign`, `ad_set` and `ad` answer for one network at a time, so `network` is required with them. A `channel` or `source` from a different network, such as `network=meta&source=google`, returns `400`.
+
+With `network=google`, a `network_campaign` row's `id` is not always a numeric Google Ads campaign ID. Clicks that reached your site with no Google campaign ID are listed under their `utm_id`, else their `utm_campaign`, the same rows the dashboard shows, so `id` can be text such as `BOF-Search-Brand`. Do not parse `id` as a number, and match it to a Google Ads campaign only when it is numeric.
 
 Some rows collect traffic that has no key, such as visits without a `utm_id`. Their `id` is `null` and their `name` describes the bucket, for example `(no campaign ID)`.
 
@@ -207,6 +209,8 @@ curl 'https://api.linkrunner.io/api/v1/reporting/web-campaigns?group_by=ad_set&n
 ```
 
 Use `ad_set_id` the same way with `group_by=ad`.
+
+`network_campaign_id` and `ad_set_id` must equal the parent row's `id` exactly, spaces included. Some ids come from your links' UTM values, such as a `utm_campaign` that ends in a space. Send the `id` as the API returned it: a trimmed value no longer matches that row.
 
 ### Errors
 

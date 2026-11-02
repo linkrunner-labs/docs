@@ -325,6 +325,14 @@ Expect a `204` response with an `access-control-allow-origin` header. Then confi
 
 The 24-hour `localStorage` copy preserves last-touch UTMs when a payment gateway or 3D Secure flow returns the visitor in a new tab.
 
+Last-touch credit goes to the visitor's latest tagged touch:
+
+- The most recent ad click, whichever network it came from. A Meta ad clicked after a Google ad is Meta.
+- A later visit from a tagged link with no ad click ID, such as an email or partner link with a `utm_source`, for 24 hours from that visit. After that, the last ad click gets the credit again for the rest of its 90 days.
+- A reload, the browser's back or forward button, or a link on your own site is not a new touch, even when the URL carries UTMs.
+
+Every stored ad click ID is still sent with each event, so each connected ad network's conversion postback still gets its own click ID. First-touch attribution never changes.
+
 ## Troubleshooting
 
 <AccordionGroup>
