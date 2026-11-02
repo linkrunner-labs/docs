@@ -112,7 +112,7 @@ On iOS, Linkrunner counts only SKAN postbacks with `did_win=TRUE`. Google Ads tr
 | Area                     | Google Ads                                                                   | Linkrunner                                                            |
 | ------------------------ | ---------------------------------------------------------------------------- | --------------------------------------------------------------------- |
 | Install record time      | Click time                                                                   | First app open (Android) or SKAN postback time (iOS)                  |
-| In-app event record time | Click time                                                                   | Campaigns tab: an event column counts an event on the day it happened, in the project time zone, credited to the install's campaign. Day-N cohort columns (for example `· D7`) group by install date |
+| In-app event record time | Click time                                                                   | Campaigns tab: the day the event happened, in the project time zone, credited to the install's campaign |
 | Attribution window       | 30 days for installs, 90 days for in-app events                              | Uses Google's API defaults; configurable per project                  |
 | Time zones               | Account local time                                                           | Project time zone                                                     |
 | View-through conversions | Shown in **All conversions** column, not **Conversions** column by default   | Click-through and view-through surfaced separately when Google provides them |
