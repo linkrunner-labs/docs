@@ -66,14 +66,14 @@ npm install -g mintlify
 mintlify dev --port 3001
 ```
 
+The preview is at http://localhost:3001. Check the installed CLI's supported commands before using additional validators. Run applicable example checks with pinned dependencies and document any unavailable runtime or access. Do not change dependency versions as an incidental part of a docs edit.
+
 Before pushing, run the same render check CI runs on every PR (the "Docs render check" job, `.github/workflows/docs-render-check.yml`). It fails on MDX that won't parse, pages in `docs.json` with no file, imports or components that don't resolve, and broken internal links:
 
 ```bash
 npx --yes mint@4.2.1184 validate
 npx --yes mint@4.2.1184 broken-links
 ```
-
-The preview is at http://localhost:3001. Check the installed CLI's supported commands before using additional validators. Run applicable example checks with pinned dependencies and document any unavailable runtime or access. Do not change dependency versions as an incidental part of a docs edit.
 
 ## Review and publication
 
