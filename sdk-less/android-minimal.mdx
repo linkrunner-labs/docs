@@ -132,16 +132,23 @@ object LinkrunnerMinimal {
                 .put("data", JSONObject().put("device_data", deviceData(context)))
         )
 
-    suspend fun trackEvent(context: Context, name: String, data: JSONObject? = null) =
+    // Send amount, paymentId, and currency together to record a payment; leave them out for a custom event
+    suspend fun trackEvent(
+        context: Context,
+        name: String,
+        data: JSONObject? = null,
+        amount: Double? = null,
+        paymentId: String? = null,
+        currency: String? = null
+    ) =
         post(
             "/api/client/capture-event",
-            base(context).put("event_name", name).apply { if (data != null) put("event_data", data) }
-        )
-
-    suspend fun capturePayment(context: Context, userId: String, amount: Double, paymentId: String) =
-        post(
-            "/api/client/capture-payment",
-            base(context).put("user_id", userId).put("amount", amount).put("payment_id", paymentId).put("status", "PAYMENT_COMPLETED")
+            base(context).put("event_name", name).apply {
+                if (data != null) put("event_data", data)
+                if (amount != null && paymentId != null && currency != null) {
+                    put("amount", amount).put("payment_id", paymentId).put("currency", currency)
+                }
+            }
         )
 }
 ```
@@ -185,9 +192,9 @@ CoroutineScope(Dispatchers.IO).launch {
     LinkrunnerMinimal.trackEvent(context, "purchase_initiated", JSONObject().put("amount", 99.99))
 }
 
-// 5. Capture a payment
+// 5. Track a payment
 CoroutineScope(Dispatchers.IO).launch {
-    LinkrunnerMinimal.capturePayment(context, userId = "user_123", amount = 99.99, paymentId = "payment_123")
+    LinkrunnerMinimal.trackEvent(context, "purchase_completed", amount = 99.99, paymentId = "payment_123", currency = "USD")
 }
 ```
 

@@ -51,10 +51,11 @@ Cross-cutting skills that are not tied to one platform:
 | --- | --- |
 | Deep link troubleshooter | `npx @linkrunner/skills add deep-links` |
 | Event & revenue instrumentation | `npx @linkrunner/skills add events` |
+| Migrate payments to `trackEvent` | `npx @linkrunner/skills add migrate-payments` |
 | Webhooks receiver | `npx @linkrunner/skills add webhooks` |
 | Meta Install Referrer (view-through) | `npx @linkrunner/skills add meta-install-referrer` |
 
-The **deep link troubleshooter** diagnoses why Universal Links / App Links open the browser instead of the app. The **events** skill wires up the correct event taxonomy, revenue tracking, and server-side APIs. The **webhooks** skill writes a receiver in your backend that verifies the `linkrunner-key` header and handles install/signup payloads.
+The **deep link troubleshooter** diagnoses why Universal Links / App Links open the browser instead of the app. The **events** skill wires up the correct event taxonomy, revenue tracking, and server-side APIs. The **migrate-payments** skill moves deprecated `capturePayment` and `removePayment` calls to `trackEvent`, keeping each payment name exactly as before. The **webhooks** skill writes a receiver in your backend that verifies the `linkrunner-key` header and handles install/signup payloads.
 
 ## Create the project from a chat
 
