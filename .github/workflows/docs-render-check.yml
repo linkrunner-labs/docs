@@ -1,0 +1,60 @@
+name: Docs render check
+
+# One check that a PR can't break docs.linkrunner.io. Mintlify deploys `main` as soon as it
+# changes, so anything it can't render (an MDX parse error, a page in docs.json with no file,
+# an import or component that doesn't resolve, an OpenAPI spec that doesn't parse, a broken
+# internal link) has to be caught here, before merge.
+#
+# `mint validate` runs Mintlify's content checks and then a strict build; it exits 1 on any
+# error. `mint broken-links` checks every internal link and anchor. The CLI is pinned (bump
+# MINT_VERSION on purpose); the strict build still uses Mintlify's current page renderer, the
+# same one docs.linkrunner.io is deployed with, so a Mintlify release can change a result.
+#
+# Runs on every PR (no path filter) so it can be a required check, and on pushes to main so a
+# direct push that breaks rendering still shows a red X.
+
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-render-check-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  MINT_VERSION: "4.2.1184"
+  MINTLIFY_TELEMETRY_DISABLED: "1"
+  DO_NOT_TRACK: "1"
+
+jobs:
+  render:
+    name: Docs render check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      # The CLI is about 380 MB; reuse it across runs of the same version.
+      - name: Cache the Mintlify CLI
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm/_npx
+          key: mint-${{ runner.os }}-${{ env.MINT_VERSION }}
+
+      - name: Validate content and build (mint validate)
+        run: npx --yes "mint@${MINT_VERSION}" validate
+
+      - name: Check internal links (mint broken-links)
+        run: npx --yes "mint@${MINT_VERSION}" broken-links
