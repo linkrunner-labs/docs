@@ -22,6 +22,8 @@ concurrency:
 
 jobs:
   build:
+    # "Docs build" is the required check on main (ruleset).
+    name: Docs build
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -59,8 +61,7 @@ jobs:
 
   deploy:
     needs: build
-    # Off until the ops apply for docs.v2 is done and the repository variable
-    # DOCS_V2_DEPLOY_ENABLED is set to "true".
+    # Runs when the repository variable DOCS_V2_DEPLOY_ENABLED is "true".
     if: >-
       github.ref == 'refs/heads/main' &&
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&

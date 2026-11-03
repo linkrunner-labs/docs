@@ -21,7 +21,7 @@ The first paragraph adds new information.
 
 - `title` and `description` are required (`check:pages`). The description also becomes the search snippet, the share card text, and the page's line in `llms.txt`, so make it a complete sentence about the reader's task.
 - The `# Title` and the `vp-lead` paragraph repeat the frontmatter, because VitePress does not draw them itself. Keep them identical to it. Do not repeat the description again in the first paragraph.
-- To give a generated page a different title on docs.v2 only, add it to `PAGE_TITLES` in `.vitepress/relay-content.ts`; the generated page itself must not change. A page in `relay-pages/` sets its title in its own frontmatter.
+- Change a page's title in its frontmatter (and its `# Title` and lead). `PAGE_TITLES` in `.vitepress/relay-content.ts` overrides some titles and sidebar labels; check it first, since an entry there wins over the page.
 
 ## Components
 
@@ -86,16 +86,16 @@ Supplementary guidance.
 - A heading can set its anchor with `## Title {#short-id}`. Keep existing anchors: old docs.linkrunner.io links point at them, and `build:relay` fails when one stops resolving. Add a renamed anchor to `RELAY_ANCHOR_ALIASES`.
 - `<BeforeYouStart />` boxes come from `.vitepress/relay-before-you-start.json`; do not write them in the page.
 
-## Add a docs.v2-only page
+## Add a page with a custom layout
 
-1. Write it at `relay-pages/<route>.md` with the page shape above. A file whose route matches a generated page replaces that page on docs.v2 only.
+An ordinary page is just a `.md` file in its topic folder plus a sidebar entry. Use `relay-pages/` only for a page with a custom layout (like the Overview or Quickstart):
+
+1. Write it at `relay-pages/<route>.md` with the page shape above. A file whose route matches a topic-folder page replaces that page.
 2. Add `"<route>.md"` to `RELAY_PAGES` in `.vitepress/relay-content.ts`. Without it the page is published at the wrong address, `/relay-pages/<route>` (`check:pages` fails).
 3. Add it to the sidebar in `.vitepress/relay-nav.ts` (`check:pages` fails otherwise). If it should be a tab's landing page, change that tab's `link` in `relayNav` too.
 4. Check that an existing page does not already cover it (for example `relay-pages/ad-networks/overview.md` already introduces every integration). Merging into it is often better than a new page.
 
-The classic site (docs.backup) does not build `relay-pages/`.
-
-The landing pages in `relay-pages/` also use docs.v2-only components: `OverviewHero`, `GuideCards`, `LinkGrid` (link lists from frontmatter data), `SectionLabel`, `HelpBox`, and `BeforeYouStart`. Use them only in `relay-pages/`, and copy their usage from the page that already has them. Generated pages must stick to the components above, which the classic site also has.
+The landing pages in `relay-pages/` also use layout components: `OverviewHero`, `GuideCards`, `LinkGrid` (link lists from frontmatter data), `SectionLabel`, `HelpBox`, and `BeforeYouStart`. Use them only in `relay-pages/`, and copy their usage from the page that already has them. Other pages stick to the components above.
 
 ## Navigation, redirects, and links
 

@@ -8,15 +8,13 @@ Before changing anything, read [AGENTS.md](AGENTS.md): where each kind of change
 
 ```bash
 bun install
-bun run dev        # http://localhost:3001 with live reload
+bun run dev:relay      # http://localhost:3002 with live reload
+bun run check          # typecheck, lint, agent files, page rules
+bun run build:relay    # the build that ships, with every built-site check
+bun run preview:relay  # serve that build locally
 ```
 
-## Build
-
-```bash
-bun run build      # vitepress build + redirect stubs -> .vitepress/dist
-bun run preview    # serve the production build locally
-```
+`bun run dev` and `bun run build` are the older classic theme, kept only for reference.
 
 ## Project layout
 
@@ -24,13 +22,13 @@ bun run preview    # serve the production build locally
 .
 ├── .vitepress/
 │   ├── config.ts            # site config, nav + sidebar (from nav.json), search
-│   ├── nav.json             # generated sidebar/nav (do not edit by hand)
+│   ├── nav.json             # sidebar data and llms.txt agent instructions (edit by hand)
 │   └── theme/
 │       ├── index.ts         # registers the Mintlify-style components globally
 │       ├── custom.css       # brand colors + component styles
 │       └── components/       # Note, Tip, Warning, Info, Card, CardGroup,
 │                            #   Steps, Step, Tabs, Tab, Accordion, Frame, Icon
-├── public/                  # images, logo, favicon, CNAME (served at site root)
+├── public/                  # images, samples, API files, logo, favicon (served at site root)
 ├── scripts/                 # Bun migration + build tooling (see below)
 ├── introduction.md, quickstart.md, sdk/, features/, ...   # content (.md)
 └── index.md                 # redirects / -> /introduction
@@ -70,7 +68,7 @@ Notes:
   path (`/images/logos/meta.webp`).
 - Internal links are absolute (`/features/deep-linking-setup`). Images live in
   `public/images/` and are referenced as `/images/...`.
-- After adding a page, add it to the sidebar by regenerating nav (below).
+- After adding a page, add it to the sidebar in `.vitepress/relay-nav.ts`.
 
 ## Converted from Mintlify
 
@@ -96,12 +94,9 @@ tabs), its redirects, and the files pages link to.
   points at a missing anchor. It runs offline. When it fails after a sync,
   add the renamed anchor to `RELAY_ANCHOR_ALIASES`.
 
-Refresh the list while docs.linkrunner.io is still on Mintlify (read-only,
-4 requests at a time):
-
-```bash
-bun run legacy-urls      # rewrites scripts/legacy-urls.json
-```
+`scripts/legacy-urls.json` is a frozen snapshot of what Mintlify served. Do
+not refresh it with `bun run legacy-urls`: docs.linkrunner.io is this site now,
+so a refresh would stop guarding the old URLs.
 
 ### Files for AI agents
 
@@ -141,5 +136,6 @@ sidebars are not copied into every page's inlined site data.
 
 ## Deployment
 
-Every push to `main` builds the site and deploys it to GitHub Pages
-(`.github/workflows/deploy.yml`) at https://docs.backup.linkrunner.io.
+Every push to `main` builds the site and deploys it to Firebase Hosting site
+`lr-docs-v2` (`.github/workflows/deploy-docs-v2.yml`), served at
+https://docs.linkrunner.io.
