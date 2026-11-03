@@ -4,7 +4,7 @@ description: "How Linkrunner routes users to the right destination when they cli
 icon: "route"
 ---
 
-When someone clicks a Linkrunner campaign link, the system detects their device, records the click for attribution, and redirects them to the best destination — whether that's your app, the app store, or your website.
+When someone clicks a Linkrunner campaign link, the system detects their device, records the click for attribution, and redirects them to the best destination, whether that's your app, the app store, or your website.
 
 ## How it works
 
@@ -52,26 +52,26 @@ When someone clicks a Linkrunner campaign link, the system detects their device,
 
     ### iOS
 
-    1. **iOS redirect URL** — A custom redirect URL configured on the campaign
-    2. **App Store link** — Your app's App Store page (with custom store listing if configured)
-    3. **Campaign website** — The website URL set on the campaign
-    4. **Project website** — Your project's default website (with the deep link path appended if a deferred deep link is configured)
+    1. **iOS redirect URL**: A custom redirect URL configured on the campaign
+    2. **App Store link**: Your app's App Store page (with custom store listing if configured)
+    3. **Campaign website**: The website URL set on the campaign
+    4. **Project website**: Your project's default website (with the deep link path appended if a deferred deep link is configured)
 
     ### Android
 
-    1. **Android redirect URL** — A custom redirect URL configured on the campaign
-    2. **Play Store link** — Your app's Play Store page (with UTM parameters and custom store listing if configured)
-    3. **Campaign website** — The website URL set on the campaign
-    4. **Project website** — Your project's default website (with the deep link path appended if a deferred deep link is configured)
+    1. **Android redirect URL**: A custom redirect URL configured on the campaign
+    2. **Play Store link**: Your app's Play Store page (with UTM parameters and custom store listing if configured)
+    3. **Campaign website**: The website URL set on the campaign
+    4. **Project website**: Your project's default website (with the deep link path appended if a deferred deep link is configured)
 
     Linkrunner uses the first available URL in the chain. If a platform-specific redirect URL is set on the campaign, it takes priority over the store link.
   </Tab>
   <Tab title="Desktop">
     Desktop visitors are redirected through a different fallback chain since they cannot install a mobile app directly.
 
-    1. **Campaign website** — The website URL set on the campaign
-    2. **Project website** — Your project's default website (with the deep link path appended if a deferred deep link is configured)
-    3. **Store link** — Falls back to the appropriate store page if no website is configured
+    1. **Campaign website**: The website URL set on the campaign
+    2. **Project website**: Your project's default website (with the deep link path appended if a deferred deep link is configured)
+    3. **Store link**: Falls back to the appropriate store page if no website is configured
   </Tab>
 </Tabs>
 
@@ -92,7 +92,7 @@ If the app is not installed, or detection is unavailable, the page falls back to
 | In-app browser | Deep link into app | App Store / Play Store | Campaign website | Project website |
 | iOS (regular browser) | iOS redirect URL | App Store | Campaign website | Project website |
 | Android (regular browser) | Android redirect URL | Play Store | Campaign website | Project website |
-| Desktop | Campaign website | Project website | Store link | — |
+| Desktop | Campaign website | Project website | Store link | None |
 
 ## Troubleshooting
 
@@ -102,7 +102,7 @@ If the app is not installed, or detection is unavailable, the page falls back to
 
 **Blank intermediary page?** This usually means the app link or store link failed to load. Check that your custom URI scheme and store links are set correctly in project settings.
 
-**Attribution not matching?** Make sure the Linkrunner SDK is initialized before calling `getAttributionData()`. The app must be installed through the campaign link — direct store installs cannot be attributed.
+**Attribution not matching?** Make sure the Linkrunner SDK is initialized before calling `getAttributionData()`. The app must be installed through the campaign link. Direct store installs cannot be attributed.
 
 **Desktop users seeing the store instead of your website?** Add a website URL to your campaign or project settings. Without a website configured, Linkrunner falls back to the store link on all platforms.
 

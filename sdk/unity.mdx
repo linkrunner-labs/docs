@@ -21,12 +21,12 @@ Linkrunner does not have a dedicated Unity SDK. This guide walks you through int
 - **Unity 2021.3 LTS** or newer
 - **Android**: Android 5.0+ (API 21), Gradle 8.0+
 - **iOS**: iOS 15.0+, Xcode 14.0+, Swift 5.9+
-- A Linkrunner project token — get it from [Dashboard → Documentation](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation)
+- A Linkrunner project token (get it from [Dashboard → Documentation](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation))
 
 <Warning>
 **Important assumptions in this guide:**
 
-1. **iOS requires a Swift bridging layer.** The Linkrunner iOS SDK (`LinkrunnerKit`) is a pure Swift module — it does not inherit from `NSObject` and has no `@objc` annotations. Since Unity's native plugin system uses C/Objective-C, we provide a **Swift wrapper file** (`LinkrunnerUnityBridge.swift`) that exposes `@_cdecl` C-callable functions which internally call the Swift SDK's `async` methods.
+1. **iOS requires a Swift bridging layer.** The Linkrunner iOS SDK (`LinkrunnerKit`) is a pure Swift module. It does not inherit from `NSObject` and has no `@objc` annotations. Since Unity's native plugin system uses C/Objective-C, we provide a **Swift wrapper file** (`LinkrunnerUnityBridge.swift`) that exposes `@_cdecl` C-callable functions which internally call the Swift SDK's `async` methods.
 
 2. **Android uses a Java-friendly callback wrapper.** The Linkrunner Android SDK provides `LinkrunnerJava`, a callback-based wrapper around the Kotlin SDK. This avoids Kotlin coroutine interop issues (Result\<T\> mangling, Continuation type mismatches, Kotlin version conflicts) that prevent Java callers from using the suspend-based API directly.
 
@@ -449,7 +449,7 @@ public class LinkrunnerBridge {
 ```
 
 <Tip>
-The bridge uses `LinkrunnerJava`, a callback-based wrapper included in the Android SDK. It handles all Kotlin coroutine execution internally — no Kotlin imports, no `BuildersKt.runBlocking`, and no background thread management needed in your bridge code. Callbacks are invoked on a background IO thread, which is safe for `UnitySendMessage`.
+The bridge uses `LinkrunnerJava`, a callback-based wrapper included in the Android SDK. It handles all Kotlin coroutine execution internally. No Kotlin imports, no `BuildersKt.runBlocking`, and no background thread management are needed in your bridge code. Callbacks are invoked on a background IO thread, which is safe for `UnitySendMessage`.
 </Tip>
 
 ---
@@ -469,7 +469,7 @@ After building your Unity project for iOS and opening the generated Xcode projec
 4. Click **Add Package** and choose the **LinkrunnerKitStatic** library
 
 <Tip>
-You'll need to add the SPM dependency each time you regenerate the Xcode project from Unity. Consider using a post-build script to automate this — see the [Automation Tips](#automating-ios-dependency-with-a-post-build-script) section.
+You'll need to add the SPM dependency each time you regenerate the Xcode project from Unity. Consider using a post-build script to automate this. See the [Automation Tips](#automating-ios-dependency-with-a-post-build-script) section.
 </Tip>
 
 ### Step 2: Info.plist Configuration
@@ -490,7 +490,7 @@ Add to your `Info.plist` (can also be done via Unity's `Assets/Plugins/iOS/Info.
 
 ### Step 3: Create the Swift Bridge
 
-The Linkrunner iOS SDK is a **pure Swift module** — it does not inherit from `NSObject` and has no `@objc` annotations, so it cannot be called directly from Objective-C. We use a Swift bridge file with `@_cdecl` to expose C-callable functions that Unity can invoke via `[DllImport("__Internal")]`.
+The Linkrunner iOS SDK is a **pure Swift module**. It does not inherit from `NSObject` and has no `@objc` annotations, so it cannot be called directly from Objective-C. We use a Swift bridge file with `@_cdecl` to expose C-callable functions that Unity can invoke via `[DllImport("__Internal")]`.
 
 Create `Assets/Plugins/iOS/LinkrunnerUnityBridge.swift`:
 
@@ -792,7 +792,7 @@ func linkrunnerHandleDeeplink(_ deeplinkUrl: UnsafePointer<CChar>?) {
 2. A **bridging header** exists (Xcode usually prompts to create one when adding the first Swift file)
 3. **SWIFT_VERSION** is set to 5.0+ in the UnityFramework build settings
 
-Alternatively, you can automate this with a Unity `PostProcessBuild` script — see the [Automation Tips](#automating-ios-dependency-with-a-post-build-script) section.
+Alternatively, you can automate this with a Unity `PostProcessBuild` script. See the [Automation Tips](#automating-ios-dependency-with-a-post-build-script) section.
 </Warning>
 
 ### Google Integrated Conversion Measurement (Optional)
@@ -1245,7 +1245,7 @@ public class LinkrunnerUserData
 
 ### Initialization (Required)
 
-Call `Initialize` as early as possible — typically in your startup scene:
+Call `Initialize` as early as possible, typically in your startup scene:
 
 ```csharp
 void Start()
@@ -1266,7 +1266,7 @@ Find your project token at: [Dashboard → Documentation](https://dashboard.link
 
 ### User Identification (Required)
 
-Call `Signup` as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
+Call `Signup` as soon as the user is identified, whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 
 ```csharp
 var userData = new LinkrunnerUserData
@@ -1286,7 +1286,7 @@ The reference C# wrapper in this guide does not expose `SetCustomerUserId`. Pass
 
 ### Handle Deeplinks
 
-Call `HandleDeeplink` when your app is opened via a deeplink — both cold start (app was closed) and warm start (app was in background):
+Call `HandleDeeplink` when your app is opened via a deeplink, in both cold start (app was closed) and warm start (app was in background):
 
 ```csharp
 void Start()
@@ -1634,3 +1634,5 @@ For detailed testing steps, see the [Integration Testing Guide](/testing/integra
 
 - **Callbacks not received**: Verify the `GameObject` is named exactly `LinkrunnerCallbackHandler` and has the `LinkrunnerSDK.cs` script attached. It must exist in the scene when native code calls `UnitySendMessage`.
 - **Editor testing**: All SDK calls are no-ops in the Unity Editor and log to the console instead. Test on actual Android/iOS devices.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

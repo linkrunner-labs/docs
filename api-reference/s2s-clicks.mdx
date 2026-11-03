@@ -168,3 +168,5 @@ X-Linkrunner-Token: <your_token>
 ## Retries and deduplication
 
 The same `tid` on the same campaign always maps to the same `click_id`, and the click is stored once, so it is safe to retry. Retry only `429` and `503`, after the delay in the `Retry-After` header. Keep `tid` unique per campaign for good: a reused `tid` is treated as a retry of the earlier click, so the new click is not recorded.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

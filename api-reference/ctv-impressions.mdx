@@ -172,3 +172,5 @@ body = res.json()  # {"status": "accepted", "impression_id": "..."}
 ## Retries and deduplication
 
 The same `tid` on the same campaign always maps to the same `impression_id`, and the impression is stored once, so it is safe to retry. CTV impression IDs are separate from `/v1/impression` ones, so the same `tid` on both endpoints does not collide. Retry only `429` and `503`, after the delay in the `Retry-After` header. Keep `tid` unique per impression: a reused `tid` is treated as a retry of the earlier impression, so the new one is not recorded.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).
