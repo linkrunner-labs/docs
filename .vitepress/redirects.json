@@ -1,0 +1,102 @@
+[
+  {
+    "source": "/sdk/react-native/installation",
+    "destination": "/sdk/react-native"
+  },
+  {
+    "source": "/sdk/react-native/usage",
+    "destination": "/sdk/react-native"
+  },
+  {
+    "source": "/sdk/flutter/installation",
+    "destination": "/sdk/flutter"
+  },
+  {
+    "source": "/sdk/flutter/usage",
+    "destination": "/sdk/flutter"
+  },
+  {
+    "source": "/sdk/flutter/uninstall-tracking",
+    "destination": "/sdk/flutter"
+  },
+  {
+    "source": "/sdk/ios/installation",
+    "destination": "/sdk/ios"
+  },
+  {
+    "source": "/sdk/ios/usage",
+    "destination": "/sdk/ios"
+  },
+  {
+    "source": "/sdk/android/installation",
+    "destination": "/sdk/android"
+  },
+  {
+    "source": "/sdk/android/usage",
+    "destination": "/sdk/android"
+  },
+  {
+    "source": "/sdk/expo/installation",
+    "destination": "/sdk/expo"
+  },
+  {
+    "source": "/sdk/expo/migration-guide",
+    "destination": "/sdk/expo"
+  },
+  {
+    "source": "/sdk/deep-linking/setup",
+    "destination": "/features/deep-linking-setup"
+  },
+  {
+    "source": "/sdk/deep-linking/verification",
+    "destination": "/features/deep-linking-setup"
+  },
+  {
+    "source": "/features/deep-linking-verification",
+    "destination": "/features/deep-linking-setup"
+  },
+  {
+    "source": "/sdk/skadnetwork/integration",
+    "destination": "/features/skadnetwork-integration"
+  },
+  {
+    "source": "/sdk/skadnetwork/conversion-values",
+    "destination": "/features/skadnetwork-conversion-values"
+  },
+  {
+    "source": "/sdk/integration-testing",
+    "destination": "/testing/integration-testing"
+  },
+  {
+    "source": "/feature/custom-store-listing",
+    "destination": "/features/custom-store-listing"
+  },
+  {
+    "source": "/feature/referral-codes",
+    "destination": "/features/referral-codes"
+  },
+  {
+    "source": "/feature/deferred-deep-linking",
+    "destination": "/features/deferred-deep-linking"
+  },
+  {
+    "source": "/feature/uninstall-tracking",
+    "destination": "/features/uninstall-tracking"
+  },
+  {
+    "source": "/web-to-app/google",
+    "destination": "/ad-networks/google-ads"
+  },
+  {
+    "source": "/ad-networks/google-web-to-app",
+    "destination": "/ad-networks/google-ads"
+  },
+  {
+    "source": "/ecommerce-manager/google-merchant-center",
+    "destination": "/ecommerce-manager/google-commerce-manager"
+  },
+  {
+    "source": "/api-reference/introduction",
+    "destination": "/api-reference/data-apis"
+  }
+]
