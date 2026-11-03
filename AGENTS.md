@@ -24,7 +24,7 @@ This is the shared repository policy for Codex and Claude Code. `CLAUDE.md` impo
 7. **Explain the decision before the code.** State which case applies and which values are required. Keep mandatory instructions visible, not inside collapsed optional content.
 8. **Separate the main path from alternatives.** Put optional configuration and uncommon failures after the primary task or in linked guidance. A necessary warning belongs before the risky step.
 9. **Use screenshots where they resolve ambiguity.** Show difficult-to-find controls or important configuration choices. Do not add an image for every obvious click. Include useful alt text, crop with padding, and redact customer data before capture. See [screenshot guidance](skills/linkrunner-docs-writing/references/screenshots.md).
-10. **Use root-relative product-doc links.** Write `/features/deep-linking-setup`, not a relative page path. Dashboard links must be full URLs pointing to the intended screen. Contributor and skill Markdown links are relative to their source files.
+10. **Use root-relative product-doc links.** Write `/features/deep-linking-setup`, not a relative page path or a full `https://docs.linkrunner.io/...` URL (docs.v2 checks this). Dashboard links must be full URLs pointing to the intended screen. Contributor and skill Markdown links are relative to their source files.
 
 ## Accuracy and example rules
 
@@ -81,3 +81,4 @@ npx --yes mint@4.2.1184 broken-links
 - Block incorrect or unsafe examples and missing required steps. Fix ambiguous decisions and success conditions. Keep style preferences separate from correctness findings; word count is not a quality score.
 - Open a non-draft PR against `main`; do not push directly to `main`. Request `RathodDarshil` as reviewer. If GitHub rejects self-review, report that limitation rather than substituting an approver or merging.
 - Publishing requires separate approval. Inspect current workflows and deployment instructions before any release action; do not assume a local build deploys the site.
+- docs.v2.linkrunner.io, which replaces this site at cutover, is generated from this repository's `main` ([linkrunner-labs/docs-backup](https://github.com/linkrunner-labs/docs-backup)). After a page change merges here, bring it to docs.v2 with that repository's `docs-v2-sync` skill, or note in the PR that the sync is still needed. Never fix a page only in docs-backup: the next sync overwrites it.
