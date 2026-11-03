@@ -28,5 +28,5 @@ This describes the capture method, not a guarantee that a particular browser too
 
 - Inspect the final pixels for sensitive data, crop errors, obscured helper text, and stray overlays or tab indicators.
 - Match surrounding screenshots for padding and scale. Keep controls and configuration values unchanged apart from privacy redaction.
-- Save under `images/<topic>/` using a descriptive lowercase hyphenated name. Prefer WebP when supported, and add useful alt text in the page.
+- Save under `public/images/<topic>/` using a descriptive lowercase hyphenated name. Prefer WebP when supported, and add useful alt text in the page.
 - Inspect the image in the rendered page. File creation alone does not prove that the reader sees a useful screenshot.
