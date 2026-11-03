@@ -73,6 +73,8 @@ Linkrunner sends webhooks for the following events:
 | `signup` | Triggered when a user signup event is recorded via the SDK |
 | `web_signup` | Website sign-ups, when **Send web events** is on. See [Website Events](#website-events) |
 
+Apple's SKAdNetwork postback copies can also be forwarded to the same URL. They carry no `event_type`, so they are described separately in [SKAdNetwork Postback Copies](#skadnetwork-postback-copies).
+
 ### Install Webhook
 
 The `install` webhook is triggered immediately when Linkrunner attributes an app installation. At this point, your app has just been opened for the first time and the user hasn't had a chance to sign up or log in yet. Because of this, user identity fields such as `user_id`, `name`, `phone`, `email`, and `additional_data` are only included in signup webhooks.
@@ -527,6 +529,73 @@ The campaign in a website webhook is the one known when the event happens. For a
   }
 }
 ```
+
+## SKAdNetwork Postback Copies
+
+Apple sends your app's SKAdNetwork postback copy to one endpoint only, the one named by `NSAdvertisingAttributionReportEndpoint` in your `Info.plist`. When you point that at Linkrunner so that [SKAdNetwork attribution](/features/skadnetwork-integration) works, Linkrunner receives the copy and you do not. Turning on SKAdNetwork forwarding sends Apple's postback on to your webhook URL, unchanged, so you keep your own record of every one.
+
+Use it when you want to decode conversion values with your own mapping, keep a raw archive, or run a second measurement stack alongside Linkrunner.
+
+<Note>
+Forwarding is off for every webhook by default. There is no self-serve control for it yet, so contact [support@linkrunner.io](mailto:support@linkrunner.io) to turn it on for a project.
+</Note>
+
+A copy is sent only to webhooks on the project whose App Store ID matches the postback's `app-id`, so a postback never reaches another project.
+
+### SKAdNetwork Payload
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `version` | `string` | The SKAdNetwork version Apple used, such as `4.0` |
+| `ad_network_id` | `string` | The ad network that signed the postback, such as `v9wttpbfk9.skadnetwork` |
+| `transaction_id` | `string` | Apple's unique ID for this postback |
+| `app_id` | `string` | Your App Store ID |
+| `received_at` | `ISO 8601 date` | When Linkrunner received the postback from Apple |
+| `postback` | `object` | Apple's postback exactly as it arrived, with nothing added, renamed or removed |
+
+The fields inside `postback` are Apple's, and which ones appear depends on the SKAdNetwork version and whether the install won attribution. `conversion-value` is the fine value from 0 to 63, `coarse-conversion-value` is `low`, `medium` or `high`, `fidelity-type` is `0` for a view-through and `1` for a StoreKit-rendered ad, and `postback-sequence-index` is the measurement window, `0`, `1` or `2`.
+
+### SKAdNetwork Example
+
+```json
+{
+  "version": "4.0",
+  "ad_network_id": "v9wttpbfk9.skadnetwork",
+  "transaction_id": "6aafb7a5-0170-41b5-bbe4-fe71dedf1e28",
+  "app_id": "1234567890",
+  "received_at": "2026-11-03T10:15:00.000Z",
+  "postback": {
+    "version": "4.0",
+    "ad-network-id": "v9wttpbfk9.skadnetwork",
+    "transaction-id": "6aafb7a5-0170-41b5-bbe4-fe71dedf1e28",
+    "app-id": 1234567890,
+    "source-identifier": "5239",
+    "source-domain": "example.com",
+    "conversion-value": 12,
+    "coarse-conversion-value": "medium",
+    "fidelity-type": 1,
+    "postback-sequence-index": 0,
+    "did-win": true,
+    "redownload": false,
+    "country-code": "IN",
+    "attribution-signature": "MEQCIEprS..."
+  }
+}
+```
+
+### Handling SKAdNetwork Copies
+
+<Warning>
+A SKAdNetwork copy has no `event_type` field, and it arrives at the same URL as your install and signup webhooks. Branch on the presence of `postback` before you read `event_type`, or your handler will treat a postback copy as an unknown event.
+</Warning>
+
+Three more differences from app and website webhooks:
+
+- **Up to three copies per install.** Apple sends one postback per measurement window, so the same install can produce three bodies over several days with different `postback-sequence-index` values. Do not treat a later one as a duplicate.
+- **No retries.** Linkrunner sends each copy once, waits 3 seconds, and does not try again. Apple does not resend it either, so a copy your endpoint misses is lost. Return a `2xx` quickly and do the work afterwards.
+- **No redirects.** The request carries your private key, so Linkrunner refuses to follow a redirect. Point the webhook at the final HTTPS URL.
+
+Verify `attribution-signature` against Apple's public key before you act on a copy. Linkrunner forwards the signature untouched so that you can check it yourself, and the check proves the postback came from Apple rather than from someone who found your webhook URL.
 
 ## Authentication
 
