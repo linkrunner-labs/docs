@@ -1,0 +1,392 @@
+/* ============================================================
+   Linkrunner docs theme — brand colors + Mintlify-style components
+   ============================================================ */
+
+:root {
+  --vp-c-brand-1: #6c69f0;
+  --vp-c-brand-2: #7a77ff;
+  --vp-c-brand-3: #7a77ff;
+  --vp-c-brand-soft: rgba(122, 119, 255, 0.14);
+
+  --vp-c-note: #3b82f6;
+  --vp-c-tip: #10b981;
+  --vp-c-warning: #f59e0b;
+}
+
+.dark {
+  --vp-c-brand-1: #9b99ff;
+  --vp-c-brand-2: #8a87ff;
+  --vp-c-brand-3: #7a77ff;
+  --vp-c-brand-soft: rgba(122, 119, 255, 0.18);
+
+  /* Deep blue-black background, matching the Mintlify docs' dark theme. */
+  --vp-c-bg: #0c0e14;
+  --vp-c-bg-alt: #08090e; /* sidebar, nav, footer */
+  --vp-c-bg-elv: #14161e; /* cards, popovers */
+  --vp-c-bg-soft: #14161e; /* code blocks, callouts, soft surfaces */
+  --vp-c-gutter: #08090e;
+  --vp-c-divider: rgba(255, 255, 255, 0.08);
+  --vp-c-border: rgba(255, 255, 255, 0.12);
+  --vp-c-text-1: #e7e8ee;
+  --vp-c-text-2: #9aa0ad;
+  --vp-c-text-3: #6b7180;
+  --vp-code-block-bg: #0f1118;
+}
+
+.dark .VPNavBar {
+  background-color: rgba(8, 9, 14, 0.85);
+  backdrop-filter: saturate(150%) blur(12px);
+}
+
+/* Brand button on home/nav */
+:root {
+  --vp-button-brand-bg: var(--vp-c-brand-3);
+  --vp-button-brand-hover-bg: var(--vp-c-brand-2);
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #7a77ff, #b06cff);
+}
+
+/* Lead paragraph (mirrors Mintlify's subtitle under the page title) */
+.vp-doc h1 + .vp-lead {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--vp-c-text-2);
+  margin: -0.25rem 0 1.75rem;
+}
+
+/* ---------- Icons ---------- */
+.lr-icon {
+  display: inline-block;
+  vertical-align: -0.125em;
+}
+.lr-icon-img {
+  width: 1.25em;
+  height: 1.25em;
+  object-fit: contain;
+  vertical-align: -0.2em;
+}
+
+/* Sidebar icons: a small glyph to the left of each page label (Mintlify-style).
+   Baked into nav.json by scripts/gen-nav.ts and rendered via the sidebar's
+   v-html, so these are plain elements, not the Icon.vue component. */
+.sidebar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 9px;
+  vertical-align: -3px;
+  color: var(--vp-c-text-3);
+  transition: color 0.25s;
+}
+.sidebar-icon svg {
+  width: 16px;
+  height: 16px;
+}
+.sidebar-icon-img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  border-radius: 3px;
+}
+.VPSidebarItem .item:hover .sidebar-icon,
+.VPSidebarItem.is-active > .item .sidebar-icon {
+  color: var(--vp-c-brand-1);
+}
+
+/* ---------- Nav search box ----------
+   By default VitePress sizes the search button to its content ("Search  ⌘K"),
+   because the #local-search wrapper doesn't stretch. Let it grow so the search
+   bar is broader, capped so it stays tasteful on wide screens. */
+@media (min-width: 768px) {
+  #local-search {
+    flex-grow: 1;
+    max-width: 420px;
+  }
+}
+
+/* ---------- Callouts (Note / Tip / Warning / Info) ---------- */
+.lr-callout {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem;
+  margin: 1.25rem 0;
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+  border-left-width: 4px;
+  font-size: 0.95rem;
+}
+.lr-callout-icon {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+.lr-callout-body {
+  min-width: 0;
+}
+.lr-callout-body > :first-child {
+  margin-top: 0;
+}
+.lr-callout-body > :last-child {
+  margin-bottom: 0;
+}
+.lr-callout-note,
+.lr-callout-info {
+  border-left-color: var(--vp-c-note);
+  background: rgba(59, 130, 246, 0.08);
+}
+.lr-callout-note .lr-callout-icon,
+.lr-callout-info .lr-callout-icon {
+  color: var(--vp-c-note);
+}
+.lr-callout-tip {
+  border-left-color: var(--vp-c-tip);
+  background: rgba(16, 185, 129, 0.08);
+}
+.lr-callout-tip .lr-callout-icon {
+  color: var(--vp-c-tip);
+}
+.lr-callout-warning {
+  border-left-color: var(--vp-c-warning);
+  background: rgba(245, 158, 11, 0.09);
+}
+.lr-callout-warning .lr-callout-icon {
+  color: var(--vp-c-warning);
+}
+
+/* ---------- Cards ---------- */
+.lr-card-group {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(var(--lr-cols, 2), minmax(0, 1fr));
+  margin: 1.25rem 0;
+}
+@media (max-width: 768px) {
+  .lr-card-group {
+    grid-template-columns: 1fr;
+  }
+}
+.lr-card {
+  display: block;
+  height: 100%;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  background: var(--vp-c-bg-soft);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+a.lr-card {
+  text-decoration: none !important;
+  color: inherit;
+}
+.lr-card--link:hover {
+  border-color: var(--vp-c-brand-1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+.lr-card--h {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.lr-card__icon {
+  font-size: 1.4rem;
+  color: var(--vp-c-brand-1);
+  margin-bottom: 0.6rem;
+  display: block;
+}
+.lr-card--h .lr-card__icon {
+  margin-bottom: 0;
+  margin-top: 0.15rem;
+}
+.lr-card__icon.lr-icon-img {
+  width: 1.7rem;
+  height: 1.7rem;
+}
+.lr-card__title {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+  line-height: 1.3;
+}
+.lr-card__content {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--vp-c-text-2);
+}
+.lr-card__content > :first-child {
+  margin-top: 0;
+}
+.lr-card__content > :last-child {
+  margin-bottom: 0;
+}
+
+/* ---------- Steps ---------- */
+.lr-steps {
+  counter-reset: lr-step;
+  margin: 1.5rem 0;
+}
+.lr-step {
+  position: relative;
+  padding-left: 2.75rem;
+  padding-bottom: 1.5rem;
+}
+.lr-step::before {
+  counter-increment: lr-step;
+  content: counter(lr-step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--vp-c-brand-1);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  z-index: 1;
+}
+.lr-step::after {
+  content: "";
+  position: absolute;
+  left: 0.875rem;
+  top: 1.75rem;
+  bottom: 0;
+  width: 1px;
+  background: var(--vp-c-divider);
+}
+.lr-step:last-child {
+  padding-bottom: 0;
+}
+.lr-step:last-child::after {
+  display: none;
+}
+.lr-step__title {
+  margin: 0.1rem 0 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+.lr-step__content > :first-child {
+  margin-top: 0;
+}
+
+/* ---------- Tabs ---------- */
+.lr-tabs {
+  margin: 1.25rem 0;
+}
+/* Mintlify-era tab anchors (Tabs.vue): empty, out of the flow. */
+.lr-tabs__anchor {
+  position: absolute;
+}
+
+.lr-tabs__bar {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--vp-c-divider);
+  margin-bottom: 1rem;
+  overflow-x: auto;
+}
+.lr-tabs__btn {
+  padding: 0.5rem 0.9rem;
+  border: 0;
+  background: none;
+  color: var(--vp-c-text-2);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+}
+.lr-tabs__btn:hover {
+  color: var(--vp-c-text-1);
+}
+.lr-tabs__btn.is-active {
+  color: var(--vp-c-brand-1);
+  border-bottom-color: var(--vp-c-brand-1);
+}
+.lr-tabs__panel > :first-child {
+  margin-top: 0;
+}
+
+/* ---------- Accordion ---------- */
+.lr-accordion-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1.25rem 0;
+}
+.lr-accordion {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  margin: 0.75rem 0;
+  overflow: hidden;
+  background: var(--vp-c-bg-soft);
+}
+.lr-accordion-group .lr-accordion {
+  margin: 0;
+}
+.lr-accordion__summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+  list-style: none;
+}
+.lr-accordion__summary::-webkit-details-marker {
+  display: none;
+}
+.lr-accordion__title {
+  flex: 1;
+}
+.lr-accordion__icon {
+  color: var(--vp-c-brand-1);
+}
+.lr-accordion__chevron {
+  font-size: 0.75rem;
+  color: var(--vp-c-text-3);
+  transition: transform 0.2s;
+}
+.lr-accordion[open] .lr-accordion__chevron {
+  transform: rotate(90deg);
+}
+.lr-accordion__body {
+  padding: 0 1rem 1rem;
+}
+.lr-accordion__body > :first-child {
+  margin-top: 0;
+}
+
+/* ---------- Frame ---------- */
+.lr-frame {
+  margin: 1.5rem 0;
+}
+.lr-frame__inner {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 0.5rem;
+  background: var(--vp-c-bg-soft);
+  display: flex;
+  justify-content: center;
+}
+.lr-frame__inner img {
+  border-radius: 6px;
+  max-width: 100%;
+  height: auto;
+}
+.lr-frame__caption {
+  text-align: center;
+  color: var(--vp-c-text-3);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}

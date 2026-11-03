@@ -1,0 +1,103 @@
+# Build the docs (DOCS_THEME=relay) and deploy them to Firebase Hosting site
+# lr-docs-v2, served at docs.linkrunner.io (LIN-3321, LIN-4601).
+#
+# Credentials: short-lived Workload Identity Federation tokens. The GCP provider
+# only accepts this workflow file, on refs/heads/main, for push or
+# workflow_dispatch (ops terraform-gcp/prod/firebase-docs-v2-hosting-deployer).
+# Pull requests run the build only and never request credentials.
+name: Deploy docs v2 to Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-v2-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0 # full history so "Last updated" dates are accurate
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.14"
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Typecheck, lint, agent files and page rules (bun run check)
+        run: bun run check
+      - name: Build Relay docs (checks sidebar coverage first, page rules last)
+        run: bun run build:relay
+      - name: Check the build output
+        run: |
+          test -s .vitepress/dist-relay/index.html
+          test -s .vitepress/dist-relay/quickstart.html
+          test -s .vitepress/dist-relay/404.html
+          test ! -e .vitepress/dist-relay/CNAME
+          test -s .vitepress/dist-relay/llms.txt
+          test -s .vitepress/dist-relay/.well-known/llms.txt
+          # firebase.json no longer ignores dotfiles, so .well-known deploys:
+          # nothing else may start with a dot.
+          test -z "$(find .vitepress/dist-relay -name '.*' ! -path '.vitepress/dist-relay/.well-known' ! -path '.vitepress/dist-relay/.well-known/*')"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: docs-v2-dist
+          path: .vitepress/dist-relay
+          # .well-known/ (llms.txt, skills) is hidden; v4 skips it by default.
+          include-hidden-files: true
+          retention-days: 7
+
+  deploy:
+    needs: build
+    # Off until the ops apply for docs.v2 is done and the repository variable
+    # DOCS_V2_DEPLOY_ENABLED is set to "true".
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      vars.DOCS_V2_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: docs-v2
+      url: https://docs.linkrunner.io
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      FIREBASE_CLI_DISABLE_UPDATE_CHECK: "true"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          sparse-checkout: firebase.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: docs-v2-dist
+          path: .vitepress/dist-relay
+      - name: Check the agent files made it into the artifact
+        run: test -s .vitepress/dist-relay/.well-known/llms.txt && test -s .vitepress/dist-relay/llms-full.txt
+      - name: Install pinned Firebase CLI before authentication
+        run: npm install --prefix "$RUNNER_TEMP/firebase-cli" --no-audit --no-fund --package-lock=false firebase-tools@15.30.0
+      - name: Authenticate with short-lived WIF credentials
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          project_id: lr-prod-482009
+          workload_identity_provider: projects/713143124200/locations/global/workloadIdentityPools/docs-v2-actions-pool/providers/github-oidc
+          service_account: docs-v2-hosting-deployer@lr-prod-482009.iam.gserviceaccount.com
+          create_credentials_file: true
+          export_environment_variables: true
+      - name: Deploy only the lr-docs-v2 Hosting site
+        run: |
+          "$RUNNER_TEMP/firebase-cli/node_modules/.bin/firebase" deploy \
+            --project lr-prod-482009 --config firebase.json --only hosting:lr-docs-v2 --non-interactive

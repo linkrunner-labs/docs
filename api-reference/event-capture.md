@@ -1,0 +1,259 @@
+---
+title: "Events Capture API"
+description: "Documentation for Linkrunner Event Capture API"
+---
+
+# Events Capture API
+
+<p class="vp-lead">Documentation for Linkrunner Event Capture API</p>
+
+<Note>
+
+**Using an AI coding agent?** Let it instrument your events and revenue correctly (taxonomy, dedupe, refunds, and these server-side APIs):
+
+```bash
+npx @linkrunner/skills add events
+```
+
+See [Linkrunner Agent Skills](/ai-agent-skills).
+
+</Note>
+
+This documentation is for tracking custom events from your backend only! For tracking events from your app please go through the [Flutter](/sdk/flutter#tracking-custom-events) or [React Native](/sdk/react-native#tracking-custom-events) documentation.
+
+<Note>
+
+Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Each request must identify the user with `user_id` or `install_instance_id`. If Linkrunner has not seen the `user_id` yet (your app has not called `signup` for that user), the event is held and shows up once that user signs up. Held events are kept for up to 30 days. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. For capturing revenue, it is recommended to use the [capture-payment](/api-reference/revenue-tracking) API instead of capture-event.
+
+</Note>
+
+Use [Test Custom Events and Payments](/testing/event-and-revenue-testing) to decide whether an action belongs in this API or the Revenue Tracking API.
+
+## Base URL
+
+```
+https://api.linkrunner.io/api/v1
+```
+
+## Authentication
+
+Generate your server key from [https://dashboard.linkrunner.io/settings?s=data-apis](https://dashboard.linkrunner.io/settings?p_id=4&s=data-apis)
+
+In the request header add the below attribute:
+
+```
+linkrunner-key: YOUR-SERVER-KEY
+```
+
+## Capture Event
+
+```
+POST: /capture-event
+```
+
+### Request Body
+
+```json
+{
+  "event_name": "product_viewed",
+  "event_data": {
+    "product_id": "ABC123",
+    "category": "electronics",
+    "amount": 249.99,
+    "currency": "USD",
+    "is_featured": true
+  },
+  "user_id": "user_12345",
+  "event_id": "evt_12345",
+  "source": "app" // optional: "app" (default) or "web"
+}
+```
+
+| Parameter             | Type   | Description                                                                                                           |
+| --------------------- | ------ | --------------------------------------------------------------------------------------------------------------------- |
+| event_name           | string | **Required**. Name of the event to track                                                                              |
+| event_data           | object | **Optional**. Additional data associated with the event                                                               |
+| user_id              | string | **Required** unless `install_instance_id` is sent. User identifier to associate with the event                        |
+| install_instance_id | string | **Required** unless `user_id` is sent. Linkrunner's ID for the install                                                |
+| event_id             | string | **Optional**. Your own unique identifier for the event, useful for deduplication and correlating with your backend    |
+| client_ip_address   | string | **Optional**. Public IP of the user's device when the event happened. See [End-user IP address](#end-user-ip-address) |
+| source                | string | **Optional**. `app` (default) or `web`. Send `web` for a user of your website. See [Website events](#website-events)  |
+
+### End-user IP address
+
+These calls come from your server, so Linkrunner never sends your server's IP to ad networks as the user's IP. By default it sends the device IP captured when the app was installed. If you know the IP of the user's device at the time of the action, pass it as `client_ip_address`. Linkrunner forwards it to ad networks (for example Meta `client_ip_address`) to improve matching.
+
+- Send only the device's public IP. Private, loopback and link-local addresses are ignored.
+- Leave it out if you don't have it. Linkrunner then uses the install-time device IP.
+
+### Website events
+
+If the event comes from a user of your website rather than your app, send `"source": "web"`. Your website must be tracked with the [Web SDK](/sdk/web), and the event then shows up on the [Web Events](https://dashboard.linkrunner.io/dashboard/web-events) page instead of the app dashboards. Leave `source` out, or send `app`, for app users. Existing integrations do not need to change.
+
+```json
+{
+  "event_name": "plan_upgraded",
+  "event_data": {
+    "plan": "pro"
+  },
+  "user_id": "user_12345",
+  "event_id": "evt_12345",
+  "source": "web"
+}
+```
+
+- **Identify the user with `user_id`.** Use the same ID your website passes to `lr.identify`. `install_instance_id` does not apply to website users, so `user_id` is required.
+- **Attribution.** Linkrunner credits the event to the channel and campaign of that user's latest visit recorded by the Web SDK in the last 90 days. If the Web SDK has not recorded a visit from that user, the event shows as Direct.
+- **No deduplication.** Every request is stored, including retries. Send your own `event_id` so repeated requests for the same action carry the same ID.
+
+### Responses
+
+1. **200** Event captured successfully
+2. **400** Missing required parameters, neither `user_id` nor `install_instance_id` was sent, `source` is not `app` or `web`, or `source` is `web` and `user_id` is missing or website tracking is not enabled for the project
+3. **401** Invalid server key
+
+#### Sample Response
+
+Upon successful event capture, the API returns:
+
+```json
+{
+  "msg": "Event capture request received!",
+  "status": 200,
+  "processing_id": "6f1c2a9e-3b7d-4c55-9a0e-2f8d1b4e7c10",
+  "data": {
+    "message": "Event capture request received!"
+  }
+}
+```
+
+`processing_id` identifies this request. Log it on your side and share it with Linkrunner support if an event does not show up. If you did not send an `event_id`, Linkrunner also uses `processing_id` as the event's ID.
+
+## Common Event Names
+
+Here are some common event names you might want to track:
+
+| Event Name             | Description                        |
+| ---------------------- | ---------------------------------- |
+| `purchase_initiated`   | User starts a purchase             |
+| `purchase_completed`   | User completes a purchase          |
+| `item_viewed`          | User views an item/product         |
+| `cart_added`           | User adds item to cart             |
+| `checkout_started`     | User starts checkout               |
+| `search_performed`     | User performs a search             |
+| `content_viewed`       | User views content                 |
+| `level_completed`      | User completes a level (for games) |
+| `achievement_unlocked` | User unlocks an achievement        |
+| `user_referred`        | User refers someone                |
+
+## Revenue Sharing with Ad Networks
+
+To enable revenue sharing with ad networks like Google Ads and Meta, include an `amount` parameter as a number in your custom event data. This allows the ad networks to optimize campaigns based on the revenue value of conversions:
+
+```json
+{
+  "event_name": "purchase_completed",
+  "event_data": {
+    "product_id": "ABC123",
+    "category": "electronics",
+    "amount": 149.99
+  },
+  "user_id": "user_12345"
+}
+```
+
+<Note>
+
+For revenue sharing with ad networks to work properly, ensure the `amount`
+parameter is passed as a number, not as a string.
+
+</Note>
+
+## Best Practices
+
+1. **Consistent naming**: Use consistent naming conventions for your events (snake_case is recommended)
+2. **Structured data**: Include structured data with each event to get more insights
+3. **Meaningful events**: Track events that provide valuable insights into user behavior
+4. **Data efficiency**: Don't include sensitive or unnecessary data in event payloads
+
+## Example
+
+### Tracking a Purchase Event
+
+```javascript
+// Using fetch API
+fetch("https://api.linkrunner.io/api/v1/capture-event", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "linkrunner-key": "YOUR-SERVER-KEY",
+  },
+  body: JSON.stringify({
+    event_name: "purchase_completed",
+    event_data: {
+      order_id: "ORD-12345",
+      product_ids: ["P-001", "P-002"],
+      total_amount: 125.99,
+      currency: "USD",
+      payment_method: "credit_card",
+    },
+    user_id: "user_12345",
+  }),
+})
+  .then((response) => response.json())
+  .then((data) => console.log(data))
+  .catch((error) => console.error("Error:", error));
+```
+
+## Error Handling
+
+The API will return appropriate HTTP status codes along with error messages when issues occur:
+
+- **400 Bad Request**: Check your request parameters
+- **401 Unauthorized**: Verify your server key
+- **429 Too Many Requests**: You've exceeded the rate limit, please try again later
+- **500 Internal Server Error**: Contact support if this persists
+
+For any help please reach out to <support@linkrunner.io>
+
+## Meta Ecommerce Events
+
+If you are tracking Ecommerce events (like `add_to_cart` or `view_content`) to sync with Meta Catalog Sales, **you must first map your custom event with the standard commerce event in the Linkrunner Dashboard** before sending the event.
+
+*Note: Any event you want to send for an add to cart action should be mapped with **AddToCart** for Commerce Event Manager. For example, map **add_to_cart** with **AddToCart**.*
+
+*Similarly, any event you want to send for viewing a product should be mapped with **ViewContent**. For example, map **item_viewed** with **ViewContent** or **view_content** with **ViewContent**.*
+
+While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events in order to correctly attribute catalog sales and optimize campaigns.
+
+### Example Ecommerce Payload
+
+Here is an example of the exact `event_data` structure you need to send for Meta Commerce Manager:
+
+For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event_data) documentation.
+
+```json
+{
+  "event_name": "add_to_cart",
+  "event_data": {
+    "content_ids": ["whshct4mwc"],
+    "contents": [
+      {
+        "id": "whshct4mwc",
+        "quantity": 2,
+        "item_price": 1000
+      }
+    ],
+    "content_type": "product",
+    "currency": "INR",
+    "value": 2000.0,
+    "num_items": 2,
+    "order_id": "order_id_1234"
+  },
+  "user_id": "user_12345"
+}
+```
+
+To verify your events are being correctly received by Meta, please follow our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
+
+**Need help?** Contact <support@linkrunner.io>.

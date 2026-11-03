@@ -80,7 +80,7 @@ coverage. Preserve useful guidance and verify that no dead destination remains.
 
 ## 4. Verify the artifact and examples separately
 
-Discover the repository's actual checks. Run applicable rendering, route, MDX, and link checks.
+Discover the repository's actual checks. Run `bun run check` and `bun run build:relay` (rendering, sidebar, legacy URL, link, and page rule checks).
 Search changed claims and aliases for stale prose. Review changed URLs and the final diff.
 Prove suspected checker false positives with the referenced file or authorized URL check.
 Compare failures with the baseline before calling them pre-existing.

@@ -1,0 +1,369 @@
+{
+  "/sdk/react-native": {
+    "for": "App developers",
+    "needs": [
+      "Your project token, from SDK Console in the Linkrunner dashboard",
+      "A React Native app, with Xcode and CocoaPods for the iOS build",
+      "Optional: your secret key and key ID, from Settings → SDK Signing"
+    ],
+    "time": "About 1 hour"
+  },
+  "/sdk/flutter": {
+    "for": "App developers",
+    "needs": [
+      "Your project token, from SDK Console in the Linkrunner dashboard",
+      "A Flutter 3.19+ app (Dart 3.3+) for iOS 15+ and Android 5.0+",
+      "Optional: your secret key and key ID, from Settings → SDK Signing"
+    ],
+    "time": "About 1 hour"
+  },
+  "/sdk/capacitor": {
+    "for": "App developers",
+    "needs": [
+      "Your project token, from SDK Console in the Linkrunner dashboard",
+      "A Capacitor app with its iOS and Android projects added",
+      "CocoaPods for iOS and the Kotlin Gradle plugin for Android",
+      "Optional: your secret key and key ID, from Settings → SDK Signing"
+    ],
+    "time": "About 1 hour"
+  },
+  "/sdk/cordova": {
+    "for": "App developers",
+    "needs": [
+      "Your project token, from SDK Console in the Linkrunner dashboard",
+      "A Cordova app where you can set config.xml before adding platforms",
+      "iOS 15+ as the deployment target, and Kotlin turned on for Android",
+      "Optional: your secret key and key ID, from Settings → SDK Signing"
+    ],
+    "time": "About 1 hour"
+  },
+  "/sdk/ios": {
+    "for": "App developers",
+    "needs": [
+      "Your project token, from SDK Console in the Linkrunner dashboard",
+      "An iOS 15+ app built with Xcode 14+ and Swift 5.9+",
+      "Optional: your secret key and key ID, from Settings → SDK Signing"
+    ],
+    "time": "About 1 hour"
+  },
+  "/sdk/android": {
+    "for": "App developers",
+    "needs": [
+      "Your project token, from SDK Console in the Linkrunner dashboard",
+      "An Android 5.0+ (API 21) app on Android Studio Flamingo+ and Gradle 8.0+",
+      "Optional: your secret key and key ID, from Settings → SDK Signing"
+    ],
+    "time": "About 1 hour"
+  },
+  "/sdk/expo": {
+    "for": "App developers",
+    "needs": [
+      "Your project token, from SDK Console in the Linkrunner dashboard",
+      "An Expo SDK 52+ app on React Native 0.70+ and Node.js 18+",
+      "A development build (EAS Build or npx expo prebuild), not Expo Go",
+      "The React Native SDK guide, which has the code steps"
+    ],
+    "time": "About 1 hour"
+  },
+  "/sdk/appbrew": {
+    "for": "App developers",
+    "needs": [
+      "An Appbrew app built on the @gauntlet packages, for iOS 15+ and Android minSdk 24",
+      "Your project token, added for your store in the Appbrew dashboard",
+      "A new app build and store release to ship the change"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/sdk/web": {
+    "for": "App developers",
+    "needs": [
+      "A Web SDK token from Linkrunner. Web Attribution is in beta, so email support for one",
+      "Access to edit your website's code, or its Next.js layout"
+    ],
+    "time": "About 20 minutes"
+  },
+  "/sdk/unity": {
+    "for": "App developers",
+    "needs": [
+      "Your project token, from SDK Console in the Linkrunner dashboard",
+      "Unity 2021.3 LTS or newer",
+      "Android API 21+ with Gradle 8.0+, and iOS 15+ with Xcode 14+ and Swift 5.9+",
+      "Real Android and iOS devices to test on. SDK calls do nothing in the Editor"
+    ],
+    "time": "About 2 hours"
+  },
+  "/sdk/shopify": {
+    "for": "Marketers and developers",
+    "needs": [
+      "A Web SDK token. Email Linkrunner support to get one, since Web Attribution is in beta",
+      "Shopify admin access to edit your theme code and add a custom pixel",
+      "A backup copy of your live theme, made with Duplicate in Online Store → Themes"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/testing/integration-testing": {
+    "for": "App developers",
+    "needs": [
+      "The Linkrunner SDK added to your app (see your SDK guide)",
+      "Your link domain set up in Linkrunner (see Use your own link domain)",
+      "A test phone or emulator, with your app uninstalled",
+      "A build of your app you can install from your computer"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/testing/event-and-revenue-testing": {
+    "for": "App developers",
+    "needs": [
+      "A test user who passed the click, install and signup test (see Test your SDK setup)",
+      "The user ID your app sent with signup",
+      "For server-side tests, a server key from Settings → Data APIs"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/testing/meta-android-attribution-testing": {
+    "for": "Marketers and developers",
+    "needs": [
+      "Your Meta App ID and Install Referrer decryption key saved in Linkrunner (see Meta Ads)",
+      "Your Facebook App ID in the Android app (see Meta install referrer)",
+      "A Play Store build on Android SDK 3.5.2+, Flutter 3.6.2+ or React Native 2.6.2+",
+      "An Android phone with Facebook 428+ or Instagram 296+, and a Meta App Promotion ad"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/features/subdomain-setup": {
+    "for": "Marketers and developers",
+    "needs": [
+      "A domain you own, such as yourdomain.com",
+      "Access to your domain's DNS settings, to add a CNAME record"
+    ],
+    "time": "About 15 minutes"
+  },
+  "/features/deep-linking-setup": {
+    "for": "App developers",
+    "needs": [
+      "Your link domain set up in Linkrunner (see Use your own link domain)",
+      "Android: your package name and SHA-256 signing fingerprint",
+      "iOS: your Apple Team ID, bundle ID and access to the Xcode project"
+    ],
+    "time": "About 1 hour"
+  },
+  "/features/deferred-deep-linking": {
+    "for": "Marketers and developers",
+    "needs": [
+      "The Linkrunner SDK in your app, reading getAttributionData after install",
+      "App screens your app can open from a link path, such as /product/123",
+      "A real phone to test on, with your app uninstalled"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/features/web-to-app-journeys": {
+    "for": "Marketers and developers",
+    "needs": [
+      "Your link domain set up (see Use your own link domain)",
+      "Deep links set up in your app (see Set up deep links)",
+      "Deferred deep linking turned on for your campaigns (see Deferred deep links)",
+      "The Linkrunner SDK in your app, calling signup once you know the user"
+    ],
+    "time": "About 15 minutes"
+  },
+  "/features/push-notification-tracking": {
+    "for": "Marketers and developers",
+    "needs": [
+      "The Linkrunner SDK in your app, with handleDeeplink set up",
+      "A push tool, such as Firebase, OneSignal, Braze or CleverTap, already sending to your app"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/features/push-notification-providers": {
+    "for": "Marketers",
+    "needs": [
+      "Push tracking set up in your app first (see Track push notifications)",
+      "Deep links set up for your link domain (see Set up deep links)",
+      "A CleverTap, WebEngage or MoEngage account that sends your push campaigns"
+    ],
+    "time": "About 15 minutes"
+  },
+  "/features/deep-link-management": {
+    "for": "Marketers and developers",
+    "needs": [
+      "Your link domain set up (see Use your own link domain)",
+      "Deep links set up in your app (see Set up deep links)",
+      "The link parameters your app reads, such as destination and variant_id"
+    ],
+    "time": "About 20 minutes"
+  },
+  "/features/referral-codes": {
+    "for": "App developers",
+    "needs": [
+      "Your link domain set up (see Use your own link domain)",
+      "Deep links set up in your app (see Set up deep links)",
+      "A backend that creates, checks and rewards referral codes"
+    ],
+    "time": "About 1 hour"
+  },
+  "/features/custom-store-listing": {
+    "for": "Marketers",
+    "needs": [
+      "A custom store listing in Google Play or a custom product page in App Store Connect",
+      "Its full store link, including the listing or ppid part"
+    ],
+    "time": "About 10 minutes"
+  },
+  "/features/uninstall-tracking": {
+    "for": "App developers",
+    "needs": [
+      "Android: Firebase Cloud Messaging in your app, and access to its Google Cloud project",
+      "iOS: an APNs key (.p8) with its key ID, plus your bundle ID and Team ID",
+      "The SDK version listed in the uninstall section of your SDK guide"
+    ],
+    "time": "About 1 hour"
+  },
+  "/features/meta-install-referrer": {
+    "for": "App developers",
+    "needs": [
+      "Your Facebook App ID, from Meta for Developers",
+      "Android SDK 3.5.2+, Flutter SDK 3.6.2+ or React Native SDK 2.6.2+"
+    ],
+    "time": "About 15 minutes"
+  },
+  "/features/send-consent": {
+    "for": "App developers",
+    "needs": [
+      "The Linkrunner SDK in your app",
+      "A consent screen or consent tool (CMP) that runs before the SDK starts",
+      "A way to tell if a user is in the EEA, the UK or Switzerland"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/features/attribution-windows": {
+    "for": "Marketers",
+    "needs": [
+      "Access to your project in the Linkrunner dashboard",
+      "At least one connected ad channel"
+    ],
+    "time": "About 5 minutes"
+  },
+  "/features/fraud-control": {
+    "for": "Marketers",
+    "needs": [
+      "The Admin or Member role in your project, to create or edit rules",
+      "Installs already coming in, so rules have traffic to check",
+      "A few days to watch a new rule on Tag only before it suppresses anything"
+    ],
+    "time": "About 20 minutes"
+  },
+  "/features/skadnetwork-integration": {
+    "for": "Marketers and developers",
+    "needs": [
+      "Your iOS app on iOS SDK 3.1.0+, React Native 2.3.0+, Flutter 3.1.1+ or Expo 3.2.0+",
+      "A developer who can add keys to your app's Info.plist",
+      "The in-app events that matter most to you, in priority order"
+    ],
+    "time": "About 45 minutes"
+  },
+  "/features/google-skan-setup": {
+    "for": "Marketers and developers",
+    "needs": [
+      "Google Ads connected to Linkrunner (see Google Ads)",
+      "Your iOS app live on a SKAN-ready SDK version (see Set up SKAN)",
+      "Admin access to the Google Ads account that runs your iOS campaigns"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/features/meta-skan-setup": {
+    "for": "Marketers and developers",
+    "needs": [
+      "Meta Ads connected with your App ID, ad account and Conversions API (see Meta Ads)",
+      "Your iOS app live on a SKAN-ready SDK version (see Set up SKAN)",
+      "Admin access to Meta Business Manager and Meta Events Manager"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/features/skadnetwork-conversion-values": {
+    "for": "Marketers",
+    "needs": [
+      "A list of the in-app actions that matter most to your business",
+      "A rough idea of which actions bring in revenue or keep users coming back"
+    ],
+    "time": "About 20 minutes"
+  },
+  "/features/remarketing": {
+    "for": "Marketers and developers",
+    "needs": [
+      "Deep links and the SDK's handleDeeplink call set up in your app (see Set up deep links)",
+      "Android backup rules in your app, so reinstalls are detected",
+      "An audience in Meta or Google Ads (see Build a remarketing audience)"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/features/remarketing-audiences": {
+    "for": "Marketers",
+    "needs": [
+      "Access to Meta Ads Manager or Google Ads",
+      "For a customer list: a CSV downloaded from an Audience Cohort in Linkrunner",
+      "For tracked events: events already reaching Meta or Google (see Meta Ads or Google Ads)"
+    ],
+    "time": "About 20 minutes"
+  },
+  "/ad-networks/meta-ads": {
+    "for": "Marketers",
+    "needs": [
+      "Access to your app in Meta for Developers, for the App ID and decryption key",
+      "A Meta ad account and an Events Manager dataset for Conversions API",
+      "Your app live with the Linkrunner SDK"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/ad-networks/google-ads": {
+    "for": "Marketers",
+    "needs": [
+      "A Google account with access to your Google Ads account",
+      "Your app published and searchable in Google Play or the App Store",
+      "Your app live with the Linkrunner SDK"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/ad-networks/tiktok": {
+    "for": "Marketers",
+    "needs": [
+      "A TikTok Ads Manager account",
+      "A website address, used to create the TikTok pixel",
+      "Your app live with the Linkrunner SDK"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/ad-networks/snapchat": {
+    "for": "Marketers",
+    "needs": [
+      "A Snapchat Ads Manager account",
+      "Your app live with the Linkrunner SDK"
+    ],
+    "time": "About 20 minutes"
+  },
+  "/ad-networks/reddit-ads": {
+    "for": "Marketers",
+    "needs": [
+      "A Reddit Ads account with business and billing set up",
+      "A Reddit Pixel ID and Conversion Access Token from that same account",
+      "Your app live with the Linkrunner SDK, and store links added in Linkrunner"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/ad-networks/linkedin-ads": {
+    "for": "Marketers",
+    "needs": [
+      "A LinkedIn Campaign Manager ad account",
+      "Your app live with the Linkrunner SDK"
+    ],
+    "time": "About 30 minutes"
+  },
+  "/ad-networks/chatgpt-ads": {
+    "for": "Marketers",
+    "needs": [
+      "A ChatGPT Ads account with business and billing set up",
+      "A Pixel ID from a web data source, and a Conversions API key",
+      "Your app live with the Linkrunner SDK, and store links added in Linkrunner"
+    ],
+    "time": "About 45 minutes"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/linkrunner-labs/relay",
+  "revision": "cbd1d8d16bd0eab59135dcffe31f486c4d2317a6",
+  "source": "src/vendor/dashboard-globals.css",
+  "sha256": "a7192df24177b891d2473c0a3b31062ba08ebadaa5bca4e2eab8fe34e2f4d579",
+  "target": ".vitepress/theme-relay/tokens.css"
+}
