@@ -46,7 +46,7 @@ async function get(path: string): Promise<Response> {
 }
 
 const decode = (s: string) =>
-  s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'");
+  s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").replace(/&amp;/g, "&");
 
 /** Anchor ids in the page body: headings, accordions, tabs, explicit <span id>. */
 function anchors(html: string): string[] {
