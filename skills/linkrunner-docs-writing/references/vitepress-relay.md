@@ -4,7 +4,7 @@ Use this reference when editing page markup. Shared writing and safety policy li
 
 ## Page shape
 
-A generated page, and any page in `relay-pages/`, looks like this:
+Every page, including those in `relay-pages/`, looks like this:
 
 ```md
 ---
