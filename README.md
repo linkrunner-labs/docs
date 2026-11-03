@@ -4,6 +4,21 @@ Linkrunner's documentation at [docs.linkrunner.io](https://docs.linkrunner.io), 
 
 Before changing anything, read [AGENTS.md](AGENTS.md): where each kind of change goes, the writing rules, and the checks (`bun run check`, `bun run build:relay`). Agents load the skills in [skills/](skills/).
 
+## This repository
+
+| | |
+| --- | --- |
+| Site | https://docs.linkrunner.io (Firebase Hosting site `lr-docs-v2`) |
+| Deploys | Every merge to `main`, by `.github/workflows/deploy-docs-v2.yml` |
+| Merge rules | The **Docs build** check must pass (no bypass). Changes to `.github/` and `firebase.json` need a code owner review (CODEOWNERS) |
+| Old addresses | docs.v2.linkrunner.io redirects here. Every docs.linkrunner.io URL and `#section` from the Mintlify site still works (`scripts/check-legacy-urls.ts`) |
+
+### History
+
+- **Until 3rd November 2026** this repository held the Mintlify site (`.mdx` pages, `docs.json`). That history is still here; the last Mintlify commit is `03885f4`.
+- **From October 2026** the VitePress site was built in [linkrunner-labs/docs-backup](https://github.com/linkrunner-labs/docs-backup) and served at docs.v2.linkrunner.io, converted from this repository's MDX.
+- **On 3rd November 2026** it moved here ([#344](https://github.com/linkrunner-labs/docs/pull/344), LIN-4601) and docs.linkrunner.io switched to it. The repository name stayed the same, so existing clones keep working with `git pull`. `docs-backup` is archived.
+
 ## Local development
 
 ```bash
