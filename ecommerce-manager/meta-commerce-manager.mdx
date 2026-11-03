@@ -6,7 +6,7 @@ icon: "cart-shopping"
 
 ## Overview
 
-Meta Catalog Sales campaigns dynamically show products from your catalog to users based on their browsing and purchase behavior — for example, retargeting someone who viewed a product but didn't buy. For these campaigns to work, Meta needs real-time signals about how users interact with your products.
+Meta Catalog Sales campaigns dynamically show products from your catalog to users based on their browsing and purchase behavior (for example, retargeting someone who viewed a product but didn't buy). For these campaigns to work, Meta needs real-time signals about how users interact with your products.
 
 By sending ecommerce events (purchases, add to cart, content views) through Linkrunner, you feed Meta the data it needs to match users to the right products and optimize your ad spend. Linkrunner seamlessly syncs these events with your connected Meta dataset.
 
@@ -26,7 +26,7 @@ To begin, you need to select your catalogue products within the Meta Commerce Ma
   alt="Select your catalogue products"
 />
 
-Make sure to add products with the correct `content_ids` and `item_group_ids`. There are various ways to add products — for example, manually or via CSV upload.
+Make sure to add products with the correct `content_ids` and `item_group_ids`. There are various ways to add products, for example, manually or via CSV upload.
 
 Click the **+ Add** button to add products to the catalogue. From the Products Manager, you can either add products manually or upload a CSV file to add products with specific content IDs.
 
@@ -48,7 +48,7 @@ The screenshot below shows exactly where to add the content ID when adding or up
   alt="Where to add content ID when uploading products to Meta catalogue"
 />
 
-Each product in your catalog has a **Content ID** and an **Item group ID**. These are the values you'll use in the `content_ids` or `item_group_ids` fields when sending events — they're how Meta matches your events back to the correct catalog products.
+Each product in your catalog has a **Content ID** and an **Item group ID**. These are the values you'll use in the `content_ids` or `item_group_ids` fields when sending events. They're how Meta matches your events back to the correct catalog products.
 
 <img
   src="/images/ecommerce-event-meta/ecommerce-4.png"
@@ -227,10 +227,12 @@ Once your events are flowing and your catalogue match rate is healthy, you can c
 1. Go to **Meta Ads Manager** → **Create Campaign** → select the **Sales** objective and choose your catalog.
 2. Select the catalog that is connected to your Linkrunner dataset.
 3. Under ad set, choose your targeting strategy:
-   - **Broad audience** — Meta finds new customers likely to purchase from your catalog.
-   - **Retargeting** — target users who have already interacted with your products (e.g., viewed content or added to cart but didn't purchase).
+   - **Broad audience**: Meta finds new customers likely to purchase from your catalog.
+   - **Retargeting**: target users who have already interacted with your products (e.g., viewed content or added to cart but didn't purchase).
 4. Configure your budget, placements, and creative, then publish.
 
 <Note>
 Retargeting audiences are automatically built from the `ViewContent`, `AddToCart`, and `Purchase` events you send through Linkrunner. The more event data Meta receives, the better it can optimize delivery.
 </Note>
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

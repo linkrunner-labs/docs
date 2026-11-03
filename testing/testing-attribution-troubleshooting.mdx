@@ -6,7 +6,7 @@ icon: "bug"
 
 ## The Problem
 
-You click a new campaign link and test a signup, but the dashboard attributes it to a **different campaign** — usually an older test link with a stale date.
+You click a new campaign link and test a signup, but the dashboard attributes it to a **different campaign**, usually an older test link with a stale date.
 
 ## Why This Happens
 
@@ -21,7 +21,7 @@ The SDK generates a unique **install instance ID** on first launch and persists 
 This clears the stored install instance ID so a fresh one is generated on next launch.
 
 <Warning>
-Force-stopping the app is **not enough** — you must fully uninstall it.
+Force-stopping the app is **not enough**. You must fully uninstall it.
 </Warning>
 
 ### 2. Enable debug mode
@@ -29,14 +29,12 @@ Force-stopping the app is **not enough** — you must fully uninstall it.
 Set `debug = true` in your SDK init to see logs confirming a fresh install.
 
 <Tabs>
-<Tab title="React Native">
-```javascript
-await linkrunner.init("TOKEN", "SECRET", "KEY_ID", false, true);
-```
-</Tab>
-<Tab title="Flutter">
-```dart
-await LinkRunner().init('TOKEN', 'SECRET', 'KEY_ID', false, true);
+<Tab title="Android">
+```kotlin
+LinkRunner.getInstance().init(
+    context = applicationContext, token = "TOKEN",
+    secretKey = "SECRET", keyId = "KEY_ID", debug = true
+)
 ```
 </Tab>
 <Tab title="iOS">
@@ -47,12 +45,14 @@ await LinkrunnerSDK.shared.initialize(
 )
 ```
 </Tab>
-<Tab title="Android">
-```kotlin
-LinkRunner.getInstance().init(
-    context = applicationContext, token = "TOKEN",
-    secretKey = "SECRET", keyId = "KEY_ID", debug = true
-)
+<Tab title="React Native">
+```javascript
+await linkrunner.init("TOKEN", "SECRET", "KEY_ID", false, true);
+```
+</Tab>
+<Tab title="Flutter">
+```dart
+await LinkRunner().init('TOKEN', 'SECRET', 'KEY_ID', false, true);
 ```
 </Tab>
 </Tabs>
@@ -60,7 +60,7 @@ LinkRunner.getInstance().init(
 ### 3. Run the test flow
 
 1. **Click** your new campaign link on the test device
-2. **Install** and **open** the app — the click must land before the first app open
+2. **Install** and **open** the app. The click must land before the first app open
 3. **Signup** (if testing signup attribution)
 
 <Tip>
@@ -70,7 +70,9 @@ LinkRunner.getInstance().init(
 ## Still seeing issues?
 
 - Confirm you clicked the link **on the same device** where the app is installed
-- Confirm you **clicked the link before opening the app** — a click that lands after the install is never matched to it
+- Confirm you **clicked the link before opening the app**. A click that lands after the install is never matched to it
 - See the full [Integration Testing guide](/testing/integration-testing) for a detailed walkthrough
 
 Need help? Reach out at [darshil@linkrunner.io](mailto:darshil@linkrunner.io).
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

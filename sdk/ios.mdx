@@ -99,7 +99,7 @@ The SDK requires network access to communicate with Linkrunner services. Make su
 ### Google Integrated Conversion Measurement (Optional)
 
 <Note>
-  **Prefer to let your AI coding agent do this?** The iOS skill already covers ICM — adding Google's ODM SDK and wiring `setConsent`:
+  **Prefer to let your AI coding agent do this?** The iOS skill already covers ICM: adding Google's ODM SDK and wiring `setConsent`:
 
   ```bash
   npx @linkrunner/skills add ios
@@ -288,7 +288,7 @@ func setCustomerUserId() async {
 </Note>
 
 ## User Identification (Required)
-Call the `signup` method as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
+Call the `signup` method as soon as the user is identified, whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 
 It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
 
@@ -445,7 +445,7 @@ public enum AdNetwork: String, Codable, Sendable {
 }
 ```
 
-**Example response** (raw values — `type`/`adNetwork` decode to enums, `installedAt`/`storeClickAt` to `Date`):
+**Example response** (raw values: `type`/`adNetwork` decode to enums, `installedAt`/`storeClickAt` to `Date`):
 
 ```json
 {

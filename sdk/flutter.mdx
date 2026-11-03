@@ -118,12 +118,12 @@ For detailed backup configuration instructions, please refer to the [Android SDK
 #### Encrypted SharedPreferences
 
 <Note>
-  **SDK Version Requirement:** Starting from `linkrunner` **v3.9.1**, the SDK automatically encrypts the credentials it stores in Android SharedPreferences (such as the install ID and other persisted SDK state). No additional configuration is required — upgrade to v3.9.1 or above to get this behavior by default.
+  **SDK Version Requirement:** Starting from `linkrunner` **v3.9.1**, the SDK automatically encrypts the credentials it stores in Android SharedPreferences (such as the install ID and other persisted SDK state). No additional configuration is required. Upgrade to v3.9.1 or above to get this behavior by default.
 </Note>
 
 On Android, values written by the SDK are encrypted at rest, with a hardware-protected key generated on the device and stored in the [Android Keystore](https://developer.android.com/training/articles/keystore). The key never leaves the device and is not bundled with the SDK.
 
-If you are upgrading from an earlier version, the SDK will transparently migrate any existing plaintext entries to the encrypted store on the next read after the upgrade — no code changes are needed on your side.
+If you are upgrading from an earlier version, the SDK will transparently migrate any existing plaintext entries to the encrypted store on the next read after the upgrade. No code changes are needed on your side.
 
 #### iOS Configuration
 
@@ -154,7 +154,7 @@ For complete SKAdNetwork integration details, see the [SKAdNetwork Integration G
 ### Google Integrated Conversion Measurement (Optional)
 
 <Note>
-  **Prefer to let your AI coding agent do this?** The Flutter skill already covers ICM — adding the pod and wiring `setConsent`:
+  **Prefer to let your AI coding agent do this?** The Flutter skill already covers ICM: adding the pod and wiring `setConsent`:
 
   ```bash
   npx @linkrunner/skills add flutter
@@ -342,7 +342,7 @@ try {
 </Note>
 
 ## User Identification (Required)
-Call the `signup` method as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
+Call the `signup` method as soon as the user is identified, whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 
 It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
 

@@ -44,18 +44,17 @@ Before you start testing, make sure your Linkrunner domain setup is completed in
 
 If you are setting up Universal Links (iOS) or App Links (Android), also complete deep link verification:
 
--   [Setup Deep Linking](https://docs.linkrunner.io/sdk/deep-linking/setup)
--   [Configure verification objects](https://docs.linkrunner.io/sdk/deep-linking/verification)
+-   [Set up deep links](/features/deep-linking-setup), including the verification files
 
 ### 2) SDK integrated in your app
 
 Complete integration for any supported SDK:
 
--   [React Native Installation](https://docs.linkrunner.io/sdk/react-native/installation) and [React Native Usage](https://docs.linkrunner.io/sdk/react-native/usage)
--   [Flutter Installation](https://docs.linkrunner.io/sdk/flutter/installation) and [Flutter Usage](https://docs.linkrunner.io/sdk/flutter/usage)
--   [iOS Installation](https://docs.linkrunner.io/sdk/ios/installation) and [iOS Usage](https://docs.linkrunner.io/sdk/ios/usage)
--   [Android Installation](https://docs.linkrunner.io/sdk/android/installation) and [Android Usage](https://docs.linkrunner.io/sdk/android/usage)
--   [Expo Installation](https://docs.linkrunner.io/sdk/expo/installation)
+-   [Android SDK](/sdk/android)
+-   [iOS SDK](/sdk/ios)
+-   [React Native SDK](/sdk/react-native)
+-   [Flutter SDK](/sdk/flutter)
+-   [Expo SDK](/sdk/expo)
 
 ### 3) Register a test device in SDK Console
 
@@ -104,7 +103,7 @@ Create a campaign from the dashboard:
 
 -   [Create Campaign](https://dashboard.linkrunner.io/dashboard?m=create-campaign)
 
-Tip: If you prefer creating campaigns via API, see [Campaign APIs](https://docs.linkrunner.io/api-reference/campaign-apis).
+Tip: If you prefer creating campaigns via API, see [Campaign APIs](/api-reference/campaign-apis).
 
 ### Step 3) Test the click
 
@@ -124,7 +123,7 @@ Important ordering rule:
 
 -   **Click the link before the app opens for the first time.** A click that lands after the install is never matched
     to it.
--   The click stays eligible for the campaign's full attribution window — **7 days by default**, and 30 days for
+-   The click stays eligible for the campaign's full attribution window: **7 days by default**, and 30 days for
     Google and Meta campaigns.
 
 <Note>
@@ -143,10 +142,10 @@ Optional but recommended:
 -   Fetch attribution inside the app after first open using `getAttributionData()` (supported in all SDKs).
     See your SDK usage guide:
 
-    -   [React Native Usage](https://docs.linkrunner.io/sdk/react-native/usage)
-    -   [Flutter Usage](https://docs.linkrunner.io/sdk/flutter/usage)
-    -   [iOS Usage](https://docs.linkrunner.io/sdk/ios/usage)
-    -   [Android Usage](https://docs.linkrunner.io/sdk/android/usage)
+    -   [Android SDK](/sdk/android)
+    -   [iOS SDK](/sdk/ios)
+    -   [React Native SDK](/sdk/react-native)
+    -   [Flutter SDK](/sdk/flutter)
 
 ### Step 5) Test the signup event (recommended)
 
@@ -161,10 +160,10 @@ Expected result:
 
 Implementation references:
 
--   [React Native Usage (signup)](https://docs.linkrunner.io/sdk/react-native/usage)
--   [Flutter Usage (signup)](https://docs.linkrunner.io/sdk/flutter/usage)
--   [iOS Usage (signup)](https://docs.linkrunner.io/sdk/ios/usage)
--   [Android Usage (signup)](https://docs.linkrunner.io/sdk/android/usage)
+-   [Android SDK](/sdk/android)
+-   [iOS SDK](/sdk/ios)
+-   [React Native SDK](/sdk/react-native)
+-   [Flutter SDK](/sdk/flutter)
 
 ## Testing Remarketing
 
@@ -217,7 +216,7 @@ This test verifies that a user who uninstalls and reinstalls the app is attribut
 -   Confirm domain setup is complete: [Domain settings](https://dashboard.linkrunner.io/settings?s=domains)
 -   If using Universal Links/App Links, verify deep link verification:
 
-    -   [Configure verification objects](https://docs.linkrunner.io/sdk/deep-linking/verification)
+    -   [Set up deep links](/features/deep-linking-setup), including the verification files
 
 ### Install count not increasing
 
@@ -238,3 +237,5 @@ This test verifies that a user who uninstalls and reinstalls the app is attribut
 -   Confirm the app with the Linkrunner SDK was opened on the test device.
 -   If GAID collection is disabled on Android, set `debug = true` in SDK init and reopen the app.
 -   If the ATT prompt is disabled on iOS, set `debug = true` in SDK init and reopen the app.
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

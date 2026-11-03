@@ -11,13 +11,13 @@ Subdomains let you use your own domain (e.g. `link.yourdomain.com`) for Linkrunn
 - A domain you own
 - Access to your domain's DNS settings
 
-## Step 1 — Choose a subdomain
+## Step 1: Choose a subdomain
 
 From the [Linkrunner dashboard](https://dashboard.linkrunner.io), go to **Settings → Manage Domains** and click **Add Subdomain**. Enter a subdomain prefix (e.g. `link`, `app`, `get`, `open`) and your domain name.
 
 Your subdomain will look like: `subdomain.yourdomain.com`
 
-## Step 2 — Add a CNAME record
+## Step 2: Add a CNAME record
 
 Go to your domain registrar's DNS settings and add a **CNAME** record with these values:
 
@@ -82,13 +82,13 @@ For example, if your subdomain is `link.example.com`, set:
   </Tab>
 </Tabs>
 
-## Step 3 — Verification
+## Step 3: Verification
 
 After adding the CNAME record, Linkrunner automatically checks your DNS configuration and provisions an SSL certificate.
 
-- **CNAME Not Verified** — DNS record hasn't been detected yet. This can take a few minutes to propagate.
-- **CNAME Verified** — Your DNS record is correctly pointing to `api.linkrunner.io`.
-- **SSL Active** — Your SSL certificate has been provisioned. Your subdomain is fully ready to use.
+- **CNAME Not Verified**: DNS record hasn't been detected yet. This can take a few minutes to propagate.
+- **CNAME Verified**: Your DNS record is correctly pointing to `api.linkrunner.io`.
+- **SSL Active**: Your SSL certificate has been provisioned. Your subdomain is fully ready to use.
 
 You can click the **refresh** button next to your subdomain in the dashboard to manually re-check the status.
 
@@ -98,7 +98,7 @@ You can click the **refresh** button next to your subdomain in the dashboard to 
 DNS changes can take up to 24–48 hours to propagate globally, though most providers update within a few minutes. If your CNAME isn't verified after adding it, wait and try refreshing later.
 
 **Wrong CNAME value**
-Make sure the CNAME value is exactly `api.linkrunner.io` — not your subdomain URL, not an IP address.
+Make sure the CNAME value is exactly `api.linkrunner.io`, not your subdomain URL or an IP address.
 
 **Cloudflare proxy interference**
 If you use Cloudflare, ensure the proxy status is set to **DNS only** (grey cloud). The orange cloud (proxied) mode will interfere with SSL certificate provisioning.
@@ -113,3 +113,5 @@ From the **Settings → Manage Domains** page in the dashboard, you can:
 - **Add** new subdomains to your project
 - **Delete** subdomains you no longer need
 - **Monitor** the CNAME and SSL status of each subdomain
+
+**Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

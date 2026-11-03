@@ -52,7 +52,7 @@ Keep your API key confidential. Do not share it or expose it in client-side code
 
 ### 1. List Campaigns
 
-For getting/listing existing campaigns, please refer to the [List Campaigns API documentation](https://docs.linkrunner.io/api-reference/data-apis#1-list-campaigns).
+For getting/listing existing campaigns, please refer to the [List Campaigns API documentation](/api-reference/data-apis#1-list-campaigns).
 
 ### 2. Create Campaign
 
@@ -315,7 +315,7 @@ To clear a web field, pass an empty string or `null`. Omitting a field leaves it
 | custom_channel_names     | string[] | **Optional**. Omit to leave unchanged, pass one name to set or replace the campaign custom channel, or pass an empty array to clear it. Linkrunner currently supports only one custom channel per campaign. |
 
 <Note>
-    Changes to `website`, `android_web_redirect` and `ios_web_redirect` are applied to live campaign links immediately — the cached copy the click path serves is cleared as part of the update.
+    Changes to `website`, `android_web_redirect` and `ios_web_redirect` are applied to live campaign links immediately. The cached copy the click path serves is cleared as part of the update.
 </Note>
 
 #### Responses

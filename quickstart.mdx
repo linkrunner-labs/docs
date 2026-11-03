@@ -89,7 +89,7 @@ Add the Android and iOS bridges, then drop in `LinkrunnerSDK.cs`. [Full Unity gu
 
 ## 3. Initialize the SDK (Required)
 
-Call `init` as early as possible in your app's startup — typically in your root component, `Application` class, or `AppDelegate`. Pass the optional `secretKey` and `keyId` if you set them up in step 1.
+Call `init` as early as possible in your app's startup, typically in your root component, `Application` class, or `AppDelegate`. Pass the optional `secretKey` and `keyId` if you set them up in step 1.
 
 <Tabs>
 <Tab title="React Native">
@@ -144,7 +144,7 @@ linkrunner.init({ token: "YOUR_WEB_SDK_TOKEN" });
 
 ## 4. Identify the User (Required)
 
-Call `signup` **once**, as soon as the user is identified — whether through signup or login. This is what ties the install (and any future events) to a user identifier and powers revenue and lifecycle attribution.
+Call `signup` **once**, as soon as the user is identified, whether through signup or login. This is what ties the install (and any future events) to a user identifier and powers revenue and lifecycle attribution.
 
 <Tabs>
 <Tab title="React Native">
@@ -201,7 +201,7 @@ LinkRunner.getInstance().signup(
 
 ## 5. Handle Deep Links
 
-To unlock [remarketing](/features/remarketing) and deferred deep linking, forward incoming deep link URLs to Linkrunner. Each SDK exposes a `handleDeeplink` (or equivalent) method — see the SDK guide for the cold-start and warm-start hooks specific to your platform.
+To unlock [remarketing](/features/remarketing) and deferred deep linking, forward incoming deep link URLs to Linkrunner. Each SDK exposes a `handleDeeplink` (or equivalent) method. See the SDK guide for the cold-start and warm-start hooks specific to your platform.
 
 <CardGroup cols={2}>
     <Card title="Deep Linking Setup" icon="link" href="/features/deep-linking-setup">
@@ -251,4 +251,4 @@ For normal testing, registering the device in SDK Console is enough. Set `debug 
 
 ## Need Help?
 
-Email [support@linkrunner.io](mailto:support@linkrunner.io) — we typically respond within a few hours during business hours.
+Email [support@linkrunner.io](mailto:support@linkrunner.io). We typically respond within a few hours during business hours.

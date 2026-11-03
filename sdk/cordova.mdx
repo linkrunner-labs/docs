@@ -88,7 +88,7 @@ For detailed Android backup configuration instructions, refer to the [Android SD
 </Note>
 
 ## Initialization (Required)
-To initialize the Linkrunner SDK, add this code inside the `deviceready` event. No import or require is needed — `linkrunner` is globally available after plugin installation.
+To initialize the Linkrunner SDK, add this code inside the `deviceready` event. No import or require is needed. `linkrunner` is globally available after plugin installation.
 
 You can find your project token [here](https://dashboard.linkrunner.io/dashboard/settings/project-details).
 
@@ -151,7 +151,7 @@ linkrunner
 </Note>
 
 ## User Identification (Required)
-Call the `signup` method as soon as the user is identified — whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
+Call the `signup` method as soon as the user is identified, whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
 
 It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
 
