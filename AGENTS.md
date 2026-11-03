@@ -24,7 +24,7 @@ This is the shared repository policy for Codex and Claude Code. `CLAUDE.md` impo
 7. **Explain the decision before the code.** State which case applies and which values are required. Keep mandatory instructions visible, not inside collapsed optional content.
 8. **Separate the main path from alternatives.** Put optional configuration and uncommon failures after the primary task or in linked guidance. A necessary warning belongs before the risky step.
 9. **Use screenshots where they resolve ambiguity.** Show difficult-to-find controls or important configuration choices. Do not add an image for every obvious click. Include useful alt text, crop with padding, and redact customer data before capture. See [screenshot guidance](skills/linkrunner-docs-writing/references/screenshots.md).
-10. **Use root-relative product-doc links.** Write `/features/deep-linking-setup`, not a relative page path or a full `https://docs.linkrunner.io/...` URL (docs.v2 checks this). Dashboard links must be full URLs pointing to the intended screen. Contributor and skill Markdown links are relative to their source files.
+10. **Use root-relative product-doc links.** Write `/features/deep-linking-setup`, not a relative page path or a full `https://docs.linkrunner.io/...` URL (docs.v2 checks this). A downloadable file, such as a Postman collection, keeps its full URL so it opens as a file. Dashboard links must be full URLs pointing to the intended screen. Contributor and skill Markdown links are relative to their source files.
 
 ## Accuracy and example rules
 
