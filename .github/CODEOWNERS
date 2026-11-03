@@ -3,5 +3,3 @@
 # so changes here need Darshil's review. Pages need no code owner review.
 /.github/        @RathodDarshil
 /firebase.json   @RathodDarshil
-/package.json    @RathodDarshil
-/bun.lock        @RathodDarshil
