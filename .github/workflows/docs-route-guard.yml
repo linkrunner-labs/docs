@@ -1,17 +1,9 @@
 name: Docs route guard
 
+# Runs on every PR (no path filter) so it can be a required check: a
+# required check that never starts would block the PR.
 on:
   pull_request:
-    paths:
-      - "**/*.md"
-      - "**/*.mdx"
-      - "docs.json"
-      - "scripts/check-doc-routes.mjs"
-      - "scripts/check-doc-agent-files.test.mjs"
-      - ".agents/skills/**"
-      - ".claude/skills/**"
-      - "package.json"
-      - ".github/workflows/docs-route-guard.yml"
 
 permissions:
   contents: read
