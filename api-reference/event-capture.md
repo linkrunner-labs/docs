@@ -165,7 +165,7 @@ Put each event, in the same format as the [Capture Event](#capture-event) reques
 
 ### Responses
 
-1. **200** The batch was processed. Check each event's result, because some events can be rejected while others are captured.
+1. **200** The batch was processed. Check each event's result: a 200 response can still contain rejected or failed events, even when every event failed.
 2. **400** The body is not valid JSON, `events` is missing or empty, or it has more than 100 events. No event in the batch was captured.
 3. **401** Invalid server key
 4. **413** The request body is larger than 1 MB
@@ -202,7 +202,7 @@ Put each event, in the same format as the [Capture Event](#capture-event) reques
 - `results` has one entry per event, in request order. `index` is the event's position in `events`, starting at 0.
 - Each result has the same `status` and `msg` that `/capture-event` returns for that event. A captured event has its own `processing_id`, which works the same as on a single request.
 - The top-level `processing_id` identifies the batch request. Share it with Linkrunner support together with the event's own `processing_id` if an event does not show up.
-- **Retrying.** Do not resend events with a 400 result without fixing them. A 500 result can be retried. Send your own `event_id` on every event, so a resent event carries the same ID as the first attempt.
+- **Retrying.** Do not resend events with a 400 result without fixing them. A 500 result can be retried: resend only the events that failed, not the whole batch, because the other events are already captured. Send your own `event_id` on every event, so a resent event carries the same ID as the first attempt.
 
 ## Common Event Names
 
