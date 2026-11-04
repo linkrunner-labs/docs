@@ -104,6 +104,9 @@ A customer has already invited your email address as an agency. Open that invita
 
 ![The sign up page pointing to an existing invitation](/images/agency-partners/signup-pending-invitation.webp)
 
+**"Use your agency's work email address to create an agency account".**
+You signed in with a personal address, such as Gmail. Click **Sign out and use another account** and sign in with your agency's work email.
+
 **"Email domain not allowed" or "This email domain is not allowed for registration".**
 Your email domain cannot be used for an agency account. Click **Sign out and use another account** and sign in with your agency's work email.
 
