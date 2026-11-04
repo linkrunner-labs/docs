@@ -40,11 +40,11 @@ See [Deep Linking Setup](/features/deep-linking-setup) for the full steps. A Lin
 ### Rules and limits
 
 - **Name:** 3 to 30 characters. Use lowercase letters, numbers and hyphens. No hyphen at the start or end, and no double hyphen.
-- **One per project.** Each project can claim one Linkrunner sub-domain.
+- **One per project.** Each project can claim one Linkrunner sub-domain, and each person up to three across their projects.
 - **No renaming.** Links and QR codes you share already use the name, so it cannot change. Linkrunner never gives a released name to another account.
 - **Names that are not allowed.** Names that look like login, payment, verification or support pages (for example names containing `login`, `verify`, `kyc`, `otp`, `wallet` or `refund`) and well-known brand names. If you own a brand, contact [support@linkrunner.io](mailto:support@linkrunner.io).
-- **New accounts.** Until your account is 7 days old or has paid an invoice, campaign links on a Linkrunner sub-domain can only send people to App Store or Play Store links, your app (deep links) and your project's own website. After that, links can go to any destination.
-- **Safe destinations.** Linkrunner checks every destination against Google's list of unsafe sites.
+- **New projects.** Until your project is 7 days old or has paid an invoice, its campaign links can only send people to App Store or Play Store links, your app (deep links) and your project's own website. This applies to every campaign in a project that has a Linkrunner sub-domain. After that, links can go to any destination.
+- **Your app's own link scheme.** Your project's app scheme (Project Details) must be your own app's, not a browser, payment app or another app's scheme. App deep links cannot carry a web address.
 - **Acceptable use.** Linkrunner can turn off a sub-domain whose links break the acceptable use policy.
 
 ## Set up a Branded sub-domain
@@ -58,7 +58,7 @@ Use your own domain (for example `link.yourdomain.com`) for Linkrunner links. Yo
 
 ### Step 1: Choose a Branded sub-domain
 
-From the [Linkrunner dashboard](https://dashboard.linkrunner.io), go to **Settings → Manage Domains** and click **Add Branded sub-domain**. Enter a subdomain prefix (e.g. `link`, `app`, `get`, `open`) and your domain name.
+From the [Linkrunner dashboard](https://dashboard.linkrunner.io), go to **Settings → Manage Domains**, click **Add sub-domain** and choose **Branded sub-domain**. Enter a subdomain prefix (e.g. `link`, `app`, `get`, `open`) and your domain name.
 
 Your subdomain will look like: `subdomain.yourdomain.com`
 
