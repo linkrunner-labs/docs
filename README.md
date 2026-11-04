@@ -10,7 +10,7 @@ Before changing anything, read [AGENTS.md](AGENTS.md): where each kind of change
 | --- | --- |
 | Site | https://docs.linkrunner.io (Firebase Hosting site `lr-docs-v2`) |
 | Deploys | Every merge to `main`, by `.github/workflows/deploy-docs-v2.yml` |
-| Merge rules | The **Docs build** check must pass (no bypass). Changes to `.github/` and `firebase.json` need a code owner review (CODEOWNERS) |
+| Merge rules | The **Docs build** check must pass (no bypass). No approval is required. Changes to `.github/` and `firebase.json` wait for Darshil's approval before merging (CODEOWNERS requests his review; agents follow this rule in AGENTS.md) |
 | Old addresses | docs.v2.linkrunner.io redirects here. Every docs.linkrunner.io URL and `#section` from the Mintlify site still works (`scripts/check-legacy-urls.ts`) |
 
 ### History
