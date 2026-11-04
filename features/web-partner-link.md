@@ -82,7 +82,7 @@ https://www.example.com/?utm_source=partnerx&utm_medium=affiliate&utm_campaign=d
 
 Does your partner's platform already send AppsFlyer-style values? The Web SDK also reads `af_siteid` or `af_sub1` as the first value, `af_sub_siteid` as the second, and `af_sub2`, `af_sub3` and `af_sub4` as the third to fifth. It reads them only when the link has no `lr_sub` parameter with that number. So ask your partner to swap `lr_sub1={publisher_id}` for their `af_siteid` parameter, not to add it next to it.
 
-A `source` parameter on the link is also read as the second value.
+A `source` parameter is also read as the second value when the link has a `utm_id` and no `lr_sub2` or `af_sub_siteid`.
 
 </Tip>
 
