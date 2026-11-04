@@ -471,7 +471,7 @@ Website events use the same `linkrunner-key` header, retries and IP addresses as
 | `visitor_id` / `session_id` | `string` \| `null` | The Web SDK's visitor and session                                                                                                                                                     |
 | `name` / `email` / `phone`  | `string` \| `null` | From the event's data, when you sent them                                                                                                                                             |
 | `attributed`                | `boolean`          | `true` when the visitor came from a paid ad or a tagged link                                                                                                                          |
-| `attribution`               | `object`           | The visit that led to the event (last touch): `channel`, `network_name`, `utm`, `web_campaign` (your Linkrunner web link, when the `utm_id` is one), `click_ids` and `gad_campaignid` |
+| `attribution`               | `object`           | The visit that led to the event (last touch): `channel`, `network_name`, `utm`, `web_campaign` (your Linkrunner web link, when the `utm_id` is one), `click_ids`, `gad_campaignid` and `sub` (`sub1` to `sub5`, the values a partner filled in a [partner web link](/features/web-partner-link), `null` when not passed) |
 | `first_touch`               | `object`           | The same fields for the visitor's first visit                                                                                                                                         |
 | `page`                      | `object`           | `url`, `entry_page` and `referring_domain`                                                                                                                                            |
 | `device`                    | `object`           | `user_agent`, `language` and `timezone`                                                                                                                                               |
@@ -521,7 +521,8 @@ The campaign in a website webhook is the one known when the event happens. For a
     "click_ids": {
       "gclid": "Cj0KCQjw_sample"
     },
-    "gad_campaignid": "21234567890"
+    "gad_campaignid": "21234567890",
+    "sub": { "sub1": null, "sub2": null, "sub3": null, "sub4": null, "sub5": null }
   },
   "first_touch": {
     "channel": "meta",
@@ -541,7 +542,8 @@ The campaign in a website webhook is the one known when the event happens. For a
     "click_ids": {
       "fbclid": "IwAR_sample"
     },
-    "gad_campaignid": null
+    "gad_campaignid": null,
+    "sub": { "sub1": null, "sub2": null, "sub3": null, "sub4": null, "sub5": null }
   },
   "page": {
     "url": "https://example.com/signup?utm_source=google",

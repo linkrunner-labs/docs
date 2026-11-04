@@ -11,6 +11,8 @@ description: "Connect Google Ads, map app events, and manage native app conversi
 
 Use this guide for native Android and iOS App campaigns. Receiving an event, importing a conversion action, and using it for campaign bidding are separate steps.
 
+To upload sign-ups and purchases from your website, see [Send website conversions to Google Ads](/features/google-ads-web-conversions).
+
 ## Setup Process
 
 Setting up Google Ads integration involves four main steps: connecting your Google Ads account, creating a link ID for your mobile app, mapping events in Linkrunner, and importing events for conversion tracking.

@@ -166,6 +166,15 @@
     ],
     "time": "About 15 minutes"
   },
+  "/features/web-partner-link": {
+    "for": "Marketers",
+    "needs": [
+      "The Web SDK on your website, tested (see Test the Web SDK)",
+      "Web Campaigns turned on for your project",
+      "The values your partner will pass on each click, such as a publisher ID (up to 5)"
+    ],
+    "time": "About 10 minutes"
+  },
   "/features/push-notification-tracking": {
     "for": "Marketers and developers",
     "needs": [
@@ -365,5 +374,55 @@
       "Your app live with the Linkrunner SDK, and store links added in Linkrunner"
     ],
     "time": "About 45 minutes"
+  },
+  "/features/web-events-tracking": {
+    "for": "Marketers, with a developer",
+    "needs": [
+      "The Web SDK on your website (see Web SDK)",
+      "A developer who can add a few lines of code, or Shopify admin access"
+    ],
+    "time": "About 15 minutes to plan, plus your developer's time"
+  },
+  "/features/web-campaign-link": {
+    "for": "Marketers",
+    "needs": [
+      "The Web SDK on your website, tested (see Test the Web SDK)",
+      "Web Campaigns turned on for your project"
+    ],
+    "time": "About 5 minutes"
+  },
+  "/features/web-campaigns-report": {
+    "for": "Marketers",
+    "needs": [
+      "Web Campaigns turned on for your project",
+      "The Web SDK sending visits from your website"
+    ],
+    "time": "About 10 minutes"
+  },
+  "/features/web-creatives": {
+    "for": "Marketers",
+    "needs": [
+      "The Web SDK on your website",
+      "Your Meta or Google Ads account connected in Linkrunner",
+      "The ad ID in your ad links"
+    ],
+    "time": "About 10 minutes"
+  },
+  "/features/meta-web-conversions": {
+    "for": "Marketers",
+    "needs": [
+      "Your Meta ad account connected, with a dataset and CAPI access token",
+      "Sign-up or purchase events coming from your website"
+    ],
+    "time": "About 10 minutes"
+  },
+  "/features/google-ads-web-conversions": {
+    "for": "Marketers",
+    "needs": [
+      "Your Google Ads account connected, with the Data Manager permission",
+      "Sign-up or purchase events coming from your website",
+      "Auto-tagging on in Google Ads"
+    ],
+    "time": "About 10 minutes"
   }
 }

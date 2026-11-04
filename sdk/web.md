@@ -127,6 +127,8 @@ window.lr.identify(String(user.id))
 
 The SDK saves this ID in `localStorage` and includes it as `user_id` on later events.
 
+Which events to send, and the exact names Linkrunner counts as sign-ups and purchases, are in [Track sign-ups and purchases on your website](/features/web-events-tracking).
+
 Track a custom event with `track`:
 
 ```js
