@@ -98,7 +98,6 @@ const guides: Group[] = [
       "/features/deep-link-management",
       "/features/link-redirection",
       "/features/deactivate-campaign-link",
-      "/features/web-to-app-journeys",
       "/features/referral-codes",
       "/features/custom-store-listing",
       "/features/social-media-intermediary-page",
@@ -109,7 +108,21 @@ const guides: Group[] = [
     false,
     "link-simple"
   ),
-  group("Web attribution", links("/features/web-partner-link"), false, "globe"),
+  group(
+    "Web attribution",
+    links(
+      "/features/web-events-tracking",
+      "/features/web-campaign-link",
+      "/features/web-partner-link",
+      "/features/web-campaigns-report",
+      "/features/web-creatives",
+      "/features/meta-web-conversions",
+      "/features/google-ads-web-conversions",
+      "/features/web-to-app-journeys"
+    ),
+    false,
+    "globe"
+  ),
   group("Users and events", links("/features/users-tab", "/features/events-tab", "/features/retention", "/features/data-export"), false, "users-three"),
   group(
     "Measurement",

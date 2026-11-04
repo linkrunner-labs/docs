@@ -9,6 +9,8 @@ description: "Give an affiliate partner one link to your website, and see visits
 
 Your partner fills in their own values on every click, such as a publisher ID. Linkrunner then splits that partner's visitors, sign-ups and revenue by each value, so you don't need a separate link for every publisher.
 
+For a link you share yourself, such as in an email or a social post, see [Create a web link for your own channels](/features/web-campaign-link).
+
 ## 1. Open Create Campaign
 
 In the dashboard, go to [Web Campaigns](https://dashboard.linkrunner.io/dashboard/web-events) and click **Create Campaign**.
@@ -113,7 +115,7 @@ Click **Download CSV** to share the numbers with your partner. The numbers follo
 
 <Note>
 
-Partners don't get automatic postbacks for website sign-ups or purchases yet. Share results with the CSV. To pass sign-ups on yourself, turn on **Send web events** for your [webhook](/features/webhooks#website-events). Each website sign-up includes the partner's values in `attribution.sub` (`sub1` to `sub5`).
+Partners don't get automatic postbacks for website sign-ups or purchases yet. Share results with the CSV from **Partner breakdown**.
 
 </Note>
 
