@@ -11,7 +11,7 @@ If you send traffic to Linkrunner customers as an affiliate and also run campaig
 
 <Info>
 
-You need an approved affiliate account and a customer who wants you to run their campaigns. Agency accounts start with a customer invitation, so there is no sign up form.
+You need an affiliate account and your agency details: a logo, name, description, website, and contact email. You do not need a customer invitation.
 
 </Info>
 
@@ -26,29 +26,25 @@ You need an approved affiliate account and a customer who wants you to run their
 
 A customer who works with you both ways sees two connections and gives each its own access. Your affiliate and agency data are never merged.
 
-## 1. Ask a customer to invite you as an agency
+## 1. Open Add an agency account
 
-Ask the customer to invite you from **Settings → Members → Invite Agency → Invite them by email**. They should use the **same email address you sign in with as an affiliate**. See [Invite an agency](/agency-partners/invite-an-agency) for their steps.
+Open the project picker at the top of the sidebar. Under **Partner accounts**, click **Add an agency account**. It opens the agency sign up page.
 
-![Invite Agency on the customer's Members page](/images/affiliate-partners/add-agency-invite-button.webp)
+![Project picker with Add an agency account under Partner accounts](/images/affiliate-partners/add-agency-switcher-add.webp)
 
-![The customer invites your affiliate sign-in email as a new agency](/images/affiliate-partners/add-agency-invite-email.webp)
+The option is there while your login has no agency account. Once you have one, it is listed under **Partner accounts** instead.
 
-<Note>
+## 2. Create your agency workspace
 
-If you are not working with a customer as an agency yet, contact <support@linkrunner.io> and we can set up your agency account.
+The page shows the email you are signed in with. Your agency account uses the same login as your affiliate account. Click **Create agency workspace**.
 
-</Note>
+![Create agency workspace, showing the signed-in email address](/images/agency-partners/signup-create-workspace.webp)
 
-## 2. Open the invitation
-
-Open the link in the invitation email. If you are already signed in to Linkrunner, you go straight to the agency setup. Otherwise sign in with the invited address first.
-
-![Invitation page asking you to sign in with the invited address](/images/affiliate-partners/add-agency-invitation.webp)
+If a customer has already invited your email as an agency, the page tells you to use that invitation instead. See [Use a customer invitation instead](#use-a-customer-invitation-instead).
 
 ## 3. Add your agency details
 
-Upload a logo, enter your agency name and a description, then add your website and contact email. Click **Complete setup**. The fields are the same as for a new agency, see [Set up your agency workspace](/agency-partners/accept-invitation#3-add-your-agency-details).
+Upload a logo, enter your agency name and a description, then add your website and contact email. Click **Complete setup**. The fields are the same as for any new agency, see [Create an agency account](/agency-partners/sign-up#4-add-your-agency-details).
 
 ![Agency setup, step 1: logo, agency name and description](/images/affiliate-partners/add-agency-details.webp)
 
@@ -62,6 +58,8 @@ Linkrunner reviews the new agency workspace. Your affiliate account keeps workin
 
 You get an email when the review is done.
 
+After approval, customers can find your agency in their agency list and engage you. See [Get engaged by customers](/agency-partners/sign-up#6-get-engaged-by-customers).
+
 ## 5. Switch between your accounts
 
 Open the project picker at the top of the sidebar. **Partner accounts** lists both workspaces. Click one to open it. While the agency workspace is under review, it shows **In review**.
@@ -72,7 +70,22 @@ When a customer has connected both your affiliate and your agency to the same pr
 
 ![Project picker with the same project listed once as Affiliate and once as Agency](/images/affiliate-partners/add-agency-switcher-both.webp)
 
+## Use a customer invitation instead
+
+A customer can also invite you from **Settings → Members → Invite Agency → Invite them by email**. Ask them to use the **same email address you sign in with as an affiliate**. See [Invite an agency](/agency-partners/invite-an-agency) for their steps.
+
+![Invite Agency on the customer's Members page](/images/affiliate-partners/add-agency-invite-button.webp)
+
+![The customer invites your affiliate sign-in email as a new agency](/images/affiliate-partners/add-agency-invite-email.webp)
+
+Open the link in the invitation email. If you are already signed in to Linkrunner, you go straight to the agency setup. Otherwise sign in with the invited address first. Then add your agency details as in step 3. The inviting customer's project appears in your agency workspace once it is approved.
+
+![Invitation page asking you to sign in with the invited address](/images/affiliate-partners/add-agency-invitation.webp)
+
 ## Troubleshooting
+
+**"You already have an agency invitation".**
+A customer has already invited your email as an agency. Open that invitation email and use its link, so your agency workspace is connected to that customer.
 
 **"This invitation belongs to a different email".**
 The invitation was sent to another address. Ask the customer to invite the email you sign in with, or sign out and sign in with the invited address.

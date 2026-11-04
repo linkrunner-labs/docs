@@ -37,6 +37,8 @@ The list holds every agency already set up on Linkrunner. Search by name, descri
 
 An agency you have already engaged shows **Invited** or **Active** instead of a checkbox, so it cannot be invited twice.
 
+Agencies can also create their own Linkrunner account. Once Linkrunner approves it, the agency appears in this list.
+
 ![Choosing an agency from the directory](/images/agency-partners/invite-agency-directory.png)
 
 </Tab>

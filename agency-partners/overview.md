@@ -13,16 +13,15 @@ An **agency workspace** lets you build and measure campaigns inside a customer's
 
 You get one workspace, no matter how many Linkrunner customers you work with. Each customer that engages you appears in it, and you switch between them from the project picker.
 
-<Note>
-
-There is no agency sign up page. A customer's invitation is the only way in, and the invitation is also the vetting. See [Set up your agency workspace](/agency-partners/accept-invitation).
-
-</Note>
-
 ## How an engagement starts
 
+There are two ways in:
+
+- **Sign up yourself** at [Agency Partner Sign Up](https://dashboard.linkrunner.io/agency/signup). See [Create an agency account](/agency-partners/sign-up).
+- **Accept a customer's invitation.** A customer invites you from **Settings → Members → Invite Agency**, and their email is your starting point. See [Set up your agency workspace](/agency-partners/accept-invitation).
+
 ```
-Customer invites you            (Settings → Members → Invite Agency)
+You sign up, or a customer invites you
    │
    ▼
 You set up your workspace       (name, logo, description, contact details)
@@ -31,10 +30,13 @@ You set up your workspace       (name, logo, description, contact details)
 Linkrunner reviews it           (you get an email either way)
    │
    ▼
+A customer engages you          (from their agency list, or by inviting you)
+   │
+   ▼
 Their project appears in your workspace
 ```
 
-A customer who engages an agency that is already on Linkrunner skips the first two steps. The project shows up in that agency's existing workspace straight away.
+Once your workspace is approved, you appear in the agency list customers choose from. A customer who engages you after that skips the setup and review. Their project shows up in your existing workspace straight away.
 
 ## What you can see
 
@@ -48,9 +50,15 @@ A screen a customer has not granted you says so when you open it, rather than sh
 
 <CardGroup :cols="2">
 
+<Card title="Create an agency account" icon="rocket" href="/agency-partners/sign-up">
+
+Sign up yourself, without a customer invitation.
+
+</Card>
+
 <Card title="Set up your workspace" icon="user-plus" href="/agency-partners/accept-invitation">
 
-Accept an invitation and complete your agency details.
+Invited by a customer? Accept the invitation and complete your agency details.
 
 </Card>
 

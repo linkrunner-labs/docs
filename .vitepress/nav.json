@@ -18,7 +18,7 @@
     {
       "text": "Partners",
       "link": "/affiliate-partners/getting-started",
-      "activeMatch": "^/(affiliate-partners/getting-started|affiliate-partners/overview|affiliate-partners/create-account|affiliate-partners/add-agency-account|affiliate-partners/create-campaign-link|affiliate-partners/edit-campaign|affiliate-partners/tracking-links|affiliate-partners/s2s-clicks|affiliate-partners/s2s-impressions|affiliate-partners/ctv-impressions|affiliate-partners/turn-on-s2s-clicks|affiliate-partners/postbacks|affiliate-partners/event-mapping|affiliate-partners/postback-logs|affiliate-partners/fraud-data|affiliate-partners/affiliate-apis|integrations/everflow|agency-partners/overview|agency-partners/accept-invitation|agency-partners/add-affiliate-account|agency-partners/manage-workspace|agency-partners/create-campaign-link|agency-partners/edit-campaign|agency-partners/campaigns-for-affiliates|agency-partners/invite-an-agency|agency-partners/control-agency-access)$"
+      "activeMatch": "^/(affiliate-partners/getting-started|affiliate-partners/overview|affiliate-partners/create-account|affiliate-partners/add-agency-account|affiliate-partners/create-campaign-link|affiliate-partners/edit-campaign|affiliate-partners/tracking-links|affiliate-partners/s2s-clicks|affiliate-partners/s2s-impressions|affiliate-partners/ctv-impressions|affiliate-partners/turn-on-s2s-clicks|affiliate-partners/postbacks|affiliate-partners/event-mapping|affiliate-partners/postback-logs|affiliate-partners/fraud-data|affiliate-partners/affiliate-apis|integrations/everflow|agency-partners/overview|agency-partners/sign-up|agency-partners/accept-invitation|agency-partners/add-affiliate-account|agency-partners/manage-workspace|agency-partners/create-campaign-link|agency-partners/edit-campaign|agency-partners/campaigns-for-affiliates|agency-partners/invite-an-agency|agency-partners/control-agency-access)$"
     },
     {
       "text": "Dashboard",
@@ -845,6 +845,11 @@
             "text": "<span class=\"sidebar-icon\"><svg viewBox=\"0 0 512 512\" width=\"1em\" height=\"1em\" fill=\"currentColor\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M184 48h144c4.4 0 8 3.6 8 8v40H176V56c0-4.4 3.6-8 8-8m-56 8v40H64c-35.3 0-64 28.7-64 64v96h512v-96c0-35.3-28.7-64-64-64h-64V56c0-30.9-25.1-56-56-56H184c-30.9 0-56 25.1-56 56m384 232H320v32c0 17.7-14.3 32-32 32h-64c-17.7 0-32-14.3-32-32v-32H0v128c0 35.3 28.7 64 64 64h384c35.3 0 64-28.7 64-64z\"/></svg></span>Agency Partner Integration",
             "link": "/agency-partners/overview",
             "icon": "briefcase"
+          },
+          {
+            "text": "Create an Agency Account",
+            "link": "/agency-partners/sign-up",
+            "icon": "rocket"
           },
           {
             "text": "<span class=\"sidebar-icon\"><svg viewBox=\"0 0 640 512\" width=\"1em\" height=\"1em\" fill=\"currentColor\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M96 128a128 128 0 1 1 256 0a128 128 0 1 1-256 0M0 482.3C0 383.8 79.8 304 178.3 304h91.4c98.5 0 178.3 79.8 178.3 178.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3M504 312v-64h-64c-13.3 0-24-10.7-24-24s10.7-24 24-24h64v-64c0-13.3 10.7-24 24-24s24 10.7 24 24v64h64c13.3 0 24 10.7 24 24s-10.7 24-24 24h-64v64c0 13.3-10.7 24-24 24s-24-10.7-24-24\"/></svg></span>Set Up Your Agency Workspace",
