@@ -36,6 +36,8 @@ A link you give to an affiliate partner must be assigned to that partner. Withou
 
 Running ads on Meta, Google or another ad network? Those campaigns come in through the network's integration, not a link you create here. See [Ad networks](/ad-networks/meta-ads).
 
+Sending a partner's traffic to your website instead of your app? See [Create a web link for a partner](/features/web-partner-link).
+
 </Note>
 
 ## Before you start

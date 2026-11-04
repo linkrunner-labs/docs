@@ -222,6 +222,7 @@ export const PAGE_TITLES: Record<string, PageTitle> = {
   "/features/deep-linking-setup": { title: "Set up deep links" },
   "/features/deferred-deep-linking": { title: "Deferred deep links" },
   "/features/web-to-app-journeys": { title: "Web to app journeys" },
+  "/features/web-partner-link": { title: "Create a web link for a partner", label: "Web link for a partner" },
   "/features/push-notification-tracking": { title: "Track push notifications" },
   "/features/push-notification-providers": { title: "Links in push notification tools", label: "Push notification tools" },
   "/features/link-redirection": { title: "Where links send users" },

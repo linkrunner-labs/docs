@@ -166,6 +166,15 @@
     ],
     "time": "About 15 minutes"
   },
+  "/features/web-partner-link": {
+    "for": "Marketers",
+    "needs": [
+      "The Web SDK on your website, tested (see Test the Web SDK)",
+      "Web Campaigns turned on for your project",
+      "The values your partner will pass on each click, such as a publisher ID (up to 5)"
+    ],
+    "time": "About 10 minutes"
+  },
   "/features/push-notification-tracking": {
     "for": "Marketers and developers",
     "needs": [
