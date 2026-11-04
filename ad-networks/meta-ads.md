@@ -11,6 +11,8 @@ description: "Configure your Meta app integration settings to enable proper attr
 
 Connect Meta Ads to send installs, registrations, purchases, and custom app events from Linkrunner to Meta. Use this guide to connect your Meta app and ad account, configure Conversions API, and map the events Meta should receive.
 
+To send sign-ups and purchases from your website, see [Send website conversions to Meta](/features/meta-web-conversions).
+
 <iframe width="100%" height="468" src="https://www.youtube.com/embed/rBs69ubSCGk" title="Meta Ads Integration Tutorial" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### What You'll Get
