@@ -41,7 +41,7 @@ Click an ad to see it in full, with its titles, ad copy, call to action, campaig
 
 ![An ad's details with its image, campaign, ad set, ad copy, metrics and daily chart](/images/web-creatives/creative-drawer.webp)
 
-Click **Ads Manager** (or **Google**) to open the ad in Meta or Google Ads, or click the campaign or ad set to see it on Web Campaigns.
+Click **Ads Manager** to open the ad in Meta or Google Ads, or click the campaign or ad set to see it on Web Campaigns.
 
 ## How Linkrunner knows which ad a visit came from
 
@@ -52,7 +52,7 @@ The ad link must carry the ad's ID, in an `ad_id` or `utm_content` parameter. Ad
 | Meta       | `utm_content={{ad.id}}`        |
 | Google Ads | `utm_content={creative}`       |
 
-Ads without an ID in the link still count toward their campaign on Web Campaigns, but don't show here.
+Meta ads without an ID in the link still count toward their campaign on Web Campaigns, but don't show here. For Google ads, Linkrunner can also find the ad from the Google click ID, which can take a few hours.
 
 To show an ad's name and image, Linkrunner reads it from your connected Meta and Google Ads accounts. Connect every account that runs ads to your website in [Integrations](https://dashboard.linkrunner.io/dashboard/integrations).
 

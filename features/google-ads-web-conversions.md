@@ -27,7 +27,7 @@ Connected Google Ads a while ago? Reconnect it on the **Account Integration** ta
 
 1. Click **Add Mapping**.
 2. Under **Your Web Events**, pick your website event, such as `lead_form_submitted`. The list shows the events Linkrunner has received from your website.
-3. Under **Google Ads Event**, pick the closest match: **Purchase**, **Sign Up**, **Generate Lead**, **Add To Cart**, **Begin Checkout** or **Custom Web Event**.
+3. Under **Google Ads Event**, pick the closest match: **Purchase**, **Sign Up**, **Generate Lead**, **Add To Cart**, **Begin Checkout** or **Custom Web Event**. To type your own name, pick **Custom Event**. Each Google Ads event can be used in one mapping only.
 4. Under **Conversion action**, pick the Google Ads conversion action that should receive it.
 
    ![The Conversion action list with existing actions and Create new](/images/google-ads-web-conversions/conversion-action.webp)
@@ -62,7 +62,7 @@ Only visits from a Google ad click carry a click ID, so only those conversions a
 
 ## Troubleshooting
 
-**"This account cannot receive web conversions yet".** The Google Ads account is missing the Data Manager permission. Reconnect it on the **Account Integration** tab and approve every permission. Mappings you made before still work once you reconnect.
+**"&lt;account name&gt; cannot receive web conversions yet".** The Google Ads account is missing the Data Manager permission. Reconnect it on the **Account Integration** tab and approve every permission. Mappings you made before still work once you reconnect.
 
 **"Conversion actions could not be loaded".** Check that the account still has Google Ads API access and the connection is authorized, then reload the page.
 

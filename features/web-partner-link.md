@@ -115,7 +115,7 @@ Click **Download CSV** to share the numbers with your partner. The numbers follo
 
 <Note>
 
-Partners don't get automatic postbacks for website sign-ups or purchases yet. Share results with the CSV. To pass sign-ups on yourself, turn on **Send web events** for your [webhook](/features/webhooks#website-events). Each website sign-up includes the partner's values in `attribution.sub` (`sub1` to `sub5`).
+Partners don't get automatic postbacks for website sign-ups or purchases yet. Share results with the CSV from **Partner breakdown**.
 
 </Note>
 

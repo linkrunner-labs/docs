@@ -61,11 +61,12 @@ For each mapped event, Linkrunner sends:
 - A hashed version of your user ID, when your website has called `identify`.
 - The value and currency, when **Send Revenue** is on.
 
-Linkrunner sends every mapped event, not only the ones from Meta ads. Meta matches each one to its own ad clicks and views.
+Linkrunner sends every mapped event from your website, not only the ones from Meta ads. Meta matches each one to its own ad clicks and views.
 
 ## Things to know
 
 - **Events older than 7 days are not sent.** Meta doesn't accept them.
+- **Events sent from your server are not sent to Meta.** Meta needs the page the event happened on, which only the website has. Send purchases you want Meta to see from the website.
 - **Already sending the same event with the Meta Pixel?** Meta may count it twice. Map a different event, or stop the Pixel sending that one.
 - **Several datasets.** If your ad accounts use different datasets, Linkrunner sends each event to each of them.
 

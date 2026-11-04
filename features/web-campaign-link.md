@@ -22,7 +22,7 @@ Go to [Web Campaigns](https://dashboard.linkrunner.io/dashboard/web-events) and 
 | Field            | What to enter                                                                                     | Example              |
 | ---------------- | ------------------------------------------------------------------------------------------------- | -------------------- |
 | **Name**         | A name your team will recognize. Required. You see it in reports.                                 | `Weekend newsletter` |
-| **UTM Source**   | Where the link is shared. Pick from the list, or type your own and click **Create**.               | `newsletter`         |
+| **UTM Source**   | Where the link is shared. Required. Pick from the list, or type your own and click **Create**.     | `newsletter`         |
 | **UTM Medium**   | The type of traffic. It decides the channel, see the table below.                                 | `email`              |
 | **UTM Campaign** | The offer or campaign.                                                                            | `weekend_games`      |
 
@@ -41,12 +41,14 @@ On the Channel tab, Linkrunner places each visit by its **UTM Medium**:
 
 | UTM Medium            | Shows under        | Use it for                          |
 | --------------------- | ------------------ | ----------------------------------- |
-| `email`               | **Email**          | Emails and newsletters              |
+| `email` or `e-mail`   | **Email**          | Emails and newsletters              |
 | `social`              | **Social**         | Organic posts, bios and stories     |
 | `affiliate`           | **Paid Affiliate** | Affiliates and paid creators        |
-| `cpc`                 | **Paid Search**    | Search ads you tag by hand          |
-| `display` or `cpm`    | **Paid Display**   | Banner and display ads              |
-| Anything else         | **Campaign**       | QR codes, print, events and the rest |
+| `cpc`, `ppc` or `sem` | **Paid Search**    | Search ads you tag by hand          |
+| `display`, `cpm` or `banner` | **Paid Display** | Banner and display ads        |
+| Any other value       | **Campaign**       | QR codes, print, events and the rest |
+
+Two combinations go to an ad network instead: `utm_medium=paid_social` with `utm_source` set to `meta`, `facebook` or `instagram` shows under **Meta**, and `cpc` or `display` with `utm_source=google` shows under **Google**.
 
 ## 3. Check the link and create it
 
@@ -84,7 +86,7 @@ Click the link's row, then use the buttons at the top of the panel:
 
 - **Edit** changes the **Name** and the **Campaign Family ID**. The domain and UTM values are fixed, because the link is already shared.
 - **The switch** pauses tracking for the link. Turn it back on to resume.
-- **Delete** removes the link. Visits and sign-ups already credited to it are kept.
+- **Delete** removes the link from your list. Visits and sign-ups already credited to it are kept, and anyone who still has the link keeps counting under its Campaign ID. To stop counting new visits, pause the link first.
 
 ![Edit Web Campaign with Name and Campaign Family ID editable, and the domain and UTM values fixed](/images/web-campaign-link/edit-link.webp)
 

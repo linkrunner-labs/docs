@@ -25,7 +25,7 @@ Linkrunner recognizes sign-ups and purchases by the event name alone. Upper or l
 
 | Counts as | Event names                                                                |
 | --------- | -------------------------------------------------------------------------- |
-| Sign-up   | `signup`, `sign_up`, `register`, `login`, `sign in`, `o2_sign_up_complete` |
+| Sign-up   | `signup`, `sign_up`, `register`, `login`, `sign in`                        |
 | Purchase  | `purchase`, `payment_completed`, `order_completed`                         |
 
 For revenue, put the amount in the purchase event's `value` or `amount` field, and add `currency`. Linkrunner doesn't convert currencies, so send every purchase in the same currency as your project.
@@ -64,8 +64,6 @@ Send website sign-ups and purchases to Meta and Google Ads, so they can find mor
 - [Send website conversions to Meta](/features/meta-web-conversions)
 - [Send website conversions to Google Ads](/features/google-ads-web-conversions)
 
-To pass sign-ups to your own systems, such as a CRM, turn on **Send web events** for a [webhook](/features/webhooks#website-events).
-
 ## Shopify stores
 
 On Shopify, you add four short snippets in the Shopify admin, with no server work. They send sign-ups, and purchases from the checkout with the order value. See [Shopify](/sdk/shopify).
@@ -74,7 +72,8 @@ On Shopify, you add four short snippets in the Shopify admin, with no server wor
 
 If a purchase is confirmed on your server, such as after a payment webhook, send it with the [Event Capture API](/api-reference/event-capture) or the [Revenue Tracking API](/api-reference/revenue-tracking), with `source` set to `web`.
 
-- Pass the same user ID you passed to `identify`. Linkrunner credits the event to that user's campaign.
+- Pass the same user ID you passed to `identify`. Linkrunner credits the event to the campaign of that user's last website visit in the past 90 days. If the Web SDK never saw the user, the event shows under **Direct**.
+- Server events are not sent to Meta, because Meta needs the page the event happened on. Send purchases you want Meta to see from the website.
 - Send each purchase from either the website or the server, not both. Linkrunner doesn't remove duplicates, so sending both counts it twice.
 
 ## Troubleshooting

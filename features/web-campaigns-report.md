@@ -23,7 +23,7 @@ The five cards show this month so far, with your all-time total under **Lifetime
 | **Revenue**         | The total value of purchase events, in your project's currency.                                |
 | **Conversion**      | Visitors who signed up, as a share of all visitors.                                            |
 
-The cards don't change with the date range you pick below them. Use the table for a custom date range.
+The cards don't change with the date range you pick below them, so use the table for a custom date range. They do follow the **Last-touch** or **First-touch** choice.
 
 ## The Channel tab
 
@@ -50,7 +50,7 @@ Click the arrow next to a channel to see its sources. To compare channels in a c
 
 ![The Campaigns tab with Campaign Name, Campaign ID and metric columns](/images/web-campaigns-report/campaigns-tab.webp)
 
-- **Campaign Name** shows the name you gave a link you created in Linkrunner, such as `Weekend newsletter`. Other rows show the campaign ID from the link.
+- **Campaign Name** shows the name you gave a link you created in Linkrunner, such as `Weekend newsletter`. Other rows show their `utm_campaign`, or the campaign ID if there is none.
 - **Campaign ID** is the link's `utm_id`. A link with no `utm_id` is listed by its `utm_campaign`.
 - The switch at the start of each row pauses tracking for that campaign.
 - The icon next to the name shows the source, such as Meta or Google.
@@ -111,7 +111,7 @@ The buttons at the top let you pause the campaign, copy its link, download a QR 
 
 Click the download icon on the right of the toolbar:
 
-- **Campaigns** downloads a CSV of the rows that match your current filters and dates.
+- **Campaigns** emails you a CSV of the rows that match your current filters and dates.
 - **Users** emails you a file of the signed-up users that match your current filters and dates.
 
 ![The export menu with Campaigns and Users](/images/web-campaigns-report/export.webp)
@@ -124,7 +124,7 @@ Linkrunner counts an event by its exact name. Upper or lower case matters.
 
 | Counts as  | Event names                                                                 |
 | ---------- | --------------------------------------------------------------------------- |
-| Sign-up    | `signup`, `sign_up`, `register`, `login`, `sign in`, `o2_sign_up_complete`  |
+| Sign-up    | `signup`, `sign_up`, `register`, `login`, `sign in`                         |
 | Purchase   | `purchase`, `payment_completed`, `order_completed`                          |
 
 Revenue comes from the purchase event's `value`, `amount_paid` or `amount` field. Linkrunner doesn't convert currencies, so send every purchase in the same currency.
@@ -137,7 +137,7 @@ Revenue comes from the purchase event's `value`, `amount_paid` or `amount` field
 
 **Sign-ups or Revenue show 0.** Your website is not sending the events yet, or their names don't match the table above. See [Track sign-ups and purchases on your website](/features/web-events-tracking).
 
-**A Meta campaign shows "Campaign not identified".** Connect the Meta ad account that runs it in [Integrations](https://dashboard.linkrunner.io/dashboard/integrations), or wait for Meta to share the campaign's data.
+**A Meta campaign shows "Meta campaign not identified".** Connect the Meta ad account that runs it in [Integrations](https://dashboard.linkrunner.io/dashboard/integrations), or wait for Meta to share the campaign's data.
 
 **Revenue, Spend or ROAS is hidden.** Your role doesn't include financial data. Ask a project admin.
 
