@@ -161,7 +161,7 @@ Put each event, in the same format as the [Capture Event](#capture-event) reques
 
 - Send between 1 and 100 events. The whole request body must be at most 1 MB (1,048,576 bytes).
 - Events are processed in the order you send them.
-- A batch counts as one request towards the rate limit.
+- A batch counts as one request towards the API rate limit. Each server key can also send at most 5 batches per second, which is up to 500 events per second.
 
 ### Responses
 
@@ -169,7 +169,7 @@ Put each event, in the same format as the [Capture Event](#capture-event) reques
 2. **400** The body is not valid JSON, `events` is missing or empty, or it has more than 100 events. No event in the batch was captured.
 3. **401** Invalid server key
 4. **413** The request body is larger than 1 MB
-5. **429** Too many requests, see [Error Handling](#error-handling)
+5. **429** Too many requests, including more than 5 batches in one second from the same server key. Wait a second and resend the batch; see [Error Handling](#error-handling)
 
 #### Sample Response
 
