@@ -109,6 +109,7 @@ const guides: Group[] = [
     false,
     "link-simple"
   ),
+  group("Web attribution", links("/features/web-partner-link"), false, "globe"),
   group("Users and events", links("/features/users-tab", "/features/events-tab", "/features/retention", "/features/data-export"), false, "users-three"),
   group(
     "Measurement",
