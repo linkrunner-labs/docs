@@ -65,6 +65,11 @@ export const RELAY_ANCHOR_ALIASES: Record<string, Record<string, string>> = {
     "step-2-\u2014-add-a-cname-record": "step-2-add-a-cname-record",
     "step-3-\u2014-verification": "step-3-verification",
   },
+  // The invitation steps moved below the self-serve path (LIN-4662).
+  "/affiliate-partners/add-agency-account": {
+    "1-ask-a-customer-to-invite-you-as-an-agency": "use-a-customer-invitation-instead",
+    "2-open-the-invitation": "use-a-customer-invitation-instead",
+  },
   "/introduction": {
     "key-features": "growth-guides",
     "get-started": "start",

@@ -7,7 +7,7 @@ description: "Accept a customer's invitation, add your agency details, and get y
 
 <p class="vp-lead">Accept a customer's invitation, add your agency details, and get your workspace approved</p>
 
-A customer invites you before you have anything on Linkrunner. The invitation email is your starting point, and it names the project you are being invited to run campaigns for.
+Use this page if a customer has invited you by email. The invitation email is your starting point, and it names the project you are being invited to run campaigns for. No invitation? [Create an agency account](/agency-partners/sign-up) yourself instead.
 
 <Info>
 
