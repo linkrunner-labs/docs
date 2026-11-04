@@ -13,7 +13,7 @@ You do not need to create a separate deep link record for every product, offer, 
 
 ## Before you start
 
-- [Configure a Linkrunner subdomain](/features/subdomain-setup), such as `get.example.com`.
+- [Set up your link domain](/features/subdomain-setup): a Linkrunner sub-domain, or a Branded sub-domain such as `get.example.com`.
 - [Set up deep linking in your app](/features/deep-linking-setup).
 - Decide which query parameters your app uses. For example, `destination=product&variant_id=987`.
 

@@ -151,7 +151,7 @@ Open `android/app/src/main/AndroidManifest.xml` and add the following inside the
   <action android:name="android.intent.action.VIEW" />
   <category android:name="android.intent.category.DEFAULT" />
   <category android:name="android.intent.category.BROWSABLE" />
-  <!-- Your domain and subdomains -->
+  <!-- Your domain and subdomains. A Linkrunner sub-domain works the same way: add yourname.app-link.co -->
   <data android:scheme="https" android:host="example.com" />
   <data android:scheme="https" android:host="app.example.com" />
   <data android:scheme="https" android:host="store.example.com" />
@@ -195,6 +195,8 @@ applinks:example.com
 applinks:app.example.com
 applinks:store.example.com
 ```
+
+Using a Linkrunner sub-domain? Add `applinks:yourname.app-link.co` the same way. Linkrunner hosts the `apple-app-site-association` file on it, as it does for a Branded sub-domain.
 
 For more details, see the [official Apple documentation](https://developer.apple.com/documentation/xcode/supporting-associated-domains).
 

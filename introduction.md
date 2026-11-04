@@ -18,7 +18,7 @@ Watch the one-minute overview with sound on, or read on.
 - **Multi-platform attribution** for web, iOS, Android, and cross-platform frameworks
 - **Deferred deep linking** that routes users to specific in-app content after install
 - **Revenue and ROAS tracking** tied to acquisition source down to ad and creative
-- **Branded short links** on your own custom domain
+- **Short links** on a Linkrunner sub-domain or your own Branded sub-domain
 - **SKAdNetwork & privacy-safe iOS measurement** with conversion value management
 - **Remarketing audiences** built from on-device events
 - **Webhooks, data APIs, and an [MCP server](/features/mcp)** to plug attribution data into any tool
