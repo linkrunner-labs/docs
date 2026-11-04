@@ -50,8 +50,8 @@ Click the arrow next to a channel to see its sources. To compare channels in a c
 
 ![The Campaigns tab with Campaign Name, Campaign ID and metric columns](/images/web-campaigns-report/campaigns-tab.webp)
 
-- **Campaign Name** shows the name you gave a link you created in Linkrunner, such as `Weekend newsletter`. Other rows show their `utm_campaign`, or the campaign ID if there is none.
-- **Campaign ID** is the link's `utm_id`. A link with no `utm_id` is listed by its `utm_campaign`.
+- **Campaign Name** shows the name you gave a link you created in Linkrunner, such as `Weekend newsletter`. Meta and Google campaigns show their name from the ad network. Other rows show their `utm_campaign`, or the campaign ID if there is none.
+- **Campaign ID** is the link's `utm_id`, or the Meta or Google campaign ID for ad traffic. A link with no `utm_id` is listed by its `utm_campaign`.
 - The switch at the start of each row pauses tracking for that campaign.
 - The icon next to the name shows the source, such as Meta or Google.
 
