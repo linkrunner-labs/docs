@@ -28,7 +28,7 @@ Edit pages here, in this repository. Each page is a `.md` file in its topic fold
 - Preserve unrelated work. If the checkout is dirty, use a separate worktree based on current `origin/main`; do not stash, reset, or commit someone else's changes.
 - Change documentation, not product behavior, during a docs task. Report product defects separately.
 - Do not inspect credentials or include customer data, tokens, or private payloads in examples, screenshots, test fixtures, or review notes. Use synthetic data.
-- Production writes, test events sent to real accounts, publishing, merges, and auto-merge require explicit approval. A docs request is not permission to exercise a live integration.
+- Production writes and test events sent to real accounts require explicit approval. A docs request is not permission to exercise a live integration. Merging a docs PR does not need approval; see [Review and publication](#review-and-publication). A manual `workflow_dispatch` run of the deploy workflow still does.
 
 ## Writing rules
 
@@ -86,7 +86,8 @@ For public-page changes, open the changed pages in the `dev:relay` preview and i
 
 - Use the [review notes template](skills/docs-implementation-audit/templates/review-notes.md). Record the reader task, behavioral evidence when applicable, exact checks and results, and untested cases. Pure copyedits can mark behavioral evidence not applicable.
 - Block incorrect or unsafe examples and missing required steps. Fix ambiguous decisions and success conditions. Keep style preferences separate from correctness findings; word count is not a quality score.
-- Open a non-draft PR against `main`; do not push directly to `main`. Request `RathodDarshil` as reviewer. If GitHub rejects self-review, report that limitation rather than substituting an approver or merging.
-- Merging to `main` publishes: `deploy-docs-v2.yml` deploys docs.linkrunner.io (Firebase Hosting site `lr-docs-v2`). Merging requires separate approval.
+- Open a non-draft PR against `main`; do not push directly to `main`. Request `RathodDarshil` as reviewer unless you are pushing as `RathodDarshil`, and do not wait for an approval.
+- Merging to `main` publishes: `deploy-docs-v2.yml` deploys docs.linkrunner.io (Firebase Hosting site `lr-docs-v2`). Merge without asking, or turn on auto-merge, when the **Docs build** check passes, the pre-push review and any later review round left no open Critical or Major finding, and you checked the changed pages in the `dev:relay` preview. Then open the live page to confirm it.
+- Do not merge a PR that touches `.github/` or `firebase.json` until Darshil approves it in the PR or in chat. The deploy workflow holds Firebase admin credentials (see `.github/CODEOWNERS`). Branch protection does not enforce this, so it is on you.
 
 The writing rules, accuracy rules, and the writing and audit skills came from the Mintlify version of this repository (commit `78ca9ec`).
