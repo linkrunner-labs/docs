@@ -53,11 +53,11 @@ Linkrunner needs access to your Meta ad account to pull spend data from the Mark
 
 <Step title="Add your Linkrunner domain">
 
-Linkrunner uses your custom subdomain as the destination URL in your Meta ads. If you have not set one up yet, go to [Settings → Domains](https://dashboard.linkrunner.io/settings?s=domains) and add a subdomain.
+Linkrunner uses your sub-domain as the destination URL in your Meta ads. If you have not set one up yet, go to [Settings → Domains](https://dashboard.linkrunner.io/settings?s=domains) and claim a Linkrunner sub-domain, or add a Branded sub-domain.
 
-For full instructions on configuring the CNAME record, see the [Subdomain Setup guide](/features/subdomain-setup).
+For both options, see [Set up your link domain](/features/subdomain-setup).
 
-Once your subdomain is active (CNAME verified and SSL active), you are ready for the next step. You can also find your ready-to-paste destination URL under [Integrations → Meta Ads → Web to App](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=web_to_app).
+Once your sub-domain is active (for a Branded sub-domain, CNAME verified and SSL active), you are ready for the next step. You can also find your ready-to-paste destination URL under [Integrations → Meta Ads → Web to App](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=web_to_app).
 
 </Step>
 
@@ -192,7 +192,7 @@ Linkrunner auto-creates a campaign on the first click that carries a valid `camp
 
 - Verify the destination URL includes `campaign_id={{campaign.id}}` with the correct macro syntax
 - Check that the URL is pasted as the **Website URL** (not the Tracking field)
-- Make sure the Linkrunner subdomain is active (CNAME verified and SSL active)
+- Make sure your sub-domain is active (for a Branded sub-domain, CNAME verified and SSL active)
 
 ### Spend Not Syncing
 

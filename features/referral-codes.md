@@ -17,7 +17,7 @@ Watch the one-minute walkthrough with sound on, or follow the steps below.
 
 ## Before you start
 
-- [Configure a Linkrunner subdomain](/features/subdomain-setup), such as `get.example.com`.
+- [Set up your link domain](/features/subdomain-setup): a Linkrunner sub-domain, or a Branded sub-domain such as `get.example.com`.
 - [Set up deep linking](/features/deep-linking-setup) for your app.
 - Use `referrer` as the query parameter name. Linkrunner reports links that carry it under the **Referrals** channel.
 

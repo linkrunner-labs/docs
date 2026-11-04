@@ -105,7 +105,7 @@
     "for": "App developers",
     "needs": [
       "The Linkrunner SDK added to your app (see your SDK guide)",
-      "Your link domain set up in Linkrunner (see Use your own link domain)",
+      "Your link domain set up in Linkrunner (see Set up your link domain)",
       "A test phone or emulator, with your app uninstalled",
       "A build of your app you can install from your computer"
     ],
@@ -133,10 +133,10 @@
   "/features/subdomain-setup": {
     "for": "Marketers and developers",
     "needs": [
-      "A domain you own, such as yourdomain.com",
-      "Access to your domain's DNS settings, to add a CNAME record"
+      "A Linkrunner sub-domain needs nothing: claim one in one click",
+      "A Branded sub-domain needs a domain you own and access to its DNS settings, to add a CNAME record"
     ],
-    "time": "About 15 minutes"
+    "time": "Seconds for a Linkrunner sub-domain, about 5 minutes for a Branded sub-domain"
   },
   "/features/deep-linking-setup": {
     "for": "App developers",

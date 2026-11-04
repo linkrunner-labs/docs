@@ -16,7 +16,7 @@ This guide maps the common journeys in each bucket to how Linkrunner tracks them
 
 ## How Linkrunner bridges web and app
 
-One thing does the bridging: a **Linkrunner link on your custom subdomain**, placed wherever the journey starts (a website button, a CRM message, an ad destination URL).
+One thing does the bridging: a **Linkrunner link on your sub-domain**, placed wherever the journey starts (a website button, a CRM message, an ad destination URL).
 
 - **If the app is installed**, the link opens the app directly. Your app reports the open with [`handleDeeplink`](/sdk/react-native#handle-deeplink), which records a re-engagement against the campaign.
 - **If the app is not installed**, the link routes the user to the store. After they install and open the app, [`getAttributionData`](/sdk/react-native#getting-attribution-data) returns the attributed campaign and the deferred deep link so you can drop them into the right screen.
@@ -33,7 +33,7 @@ For Meta campaigns, use the dedicated handoff instead of building the link yours
 
 Set these up once and every journey below works:
 
-1. **Custom subdomain** for your Linkrunner links. See [Subdomain Setup](/features/subdomain-setup).
+1. **A link domain**, either a Linkrunner sub-domain or a Branded sub-domain. See [Subdomain Setup](/features/subdomain-setup).
 2. **Deep linking** so installed apps open directly. See [Deep Linking Setup](/features/deep-linking-setup).
 3. **Deferred deep linking** on campaigns so context survives the install. See [Deferred Deep Linking](/features/deferred-deep-linking).
 4. **Mobile SDK installed** with `init`, `handleDeeplink`, and `getAttributionData` wired up, and [`signup`](/sdk/react-native#user-identification-required) called once you know who the user is. Events and revenue are only stored for users registered through `signup`.

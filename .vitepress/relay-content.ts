@@ -61,9 +61,11 @@ export const RELAY_REMOVED = Object.keys(RELAY_REDIRECTS).map((p) => p.slice(1) 
 export const RELAY_ANCHOR_ALIASES: Record<string, Record<string, string>> = {
   // Step headings lost their em dash (LIN-4588).
   "/features/subdomain-setup": {
-    "step-1-\u2014-choose-a-subdomain": "step-1-choose-a-subdomain",
+    "step-1-\u2014-choose-a-subdomain": "step-1-choose-a-branded-sub-domain",
     "step-2-\u2014-add-a-cname-record": "step-2-add-a-cname-record",
     "step-3-\u2014-verification": "step-3-verification",
+    "step-1-choose-a-subdomain": "step-1-choose-a-branded-sub-domain",
+    "managing-subdomains": "manage-your-sub-domains",
   },
   "/introduction": {
     "key-features": "growth-guides",
@@ -218,7 +220,7 @@ export const PAGE_TITLES: Record<string, PageTitle> = {
   "/features/create-trackable-link": { title: "Create a trackable link" },
   "/features/deactivate-campaign-link": { title: "Deactivate a campaign link", label: "Deactivate a link" },
   "/features/custom-landing-page": { title: "Custom landing pages" },
-  "/features/subdomain-setup": { title: "Use your own link domain" },
+  "/features/subdomain-setup": { title: "Set up your link domain" },
   "/features/deep-linking-setup": { title: "Set up deep links" },
   "/features/deferred-deep-linking": { title: "Deferred deep links" },
   "/features/web-to-app-journeys": { title: "Web to app journeys" },

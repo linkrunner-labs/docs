@@ -42,7 +42,7 @@ Sending people to your website instead of your app? See [Create a web link for y
 
 ## Before you start
 
-- [Set up your Linkrunner subdomain](/features/subdomain-setup), such as `get.yourapp.com`.
+- [Set up your link domain](/features/subdomain-setup): a Linkrunner sub-domain, or a Branded sub-domain such as `get.yourapp.com`.
 - To open a specific screen in your app, [set up deep linking](/features/deep-linking-setup) first.
 
 ## 1. Open Create Link
