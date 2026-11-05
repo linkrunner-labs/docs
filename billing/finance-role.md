@@ -42,13 +42,13 @@ Only project admins can add a finance member or change someone's role to Finance
 
 <Step title="Open Members">
 
-Go to [Settings → Members](https://dashboard.linkrunner.io/dashboard/settings/members) and click **Invite**.
+Go to [Settings → Members](https://dashboard.linkrunner.io/dashboard/settings/members) and click **Invite Teammate**.
 
 </Step>
 
 <Step title="Enter their email and choose Finance">
 
-Enter one or more email addresses, set **Role** to **Finance**, and click **Add**.
+Enter one or more email addresses, set **Permission** to **Finance**, and click **Invite Member**.
 
 <img src="/images/billing/finance-role-invite.webp" alt="The Invite Members dialog with the Finance role selected" />
 
