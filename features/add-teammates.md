@@ -7,7 +7,7 @@ description: "Give every teammate their own Linkrunner login, so each person sig
 
 <p class="vp-lead">Give every teammate their own Linkrunner login, so each person signs in with their own email</p>
 
-Linkrunner has no passwords and no shared logins. Each person signs in with their own work email, and a teammate gets access when someone on your team invites them.
+Linkrunner has no passwords and no shared logins. Each person signs in with their own work email. A teammate gets access when someone on your team invites them, or through auto-join for your company's email domain.
 
 ## How sign-in works
 
@@ -41,6 +41,9 @@ Enter their work email. To invite several people, separate the emails with comma
 | **Admin** | Full access, including billing |
 | **Member** | Full access, except billing |
 | **Finance** | Only usage, invoices and payments. See [Add your finance team](/billing/finance-role) |
+| **Influencer** | Only the campaigns shared with them |
+
+**Role** (Marketing, Engineering, Finance, Other) only labels what the person does. Access comes from **Permission**.
 
 <img src="/images/team/customer-invite-teammate.webp" alt="The Invite Members dialog with an email entered and the Member permission selected" />
 
@@ -48,13 +51,17 @@ Enter their work email. To invite several people, separate the emails with comma
 
 <Step title="They sign in with that email">
 
-They get an email invitation. Their row shows **Invited** until they sign in with the invited address, using Google or a sign-in link. They then see your project.
+If they already have a Linkrunner account, they are added right away. Otherwise they get an email invitation, and their row shows **Invited** until they sign in with the invited address, using Google or a sign-in link. They then see your project.
 
 </Step>
 
 </Steps>
 
-Admins can invite any permission. Members can invite other members only.
+Admins can invite any permission. Members can invite Members and Influencers.
+
+### Let your whole team join
+
+Admins can turn on auto-join on the same **Members** page. Anyone who then signs up with your company's email domain can find and join the project as a **Member**, without an invite. Auto-join only offers domains that a current admin or member already uses.
 
 ## Add a teammate to your agency or affiliate workspace
 
@@ -73,10 +80,10 @@ Your teammate must accept the invitation while signed in with the invited email.
 The colleague typed another person's email. Invite them with their own address using the steps above, then they sign in with that address.
 
 **A colleague signed in and was asked to create a new project.**
-They signed in before being invited, or with a different address than the invited one. Invite the exact address they sign in with, then ask them to sign in again.
+They signed in before being invited, or with a different address than the invited one, and auto-join is off for their domain. Invite the exact address they sign in with, then ask them to sign in again.
 
 **Accepting the invitation fails.**
-The teammate is signed in with a different address than the one invited. Sign out, then sign in with the invited address.
+The teammate is signed in with a different address than the one invited, or the invitation expired. Sign in with the invited address, or click **Resend** to send a fresh invitation.
 
 **Can we use a password instead?**
 No. Linkrunner uses Google sign-in or a one-time email link, so there is no password to share or reset.
