@@ -89,7 +89,7 @@ const sub = (text: string, items: Item[]): Item => {
 };
 
 const guides: Group[] = [
-  group("Start here", [page("Overview", "/", "compass")], true, "flag"),
+  group("Start here", [page("Overview", "/", "compass"), page("Sign in and add teammates", "/features/add-teammates", "users")], true, "flag"),
   group(
     "Deep links",
     links(
