@@ -37,7 +37,7 @@ Scroll down to **Agencies** and click **Connect** on your agency, or **Invite Ag
 
 ![Brightline Media engaged under Integrations → Agencies](/images/agency-partners/agency-engaged.webp)
 
-The access panel opens as soon as you connect. Turn on **Campaigns → Edit** so the agency can create campaigns, then click **Save**. See [Control agency access](/agency-partners/control-agency-access) for every switch.
+The access panel opens as soon as you connect. Turn on **App campaigns → Edit** so the agency can create campaigns, then click **Save**. See [Control agency access](/agency-partners/control-agency-access) for every switch.
 
 ## 3. The agency creates a campaign for the affiliate
 
@@ -117,8 +117,8 @@ The affiliate sees only the campaigns attributed to it, including those the agen
 | Clicks, installs, sign-ups       | Yes            | Yes                                                                                                                                   | Yes                                                                    |
 | Spend, revenue, ROAS             | Yes            | Only with **Revenue & spend** on                                                                                                      | Never                                                                  |
 | Channels tab and overview totals | Yes            | Only if you turn them on                                                                                                              | No                                                                     |
-| Create campaigns                 | Yes            | With **Campaigns → Edit**                                                                                                             | Its own links only                                                     |
-| Edit campaigns                   | Yes            | With **Campaigns → Edit**. See [Edit a campaign](/agency-partners/edit-campaign).                                                     | Rename only. See [Edit a campaign](/affiliate-partners/edit-campaign). |
+| Create campaigns                 | Yes            | With **App campaigns → Edit**                                                                                                             | Its own links only                                                     |
+| Edit campaigns                   | Yes            | With **App campaigns → Edit**. See [Edit a campaign](/agency-partners/edit-campaign).                                                     | Rename only. See [Edit a campaign](/affiliate-partners/edit-campaign). |
 | Delete campaigns                 | Yes            | No                                                                                                                                    | No                                                                     |
 
 ## Troubleshooting
@@ -130,7 +130,7 @@ You have not connected that affiliate, or nobody from the affiliate has joined t
 Same cause as above. The agency can only pick affiliates you have connected.
 
 **The agency has no Create Link button.**
-Turn on **Campaigns → Edit** for the agency in **Settings → Members**. See [Control agency access](/agency-partners/control-agency-access).
+Turn on **App campaigns → Edit** for the agency in **Settings → Members**. See [Control agency access](/agency-partners/control-agency-access).
 
 **The affiliate cannot see a campaign the agency made.**
 The agency left **Ad Channel** empty or picked another channel. The affiliate only sees campaigns attributed to them. Ask the agency to create a new campaign with the affiliate as **Ad Channel**.

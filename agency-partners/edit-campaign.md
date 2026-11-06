@@ -13,7 +13,7 @@ You can change a campaign's name, deep link, link preview, redirects and link op
 
 You need:
 
-- **Campaigns → Edit** turned on for your agency. It is the same switch that lets you create links. See [Ask the customer to turn on link creation](/agency-partners/create-campaign-link#1-ask-the-customer-to-turn-on-link-creation).
+- **App campaigns → Edit** turned on for your agency. It is the same switch that lets you create links. See [Ask the customer to turn on link creation](/agency-partners/create-campaign-link#1-ask-the-customer-to-turn-on-link-creation).
 - A campaign you can see in **All Campaigns**. By default that is only the campaigns your agency created. If the customer limited you to certain networks, it is only campaigns on those networks.
 
 ## 1. Open the campaign
@@ -82,7 +82,7 @@ Click **Update**. You see **Campaign updated successfully**.
 
 <Accordion title="&quot;You can't make this change&quot;" description="The customer has not let your agency edit this campaign.">
 
-Either **Campaigns → Edit** is off for your agency, or the campaign is outside the networks or campaigns the customer shares with you. Ask the customer to check your agency's access in **Settings → Members**. See [Control agency access](/agency-partners/control-agency-access).
+Either **App campaigns → Edit** is off for your agency, or the campaign is outside the networks or campaigns the customer shares with you. Ask the customer to check your agency's access in **Settings → Members**. See [Control agency access](/agency-partners/control-agency-access).
 
 </Accordion>
 
