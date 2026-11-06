@@ -20,7 +20,7 @@ A customer can run [Fraud Control](/features/fraud-control) rules on the traffic
 | Where                                              | What you see                                                               |
 | -------------------------------------------------- | -------------------------------------------------------------------------- |
 | **Postback Logs**                                  | Every rejected conversion, with its status, click ID, and campaign.        |
-| **Settings → Postback URLs → Rejection postbacks** | The URLs Linkrunner calls to tell your server about a rejected conversion. |
+| **Settings → Postback URLs**                       | The rejection URLs Linkrunner calls to tell your server about a rejected conversion. |
 
 A rejected conversion has one of two statuses:
 
@@ -76,12 +76,12 @@ To see the reasons for withheld conversions in future, add a rejection postback 
 
 Rejection postbacks send each rejected conversion, with its reason codes, to your server. Use them to remove the conversion from your publisher payouts automatically.
 
-1. Go to **Settings → Postback URLs**.
-2. Under **Rejection postbacks**, click **Edit**.
-3. Add an **Install Rejection URL**, an **Event Rejection URL**, or both. Use the macros listed on the page, for example `{click_id}` and `{rejection_reason}`.
-4. Click **Save**.
+1. Go to [**Settings → Postback URLs**](https://dashboard.linkrunner.io/affiliate/settings?tab=postbacks).
+2. Under **If we reject an app conversion as fraud**, click **Install Rejection URL** or **Event Rejection URL**.
+3. Enter the URL. Use **Add a macro** to insert macros, for example `{click_id}` and `{rejection_reason}`.
+4. Click **Save**. Repeat for the other URL if you want both.
 
-![The Rejection postbacks section in affiliate Settings, with both URLs and the list of macros you can use](/images/affiliate-partners/fraud-rejection-postbacks-settings.webp)
+![The If we reject an app conversion as fraud section of Postback URLs, with both rejection URLs marked](/images/affiliate-partners/rejection-postbacks-map.webp)
 
 Both URLs are optional. Leave one empty and those conversions show as **Withheld (fraud)** instead. You can add them once your application is approved. A rejection only takes effect from the next conversion. Conversions that were already withheld are not sent again.
 
@@ -111,13 +111,13 @@ Expand the row and note the click ID, the install instance ID, and the reason co
 
 <Accordion title="All my rejections show Withheld (fraud)">
 
-You have no rejection postback URL for those conversions. Add one under **Settings → Postback URLs → Rejection postbacks**. Install rejections and event rejections have separate URLs, so check you added the one you need.
+You have no rejection postback URL for those conversions. Add one in **Settings → Postback URLs**, under **If we reject an app conversion as fraud**. Install rejections and event rejections have separate URLs, so check you added the one you need.
 
 </Accordion>
 
 <Accordion title="I cannot edit Rejection postbacks">
 
-Rejection postbacks open once your partner application is approved. If your account is not active, they stay locked. Contact support.
+Rejection URLs open once your partner application is approved. If your account is not active, they stay locked. Contact support.
 
 </Accordion>
 

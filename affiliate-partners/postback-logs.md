@@ -42,6 +42,18 @@ The other columns:
 
 Click **Clear filters** to go back to the full log.
 
+## App and web postbacks
+
+When the customer has connected you for app and web campaigns, the log opens on **App**, with your installs and in-app events. Pick **Web** to see your website conversions. The totals, the pages and the **All events** list follow the side you pick. If you are connected for one kind only, there is no switch and the log shows everything.
+
+![Postback Logs on the Web side, with the Web option marked](/images/affiliate-partners/postback-logs-web.webp)
+
+A website conversion shows the web campaign it came from under **Campaign**. It has no app install, so its expanded row shows **Source: Web conversion** instead of an install instance ID. See [Web Campaigns for affiliate partners](/affiliate-partners/web-campaigns).
+
+## Export the log
+
+Click the download icon at the end of the filters to get the log as a CSV file, emailed to you. The file holds the postbacks that match the current status filter, search and date range, and the App or Web side you are on.
+
 ## Statuses
 
 ![The status filter open](/images/affiliate-partners/postback-status-filter.webp)
@@ -87,7 +99,7 @@ Click a **Rejected (fraud)** row to see the notice Linkrunner sent.
 - **Attempt.** There is only one. Linkrunner never retries a rejected conversion, whatever your endpoint answers.
 - **Request sent.** Your rejection postback URL, with the reason codes filled in. Scroll the box to read the whole URL. See [Reason codes](/affiliate-partners/postbacks#reason-codes) for what the codes mean.
 
-A **Withheld (fraud)** row has no request. Linkrunner did not call your endpoint, because you have not added a rejection postback URL for that kind of conversion. Add one under **Settings → Postback URLs → Rejection postbacks** to receive them. See [Rejected conversions](/affiliate-partners/postbacks#rejected-conversions).
+A **Withheld (fraud)** row has no request. Linkrunner did not call your endpoint, because you have not added a rejection postback URL for that kind of conversion. Add one in **Settings → Postback URLs**, under **If we reject an app conversion as fraud** to receive them. See [Rejected conversions](/affiliate-partners/postbacks#rejected-conversions).
 
 ## Troubleshooting
 

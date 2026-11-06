@@ -99,6 +99,20 @@ Click the bin icon at the end of a row.
 - For an install or registration rule, the event falls back to your standing row.
 - Standing rows cannot be removed. Their bin icon is disabled.
 
+## Web events
+
+When a customer connects you for Web campaigns, the page also has a **Web events** table. Linkrunner sends a website conversion only for a website event mapped here, by you or by the customer. See [Web Campaigns for affiliate partners](/affiliate-partners/web-campaigns).
+
+![The Web events table with one purchase mapping, and the Add Mapping button marked](/images/affiliate-partners/web-event-mapping.webp)
+
+- **Add Mapping** lists the website events the customer has shared with you and that are not mapped yet. It is greyed out when the customer has shared none. Ask them to share the events from **Integrations → Affiliate Partners → Configure → Share events**.
+- **Sent to you as** and **Send Revenue** work as they do for app events.
+- **Currency** is the currency code sent with the amount.
+- **Reaches** is always **Only \<customer name>**. A web mapping applies to the customer you are looking at.
+- A row the customer added is read only for you. Remove your own row with the bin icon, and that website event is no longer sent to you.
+
+A website conversion uses its web mapping only. Your app event mappings do not change its name, revenue or currency.
+
 ## Troubleshooting
 
 <AccordionGroup>

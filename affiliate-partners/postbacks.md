@@ -37,6 +37,27 @@ Missing an event you expected? Check that it has a mapping for this advertiser.
 
 </Note>
 
+## Website conversions
+
+When a customer connects you for Web campaigns, sign-ups and purchases on their website from your web links are sent to you too. See [Web Campaigns for affiliate partners](/affiliate-partners/web-campaigns).
+
+- They go to your **Event Postback URL**, unless you add a **Web Postback URL** under **Settings → Postback URLs**. See [Postbacks for website conversions](/affiliate-partners/web-campaigns#postbacks-for-website-conversions).
+- Only website events with a web mapping are sent. The web mapping sets the name in `{event_name}`, whether revenue is sent, and the currency. See [Web events](/affiliate-partners/event-mapping#web-events).
+- `{platform}` is `web`, so one URL can tell website and app conversions apart.
+
+### Macros on website conversions
+
+A website conversion has no app install behind it, so the app-only macros are sent empty.
+
+| Filled in      | Macros                                                                                                                                                                                                   |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Always         | `{click_id}`, `{tid}`, `{event_name}`, `{event}`, `{timestamp}`, `{event_time}`, `{platform}` (`web`)                                                                                                    |
+| Revenue        | `{revenue}`, `{sale_amount}`, `{amount}` and `{currency}` carry the amount when the web mapping has **Send Revenue** on. Otherwise the amount is `0`.                                                     |
+| When available | `{ip}` and `{user_agent}`: the visitor's IP address and browser when they converted                                                                                                                      |
+| Empty          | `{install_id}`, `{campaign_id}`, `{cc}`, `{gaid}`, `{idfa}`, `{s2}`, `{s3}`, `{s4}`, `{click_time}`, `{install_time}`, `{bundle_id}`, `{app_version}`, `{os_version}`, `{device_model}`, `{device_brand}`, `{is_reinstall}`, `{touch_type}` |
+
+If your endpoint needs one of the empty macros, use a separate **Web Postback URL** without it.
+
 ## Allowlist Linkrunner postback IPs
 
 If your endpoint restricts incoming traffic by source IP, allowlist both Linkrunner production egress addresses:
@@ -58,14 +79,14 @@ macros before sending traffic to Linkrunner.
 
 ## Rejected conversions
 
-A customer can run Fraud Control rules that reject conversions attributed to you. To be told about them, add rejection postback URLs in your affiliate dashboard under **Settings → Postback URLs → Rejection postbacks**.
+A customer can run Fraud Control rules that reject conversions attributed to you. To be told about them, add rejection postback URLs in your affiliate dashboard in **Settings → Postback URLs**, under **If we reject an app conversion as fraud**. Click a URL to add it. Rejections apply to app conversions only.
 
 | URL                       | Called for                                        |
 | ------------------------- | ------------------------------------------------- |
 | **Install Rejection URL** | A rejected install                                |
 | **Event Rejection URL**   | A rejected in-app event, signup, or revenue event |
 
-![The Rejection postbacks section in the affiliate Settings page, with both URLs](/images/affiliate-partners/rejection-postbacks-settings.webp)
+![The If we reject an app conversion as fraud section of Postback URLs, with both rejection URLs marked](/images/affiliate-partners/rejection-postbacks-map.webp)
 
 Both are optional. Leave one empty and you receive none of that kind. You can add them once your application is approved.
 
@@ -297,7 +318,7 @@ not 9.99 cents. Parse it as a decimal amount.
 | `{device_brand}` | Device brand.                                                                   | `POCO`                                            |
 | `{device_model}` | Device model. Android sends a readable name, iOS sends the hardware identifier. | `Xiaomi 2302EPCC4I` (Android), `iPhone15,2` (iOS) |
 | `{os_version}`   | Operating system version.                                                       | `13`                                              |
-| `{platform}`     | `android` or `ios`, always lowercase.                                           | `android`                                         |
+| `{platform}`     | `android` or `ios`, or `web` on a website conversion. Always lowercase.         | `android`                                         |
 
 ### Network
 
@@ -407,7 +428,7 @@ Linkrunner retries a postback if your endpoint does not respond with a success s
 | Timestamps (`{timestamp}`, `{click_time}`, `{install_time}`, `{event_time}`) | Unix seconds, UTC.                         |
 | Revenue (`{revenue}`)                                                        | Decimal, two places, major currency units. |
 | Currency (`{currency}`)                                                      | ISO 4217 three-letter code.                |
-| Platform (`{platform}`)                                                      | Lowercase `android` or `ios`.              |
+| Platform (`{platform}`)                                                      | Lowercase `android`, `ios` or `web`.       |
 | Reinstall flag (`{is_reinstall}`)                                            | `1` or `0`.                                |
 | All values                                                                   | URL-encoded.                               |
 
