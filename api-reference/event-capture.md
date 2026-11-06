@@ -85,9 +85,10 @@ POST: /capture-event
 
 By default Linkrunner records an event at the time it receives the request. If you queue events and send them later, for example in a [batch](#capture-events-in-a-batch), pass `event_timestamp` so each event keeps the time it actually happened. Reports, cohorts and ad-network postbacks then use that time.
 
-- Use ISO 8601 with a timezone, for example `2026-01-31T10:15:30Z` or `2026-01-31T15:45:30+05:30`. Fractional seconds are accepted; the time is stored to the second.
+- Send it as a string in ISO 8601 (RFC 3339) format with a timezone, for example `2026-01-31T10:15:30Z` or `2026-01-31T15:45:30+05:30`. Fractional seconds are accepted; the time is stored to the second.
 - It can be at most 7 days in the past and at most 10 minutes in the future. Anything else is rejected with a 400.
 - Leave it out if the event is happening now. Linkrunner then uses the time it receives the request.
+- For website events (`"source": "web"`) the time is saved with the event, but Web Events reports and ad-network postbacks still use the time Linkrunner received it.
 
 ### End-user IP address
 
