@@ -203,6 +203,7 @@ To confirm sign-ups, campaign attribution, custom events, and purchases end to e
 | `data-endpoint` | No       | A full URL or same-origin path for a proxy you operate         | None                     |
 | `data-spa`      | No       | Set to `"false"` to disable automatic SPA page views           | `true`                   |
 | `data-debug`    | No       | Set to `"true"` or `"false"` to control console logging        | On for local development |
+| `data-hotstar-pixel-id` | No | Your JioHotstar pixel ID. Loads JioHotstar's pixel and forwards supported events. See [JioHotstar Ads for Web](/ad-networks/jiohotstar-ads) | None |
 
 You can also set the same options before the script loads:
 
