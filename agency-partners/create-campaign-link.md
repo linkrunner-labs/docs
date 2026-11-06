@@ -47,7 +47,7 @@ On the **App campaigns** tab, they turn on **Edit** next to **App campaigns**. T
 
 ![The agency access window on the App campaigns tab, with Read and Edit turned on](/images/agency-partners/agency-access-app-tab.webp)
 
-For Web campaigns, they turn on **Edit** on the **Web campaigns** tab instead.
+For Web campaigns, they turn on **Edit** on the **Web campaigns** tab instead. See [Create an Agency Web Campaign](/agency-partners/create-web-campaign).
 
 </Step>
 
