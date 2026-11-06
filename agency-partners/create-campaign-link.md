@@ -41,11 +41,13 @@ They click the sliders icon on your row, next to the bin icon.
 
 </Step>
 
-<Step title="Turn on Campaigns → Edit">
+<Step title="Turn on App campaigns → Edit">
 
-Under **Campaigns**, they turn on **Edit**. This also turns on **Read**. Then they click **Save**.
+On the **App campaigns** tab, they turn on **Edit** next to **App campaigns**. This also turns on **Read**. Then they click **Save**.
 
-![The agency access window with Campaigns Read and Edit turned on](/images/agency-partners/agency-access-modal.png)
+![The agency access window on the App campaigns tab, with Read and Edit turned on](/images/agency-partners/agency-access-app-tab.webp)
+
+For Web campaigns, they turn on **Edit** on the **Web campaigns** tab instead.
 
 </Step>
 
@@ -149,7 +151,7 @@ To change the name, deep link or link settings later, see [Edit a campaign](/age
 
 <Accordion title="The Create Link button is missing" description="The customer has not let your agency create campaigns.">
 
-Ask the customer to turn on **Campaigns → Edit** for your agency (step 1). You may need to refresh the page after they save.
+Ask the customer to turn on **App campaigns → Edit** for your agency (step 1). You may need to refresh the page after they save.
 
 </Accordion>
 
@@ -161,7 +163,7 @@ Ask the customer to invite your agency from **Settings → Members → Invite Ag
 
 <Accordion title="&quot;This customer has not granted your agency permission to create campaigns&quot;" description="Link creation is switched off for your agency.">
 
-Same fix as a missing **Create Link** button. Ask the customer to turn on **Campaigns → Edit**.
+Same fix as a missing **Create Link** button. Ask the customer to turn on **App campaigns → Edit**.
 
 </Accordion>
 
