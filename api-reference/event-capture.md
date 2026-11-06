@@ -65,6 +65,7 @@ POST: /capture-event
   },
   "user_id": "user_12345",
   "event_id": "evt_12345",
+  "event_timestamp": "2026-01-31T10:15:30Z", // optional: when the event happened
   "source": "app" // optional: "app" (default) or "web"
 }
 ```
@@ -78,6 +79,16 @@ POST: /capture-event
 | event_id             | string | **Optional**. Your own unique identifier for the event, useful for deduplication and correlating with your backend    |
 | client_ip_address   | string | **Optional**. Public IP of the user's device when the event happened. See [End-user IP address](#end-user-ip-address) |
 | source                | string | **Optional**. `app` (default) or `web`. Send `web` for a user of your website. See [Website events](#website-events)  |
+| event_timestamp      | string | **Optional**. When the event happened, in ISO 8601 with a timezone. See [Event time](#event-time)                     |
+
+### Event time
+
+By default Linkrunner records an event at the time it receives the request. If you queue events and send them later, for example in a [batch](#capture-events-in-a-batch), pass `event_timestamp` so each event keeps the time it actually happened. Reports, cohorts and ad-network postbacks then use that time.
+
+- Send it as a string in ISO 8601 (RFC 3339) format with a timezone, for example `2026-01-31T10:15:30Z` or `2026-01-31T15:45:30+05:30`. Fractional seconds are accepted; the time is stored to the second.
+- It can be at most 7 days in the past and at most 10 minutes in the future. Anything else is rejected with a 400.
+- Leave it out if the event is happening now. Linkrunner then uses the time it receives the request.
+- For website events (`"source": "web"`) the time is saved with the event, but Web Events reports and ad-network postbacks still use the time Linkrunner received it.
 
 ### End-user IP address
 
@@ -109,7 +120,7 @@ If the event comes from a user of your website rather than your app, send `"sour
 ### Responses
 
 1. **200** Event captured successfully
-2. **400** Missing required parameters, neither `user_id` nor `install_instance_id` was sent, `source` is not `app` or `web`, or `source` is `web` and `user_id` is missing or website tracking is not enabled for the project
+2. **400** Missing required parameters, neither `user_id` nor `install_instance_id` was sent, `event_timestamp` is not a valid time or is out of range, `source` is not `app` or `web`, or `source` is `web` and `user_id` is missing or website tracking is not enabled for the project
 3. **401** Invalid server key
 
 #### Sample Response
@@ -148,7 +159,8 @@ Put each event, in the same format as the [Capture Event](#capture-event) reques
       "event_name": "product_viewed",
       "event_data": { "product_id": "ABC123" },
       "user_id": "user_12345",
-      "event_id": "evt_12345"
+      "event_id": "evt_12345",
+      "event_timestamp": "2026-01-31T10:15:30Z"
     },
     {
       "event_name": "cart_added",
@@ -161,6 +173,7 @@ Put each event, in the same format as the [Capture Event](#capture-event) reques
 
 - Send between 1 and 100 events. The whole request body must be at most 1 MB (1,048,576 bytes).
 - Events are processed in the order you send them.
+- Each event can carry its own `event_timestamp`. Events without one are recorded at the time the batch is received. See [Event time](#event-time).
 - A batch counts as one request towards the API rate limit. Each server key can also send at most 5 batches per second, which is up to 500 events per second.
 
 ### Responses
