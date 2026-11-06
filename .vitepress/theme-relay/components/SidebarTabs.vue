@@ -1,0 +1,37 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import { useData } from "vitepress";
+import PhIcon from "./PhIcon.vue";
+import { pagePath } from "../page-path";
+
+// Below 960px the top-bar links are hidden, so the drawer leads with them. The
+// appearance switch sits at the bottom of the drawer (SidebarFooter.vue).
+const { theme, page } = useData();
+
+type NavLink = { text: string; link: string; activeMatch?: string };
+const items = computed(() => (theme.value.nav || []) as NavLink[]);
+const current = computed(() => pagePath(page.value.relativePath));
+const external = (link: string) => /^https?:/.test(link);
+const isActive = (it: NavLink) => !!it.activeMatch && new RegExp(it.activeMatch).test(current.value);
+
+</script>
+
+<template>
+  <div class="lr-sidebar-tabs">
+    <p class="lr-sidebar-tabs__label">Sections</p>
+    <ul>
+      <li v-for="it in items" :key="it.text">
+        <a
+          :href="it.link"
+          :class="{ 'is-active': isActive(it) }"
+          :aria-current="isActive(it) ? 'page' : undefined"
+          :target="external(it.link) ? '_blank' : undefined"
+          :rel="external(it.link) ? 'noreferrer' : undefined"
+        >
+          {{ it.text }}
+          <PhIcon v-if="external(it.link)" name="arrow-up-right" />
+        </a>
+      </li>
+    </ul>
+  </div>
+</template>
