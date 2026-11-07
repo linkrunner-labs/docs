@@ -200,14 +200,14 @@ Start with simple conversion events like app installs or sign-ups before optimiz
 
 ## Troubleshooting
 
-### Conversions Not Tracking
+### 1. Conversions not tracking {#conversions-not-tracking}
 
 - Verify your Meta account is properly connected in Linkrunner Settings → Meta Integration
 - Ensure CAPI is configured correctly in Facebook Events Manager
 - Check that your access token is valid and has not expired
 - Confirm your app is sending events to the Linkrunner SDK
 
-### Download is not showing in Events Manager
+### 2. Download is not showing in Events Manager {#download-is-not-showing-in-events-manager}
 
 Work through these checks in order:
 
@@ -217,7 +217,7 @@ Work through these checks in order:
 4. **Conversions API is not set up for that ad account.** Linkrunner sends `Download` only through the Conversions API. On the [Ad Account tab](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=ad_account), check that the ad account running the campaign has a **Dataset ID** and access token saved, and that your ad set uses the same dataset.
 5. **The install was not credited to your Web to App campaign.** Linkrunner sends `Download` only for installs attributed to a Meta Web to App campaign. If the campaign is missing in Linkrunner, see [Campaign not appearing in Linkrunner dashboard](#campaign-not-appearing-in-linkrunner-dashboard).
 
-### Download is blocked by Meta
+### 3. Download is blocked by Meta {#download-is-blocked-by-meta}
 
 Meta puts some datasets under data sharing restrictions based on the business category, for example finance or health. Events Manager then shows **Data sharing restrictions applied** on the **Overview** page. With any restriction in place, Meta blocks every custom event, including `Download` and any custom event name you map, until you confirm it. A blocked event cannot be used in a custom conversion or a campaign.
 
@@ -236,7 +236,7 @@ To confirm `Download`:
 
 Standard events such as `CompleteRegistration` and `Purchase` do not need this review. Under **core setup**, Meta also removes everything after the domain from event URLs, so build custom conversion URL rules on your link domains only.
 
-### Campaign Not Appearing in Linkrunner Dashboard
+### 4. Campaign not appearing in Linkrunner dashboard {#campaign-not-appearing-in-linkrunner-dashboard}
 
 Linkrunner auto-creates a campaign on the first click that carries a valid `campaign_id` in the destination URL. If no campaign appears after the first click:
 
@@ -244,7 +244,7 @@ Linkrunner auto-creates a campaign on the first click that carries a valid `camp
 - Check that the URL is pasted as the **Website URL** (not the Tracking field)
 - Make sure your sub-domain is active (for a Branded sub-domain, CNAME verified and SSL active)
 
-### Spend Not Syncing
+### 5. Spend not syncing {#spend-not-syncing}
 
 - Confirm the `campaign_id` macro is present in the destination URL
 - Verify the Meta ad account connected in Linkrunner matches the account running the campaign
