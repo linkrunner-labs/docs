@@ -207,6 +207,16 @@ Start with simple conversion events like app installs or sign-ups before optimiz
 - Check that your access token is valid and has not expired
 - Confirm your app is sending events to the Linkrunner SDK
 
+### Download is not showing in Events Manager
+
+Work through these checks in order:
+
+1. **No Web to App install has happened yet.** Linkrunner sends `Download` only when a user opens your app for the first time after tapping a Web to App ad. To see one before launch, click the paper plane **Send event to ad network** icon on the **Mobile App Install** row of the [Event Mapping tab](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=event_mapping).
+2. **You are checking the Test events tab.** Linkrunner's test is sent as a normal event without a Meta test event code, so it does not appear under **Test events**. Look for it on the dataset's **Overview** instead.
+3. **Meta is holding it for review.** If your dataset has data sharing restrictions, `Download` shows as **Blocked by Meta** until you confirm it. See [Download is blocked by Meta](#download-is-blocked-by-meta).
+4. **Conversions API is not set up for that ad account.** Linkrunner sends `Download` only through the Conversions API. On the [Ad Account tab](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=ad_account), check that the ad account running the campaign has a **Dataset ID** and access token saved, and that your ad set uses the same dataset.
+5. **The install was not credited to your Web to App campaign.** Linkrunner sends `Download` only for installs attributed to a Meta Web to App campaign. If the campaign is missing in Linkrunner, see [Campaign not appearing in Linkrunner dashboard](#campaign-not-appearing-in-linkrunner-dashboard).
+
 ### Download is blocked by Meta
 
 Meta puts some datasets under data sharing restrictions based on the business category, for example finance or health. Events Manager then shows **Data sharing restrictions applied** on the **Overview** page. With any restriction in place, Meta blocks every custom event, including `Download` and any custom event name you map, until you confirm it. A blocked event cannot be used in a custom conversion or a campaign.
