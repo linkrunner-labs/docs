@@ -215,7 +215,13 @@ To confirm `Download`:
 
 1. In Meta Events Manager, open **Overview**.
 2. Under **Confirm custom event(s) that belong to you**, click **Review events** and acknowledge Meta's terms.
+
+   ![Meta Events Manager Overview showing Data sharing restrictions applied and Confirm custom event(s) that belong to you, with the Review events button](/images/meta/events-manager-confirm-custom-events.webp)
+
 3. On the **Action required** tab, select `Download` and confirm it.
+
+   ![Meta Event statuses dialog with the Download website event marked Blocked by Meta on the Action required tab](/images/meta/events-manager-download-blocked.webp)
+
 4. Send another test from the **Mobile App Install** row so the event shows as active.
 
 Standard events such as `CompleteRegistration` and `Purchase` do not need this review. Under **core setup**, Meta also removes everything after the domain from event URLs, so build custom conversion URL rules on your link domains only.
