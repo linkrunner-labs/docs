@@ -200,14 +200,24 @@ Start with simple conversion events like app installs or sign-ups before optimiz
 
 ## Troubleshooting
 
-### Conversions Not Tracking
+### 1. Conversions not tracking {#conversions-not-tracking}
 
 - Verify your Meta account is properly connected in Linkrunner Settings → Meta Integration
 - Ensure CAPI is configured correctly in Facebook Events Manager
 - Check that your access token is valid and has not expired
 - Confirm your app is sending events to the Linkrunner SDK
 
-### Download is blocked by Meta
+### 2. Download is not showing in Events Manager {#download-is-not-showing-in-events-manager}
+
+Work through these checks in order:
+
+1. **No Web to App install has happened yet.** Linkrunner sends `Download` only when a user opens your app for the first time after tapping a Web to App ad. To see one before launch, click the paper plane **Send event to ad network** icon on the **Mobile App Install** row of the [Event Mapping tab](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=event_mapping).
+2. **You are checking the Test events tab.** Linkrunner's test is sent as a normal event without a Meta test event code, so it does not appear under **Test events**. Look for it on the dataset's **Overview** instead.
+3. **Meta is holding it for review.** If your dataset has data sharing restrictions, `Download` shows as **Blocked by Meta** until you confirm it. See [Download is blocked by Meta](#download-is-blocked-by-meta).
+4. **Conversions API is not set up for that ad account.** Linkrunner sends `Download` only through the Conversions API. On the [Ad Account tab](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=ad_account), check that the ad account running the campaign has a **Dataset ID** and access token saved, and that your ad set uses the same dataset.
+5. **The install was not credited to your Web to App campaign.** Linkrunner sends `Download` only for installs attributed to a Meta Web to App campaign. If the campaign is missing in Linkrunner, see [Campaign not appearing in Linkrunner dashboard](#campaign-not-appearing-in-linkrunner-dashboard).
+
+### 3. Download is blocked by Meta {#download-is-blocked-by-meta}
 
 Meta puts some datasets under data sharing restrictions based on the business category, for example finance or health. Events Manager then shows **Data sharing restrictions applied** on the **Overview** page. With any restriction in place, Meta blocks every custom event, including `Download` and any custom event name you map, until you confirm it. A blocked event cannot be used in a custom conversion or a campaign.
 
@@ -215,12 +225,18 @@ To confirm `Download`:
 
 1. In Meta Events Manager, open **Overview**.
 2. Under **Confirm custom event(s) that belong to you**, click **Review events** and acknowledge Meta's terms.
+
+   ![Meta Events Manager Overview showing Data sharing restrictions applied and Confirm custom event(s) that belong to you, with the Review events button](/images/meta/events-manager-confirm-custom-events.webp)
+
 3. On the **Action required** tab, select `Download` and confirm it.
+
+   ![Meta Event statuses dialog with the Download website event marked Blocked by Meta on the Action required tab](/images/meta/events-manager-download-blocked.webp)
+
 4. Send another test from the **Mobile App Install** row so the event shows as active.
 
 Standard events such as `CompleteRegistration` and `Purchase` do not need this review. Under **core setup**, Meta also removes everything after the domain from event URLs, so build custom conversion URL rules on your link domains only.
 
-### Campaign Not Appearing in Linkrunner Dashboard
+### 4. Campaign not appearing in Linkrunner dashboard {#campaign-not-appearing-in-linkrunner-dashboard}
 
 Linkrunner auto-creates a campaign on the first click that carries a valid `campaign_id` in the destination URL. If no campaign appears after the first click:
 
@@ -228,7 +244,7 @@ Linkrunner auto-creates a campaign on the first click that carries a valid `camp
 - Check that the URL is pasted as the **Website URL** (not the Tracking field)
 - Make sure your sub-domain is active (for a Branded sub-domain, CNAME verified and SSL active)
 
-### Spend Not Syncing
+### 5. Spend not syncing {#spend-not-syncing}
 
 - Confirm the `campaign_id` macro is present in the destination URL
 - Verify the Meta ad account connected in Linkrunner matches the account running the campaign
