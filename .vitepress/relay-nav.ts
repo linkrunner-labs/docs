@@ -170,7 +170,9 @@ const setup: Group[] = [
       "/sdk/unity",
       "/sdk/web",
       "/sdk/shopify",
-      "/sdk/appbrew"
+      "/sdk/appbrew",
+      "/sdk/track-payments",
+      "/sdk/migrate-to-track-event"
     ),
     false,
     "code"
