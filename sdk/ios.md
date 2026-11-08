@@ -1,0 +1,1063 @@
+---
+title: "iOS SDK"
+description: "Linkrunner MMP SDK for iOS: install attribution, deferred deep linking, in-app events and revenue tracking."
+---
+
+# iOS SDK
+
+<p class="vp-lead">Linkrunner MMP SDK for iOS: install attribution, deferred deep linking, in-app events and revenue tracking.</p>
+
+<Note>
+
+**Prefer to let your AI coding agent do this?** Install the Linkrunner skill and Claude Code, Cursor, GitHub Copilot, or Windsurf will wire up the SDK and deep links for you:
+
+```bash
+npx @linkrunner/skills add ios
+```
+
+Then ask your agent to "integrate Linkrunner". See [Linkrunner Agent Skills](https://github.com/linkrunner-labs/skills).
+
+</Note>
+
+## Requirements
+
+- iOS 15.0 or higher
+- Swift 5.9 or higher
+- Xcode 14.0 or higher
+
+## Installation
+
+### Swift Package Manager
+
+The Linkrunner SDK can be installed via Swift Package Manager (SPM), which is integrated directly into Xcode.
+
+1. In Xcode, select **File** → **Add Package Dependencies...**
+2. Enter the following repository URL:
+   ```
+   https://github.com/linkrunner-labs/linkrunner-ios.git
+   ```
+3. Select the version you want to use (we recommend using the latest version)
+4. Click **Add Package**
+5. Choose the library type **LinkrunnerKitStatic**
+
+Alternatively, you can add the package dependency to your `Package.swift` file:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "5.0.0")
+]
+```
+
+And add the dependency to your target:
+
+```swift
+targets: [
+    .target(
+        name: "YourApp",
+        dependencies: [
+            .product(name: "LinkrunnerKitStatic", package: "linkrunner-ios")
+        ]
+    )
+]
+```
+
+### Importing in Swift
+
+After installation, you can import the SDK in your Swift files:
+
+```swift
+import LinkrunnerKit
+```
+
+<Note>
+
+Use `import LinkrunnerKit` for v3.0.0 and later. The public API remains `LinkrunnerSDK.shared`.
+
+</Note>
+
+### Required Permissions
+
+#### App Tracking Transparency
+
+If you plan to use IDFA (Identifier for Advertisers), you need to request permission from the user through App Tracking Transparency. Add the following to your `Info.plist` file:
+
+```xml
+<key>NSUserTrackingUsageDescription</key>
+<string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
+```
+
+#### SKAdNetwork Configuration
+
+To enable SKAdNetwork postback copies to be sent to Linkrunner, add the following keys to your `Info.plist` file:
+
+```xml
+<key>NSAdvertisingAttributionReportEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+<key>AttributionCopyEndpoint</key>
+<string>https://linkrunner-skan.com</string>
+```
+
+For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
+
+#### Network Access
+
+The SDK requires network access to communicate with Linkrunner services. Make sure your app has the appropriate permissions for network access.
+
+### Google Integrated Conversion Measurement (Optional)
+
+<Note>
+
+**Prefer to let your AI coding agent do this?** The iOS skill already handles ICM. It adds Google's ODM SDK and wires `setConsent`:
+
+```bash
+npx @linkrunner/skills add ios
+```
+
+See [Linkrunner Agent Skills](/ai-agent-skills).
+
+</Note>
+
+Integrated Conversion Measurement (ICM) recovers Google App Campaign installs that Google cannot attribute because there is no click identifier and no IDFA to match on. Google's On-Device Measurement (ODM) SDK turns the click context into an encrypted signal that never leaves the device, and Linkrunner sends it with the install. See [Google ICM](/features/google-icm) for how it works.
+
+Set this up if you run Google App Campaigns for your iOS app. Requires LinkrunnerKit 4.1.0 or later.
+
+<Note>
+
+Google keeps ODM inactive for users in the European Economic Area, the United Kingdom, and Switzerland, so ICM recovers nothing for that traffic. Elsewhere, Google reports improved coverage for iOS 14+ users.
+
+</Note>
+
+<Note>
+
+ICM also needs an **iOS link ID** configured in your Google Ads integration. Google has nowhere to send the conversion without one. See [Prerequisites](/features/google-icm#prerequisites).
+
+</Note>
+
+<Steps>
+
+<Step title="Add Google's On-Device Measurement SDK">
+
+<Note>
+
+Already using the Firebase iOS SDK 11.14.0 or later? The `FirebaseAnalytics` pod brings this SDK in for you. Skip to the next step.
+
+</Note>
+
+Linkrunner does not bundle this SDK, so apps that skip ICM carry none of its weight. Add it to your app yourself.
+
+<Tabs>
+
+<Tab title="Swift Package Manager">
+
+Add `https://github.com/googleads/google-ads-on-device-conversion-ios-sdk` in **File** → **Add Package Dependencies...** and select the `GoogleAdsOnDeviceConversion` product.
+
+</Tab>
+
+<Tab title="CocoaPods">
+
+Add the pod inside your app target in the `Podfile`:
+
+```ruby
+target 'YourApp' do
+  # ...your existing pods
+
+  pod 'GoogleAdsOnDeviceConversion'
+end
+```
+
+Then run `pod install`.
+
+</Tab>
+
+</Tabs>
+
+</Step>
+
+<Step title="Add the -ObjC linker flag (Swift Package Manager only)">
+
+<Note>
+
+Using CocoaPods? Skip this step. CocoaPods adds `-ObjC` and `-lc++` for you when it links Google's static framework. The one exception is an app target whose **Other Linker Flags** no longer contain `$(inherited)`, in which case add `-ObjC` yourself.
+
+</Note>
+
+If you added Google's SDK with Swift Package Manager, add this to **Build Settings** → **Other Linker Flags** on your app target:
+
+```
+-ObjC
+```
+
+<Warning>
+
+Without it, ICM silently does nothing and your build still succeeds. Linkrunner finds Google's class through the Objective-C runtime, so nothing references it at link time, and the linker drops it from Google's static library.
+
+</Warning>
+
+</Step>
+
+<Step title="Provide consent">
+
+Google reads consent signals when it matches your installs. See [Consent](#consent) below.
+
+</Step>
+
+</Steps>
+
+That is the whole integration. Linkrunner detects the SDK at runtime and there is no API to call. Attribution comes back through [`getAttributionData`](#getting-attribution-data) as usual.
+
+<Tip>
+
+ODM matches on the time of first launch, which Linkrunner records when you call `initialize`.
+
+</Tip>
+
+<Note>
+
+ICM complements SKAdNetwork, it does not replace it. Keep your existing [SKAdNetwork integration](/features/skadnetwork-integration) in place.
+
+</Note>
+
+#### Consent
+
+Google needs to know whether European regulations apply to a user and what that user agreed to. Set the values with `setConsent` before you call `initialize`, and again whenever the user changes their choice.
+
+```swift
+LinkrunnerSDK.shared.setConsent(
+    LinkrunnerConsent(
+        isEEA: .granted,
+        hasConsentForDataUsage: .granted,
+        hasConsentForAdsPersonalization: .denied
+    )
+)
+
+await LinkrunnerSDK.shared.initialize(token: "YOUR_PROJECT_TOKEN")
+```
+
+| Parameter                         | Meaning                                                                   |
+| --------------------------------- | ------------------------------------------------------------------------- |
+| `isEEA`                           | European regulations apply to this user (the EEA, the UK, or Switzerland) |
+| `hasConsentForDataUsage`          | The user agreed to their data being sent to Google for advertising        |
+| `hasConsentForAdsPersonalization` | The user agreed to their data being used to personalize ads               |
+
+Each takes `.granted`, `.denied`, or `.unknown`. Anything left `.unknown` is omitted rather than reported as a denial, so Linkrunner never reports a choice your user did not make.
+
+Google treats these as required whenever their value is known. `hasConsentForDataUsage` decides whether Google may use the conversion at all, `hasConsentForAdsPersonalization` decides whether it may feed audiences and remarketing, and `isEEA` tells Google which rules apply. Set them from your app's real consent state rather than hardcoding them. **For users outside the EEA, the UK, and Switzerland, report `isEEA` as denied and leave the other two unset.** See [Send Consent](/features/send-consent). App Tracking Transparency is not a substitute, because it governs IDFA access only and is reported separately.
+
+<Warning>
+
+Consent is stored between launches. Call `setConsent` again whenever the user's consent state changes, otherwise the previous value keeps being sent after your user has withdrawn it.
+
+</Warning>
+
+#### Verifying your setup
+
+Initialize with `debug: true` and look for this line in the Xcode console:
+
+```
+Linkrunner: odm_available=true odm_fetch_result=success odm_fetch_latency_ms=124
+```
+
+`odm_available=false` with `odm_fetch_result=unavailable` means Google's SDK is not linked. On Swift Package Manager, check the `-ObjC` flag first, because a missing flag strips the class with no build warning.
+
+## Initialization (Required)
+
+Initialize the Linkrunner SDK in your app's startup code, typically in your `AppDelegate` or `SceneDelegate`:
+
+You can find your project token [here](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
+
+Note: The initialization method doesn't return any value. To get attribution data and deeplink information, use the `getAttributionData` method.
+
+```swift
+import LinkrunnerKit
+import SwiftUI
+
+@main
+struct MyApp: App {
+    init() {
+        Task {
+            await LinkrunnerSDK.shared.initialize(
+                token: "YOUR_PROJECT_TOKEN",
+                secretKey: "YOUR_SECRET_KEY", // Optional: Required for SDK signing
+                keyId: "YOUR_KEY_ID", // Optional: Required for SDK signing
+                debug: true // Optional: Enable debug mode for development (defaults to false)
+            )
+            print("Linkrunner initialized successfully")
+        }
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+```
+
+## SDK Signing Parameters (Optional)
+
+For enhanced security, the LinkRunner SDK requires the following signing parameters during initialization:
+
+- **`secretKey`**: A unique secret key used for request signing and authentication
+- **`keyId`**: A unique identifier for the key pair used in the signing process
+- **`disableIdfa`** (optional): Boolean flag to disable IDFA collection (defaults to false)
+- **`debug`** (optional): Boolean flag to enable debug mode for development (defaults to false)
+
+You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
+
+## Setting the Customer User ID
+
+Use `setCustomerUserId` to attach your own user identifier to the device **right after `init`**. Once set, the identifier is stored securely on-device and automatically included in every event you track, so you never have to pass it on each `trackEvent` call.
+
+Call it as early as the user's ID is available. This guarantees every event carries a `user_id` from the very first event, and is especially useful for existing users who were already onboarded before this feature shipped.
+
+<Note>
+
+Available from **iOS SDK v3.11.0**.
+
+</Note>
+
+<Note>
+
+**Best practice:** set the Customer User ID as early as possible. The `user_id` is only attached to events tracked **after** it's set, and is not applied retroactively. Use a stable, unique identifier from your own system (for example your internal user ID or a UUID) rather than an email address or other PII.
+
+</Note>
+
+```swift
+func setCustomerUserId() async {
+    await LinkrunnerSDK.shared.setCustomerUserId("f47ac10b-58cc-4372-a567-0e02b2c3d479") // Your unique customer user ID (e.g. a UUID)
+}
+```
+
+<Note>
+
+The identifier is stored in the Keychain and persists across app restarts. Calling `setCustomerUserId` again with a **different** identifier updates the stored value; passing the same identifier is a no-op. `signup()`, and `setUserData()` called with an `id`, also update it.
+
+</Note>
+
+## User Identification (Required)
+
+Call the `signup` method as soon as the user is identified, whether through signup or login. This is the moment Linkrunner ties the install (and any future events) to a user identifier.
+
+It is strongly recommended to use the integrated platform's identify function to set a persistent user_id once it becomes available (typically after signup or login).
+
+- [Mixpanel - ID Management & User Identification](https://docs.mixpanel.com/docs/tracking-methods/id-management/identifying-users-simplified)
+- [PostHog - How User Identification Works](https://posthog.com/docs/product-analytics/identify#how-identify-works)
+- [Amplitude - Identify Users Documentation](https://amplitude.com/docs/get-started/identify-users)
+
+If the platform's identifier function is not called, you must provide a user identifier for Mixpanel, PostHog, and Amplitude integration.
+
+- mixPanelDistinctId for Mixpanel
+- amplitudeDeviceId for Amplitude
+- posthogDistinctId for PostHog
+
+```swift
+func onSignup() async {
+    let userData = UserData(
+        id: "123", // Required: User ID
+        name: "John Doe", // Optional
+        phone: "9876543210", // Optional
+        email: "user@example.com", // Optional
+        isFirstTimeUser: isFirstTimeUser,
+        userCreatedAt: "2022-01-01T00:00:00Z", // Optional
+        mixPanelDistinctId: "mixpanelDistinctId", // Optional - Mixpanel Distinct ID
+        amplitudeDeviceId: "amplitudeDeviceId", // Optional - Amplitude Device ID
+        posthogDistinctId: "posthogDistinctId" // Optional - PostHog Distinct ID
+    )
+
+    await LinkrunnerSDK.shared.signup(
+        userData: userData,
+        additionalData: [:] // Optional: Any additional data
+    )
+
+    print("Signup successful")
+}
+```
+
+## Handle Deeplink
+
+To enable [remarketing and reattribution](/features/remarketing), you need to capture deep links and pass them to the Linkrunner SDK. This allows Linkrunner to detect returning users who open the app via a deep link.
+
+Add the following to your `SceneDelegate.swift`:
+
+```swift
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    var window: UIWindow?
+
+    // Cold start via Universal Link
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
+               options connectionOptions: UIScene.ConnectionOptions) {
+        // Check if app was launched via a Universal Link
+        if let userActivity = connectionOptions.userActivities.first,
+           userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+           let url = userActivity.webpageURL {
+            Task {
+                await LinkrunnerSDK.shared.handleDeeplink(url: url.absoluteString)
+            }
+        }
+
+        // Check if app was launched via a custom URL scheme
+        if let urlContext = connectionOptions.urlContexts.first {
+            Task {
+                await LinkrunnerSDK.shared.handleDeeplink(url: urlContext.url.absoluteString)
+            }
+        }
+    }
+
+    // Warm start — Universal Links (app already running in background)
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+              let url = userActivity.webpageURL else { return }
+
+        Task {
+            await LinkrunnerSDK.shared.handleDeeplink(url: url.absoluteString)
+        }
+    }
+
+    // Warm start — Custom URL schemes (app already running in background)
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+
+        Task {
+            await LinkrunnerSDK.shared.handleDeeplink(url: url.absoluteString)
+        }
+    }
+}
+```
+
+Linkrunner sends the updated deeplink back after processing. For Linkrunner campaign links, use the returned `deeplink` as the resolved destination instead of the original tracking URL.
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123"
+}
+```
+
+## Getting Attribution Data
+
+<Note>
+
+Using Amplitude for install or pre-login onboarding reports? [Send attribution from your app before tracking those events](/analytics-integrations/amplitude#send-attribution-before-login). The automatic signup integration does not add campaign properties to earlier events.
+
+</Note>
+
+To get attribution data and deeplink information for the current installation, use the `getAttributionData` function:
+
+```swift
+func getAttributionInfo() async {
+    let attributionData = await LinkrunnerSDK.shared.getAttributionData()
+    print("Attribution data:", attributionData)
+
+    // Attribution data includes:
+    // - deeplink: The deep link URL that led to app installation
+    // - campaignData: Campaign information
+    if let deeplink = attributionData.deeplink {
+        print("Deeplink:", deeplink)
+        // Handle the deeplink in your app
+    }
+}
+```
+
+```swift
+// getAttributionData() returns this type
+public struct LRAttributionDataResponse: Codable, Sendable {
+    public let deeplink: String?
+    public let campaignData: CampaignData?
+    public let attributionSource: String
+    public let gaid: String?   // Always nil on iOS
+    public let idfa: String?   // nil when ATT is not authorized
+}
+
+public struct CampaignData: Codable, Sendable {
+    public let id: String
+    public let name: String
+    public let type: CampaignType        // .organic ("ORGANIC") | .inorganic ("INORGANIC")
+    public let adNetwork: AdNetwork?      // .meta ("META") | .google ("GOOGLE")
+    public let groupName: String?
+    public let assetGroupName: String?
+    public let adNetworkCampaignId: String? // Ad network campaign ID
+    public let adSetId: String?             // Ad set ID
+    public let adSetName: String?           // Ad set name
+    public let adCreativeId: String?        // Ad creative ID
+    public let adCreativeName: String?      // Ad creative name
+    public let assetName: String?
+    public let installedAt: Date?
+    public let storeClickAt: Date?
+}
+
+public enum CampaignType: String, Codable, Sendable {
+    case organic = "ORGANIC"
+    case inorganic = "INORGANIC"
+}
+
+public enum AdNetwork: String, Codable, Sendable {
+    case meta = "META"
+    case google = "GOOGLE"
+}
+```
+
+**Example response** (raw values: `type`/`adNetwork` decode to enums, `installedAt`/`storeClickAt` to `Date`):
+
+```json
+{
+    "deeplink": "https://app.yourdomain.com/product/123",
+    "campaignData": {
+        "id": "camp_123",
+        "name": "Summer Sale 2024",
+        "type": "INORGANIC",
+        "adNetwork": "META",
+        "installedAt": "2024-03-20T10:30:00Z",
+        "storeClickAt": "2024-03-20T10:29:45Z",
+        "groupName": "Summer Sale Group",
+        "assetName": "Banner Ad 1",
+        "assetGroupName": "Product Catalog",
+        "adNetworkCampaignId": "120214682829390250",
+        "adSetId": "120214682829640250",
+        "adSetName": "Productivity",
+        "adCreativeId": "120214682926100250",
+        "adCreativeName": "Static_2"
+    },
+    "attributionSource": "META",
+    "gaid": null,
+    "idfa": "6D92078A-8246-4BA4-AE5B-76104861E7DC"
+}
+```
+
+`idfa` is `nil` unless the user allowed tracking through App Tracking Transparency (ATT). Requires LinkrunnerKit 4.2.0 or later.
+
+## Setting User Data
+
+Call `setUserData` to send user details and the IDs your product analytics tools use for this user. You can call it right after `init`, before the user logs in: `id` is optional for `setUserData`. Pass `id` once the user is logged in.
+
+When you pass a tool's ID and that integration is configured in Linkrunner, Linkrunner sends this install's attribution to that tool for this user, the same attribution it sends after `signup` (for example, `lr_campaign` and `lr_ad_network` on the Mixpanel profile). This applies to installs attributed to a campaign. If the install is not attributed yet, Linkrunner sends the properties once attribution completes. Supported IDs:
+
+| Tool               | Field                               |
+| ------------------ | ----------------------------------- |
+| Mixpanel           | `mixPanelDistinctId`                |
+| Amplitude          | `amplitudeDeviceId`                 |
+| PostHog            | `posthogDistinctId`                 |
+| MoEngage           | `moengageUserId`                    |
+| Braze              | `brazeDeviceId`                     |
+| Google Analytics 4 | `gaAppInstanceId` and `gaSessionId` |
+| Netcore            | `netcoreDeviceGuid`                 |
+
+<Note>
+
+**`setUserData` is not a replacement for `signup`.** Call `signup` as soon as the user is identified (signup or login). `signup` still requires `id`.
+
+</Note>
+
+<Note>
+
+Calling `setUserData` without `id` requires iOS SDK 4.3.0 or later. On earlier versions `id` is required.
+
+</Note>
+
+Right after `init`, before the user logs in:
+
+```swift
+func setAnalyticsIds(mixpanelDistinctId: String) async {
+    await LinkrunnerSDK.shared.setUserData(
+        UserData(mixPanelDistinctId: mixpanelDistinctId)
+    )
+}
+```
+
+After the user logs in:
+
+```swift
+func setUserData() async {
+    let userData = UserData(
+        id: "123", // Your customer user ID
+        name: "John Doe", // Optional
+        phone: "9876543210", // Optional
+        email: "user@example.com", // Optional
+        mixPanelDistinctId: "mixpanel_distinct_id" // Optional
+    )
+
+    await LinkrunnerSDK.shared.setUserData(userData)
+}
+```
+
+## Setting CleverTap ID
+
+Use `setAdditionalData` to add CleverTap ID to the SDK:
+
+```swift
+func setAdditionalData() async {
+    let integrationData = IntegrationData(
+        clevertapId:clevertapId
+    )
+
+    await LinkrunnerSDK.shared.setAdditionalData(integrationData)
+    print("CleverTap ID set successfully")
+}
+```
+
+## Revenue Tracking
+
+<Note>
+
+Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Pass your user ID as `userId` so each payment is linked to the user who paid. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
+
+</Note>
+
+### Tracking Payments
+
+A payment is an in-app event with revenue. Send it with `trackEvent`, and put `amount`, `paymentId`, and `currency` in `eventData`. The event name becomes the payment type in reports and mappings, so you can use any name, such as `purchase` or `SUBSCRIPTION_RENEWED`. Requires LinkrunnerKit 5.0.0 or later. For examples for every case and how payments reach ad networks, see the full [Track payments](/sdk/track-payments) guide.
+
+This example sends every payment key. `amount`, `paymentId`, `currency`, and `userId` are required for a payment.
+
+```swift
+import LinkrunnerKit
+
+func trackPurchase() async {
+    await LinkrunnerSDK.shared.trackEvent(
+        eventName: "purchase",          // Payment name, stored as the payment type in reports and mappings
+        eventData: [
+            "amount": 1499.0,           // Required for a payment: total the user paid, a finite number >= 0
+            "paymentId": "order_123",   // Required for a payment: your order or transaction ID, used to deduplicate
+            "currency": "INR",          // Required for a payment: 3-letter ISO 4217 code
+            "userId": "user_123",       // Required for a payment: your user ID. "" uses the user saved by signup or setUserData
+            "status": "PAYMENT_COMPLETED", // Optional: defaults to PAYMENT_COMPLETED (see statuses below)
+            // Optional: any other keys stay as event data. Meta and Google read these product fields
+            "content_ids": ["sku_1", "sku_2"],
+            "contents": [
+                ["id": "sku_1", "quantity": 1, "item_price": 999],
+                ["id": "sku_2", "quantity": 1, "item_price": 500]
+            ],
+            "content_type": "product",
+            "num_items": 2,
+            "order_id": "order_123"
+        ],
+        eventId: "evt_order_123"        // Optional: your own ID for this event
+    )
+}
+```
+
+#### Payment keys in `eventData`
+
+| Key | Type | Required | Description |
+| --- | ---- | -------- | ----------- |
+| `amount` | `Double` or `Int` | Yes | Total the user paid. Must be a finite number, 0 or greater. This is the revenue value. |
+| `paymentId` | `String` | Yes | Your order or transaction ID. Must not be blank. Used to recognize the same payment when it arrives again. |
+| `currency` | `String` | Yes | 3-letter ISO 4217 currency code, such as `INR` or `USD`. Case-insensitive, sent in uppercase. |
+| `userId` | `String` | Yes | Your ID for the user who paid. If you pass an empty string, the SDK uses the user saved by `signup` or `setUserData`. |
+| `status` | `String` | No | `PAYMENT_INITIATED`, `PAYMENT_COMPLETED` (default), `PAYMENT_FAILED`, or `PAYMENT_CANCELLED`. |
+| Any other key | Any | No | Stays in the event data, such as product details for [ecommerce events](#ecommerce-events). |
+
+How `trackEvent` decides:
+
+- **`amount`, `paymentId`, and `currency` are all in `eventData`:** the event is a payment. The SDK checks the payment keys and sends them as payment fields.
+- **None of them, or `amount` or `currency` without `paymentId`:** the event is a normal custom event, exactly as before. An `amount` or `currency` key on its own is ordinary event data.
+- **`paymentId` with `amount` or `currency` missing:** `trackEvent` does not send the event, and debug builds print with `amount, paymentId and currency must be sent together`, and nothing is sent.
+- **A negative or non-numeric `amount`, a blank `paymentId`, a currency that is not 3 letters, or an unknown `status`:** `trackEvent` does not send the event, and debug builds print the reason to the console, and nothing is sent.
+
+#### Payment status
+
+`status` is a string. `LinkrunnerKit` also has a `PaymentStatus` enum whose `rawValue` is the same string, for example `PaymentStatus.cancelled.rawValue`.
+
+| Status | Use it when | Effect |
+| ------ | ----------- | ------ |
+| `PAYMENT_INITIATED` | The user started paying, such as opening the checkout or payment sheet. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_COMPLETED` (default) | The charge succeeded. | Added to revenue and paying users. Sent to ad networks when the event name is mapped. |
+| `PAYMENT_FAILED` | The charge was declined or errored. | Stored for reports and analytics. Not added to revenue and not sent to ad networks. |
+| `PAYMENT_CANCELLED` | The user backed out before paying, or you refunded it. Send it with the same event name, `paymentId`, `amount`, and `currency` as the completed payment. | Stored for reports and analytics. The payment no longer counts as revenue and nothing is sent to ad networks. |
+
+Linkrunner keeps one payment per `paymentId`, event name, and status, so a retry with the same values is recorded once. See [Payment status](/sdk/track-payments#payment-status) for a full lifecycle example.
+
+<Note>
+    The event name is stored exactly as you send it. If you used one of the old payment types, pass it in uppercase exactly as before, such as `FIRST_PAYMENT` or `DEFAULT`, so your existing mappings and reports keep working. A different spelling such as `first_payment` is a new payment type. Any other name, such as `purchase`, is also stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
+</Note>
+
+<Note>
+    `capturePayment` and `removePayment` are deprecated. They still work in 5.0.0 and show a deprecation warning, and they will be removed in a future major version. Use `trackEvent` with the payment keys instead. Apps on LinkrunnerKit 4.x keep working unchanged. To move, see [Migrate payments to in-app events](/sdk/migrate-to-track-event).
+</Note>
+
+## Tracking Custom Events
+
+<Note>
+
+From **iOS SDK v3.11.0**, custom events automatically include the `user_id` you set during `signup()` / `setUserData()`. The SDK stores this identifier securely on-device (Keychain) and attaches it to every `trackEvent` call, so you no longer need to pass it manually. Events tracked before signup are sent without a `user_id`.
+
+</Note>
+
+<Note>
+
+Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Call [`.signup`](#user-identification-required) so events are linked to a user. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, add the [payment keys](#tracking-payments) to `eventData`.
+
+</Note>
+
+Track custom events in your app:
+
+```swift
+func trackEvent() async {
+    await LinkrunnerSDK.shared.trackEvent(
+        eventName: "purchase_initiated", // Event name
+        eventData: [ // Optional: Event data
+            "product_id": "12345",
+            "category": "electronics"
+        ],
+        eventId: "order_12345" // Optional: Your own unique event identifier
+    )
+    print("Event tracked successfully")
+}
+```
+
+#### Parameters for `LinkrunnerSDK.shared.trackEvent`
+
+- `eventName`: `String` (required) - Name of the event to track
+- `eventData`: `[String: Any]` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties. Add `amount`, `paymentId`, `currency`, and `userId` to make it a payment. See [Tracking Payments](#tracking-payments).
+- `eventId`: `String` (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
+
+### Revenue Sharing with Ad Networks
+
+Send revenue to ad networks such as Google Ads and Meta as a [payment](#tracking-payments). Meta and Google receive the value and currency from the payment `amount` and `currency`, so send the order total as `amount`. Linkrunner does not add up item prices.
+
+Put the payment keys and the product details in `eventData`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`. Google receives `content_ids` as item IDs.
+
+```swift
+func trackPurchase() async {
+    await LinkrunnerSDK.shared.trackEvent(
+        eventName: "purchase",
+        eventData: [
+            "amount": 149.99, // Order total, sent to ad networks as the value
+            "paymentId": "order_12345",
+            "currency": "USD",
+            "userId": "user_123",
+            "content_ids": ["product_123"],
+            "num_items": 1,
+            "order_id": "order_12345"
+        ]
+    )
+}
+```
+
+An `amount` in `eventData` is revenue only when `paymentId` and `currency` are there too. On its own it is ordinary event data, and on iOS it still counts toward SKAN conversion values. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
+
+## Ecommerce Events
+
+> **Minimum SDK Version:** Ecommerce Event Manager requires `linkrunner-ios` **v3.8.0** or above. Please ensure your SDK is updated before using this feature.
+
+If you are tracking Ecommerce events to sync with Meta or Google, you must format your `eventData` to include the required fields. **You also need to map your custom event to the standard commerce event in the Linkrunner Dashboard.**
+
+For detailed explanations of the required fields like `content_ids`, `contents`, and `value`, refer to our [Meta Commerce Manager documentation](/ecommerce-manager/meta-commerce-manager#understanding-event_data) or [Google Commerce Manager documentation](/ecommerce-manager/google-commerce-manager#understanding-event_data-for-google).
+
+### Add To Cart Example
+
+Use the `trackEvent` method to send an `AddToCart` event:
+
+```swift
+func trackAddToCart() async {
+    await LinkrunnerSDK.shared.trackEvent(
+        eventName: "add_to_cart", // Map this custom event to "AddToCart" (Meta) or "add_to_cart" (Google) in the Linkrunner Dashboard
+        eventData: [
+            "content_ids": ["product_123"],
+            "contents": [
+                [
+                    "id": "product_123", // Matches content_ids
+                    "quantity": 1,
+                    "item_price": 49.99
+                ]
+            ],
+            "content_type": "product",
+            "currency": "USD",
+            "value": 49.99,
+            "num_items": 1
+        ]
+    )
+    print("Add To Cart event tracked successfully")
+}
+```
+
+### View Content Example
+
+Use the `trackEvent` method to send a `ViewContent` event:
+
+```swift
+func trackViewContent() async {
+    await LinkrunnerSDK.shared.trackEvent(
+        eventName: "view_item", // Map this custom event to "ViewContent" (Meta) or "view_item" (Google) in the Linkrunner Dashboard
+        eventData: [
+            "content_ids": ["product_123"],
+            "contents": [
+                [
+                    "id": "product_123", // Matches content_ids
+                    "quantity": 1,
+                    "item_price": 49.99
+                ]
+            ],
+            "content_type": "product",
+            "currency": "USD",
+            "value": 49.99,
+            "num_items": 1
+        ]
+    )
+    print("View Content event tracked successfully")
+}
+```
+
+### Payment / Purchase Example
+
+Use `trackEvent` with the [payment keys](#tracking-payments) and the ecommerce fields in `eventData` to send a `Purchase` event:
+
+```swift
+func trackPurchase() async {
+    await LinkrunnerSDK.shared.trackEvent(
+        eventName: "purchase", // Map this event to "Purchase" (Meta) or "ecommerce_purchase" (Google) in the Linkrunner Dashboard
+        eventData: [
+            "amount": 49.99, // Order total, sent to ad networks as the value
+            "paymentId": "payment_456",
+            "currency": "USD",
+            "userId": "user_123",
+            "status": "PAYMENT_COMPLETED", // Optional, the default
+            "content_ids": ["product_123"],
+            "contents": [["id": "product_123", "quantity": 1, "item_price": 49.99]],
+            "content_type": "product",
+            "num_items": 1,
+            "order_id": "order_abc123" // Required for Purchase events
+        ]
+    )
+}
+```
+
+> **Note:** For more information on testing and verifying your ecommerce events, please see our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) or [Google Commerce Manager](/ecommerce-manager/google-commerce-manager#verifying-events-in-google-ads) guide.
+
+## Enhanced Privacy Controls
+
+The SDK offers options to enhance user privacy:
+
+```swift
+// Enable PII (Personally Identifiable Information) hashing
+LinkrunnerSDK.shared.enablePIIHashing(true)
+
+// Check if PII hashing is enabled
+let isHashingEnabled = LinkrunnerSDK.shared.isPIIHashingEnabled()
+```
+
+When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
+
+## Uninstall Tracking
+
+### Before you begin
+
+Here's what you need to know before getting started:
+
+**Requirements:**
+
+- iOS SDK 3.4.0 and later
+- [Registering your app with APNs](https://developer.apple.com/documentation/usernotifications/registering-your-app-with-apns)
+
+### iOS
+
+Connect APNs with Linkrunner
+
+<AccordionGroup>
+
+<Accordion title="Apple Developer Portal">
+
+Get the required credentials from the Apple Developer Portal:
+
+**APNs Authentication Key (p8) and Key ID:**
+
+- Go to the [Apple Developer Portal](https://developer.apple.com/account).
+- Select **Identifiers** under **Certificates, IDs & Profiles**.
+- Click on the app you want to track uninstalls for. Then, under **Capabilities**, search for **Push Notifications** and enable it.
+- Under **Certificates, IDs & Profiles**, select **Keys** and click on plus (+) icon to create a key. Enable APNs when creating the key and download the key file (p8).
+- The Key ID can be found in the **Keys** tab.
+
+**Bundle ID and Team ID:**
+
+- Under **Identifiers**, click on your app and you will see the Bundle ID and Team ID (App ID Prefix).
+
+</Accordion>
+
+<Accordion title="Linkrunner Dashboard">
+
+1. In Linkrunner, go to **Settings** > **Uninstall Tracking**.
+2. Under the **iOS** tab, upload the APNs Authentication Key (p8) file and enter the Key ID, Bundle ID and Team ID (App ID Prefix) that you copied from the Apple Developer Portal.
+
+![Uninstall Tracking](/images/uninstall-tracking-dashboard-ios.png)
+
+</Accordion>
+
+<Accordion title="Integrate with Linkrunner SDK">
+
+Follow these instructions to integrate APNs with the Linkrunner SDK:
+
+1. **Set up Push Notifications:**
+
+Enable push notifications in your Xcode project by adding the Push Notifications capability.
+
+2. Configure your app to provide the device's APNs token to the Linkrunner SDK.
+
+```swift
+import UIKit
+import LinkrunnerKit
+
+class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Request push notification permissions
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            if granted {
+                DispatchQueue.main.async {
+                    application.registerForRemoteNotifications()
+                }
+            }
+        }
+        return true
+    }
+
+    // Called when APNs token is received
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        Task {
+            try? await LinkrunnerSDK.shared.setPushToken(tokenString)
+        }
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("Failed to register for remote notifications: \(error)")
+    }
+}
+```
+
+For SwiftUI apps using the new app lifecycle:
+
+```swift
+import SwiftUI
+import LinkrunnerKit
+
+@main
+struct MyApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            if granted {
+                DispatchQueue.main.async {
+                    application.registerForRemoteNotifications()
+                }
+            }
+        }
+        return true
+    }
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        Task {
+            try? await LinkrunnerSDK.shared.setPushToken(tokenString)
+        }
+    }
+}
+```
+
+</Accordion>
+
+</AccordionGroup>
+
+## Function Placement Guide
+
+| Function | Requirement | Where to Place | When to Call |
+| --- | --- | --- | --- |
+| [`LinkrunnerSDK.shared.initialize`](/sdk/ios#initialization-required) | Required | App initialization | Once when app starts |
+| [`LinkrunnerSDK.shared.signup`](/sdk/ios#user-identification-required) | Required | Identification flow (signup or login) | Once when the user is identified |
+| [`LinkrunnerSDK.shared.setCustomerUserId`](/sdk/ios#setting-the-customer-user-id) | Required | App initialization or identification flow | After `initialize`, as soon as your user ID is available |
+| [`LinkrunnerSDK.shared.handleDeeplink`](/sdk/ios#handle-deeplink) | Required | SceneDelegate deep link entry points | When app is opened via a deep link |
+| [`LinkrunnerSDK.shared.getAttributionData`](/sdk/ios#getting-attribution-data) | Optional | Attribution data handling flow | Whenever the attribution data is needed |
+| [`LinkrunnerSDK.shared.setAdditionalData`](/sdk/ios#setting-clevertap-id) | Optional | Integration code | When third-party integration IDs are available |
+| [`LinkrunnerSDK.shared.setUserData`](/sdk/ios#setting-user-data) | Optional | App start, authentication or profile update logic | Right after `init` with your analytics IDs, and when user details become available |
+| [`LinkrunnerSDK.shared.trackEvent`](/sdk/ios#tracking-custom-events) | Optional | Throughout app | When specific user actions occur, including [ecommerce events](/sdk/ios#ecommerce-events) |
+| [`LinkrunnerSDK.shared.trackEvent` with payment keys](/sdk/ios#tracking-payments) | Optional | Payment processing | When user makes a payment, including [ecommerce purchases](/sdk/ios#ecommerce-events) |
+| [`LinkrunnerSDK.shared.setPushToken`](/sdk/ios#uninstall-tracking) | Optional | Push notification setup | When APNs token is available |
+| [`LinkrunnerSDK.shared.setConsent`](/sdk/ios#consent) | Optional | App initialization or consent flow | Before `initialize`, and again when consent changes |
+| [`LinkrunnerSDK.shared.enablePIIHashing`](/sdk/ios#enhanced-privacy-controls) | Optional | Privacy settings | When you want to enable PII hashing |
+| [`LinkrunnerSDK.shared.isPIIHashingEnabled`](/sdk/ios#enhanced-privacy-controls) | Optional | Privacy settings or compliance checks | When you need to check PII hashing status |
+
+## Complete Example
+
+Here's a simplified example showing how to integrate Linkrunner in a SwiftUI iOS app:
+
+You can find your project token [here](https://dashboard.linkrunner.io/dashboard?s=members&m=documentation).
+
+```swift
+import SwiftUI
+import LinkrunnerKit
+
+@main
+struct MyApp: App {
+    init() {
+        Task {
+            await initializeLinkrunner()
+        }
+    }
+
+    func initializeLinkrunner() async {
+        await LinkrunnerSDK.shared.initialize(token: "YOUR_PROJECT_TOKEN")
+        print("Linkrunner initialized successfully")
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+
+struct ContentView: View {
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                Text("Linkrunner Demo")
+                    .font(.largeTitle)
+
+                Button("Track Event") {
+                    Task {
+                        await trackCustomEvent()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .padding()
+        }
+    }
+
+    func trackCustomEvent() async {
+        await LinkrunnerSDK.shared.trackEvent(
+            eventName: "button_clicked",
+            eventData: ["screen": "home"]
+        )
+        print("Event tracked successfully")
+    }
+}
+```
+
+## Next Steps
+
+<CardGroup :cols="2">
+
+<Card title="Test Your Integration" icon="flask" href="/testing/integration-testing">
+
+Validate your setup end-to-end
+
+</Card>
+
+<Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking-setup">
+
+Configure deep links for your app
+
+</Card>
+
+</CardGroup>
+
+## Support
+
+If you encounter issues during integration, contact us at <support@linkrunner.io>.
