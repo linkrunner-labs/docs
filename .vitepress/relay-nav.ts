@@ -126,14 +126,17 @@ const guides: Group[] = [
   group("Users and events", links("/features/users-tab", "/features/events-tab", "/features/retention", "/features/data-export"), false, "users-three"),
   group(
     "Measurement",
-    links(
+    [
+      page("What the Campaigns columns mean", "/features/campaign-metrics", "chart-bar"),
+      ...links(
       "/features/attribution-windows",
       "/features/ctv-attribution",
       "/features/fraud-control",
       "/features/uninstall-tracking",
       "/features/send-consent",
       "/features/meta-install-referrer"
-    ),
+      ),
+    ],
     false,
     "chart-line"
   ),
