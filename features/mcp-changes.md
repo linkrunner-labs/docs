@@ -84,12 +84,12 @@ You can also confirm a change by replying in your AI app's chat. How depends on 
 | Every other edit or delete | You type the short code shown with that change, for example `confirm 7Q4K`. Each change has its own code. |
 | Team and settings changes: members, partners, agencies, webhooks, domains, SDK keys, project settings, sharing | Never in the chat. Approve on the review page or in the approval card. |
 
-Any other create, such as a web campaign or a postback mapping, needs the code. So does a create that would also change something that already exists.
+Every other create needs the code, including a web campaign, a deep link, a test device and a postback mapping. So does a create that would also change something that already exists.
 
 Confirming in the chat works only when all of these hold:
 
 - You are the person who asked for the change.
-- You confirm in the same AI app connection where you asked.
+- You confirm in the same AI app connection where you asked. Another AI app or script of yours cannot confirm it, and the code is only shown in that connection.
 - Your project role lets you make that change in the dashboard (see [Who can approve](#who-can-approve)).
 - **Approve in the AI chat** is on for the project (see [Approve in the AI chat](#approve-in-the-ai-chat)).
 
