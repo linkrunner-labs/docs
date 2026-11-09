@@ -37,13 +37,13 @@ These columns are on when you first open the page.
 
 Your app calls the SDK's `init` method every time it opens ([React Native](/sdk/react-native#initialization-required), [Android](/sdk/android#initialization-required)). The first `init` from a new install records the install. Later opens count as app opens, not installs.
 
-The install is dated by the install time the device reports. On Android, that is when the Play Store download started. If the device reports no install time, the install is dated at the first app open.
+On Android, the install is dated when the Play Store download started. On iOS, and on Android when the Play Store gives no install time (for example a build installed from a computer), the install is dated at the first app open.
 
 This has three effects:
 
 - **Downloads that are never opened are not counted.** The SDK only runs once the app opens, so the store's download count is usually higher than Installs.
 - **Past days can still go up.** An Android user who downloads on Monday and opens the app on Wednesday is counted on Monday, but only appears once they open the app on Wednesday.
-- **Existing users who update into the SDK count once, as organic.** If the Play Store install time is more than 30 days before the first `init` and no campaign matches, the install is dated at the first app open instead. This stops old users from filling past dates when you first add the SDK.
+- **Existing users who update into the SDK are dated at their first open.** On Android, if the Play Store install time is more than 30 days before the first `init` and no campaign matches, the install is dated at the first app open instead. This stops old users from filling past dates when you first add the SDK.
 
 ### How it is credited to a campaign
 
@@ -51,10 +51,12 @@ Linkrunner credits each install to one campaign. It checks the signals below, mo
 
 | Strength | Signal |
 | :-- | :-- |
-| 1 | Install referrer data from the store or ad network: the Google Play Install Referrer, the [Meta Install Referrer](/features/meta-install-referrer), or [Google ICM](/features/google-icm) |
+| 1 | Google Ads click data in the Google Play Install Referrer, the [Meta Install Referrer](/features/meta-install-referrer), or a [Google ICM](/features/google-icm) match that Google reports as exact |
 | 2 | An exact ID: the device's advertising ID (GAID or IDFA) matching a click, the Linkrunner click ID from a link, or the Google and Apple Search Ads attribution APIs |
 | 3 | A click from the same IP address |
-| 4 | An ad view, only if [view-through attribution](/features/attribution-windows#view-through-attribution) is turned on for that network |
+| 4 | An ad view matched on advertising ID, only if [view-through attribution](/features/attribution-windows#view-through-attribution) is turned on for that partner |
+| 5 | A TV ad view from the same home network ([CTV](/features/ctv-attribution)), only if view-through is on |
+| 6 | A network's modeled claim, such as a Google ICM match that Google does not report as exact |
 
 A click can only be used when:
 
@@ -62,9 +64,9 @@ A click can only be used when:
 - it falls inside the network's [attribution window](/features/attribution-windows): 30 days for Google and Meta, and 7 days for other networks, unless you changed it.
 - it is not already credited to another install.
 
-If nothing matches, the install is **organic** and counts in the Organic row, not in a campaign. An install from before the campaign was created also counts as organic.
+If nothing matches, the install is **organic** and counts in the Organic row, not in a campaign. An install dated before the day the campaign was created also counts in the Organic row.
 
-Most installs are credited within seconds of the first app open. When Google has not yet returned the campaign for an install from Google Ads, Linkrunner waits and asks again, so that install can take up to about 5 hours to appear.
+Most installs are credited within seconds of the first app open. When Google has not yet returned the campaign for an install from Google Ads, Linkrunner waits and asks again, so that install can take up to about 5 hours to appear. If Google still has not answered, the install is credited to Google Ads without a campaign.
 
 ### Reinstalls
 
@@ -72,7 +74,8 @@ A reinstall is an install on a device that already installed your app in the las
 
 - A reinstall is credited again from scratch. It goes to the campaign that matches now, or to organic. It does not keep the campaign from the first install.
 - It counts in **Installs** and in **Reinstalls**.
-- On iOS, when the user has not allowed tracking there is no IDFA. Those reinstalls cannot be detected, so they count as new installs.
+- When there is no advertising ID (iOS without tracking permission, or Android with the ad ID deleted), a reinstall cannot be detected, so it counts as a new install.
+- On Android, this needs the SDK's [backup rules](/sdk/android#step-3-backup-configuration). Without them, a reinstall that restores app data counts as an app open, not an install.
 
 <Note>
 
