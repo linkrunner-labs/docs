@@ -15,16 +15,15 @@ The connector address is:
 https://mcp.linkrunner.io/mcp
 ```
 
-<Warning>
+<Note>
 
-Editing tools act on your live project, not a sandbox. The connector can create
-projects, and create and edit campaigns, funnels, domains, store listings,
-webhooks, and postback event mappings. A few of these send real traffic to
-third parties or cannot be undone. Read
-[What the connector can change](#what-the-connector-can-change) before you
-share the connector with a team.
+Your assistant never changes your project by itself. When you ask for a
+change, it proposes it and shows you what will change. Linkrunner applies it
+only after a person approves it in Linkrunner or the approval card, or you
+confirm it in the chat. See
+[Approve changes your AI assistant asks for](/features/mcp-changes).
 
-</Warning>
+</Note>
 
 ## Connect
 
@@ -122,7 +121,7 @@ The assistant calls `create_project` with the project name, company, project
 type (app or website), store links, report timezone, and optionally the
 billing currency (USD or INR). If you already have a Linkrunner billing
 account, the assistant asks which one the project belongs to. Check these
-details before you approve. The tool returns the new project ID and your SDK
+details before you confirm. The tool returns the new project ID and your SDK
 token.
 
 </Step>
@@ -157,7 +156,7 @@ These are the same rules the dashboard applies.
 - **You need a company email to create a project.** Gmail accounts can sign up and be invited to existing projects, but cannot create one. For help, contact <support@linkrunner.io>.
 - **An app project needs a live App Store or Play Store listing.** You cannot set up an app that is not published yet. Come back once its listing is live. A website-only project needs the website URL instead.
 - **You can create up to 3 projects per day from an AI assistant.** Only projects you created this way count.
-- **To use an existing project, you must be its Admin, Owner, or Manager.**
+- **To use an existing project, you must be its Admin or Member.** Influencer, finance, partner and agency roles cannot connect.
 - **If you already have a billing account, you choose which one the new project uses.** On your first project, a new billing account is created for you.
 - New projects get the same free allowance and billing setup as projects you create in the dashboard. See [Billing](/billing/overview).
 
@@ -177,11 +176,12 @@ Your assistant picks the right tool for your question. Some examples:
 - "Is my iOS link setup right? The link opens the App Store instead of my app."
 - "Is Meta receiving my purchase events?"
 
-The assistant can also make a defined set of changes for you:
+The assistant can also ask for changes. Each one waits until a person approves it:
 
 - "Create a Meta campaign for the Diwali sale pointing at our sneakers page."
-- "Pause every campaign with no installs in the last 30 days."
+- "Pause the link for the influencer campaign."
 - "Save a funnel for install, sign up, then purchase."
+- "Set the Google click lookback window to 14 days."
 
 ### Built-in prompts
 
@@ -197,16 +197,15 @@ These are shortcuts. You can always ask the same questions in your own words.
 
 ## Tool reference
 
-A sign-in connection offers 45 tools: 28 that read and 17 that make changes.
-A token connection with **Make changes in Linkrunner** turned on offers the
-same tools except the overview, account, and `create_project` tools (40), plus
-7 read-only
-[ad-account tools](#what-the-connector-can-read-from-your-ad-accounts) when the
-token has **Read connected ad accounts**.
+This section lists the tools that read. The tools that ask for changes are in
+the [AI change tool reference](/features/mcp-tools). Which tools your assistant
+sees depends on your connection's permissions and the toolsets you pick (see
+[Choose which tools your assistant sees](/features/mcp-tools#choose-which-tools-your-assistant-sees)).
+A token with **Read connected ad accounts** also gets 7 read-only
+[ad-account tools](#what-the-connector-can-read-from-your-ad-accounts).
 
 Your assistant reads each tool's description and decides which to call. You
-don't need to call tools yourself. Tools that change your project are listed
-separately under [What the connector can change](#what-the-connector-can-change).
+don't need to call tools yourself.
 
 On a sign-in connection, every project tool takes the project ID, and the
 assistant gets it from `list_projects` or `create_project`. On a
@@ -360,17 +359,22 @@ and search queries use `search_term_view`. The assistant picks these through
 ## What the connector can change
 
 Ask in plain language ("create a campaign for the Diwali sale") and your
-assistant picks the right tool. Describe what you want changed, and confirm the
-summary it gives you before it writes.
+assistant picks the right tool. Apart from creating a project, every change
+is only a proposal: you see what will change, and Linkrunner applies it only
+after a person approves it in Linkrunner or the approval card, or confirms it
+in the chat with a yes or the change's code. The assistant cannot approve on
+its own.
 
-<Warning>
+- [Approve changes your AI assistant asks for](/features/mcp-changes) explains
+  the approval flow, who can approve, and the switches that turn each type of
+  change on or off.
+- The [AI change tool reference](/features/mcp-tools) lists every change the
+  assistant can ask for: campaigns, links, funnels, cohorts, postbacks,
+  attribution settings, integrations, project settings, fraud rules, Signals,
+  team, partners, agencies, landing pages, setup and exports.
 
-Every tool below writes to your live account or project. Your assistant asks
-before making an ambiguous change, but it is worth being specific about what you
-want, especially for the tools marked as sending live traffic or being
-irreversible.
-
-</Warning>
+The sections below cover the changes with side effects you should know about
+before you approve.
 
 ### Projects
 
@@ -378,94 +382,63 @@ irreversible.
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `create_project` | Create a new project in your account and get its project ID and SDK token. Sign-in connections only. See [Rules for new projects](#rules-for-new-projects). |
 
-### Campaigns
+`create_project` is the one tool that does not wait for approval. Your
+assistant asks you to confirm the details first.
 
-| Tool                    | Use it for                                                                                                    |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `create_campaign`       | A new tracking link for an ad creative, an influencer, an organic channel, or a web-to-app flow.              |
-| `edit_campaign`         | Rename, pause or resume, change the deep link, swap the store listing, or reassign the ad account.            |
-| `create_deeplink`       | A per-ad-set or per-creative deep link under a Meta or Google campaign.                                       |
-| `update_custom_channel` | Rename a custom channel label. See the troubleshooting note on [renaming a custom channel](#troubleshooting). |
-| `delete_custom_channel` | Remove a custom channel label. The campaign itself is not deleted.                                            |
+### Campaigns
 
 A deep link has to be a full URL on one of your own tracking domains, for
 example `https://links.yourbrand.com/product/sneakers`. An external URL is
 rejected. Ask your assistant to list your domains if you are not sure which to
 use.
 
-<Note>
-
-Campaigns cannot be deleted through the connector. Pause them with
-`edit_campaign` instead.
-
-</Note>
+Deleting a campaign stops its link working, and it cannot be undone. To stop a
+link for now, ask the assistant to pause it instead.
 
 ### Funnels
 
-| Tool            | Use it for                                                           |
-| --------------- | -------------------------------------------------------------------- |
-| `create_funnel` | Save a funnel so it appears in your dashboard and in `list_funnels`. |
-| `update_funnel` | Rename a saved funnel or change its steps.                           |
+Saving a funnel makes it appear in your dashboard and in `list_funnels` for
+everyone in the project. Changing a funnel's steps replaces all of them.
 
 ### Domains and store listings
-
-| Tool                   | Use it for                                          |
-| ---------------------- | --------------------------------------------------- |
-| `create_domain`        | Register a tracking domain or subdomain.            |
-| `create_store_listing` | Add a custom Play Store or App Store listing.       |
-| `update_store_listing` | Change a listing's name or its platform listing id. |
-| `delete_store_listing` | Remove a listing no campaign is using.              |
 
 <Warning>
 
 `create_domain` does not check DNS, so it will save a domain that is not pointed
-at Linkrunner yet, and there is no way to delete a domain through the connector.
-Check the spelling before you confirm. Adding a domain also creates a permanent
-`MAIN_DOMAIN` campaign that backs root-domain links and counts toward your
-campaign limit, and making the new domain primary changes which domain later
-campaigns use by default.
+at Linkrunner yet. Check the spelling before you approve. Adding a domain also
+creates a permanent `MAIN_DOMAIN` campaign that backs root-domain links and
+counts toward your campaign limit, and making the new domain primary changes
+which domain later campaigns use by default.
 
 </Warning>
 
-`delete_store_listing` is refused while any campaign still points at the
-listing, and the error names the campaigns. Remove it from those campaigns
-first.
+A store listing cannot be deleted while any campaign still points at it. The
+assistant names those campaigns. Remove the listing from them first.
 
 ### Webhooks
 
-| Tool             | Use it for                                                                                |
-| ---------------- | ----------------------------------------------------------------------------------------- |
-| `update_webhook` | Set the endpoint that receives install and event payloads, or change the organic setting. |
-| `test_webhook`   | Send a sample payload to the configured endpoint.                                         |
-
 <Warning>
 
-Both tools deliver a real payload to your endpoint. Saving a webhook sends one
-by itself, because Linkrunner only stores an endpoint that answers `200` or
-`201`, so configuring a Slack webhook posts a real message to that channel. Ask
-your assistant to test afterwards only if you want a second message.
+Both webhook tools deliver a real payload to your endpoint when the change is
+applied. Saving a webhook sends one by itself, because Linkrunner only stores an
+endpoint that answers `200` or `201`, so configuring a Slack webhook posts a
+real message to that channel.
 
 Replacing the URL cannot be undone. A project has one webhook, the new URL
 overwrites the old one, and the assistant cannot read the old value back to
 restore it (`get_webhook` hides the path, because a Slack webhook path is
-itself a credential). Keep a copy of the current URL before you replace it.
+itself a credential). Keep a copy of the current URL before you approve.
 
 </Warning>
 
 ### Postback event mappings
 
-| Tool                        | Use it for                                                |
-| --------------------------- | --------------------------------------------------------- |
-| `create_postback_event_map` | Map one of your events to the name an ad network expects. |
-| `update_postback_event_map` | Change an existing mapping.                               |
-| `delete_postback_event_map` | Remove a mapping you added.                               |
-
 <Warning>
 
-Creating or updating a mapping immediately sends a test postback to every
-connected account on that network (Meta, Google, TikTok, Snapchat, LinkedIn,
-Reddit). That puts a synthetic conversion in your real ad account, so avoid
-repeated edits.
+When a new or changed mapping is applied, Linkrunner sends a test postback to
+every connected account on that network (Meta, Google, TikTok, Snapchat,
+LinkedIn, Reddit). That puts a test conversion in your real ad account, so
+avoid repeated edits. The preview lists the accounts that receive it.
 
 </Warning>
 
@@ -482,11 +455,11 @@ fixed to one project.
 ### Prerequisites
 
 - A project on Linkrunner that you have access to.
-- The **Admin** or **Member** role on that project. **Influencers** cannot mint
-  MCP tokens.
-- Editing tools run as the person who created the token, using that person's
-  project permissions. A role that cannot edit in the dashboard cannot edit
-  through the connector either.
+- The **Admin** role on that project. Other roles cannot generate MCP tokens.
+  Members can connect with [sign-in](#connect) instead.
+- A change asked for through the connector runs as the person who approves
+  it, using that person's project permissions. See
+  [Who can approve](/features/mcp-changes#who-can-approve).
 
 ### 1. Generate a token
 
@@ -494,11 +467,14 @@ fixed to one project.
    to the project you want to connect.
 2. Click **MCP** in the sidebar.
 3. Choose what the token may do:
-   - **Read Linkrunner data** is always on.
-   - **Make changes in Linkrunner** lets the assistant use the editing tools
-     listed under
-     [What the connector can change](#what-the-connector-can-change). Turn it
-     off for a read-only token.
+   - **Read Linkrunner data** is always on. A new token can only read until
+     you tick another option.
+   - **Make changes in Linkrunner** lets the assistant ask for changes, such
+     as creating and editing campaigns, funnels and postback mappings. Each
+     change waits for approval.
+   - **Deletes** lets it also ask to delete things.
+   - **Team and settings** lets it also ask for team, sharing, webhook and
+     project settings changes.
    - **Read connected ad accounts** lets the assistant read your connected
      Meta and Google accounts. See
      [What the connector can read from your ad accounts](#what-the-connector-can-read-from-your-ad-accounts).
@@ -632,8 +608,8 @@ project. For each token you can see:
 - The user who created it.
 - The last time it was used (helps spot stale tokens).
 
-Each token also shows its capabilities: **Read**, **Changes**, and **Ad
-accounts**.
+Each token also shows its capabilities: **Read**, **Changes**, **Deletes**,
+**Team and settings**, and **Ad accounts**.
 
 Click the trash icon next to a token to revoke it. Anyone using that token will
 be disconnected immediately. Revocation is not reversible. Mint a new token if
@@ -649,11 +625,11 @@ revoke an unused token before creating a new one.
 - You sign in on `auth.linkrunner.io`. Before the connector gets access, a
   consent page shows which app is asking, the email you signed in with, and
   what the connector can do.
-- The connection acts as you. It can use the projects where you are an Admin,
-  Owner, or Manager, and it can create new projects in your account.
-- It can make the changes listed under
-  [What the connector can change](#what-the-connector-can-change). It cannot
-  read your ad accounts.
+- The connection acts as you. It can use the projects where you are an Admin
+  or Member, and it can create new projects in your account.
+- It can ask for changes of the **Changes** type, and each one waits for
+  approval. It cannot ask for deletes or team and settings changes, and it
+  cannot read your ad accounts. Use a token for those.
 - To revoke access, disconnect or remove the Linkrunner connector in your
   assistant. That ends the session.
 
@@ -661,13 +637,13 @@ revoke an unused token before creating a new one.
 
 - Tokens are scoped to a single project. They cannot read or change other
   projects you are a member of, even when the same person created the token.
-- Editing tools run as the person who created the token and apply that person's
-  project role, so the connector cannot do anything that person could not do in
-  the dashboard.
-- Every change made through the connector is recorded with the action, the
-  token, the person who created it, and what was changed. Every ad-account
-  read is recorded the same way, with the account, the query type and the
-  date range, but never the returned data.
+- A change runs only after a person approves it, and it runs as the person
+  who approved it, with that person's project role. The connector cannot do
+  anything the approver could not do in the dashboard.
+- Every applied change is recorded in Change History with who asked for it,
+  in which app, and who approved it. Every ad-account read is recorded with
+  the account, the query type and the date range, but never the returned
+  data.
 - Ad-account access is read-only and opt-in per token. The Meta and Google
   credentials stay on Linkrunner's servers; the connector never receives them,
   and they are removed from every response and log.
@@ -678,20 +654,29 @@ revoke an unused token before creating a new one.
 
 <Note>
 
-If you only want someone to read, turn off **Make changes in Linkrunner** when
-you generate their token. A read-only token does not even list the editing
-tools, so the assistant cannot attempt a change with it.
+If you only want someone to read, leave **Make changes in Linkrunner** off when
+you generate their token. A read-only token does not even list the tools that
+ask for changes, so the assistant cannot propose one. You can also connect to
+the [read-only address](/features/mcp-tools#read-only-connection).
 
 </Note>
 
 ### Both connection types
 
-- The connector cannot delete campaigns, funnels, domains, or projects, cannot
-  manage members, and cannot disconnect an ad-network account. Those stay in the
-  dashboard.
+- The connector never changes a project by itself. Every change waits for a
+  person to approve or confirm it, and it can be rejected or left to expire.
+- When you confirm a change in the chat, your AI app passes your yes or code on
+  to Linkrunner, so the approve link and the approval card are the most secure
+  way to approve. Admins who want only those can turn off **Approve in the AI
+  chat** in **Settings → MCP → AI changes**.
+- Deletes and team and settings changes are off for every project until a
+  project admin turns them on in **Settings → MCP → AI changes**.
+- Projects cannot be deleted through the connector.
 - The webhook URL is never fully readable. `get_webhook` returns the host but
   hides the path, because a Slack webhook path is a credential in itself.
-- SDK private keys, billing settings, and admin actions are not exposed.
+- Secret values (SDK signing secrets, API keys) are never shown or set through
+  the connector, and billing settings are never changed. The assistant gives
+  you a dashboard link for those.
 - To improve the connector, Linkrunner records basic usage for each call: the
   tool used, whether it worked, how long it took, the names of the arguments
   (not their values), the AI app you use, and the token, project, and person it
@@ -723,8 +708,13 @@ You can create up to 3 projects per day from an AI assistant. Try again the next
 day, or create the project in the [dashboard](https://dashboard.linkrunner.io).
 
 **The assistant says you do not have access to a project.**
-A sign-in connection can only use projects where you are an Admin, Owner, or
-Manager. Ask an Admin of that project to change your role, then ask again.
+A sign-in connection can only use projects where you are an Admin or Member.
+Ask an Admin of that project to change your role, then ask again.
+
+**The assistant says a change is waiting for approval.**
+That is expected. Open the approve link it gives you, or the approval card if
+your AI app shows one. See
+[Approve changes your AI assistant asks for](/features/mcp-changes).
 
 **Claude shows Connect again, or Claude Code asks you to sign in.**
 The session ended, for example because the connector was disconnected. In
@@ -785,10 +775,9 @@ report for the ad account, in the account's currency and timezone. Linkrunner's
 campaign spend is synced periodically and shown in your display currency. Ask
 your assistant for both and it will label which is which.
 
-**The assistant cannot rename a custom channel.**
-Renaming needs the channel's internal id, which the assistant only sees right
-after it creates or edits a campaign. In a later chat it has no way to look the
-id up. Rename the channel in the dashboard instead.
+**The assistant renamed the wrong thing when you asked to rename a channel.**
+Ask it to rename the custom channel itself. It looks the channel up with
+`list_custom_channels` and proposes `update_custom_channel`.
 
 <Warning>
 
@@ -800,11 +789,11 @@ behind, which changes the channel's reporting name and splits its history.
 
 ## What this is not
 
-- Not a full write API. The connector can make the changes listed above, and
-  nothing else. Use the [Linkrunner data API](/api-reference/data-apis) for
-  programmatic writes.
-- Not a way to delete things. Campaigns, funnels, domains, and projects can only
-  be deleted from the dashboard.
+- Not a full write API. The connector can ask for the changes in the
+  [AI change tool reference](/features/mcp-tools), and nothing else. Use the
+  [Linkrunner data API](/api-reference/data-apis) for programmatic writes.
+- Not a way to change things without a person. Every change waits for
+  approval.
 - Not a way to edit ads. The ad-account tools read from Meta and Google; they
   cannot pause a campaign, change a budget, or edit targeting there.
 - Not a generic SQL/Postgres bridge. It calls the same endpoints the

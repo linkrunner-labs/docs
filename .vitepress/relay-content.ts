@@ -343,4 +343,6 @@ export const PAGE_TITLES: Record<string, PageTitle> = {
   "/api-reference/s2s-impressions": { title: "S2S impression API" },
   "/api-reference/ctv-impressions": { title: "CTV impression API" },
   "/features/mcp": { title: "Use Linkrunner from Claude and other AI assistants", label: "Use Linkrunner from Claude" },
+  "/features/mcp-changes": { title: "Approve changes your AI assistant asks for", label: "Approve AI changes" },
+  "/features/mcp-tools": { title: "AI change tool reference", label: "AI change tool reference" },
 };
