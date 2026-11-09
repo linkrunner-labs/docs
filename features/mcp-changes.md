@@ -80,11 +80,11 @@ You can also confirm a change by replying in your AI app's chat. How depends on 
 
 | Change | How you confirm it in the chat |
 | --- | --- |
-| Creating something new: a campaign whose link id Linkrunner picks, a funnel, cohort, store listing, or fraud rule (a new fraud rule starts switched off) | The assistant asks, and you say yes. |
+| Creating something new: a campaign whose link id Linkrunner picks and that names no Meta or Google campaign id, a funnel, cohort, store listing, or fraud rule (a new fraud rule starts switched off) | The assistant asks, and you say yes. |
 | Every other edit or delete | You type the short code shown with that change, for example `confirm 7Q4K`. Each change has its own code. |
 | Team and settings changes: members, partners, agencies, webhooks, domains, SDK keys, project settings, sharing | Never in the chat. Approve on the review page or in the approval card. |
 
-Every other create needs the code, including a web campaign, a deep link, a test device and a postback mapping. So does a campaign with a link id you chose, because it could take over the links of a deleted campaign with that id, and any create that would also change something that already exists.
+Every other create needs the code, including a web campaign, a deep link, a test device and a postback mapping. So does a campaign with a link id you chose or a Meta or Google campaign id, because a deleted campaign may have held that id and its links or ad traffic could move to the new one, and any create that would also change something that already exists.
 
 Confirming in the chat works only when all of these hold:
 

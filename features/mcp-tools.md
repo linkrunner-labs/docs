@@ -78,7 +78,7 @@ These tools let the assistant follow up on changes. Toolsets never hide them.
 
 | Tool | What it asks for | Type | Who can approve | In the chat |
 | --- | --- | --- | --- | --- |
-| `create_campaign` | A new campaign (tracking link) | Change | Depends | Yes, or Code with a custom link id |
+| `create_campaign` | A new campaign (tracking link) | Change | Depends | Yes, or Code with a custom link id or a Meta or Google campaign id |
 | `edit_campaign` | Edit a campaign's name, status, deep link, store listings or other settings | Change | Depends | Code |
 | `create_deeplink` | The deep link for one Meta or Google ad set or ad | Change | Admin or member | Code |
 | `set_campaign_link_active` | Pause or turn back on a Linkrunner link | Change | Admin or member | Code |
@@ -96,7 +96,7 @@ These tools let the assistant follow up on changes. Toolsets never hide them.
 
 `create_campaign` and `edit_campaign` need an admin when the change includes the campaign's landing page (setting, changing or removing it). Otherwise a member can approve them.
 
-A new campaign is confirmed in the chat with a yes only when Linkrunner picks its link id. With a custom link id it needs the code, because it could take over the links of a deleted campaign with the same id.
+A new campaign is confirmed in the chat with a yes only when Linkrunner picks its link id and it names no Meta or Google campaign id. With a custom link id, a Meta campaign id or a Google campaign id it needs the code, because a deleted campaign may have held that id.
 
 ## Audiences
 
