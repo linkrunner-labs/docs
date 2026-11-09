@@ -159,7 +159,19 @@ const guides: Group[] = [
 // Setup: for whoever wires Linkrunner into the app (SDKs, deep link
 // verification, testing, APIs).
 const setup: Group[] = [
-  group("Start here", [p("/quickstart"), p("/features/mcp"), p("/features/website-projects"), p("/ai-agent-skills")], true, "flag"),
+  group(
+    "Start here",
+    [
+      p("/quickstart"),
+      p("/features/mcp"),
+      page("Approve AI changes", "/features/mcp-changes", "shield-check"),
+      page("AI change tool reference", "/features/mcp-tools", "list-check"),
+      p("/features/website-projects"),
+      p("/ai-agent-skills"),
+    ],
+    true,
+    "flag",
+  ),
   group(
     "SDKs",
     links(
