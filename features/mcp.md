@@ -19,7 +19,8 @@ https://mcp.linkrunner.io/mcp
 
 Your assistant never changes your project by itself. When you ask for a
 change, it proposes it and shows you what will change. Linkrunner applies it
-only after a person approves it. See
+only after a person approves it in Linkrunner or the approval card, or you
+confirm it in the chat. See
 [Approve changes your AI assistant asks for](/features/mcp-changes).
 
 </Note>
@@ -360,7 +361,9 @@ and search queries use `search_term_view`. The assistant picks these through
 Ask in plain language ("create a campaign for the Diwali sale") and your
 assistant picks the right tool. Apart from creating a project, every change
 is only a proposal: you see what will change, and Linkrunner applies it only
-after a person approves it. The assistant cannot approve for you.
+after a person approves it in Linkrunner or the approval card, or confirms it
+in the chat with a yes or the change's code. The assistant cannot approve on
+its own.
 
 - [Approve changes your AI assistant asks for](/features/mcp-changes) explains
   the approval flow, who can approve, and the switches that turn each type of
@@ -661,7 +664,11 @@ the [read-only address](/features/mcp-tools#read-only-connection).
 ### Both connection types
 
 - The connector never changes a project by itself. Every change waits for a
-  person to approve it, and it can be rejected or left to expire.
+  person to approve or confirm it, and it can be rejected or left to expire.
+- When you confirm a change in the chat, your AI app passes your yes or code on
+  to Linkrunner, so the approve link and the approval card are the most secure
+  way to approve. Admins who want only those can turn off **Approve in the AI
+  chat** in **Settings → MCP → AI changes**.
 - Deletes and team and settings changes are off for every project until a
   project admin turns them on in **Settings → MCP → AI changes**.
 - Projects cannot be deleted through the connector.

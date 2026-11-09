@@ -34,15 +34,13 @@ The assistant shows you this preview. Nothing has changed yet.
 
 <Step title="A person approves or rejects it">
 
-Approve it on the review page in the Linkrunner dashboard, or in the chat itself if your AI app supports it. See [Approve or reject a change](#approve-or-reject-a-change).
+Approve it on the review page in the Linkrunner dashboard, in an approval card if your AI app shows one, or by confirming it in your AI app's chat. See [Approve or reject a change](#approve-or-reject-a-change).
 
 </Step>
 
 <Step title="Linkrunner checks it again and applies it">
 
 Linkrunner rebuilds the preview from your current data. If anything you were shown has changed since, it stops and nothing runs (see [Out of date](#out-of-date-changes)). Otherwise it applies the change as the person who approved it, with that person's project permissions, and records it in [Change History](#change-history).
-
-If live changes are not on for your project yet, the approval is recorded as a **Dry run** and nothing changes. See [What each status means](#what-each-status-means).
 
 </Step>
 
@@ -52,7 +50,7 @@ If live changes are not on for your project yet, the approval is recorded as a *
 
 <Note>
 
-The assistant cannot approve for you. Approving is always done by a person: in Linkrunner, in the approval card, or in your AI app's confirm prompt.
+The assistant cannot approve on its own. A person approves on the review page or in the approval card, or confirms in the chat by saying yes or typing the change's code.
 
 </Note>
 
@@ -68,13 +66,42 @@ To see every change waiting in a project, open [AI changes](https://dashboard.li
 
 ![AI changes list with one change waiting for approval](/images/mcp/ai-changes-list.webp)
 
-### In the chat
+### In the approval card
 
-Some AI apps can show an approval card right under the assistant's reply, or ask you to confirm in the chat. The card shows the same preview with **Approve** and **Reject** buttons, and after you click it shows the result.
+Some AI apps can show an approval card right under the assistant's reply, or a prompt that asks you to approve. The card shows the same preview with **Approve** and **Reject** buttons, and after you click it shows the result.
 
 ![Approval card in an AI app, with the change table and the Approve, Reject and Open in Linkrunner buttons](/images/mcp/ai-change-approval-card.webp)
 
-Approving in the chat works only for the person who asked, and only on a [sign-in connection](/features/mcp#connect) in an AI app that supports it. Everywhere else, the assistant gives you the approve link instead, and you approve on the review page. The link is always there, even when the card is shown.
+The approval card works only for the person who asked, and only on a [sign-in connection](/features/mcp#connect) in an AI app that supports it. Everywhere else, the assistant gives you the approve link, or you [confirm in the chat](#confirm-in-the-chat). The link is always there.
+
+### Confirm in the chat
+
+You can also confirm a change by replying in your AI app's chat. How depends on the change:
+
+| Change | How you confirm it in the chat |
+| --- | --- |
+| Creating something new: a campaign, funnel, cohort, store listing, or fraud rule (a new fraud rule starts switched off) | The assistant asks, and you say yes. |
+| Every other edit or delete | You type the short code shown with that change, for example `confirm 7Q4K`. Each change has its own code. |
+| Team and settings changes: members, partners, agencies, webhooks, domains, SDK keys, project settings, sharing | Never in the chat. Approve on the review page or in the approval card. |
+
+Any other create, such as a web campaign or a postback mapping, needs the code. So does a create that would also change something that already exists.
+
+Confirming in the chat works only when all of these hold:
+
+- You are the person who asked for the change.
+- You confirm in the same AI app connection where you asked.
+- Your project role lets you make that change in the dashboard (see [Who can approve](#who-can-approve)).
+- **Approve in the AI chat** is on for the project (see [Approve in the AI chat](#approve-in-the-ai-chat)).
+
+Otherwise the assistant gives you the approve link. A confirmed change goes through every check an approval does, including the [out-of-date check](#out-of-date-changes), and it runs as you. The review page then says **Confirmed in the AI app's chat**.
+
+![Review page for an applied change, showing Confirmed in the AI app's chat by the person who asked](/images/mcp/ai-change-confirmed-in-chat.webp)
+
+<Warning>
+
+Your AI app passes your yes or your code on to Linkrunner, so Linkrunner cannot see that you typed it yourself. The approve link and the approval card are the most secure way to approve. A project admin who wants every change approved that way can turn off **Approve in the AI chat**.
+
+</Warning>
 
 ### Withdraw a change
 
@@ -84,7 +111,7 @@ To withdraw a change you asked for, ask the assistant to cancel it, or click **R
 
 A change can be approved by:
 
-- **The person who asked**, if their project role lets them make the same change in the dashboard. They can approve on the review page or in the chat.
+- **The person who asked**, if their project role lets them make the same change in the dashboard. They can approve on the review page or in the approval card, or confirm in the chat.
 - **A project admin**, on the review page.
 
 Only admins and members can approve. Influencers, finance members, affiliate partners and agencies cannot.
@@ -114,7 +141,7 @@ If your role cannot approve a change, the review page says why and hides **Appro
 | **Waiting for approval** | Proposed, not approved yet. Nothing has changed. | Approve or reject it within 24 hours. |
 | **Applying** | Approved, and Linkrunner is applying it now. | Wait a moment. The page shows the result. |
 | **Applied** | Approved and done. | Nothing. It shows in Change History. |
-| **Dry run** | Approved, but live changes are not on for this project yet, so nothing changed. A dry run cannot be undone because nothing ran. | Contact [support@linkrunner.io](mailto:support@linkrunner.io) to turn on live changes. |
+| **Dry run** | Approved while AI changes were in test mode, so nothing changed. Changes from your own AI app are only in test mode if Linkrunner pauses AI changes. Changes asked for in the dashboard's own AI chat stay in test mode until Linkrunner turns them on for your project. | Ask again later, or contact [support@linkrunner.io](mailto:support@linkrunner.io). |
 | **Rejected** | Someone rejected it. Nothing changed. | Ask again if you still want it. |
 | **Cancelled** | The person who asked withdrew it. Nothing changed. | Ask again if you still want it. |
 | **Expired** | Nobody approved it within 24 hours. Nothing changed. | Ask again. |
@@ -140,11 +167,15 @@ Changes come in three types. A project admin turns each type on or off for the p
 | **Deletes** | Delete campaigns, channels, funnels, cohorts, store listings, mappings, fraud rules, landing pages and test devices | Off |
 | **Team and settings** | Invite and manage members, partners and agencies, share campaigns, and change webhooks, domains, ad network connections, project settings, SDK keys and Web SDK websites | Off |
 
-![AI changes card in Settings → MCP with the Changes, Deletes and Team and settings switches](/images/mcp/ai-changes-settings.webp)
+![AI changes card in Settings → MCP with the Changes, Deletes, Team and settings, and Approve in the AI chat switches](/images/mcp/ai-changes-settings.webp)
 
 Members can see the switches. Only project admins can change them. When a type is off, the assistant tells you it is switched off for the project.
 
 The [tool reference](/features/mcp-tools) lists the type of every change.
+
+### Approve in the AI chat
+
+The same card has a fourth switch, **Approve in the AI chat**. It is on by default, so people can [confirm changes in the chat](#confirm-in-the-chat). Only project admins can change it. Turn it off to have every change approved on the review page or in the approval card.
 
 ### What your connection is allowed to ask for
 
@@ -165,7 +196,7 @@ Undoing a create, such as a new fraud rule or test device, proposes a delete. It
 
 ## Change History
 
-Every applied change is recorded in [Settings → Change History](https://dashboard.linkrunner.io/dashboard/settings/change-history). Changes that came from an AI app carry an **AI** badge and say who asked, in which app, and who approved it. Click **View change** to open its review page.
+Every applied change is recorded in [Settings → Change History](https://dashboard.linkrunner.io/dashboard/settings/change-history). Changes that came from an AI app carry an **AI** badge and say who asked, in which app, and who approved it. A change confirmed in the chat lists the person who confirmed it as the approver. Click **View change** to open its review page, which shows where it was approved, for example **Confirmed in the AI app's chat**.
 
 ![Change History row with the AI badge and Requested by Riya Mehta in Claude, approved by Riya Mehta](/images/mcp/ai-change-history.webp)
 
@@ -186,9 +217,15 @@ The page says why. If your role cannot approve the change, send the review link 
 Ask the assistant to propose it again. It builds a new preview from your current data.
 
 **My AI app shows a link, not an approval card.**
-Approving in the chat is only available on sign-in connections in AI apps that support it. Use the link. If you connected before approval cards were available, disconnect Linkrunner in your AI app and connect again.
+The approval card is only available on sign-in connections in AI apps that support it. Use the link, or confirm in the chat. If you connected before approval cards were available, disconnect Linkrunner in your AI app and connect again.
+
+**The assistant says the change cannot be confirmed in the chat.**
+It is a team and settings change, it is no longer waiting, someone else asked for it, you are in a different AI app connection, your role cannot approve it, your connection is not allowed that type of change, or a project admin turned off **Approve in the AI chat**. Open the approve link instead.
+
+**The assistant says the code does not match.**
+Type the code shown with this change, for example `confirm 7Q4K`. Each change has its own code, so a code from another change does not work. Nothing changed.
 
 **The assistant said it was done, but nothing changed.**
-The change runs only after a person approves it. Ask the assistant for the change's status, or open [AI changes](https://dashboard.linkrunner.io/dashboard/changes) in the dashboard. If the status is **Dry run**, live changes are not on for your project yet.
+The change runs only after a person approves it. Ask the assistant for the change's status, or open [AI changes](https://dashboard.linkrunner.io/dashboard/changes) in the dashboard. If the status is **Dry run**, AI changes were in test mode, so nothing changed. See [What each status means](#what-each-status-means).
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io)
