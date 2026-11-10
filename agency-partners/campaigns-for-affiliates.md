@@ -105,21 +105,21 @@ The agency sees the campaigns it built, each with the affiliate's logo next to i
 
 ### The affiliate
 
-The affiliate sees only the campaigns attributed to it, including those the agency built for it, with the agency's logo on them. It never sees your spend or revenue, your other partners' campaigns, or your own campaigns. Whether it sees sign-ups is your choice, see [Show or hide sign-ups for partners](/affiliate-partners/hide-sign-ups).
+The affiliate sees only the campaigns attributed to it, including those the agency built for it, with the agency's logo on them. It never sees your spend or revenue, your other partners' campaigns, or your own campaigns. Whether it sees sign-ups is your choice. See [Show or hide sign-ups for partners](/affiliate-partners/hide-sign-ups).
 
 ![The affiliate's campaign list, limited to campaigns attributed to it](/images/agency-partners/campaigns-affiliate.webp)
 
 ### Side by side
 
-|                                  | You (customer) | Agency                                                                                                                                | Affiliate                                                              |
-| -------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Campaigns listed                 | All            | Only the ones it built. You can widen this in [Control agency access](/agency-partners/control-agency-access#3-choose-how-much-data). | Only the ones attributed to it                                         |
-| Clicks, installs, sign-ups | Yes | Yes | Clicks and installs. Sign-ups only if you [show them](/affiliate-partners/hide-sign-ups) |
-| Spend, revenue, ROAS             | Yes            | Only with **Revenue & spend** on                                                                                                      | Never                                                                  |
-| Channels tab and overview totals | Yes            | Only if you turn them on                                                                                                              | No                                                                     |
-| Create campaigns                 | Yes            | With **App campaigns → Edit**                                                                                                             | Its own links only                                                     |
-| Edit campaigns                   | Yes            | With **App campaigns → Edit**. See [Edit a campaign](/agency-partners/edit-campaign).                                                     | Rename only. See [Edit a campaign](/affiliate-partners/edit-campaign). |
-| Delete campaigns                 | Yes            | No                                                                                                                                    | No                                                                     |
+|                                  | You (customer) | Agency                                                                                                                                | Affiliate                                                                                |
+| -------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Campaigns listed                 | All            | Only the ones it built. You can widen this in [Control agency access](/agency-partners/control-agency-access#3-choose-how-much-data). | Only the ones attributed to it                                                           |
+| Clicks, installs, sign-ups       | Yes            | Yes                                                                                                                                   | Clicks and installs. Sign-ups only if you [show them](/affiliate-partners/hide-sign-ups) |
+| Spend, revenue, ROAS             | Yes            | Only with **Revenue & spend** on                                                                                                      | Never                                                                                    |
+| Channels tab and overview totals | Yes            | Only if you turn them on                                                                                                              | No                                                                                       |
+| Create campaigns                 | Yes            | With **App campaigns → Edit**                                                                                                         | Its own links only                                                                       |
+| Edit campaigns                   | Yes            | With **App campaigns → Edit**. See [Edit a campaign](/agency-partners/edit-campaign).                                                 | Rename only. See [Edit a campaign](/affiliate-partners/edit-campaign).                   |
+| Delete campaigns                 | Yes            | No                                                                                                                                    | No                                                                                       |
 
 ## Troubleshooting
 

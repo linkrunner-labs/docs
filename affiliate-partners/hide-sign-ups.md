@@ -11,15 +11,15 @@ Affiliate partners see clicks and installs on the campaigns attributed to them. 
 
 | Partner | Sign-ups |
 | --- | --- |
-| Already connected when this setting was added (November 2026) | Shown, until you hide them |
-| Connected after that | Hidden, until you show them |
+| Already connected before this setting existed | Shown, until you hide them |
+| Connected after that, or disconnected and connected again | Hidden, until you show them |
 
 When sign-ups are hidden, the partner doesn't see:
 
-- The **Sign-ups**, **Conversion** and **Cost Per Signup** columns on its campaigns, ad sets, creatives and keywords
-- The **Sign Ups** figure, chart line and sign-up stage in the campaign details
+- The **Sign-ups** and **Conversion** columns on its campaigns, ad sets, creatives and keywords
+- The **Sign Ups** figure, chart line and sign-up flow in the campaign details
 
-It still sees clicks, installs and the [events you share](#share-events-with-a-partner). Postbacks don't change: if a partner receives sign-up postbacks today, it keeps receiving them.
+It still sees clicks, installs and the [events you share](#share-events-with-a-partner) in its campaigns table. Disconnecting a partner resets this, so tell the partner before you connect it again. Postbacks don't change: if a partner receives sign-up postbacks today, it keeps receiving them.
 
 <Info>
 
@@ -85,7 +85,7 @@ Tell partners before you hide sign-ups. The column disappears from their dashboa
 
 ## Share events with a partner
 
-Separately from sign-ups, you choose which in-app events a partner sees as counts on its campaigns. On the partner's page, click **Share events** (or **Shared events** once some are shared), pick the events and click **Save**. Partners never see revenue, other partners' campaigns or your users.
+Separately from sign-ups, you choose which in-app events a partner sees as counts on its campaigns. On the partner's page, click **Share events** (or **Shared events** with a count, once some are shared), pick the events and click **Save**. Partners never see revenue, other partners' campaigns or your users.
 
 If a partner needs a sign-up number that matches yours, share the event your app sends at registration instead of showing sign-ups.
 
