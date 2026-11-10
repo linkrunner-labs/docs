@@ -11,7 +11,7 @@ If you run campaigns for Linkrunner customers as an agency and also send them tr
 
 <Info>
 
-You need your network logo, a short description, and a post-install event URL where Linkrunner sends conversions. The install postback URL and website are optional.
+You need your network logo, a short description, and an event postback URL where Linkrunner sends conversions. The install postback URL and website are optional.
 
 </Info>
 
@@ -38,7 +38,7 @@ Upload your logo, enter your affiliate network name and description, then add th
 
 ![Affiliate setup, step 1: logo, network name, description and website](/images/agency-partners/add-affiliate-details.webp)
 
-![Affiliate setup, step 2: install postback URL and post-install event URL, then Complete setup](/images/agency-partners/add-affiliate-postbacks.webp)
+![Affiliate setup, step 2: install postback URL and event postback URL, then Complete setup](/images/agency-partners/add-affiliate-postbacks.webp)
 
 ## 3. Wait for approval
 
@@ -65,7 +65,7 @@ When a customer has connected both your agency and your affiliate to the same pr
 ## Troubleshooting
 
 **Complete setup is disabled.**
-Enter a valid HTTPS post-install event URL. The install postback URL can stay blank.
+Enter a valid HTTPS event postback URL. The install postback URL can stay blank.
 
 **Your application still shows Pending verification.**
 Linkrunner has not finished the review. You get an email when it is done.
