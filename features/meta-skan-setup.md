@@ -57,7 +57,11 @@ Apple only generates SKAN postbacks for ad networks listed in your app's `Info.p
 </array>
 ```
 
-<Info>On Expo, add these under `ios.infoPlist.SKAdNetworkItems` in your `app.json`.</Info>
+<Info>
+
+On Expo, add these under `ios.infoPlist.SKAdNetworkItems` in your `app.json`.
+
+</Info>
 
 ### Add the Postback Copy Endpoints
 
@@ -137,8 +141,16 @@ For each event in your SKAN schema, select the Meta event it should map to.
 
 </Step>
 
-<Step title="Enable revenue">Turn on **Send Revenue** for revenue events and select the currency.</Step>
-<Step title="Save">Click **Save**.</Step>
+<Step title="Enable revenue">
+
+Turn on **Send Revenue** for revenue events and select the currency.
+
+</Step>
+<Step title="Save">
+
+Click **Save**.
+
+</Step>
 
 </Steps>
 

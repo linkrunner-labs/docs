@@ -169,6 +169,10 @@ export const RELAY_ANCHOR_ALIASES: Record<string, Record<string, string>> = {
 
   // Content links (#user-registration is the old name of the signup section).
   "/sdk/android": {
+    "capturing-payments": "tracking-payments",
+    "available-payment-types": "tracking-payments",
+    "available-payment-statuses": "tracking-payments",
+    "removing-payments": "tracking-payments",
     "backup-configuration": "step-3-backup-configuration",
     "step-4-revoking-the-ad_id-permission-optional": "step-5-revoking-the-ad_id-permission-optional",
     "user-registration": "user-identification-required",
@@ -180,6 +184,57 @@ export const RELAY_ANCHOR_ALIASES: Record<string, Record<string, string>> = {
     ])
   ),
   "/ad-networks/meta-ads": { "2-generate-access-token": "step-5-configure-capi" },
+  // Payment sections moved to trackEvent payments.
+  "/api-reference/event-capture": {
+    "tracking-a-purchase-event": "tracking-a-purchase",
+  },
+  "/api-reference/revenue-tracking": {
+    "capture-payment": "capture-a-payment",
+    "payment-types": "capture-a-payment",
+    "sample-response": "responses",
+    "remove-captured-payment": "capture-a-payment",
+    "request-body-2": "request-body",
+    "responses-2": "responses",
+  },
+  "/testing/event-and-revenue-testing": {
+    "usually-send-with-capturepayment": "usually-send-as-a-payment",
+    "test-payment-removal": "troubleshooting",
+    "the-payment-status-did-not-change": "troubleshooting",
+  },
+  "/sdk/ios": {
+    "capturing-payments": "tracking-payments",
+    "available-payment-types": "tracking-payments",
+    "available-payment-statuses": "tracking-payments",
+    "removing-payments": "tracking-payments",
+  },
+  "/sdk/flutter": {
+    "capturing-payments": "tracking-payments",
+    "parameters-for-lrcapturepayment": "tracking-payments",
+    "removing-payments": "tracking-payments",
+    "parameters-for-lrremovepayment": "tracking-payments",
+  },
+  "/sdk/capacitor": {
+    "capture-payment": "tracking-payments",
+    "parameters-for-linkrunner-capturepayment": "tracking-payments",
+    "removing-payments": "tracking-payments",
+    "parameters-for-linkrunner-removepayment": "tracking-payments",
+  },
+  "/sdk/cordova": {
+    "capture-payment": "tracking-payments",
+    "parameters-for-linkrunner-capturepayment": "tracking-payments",
+    "removing-payments": "tracking-payments",
+    "parameters-for-linkrunner-removepayment": "tracking-payments",
+  },
+  "/sdk/react-native": {
+    "capture-payment": "tracking-payments",
+    "parameters-for-linkrunner-capturepayment": "tracking-payments",
+    "removing-payments": "tracking-payments",
+    "parameters-for-linkrunner-removepayment": "tracking-payments",
+  },
+  "/sdk/unity": {
+    "capture-payment": "track-payments",
+    "remove-payment-refunds": "track-payments",
+  },
 };
 
 /** Exact source text dropped from a page in the Relay build. */
@@ -211,6 +266,8 @@ export const PAGE_TITLES: Record<string, PageTitle> = {
   "/sdk/web": { label: "Web" },
   "/sdk/unity": { title: "Unity SDK", label: "Unity" },
   "/sdk/shopify": { title: "Shopify app", label: "Shopify" },
+  "/sdk/track-payments": { label: "Track payments" },
+  "/sdk/migrate-to-track-event": { label: "Migrate payments to in-app events" },
 
 
   "/testing/integration-testing": { title: "Test your SDK setup" },
@@ -286,4 +343,6 @@ export const PAGE_TITLES: Record<string, PageTitle> = {
   "/api-reference/s2s-impressions": { title: "S2S impression API" },
   "/api-reference/ctv-impressions": { title: "CTV impression API" },
   "/features/mcp": { title: "Use Linkrunner from Claude and other AI assistants", label: "Use Linkrunner from Claude" },
+  "/features/mcp-changes": { title: "Approve changes your AI assistant asks for", label: "Approve AI changes" },
+  "/features/mcp-tools": { title: "AI change tool reference", label: "AI change tool reference" },
 };

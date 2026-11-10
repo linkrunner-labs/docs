@@ -68,7 +68,7 @@ Older versions leave the conversion value empty on SKAdNetwork postbacks from de
 
 ### How the SDK updates conversion values
 
-You don't need to call any SKAN APIs yourself. On first launch the SDK registers an initial conversion value (0/low), and every `trackEvent`, `capturePayment`, and `signup` call returns the updated conversion value from Linkrunner, which the SDK applies automatically. On iOS 17.4+ the SDK updates both AdAttributionKit and SKAdNetwork, so networks on either framework (Meta and Google sign with SKAdNetwork) receive the value. On iOS 14.0 to 17.3 it uses SKAdNetwork.
+You don't need to call any SKAN APIs yourself. On first launch the SDK registers an initial conversion value (0/low), and every `trackEvent` (including payments) and `signup` call returns the updated conversion value from Linkrunner, which the SDK applies automatically. On iOS 17.4+ the SDK updates both AdAttributionKit and SKAdNetwork, so networks on either framework (Meta and Google sign with SKAdNetwork) receive the value. On iOS 14.0 to 17.3 it uses SKAdNetwork.
 
 ### Add Ad Network Identifiers
 

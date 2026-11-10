@@ -39,7 +39,11 @@ Filters stack on top of each other, so you can ask for iOS users from a Meta Ads
 
 <img src="/images/users-tab/users-table-filters.png" alt="The Users table with the search, channel, platform, date, events, and campaign filters above it" />
 
-<Tip>If a set of filters is worth keeping, save it as a **cohort**, a named group of users you can come back to. See [Cohorts](#cohorts) below.</Tip>
+<Tip>
+
+If a set of filters is worth keeping, save it as a **cohort**, a named group of users you can come back to. See [Cohorts](#cohorts) below.
+
+</Tip>
 
 ## The user profile
 
@@ -106,7 +110,11 @@ The **Cohorts** sub-tab shows each saved cohort as a card with its name, descrip
 
 <Steps>
 
-<Step title="Filter the Users table">Set the **Events** and **Platform** filters so the table shows the group you want.</Step>
+<Step title="Filter the Users table">
+
+Set the **Events** and **Platform** filters so the table shows the group you want.
+
+</Step>
 <Step title="Click Save as cohort">Those event conditions and the platform carry over into the new cohort.</Step>
 <Step title="Name it">Give it a name and description that will still make sense to a colleague in three months.</Step>
 

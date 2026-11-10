@@ -21,7 +21,7 @@ One thing does the bridging: a **Linkrunner link on your sub-domain**, placed wh
 - **If the app is installed**, the link opens the app directly. Your app reports the open with [`handleDeeplink`](/sdk/react-native#handle-deeplink), which records a re-engagement against the campaign.
 - **If the app is not installed**, the link routes the user to the store. After they install and open the app, [`getAttributionData`](/sdk/react-native#getting-attribution-data) returns the attributed campaign and the deferred deep link so you can drop them into the right screen.
 
-Everything after the open is the mobile SDK's job: `init` records the app open, [`signup`](/sdk/react-native#user-identification-required) registers the user, [`trackEvent`](/sdk/react-native#tracking-custom-events) captures actions, and [`capturePayment`](/sdk/react-native#revenue-tracking) captures revenue.
+Everything after the open is the mobile SDK's job: `init` records the app open, [`signup`](/sdk/react-native#user-identification-required) registers the user, [`trackEvent`](/sdk/react-native#tracking-custom-events) captures actions, and [`trackEvent` with a payment](/sdk/react-native) captures revenue.
 
 <Note>
 
@@ -44,12 +44,12 @@ Set these up once and every journey below works:
 
 These journeys open the app directly through the Linkrunner link. You track the re-engagement plus whatever the user does once inside.
 
-| Journey                                    | What Linkrunner tracks                                                                                                                    | Where in the dashboard                                                    | What to set up                                                                                             |
-| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| **Website → App Open**                     | Link click + app re-engagement via `handleDeeplink`                                                                                       | Campaigns → **Clicks**; switch **Install Attribution** to **Retargeting** | Deep linking configured; `handleDeeplink` called on every launch; "Open App" button uses a Linkrunner link |
-| **Web content → specific screen**          | Same, with a deep link **path** that routes in-app (e.g. `/product/123`)                                                                  | Same as above; in-screen actions show in event columns                    | App routes match the link's paths; encode the path in the link                                             |
-| **Web CTA → in-app conversion**            | Re-engagement + in-app [`trackEvent`](/sdk/react-native#tracking-custom-events) or [`capturePayment`](/sdk/react-native#revenue-tracking) | Custom **event columns**; **Revenue**, **ROAS**, **Paying Users**         | Call `signup` first; instrument the conversion event or payment                                            |
-| **CRM → app** (email, SMS, WhatsApp, push) | One tagged link per channel + downstream events                                                                                           | One **campaign per channel**: Clicks, Reengagements, and event columns    | A Linkrunner link per channel; for push, carry the link in the notification payload                        |
+| Journey | What Linkrunner tracks | Where in the dashboard | What to set up |
+| --- | --- | --- | --- |
+| **Website → App Open** | Link click + app re-engagement via `handleDeeplink` | Campaigns → **Clicks**; switch **Install Attribution** to **Retargeting** | Deep linking configured; `handleDeeplink` called on every launch; "Open App" button uses a Linkrunner link |
+| **Web content → specific screen** | Same, with a deep link **path** that routes in-app (e.g. `/product/123`) | Same as above; in-screen actions show in event columns | App routes match the link's paths; encode the path in the link |
+| **Web CTA → in-app conversion** | Re-engagement + in-app [`trackEvent`](/sdk/react-native#tracking-custom-events), with a payment for purchases | Custom **event columns**; **Revenue**, **ROAS**, **Paying Users** | Call `signup` first; instrument the conversion event or payment |
+| **CRM → app** (email, SMS, WhatsApp, push) | One tagged link per channel + downstream events | One **campaign per channel**: Clicks, Reengagements, and event columns | A Linkrunner link per channel; for push, carry the link in the notification payload |
 
 <Tip>
 
@@ -65,14 +65,15 @@ At the top of the [Campaigns](https://dashboard.linkrunner.io/dashboard/campaign
 
 These journeys go through the store. Deferred deep linking carries the original context across the install so the user resumes where they intended.
 
-| Journey                                    | What Linkrunner tracks                                                  | Where in the dashboard                                                                          | What to set up                                                                                                      |
-| ------------------------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| **Website → Install**                      | Click → install, with the attributed campaign from `getAttributionData` | **Overview** stat cards (All / Attributed / Organic Installs); Campaigns → **Installs**         | Linkrunner link as the store target; `init` + `getAttributionData` after first open                                 |
-| **Website → Install → Signup**             | Install + user registration                                             | **Sign-ups** and **Conversion** (sign-ups / installs) columns; user list in the campaign drawer | Call [`signup`](/sdk/react-native#user-identification-required) with `user_data.id`                                 |
-| **Website → Install → Purchase**           | Install + revenue                                                       | **Revenue**, **ROAS**, **Paying Users**, **Daywise Revenue** columns                            | [`capturePayment`](/sdk/react-native#revenue-tracking); convert to one currency; map the event for Meta/Google ROAS |
-| **Website → Install → Onboarding**         | Install + activation event                                              | Custom **event column**; [Events](https://dashboard.linkrunner.io/dashboard/events)             | Define the activation event and fire it with [`trackEvent`](/sdk/react-native#tracking-custom-events)               |
-| **Specific page → Install → Same context** | Deferred deep link carrying the page context through the install        | Campaign **Installs**; the link resolves via `getAttributionData().deeplink`                    | Enable deferred deep linking on the campaign; pass the path into the link; parse `deeplink` in-app                  |
-| **Referral link → Install**                | Install + referral conversion                                           | Campaign per referral; event column                                                             | [Referral tracking](/features/referral-codes); add `?referrer=` to the link; handle it in-app                       |
+| Journey | What Linkrunner tracks | Where in the dashboard | What to set up |
+| --- | --- | --- | --- |
+| **Website → Install** | Click → install, with the attributed campaign from `getAttributionData` | **Overview** stat cards (All / Attributed / Organic Installs); Campaigns → **Installs** | Linkrunner link as the store target; `init` + `getAttributionData` after first open |
+| **Meta or Google ad → Website → Install** | Ad click → install, credited to the ad the visitor clicked before reaching your website | Campaigns → **Installs** | Web SDK on your website; the download button opens the link from [`getAppDownloadURL`](/sdk/web#send-ad-visitors-from-your-website-to-your-app) |
+| **Website → Install → Signup** | Install + user registration | **Sign-ups** and **Conversion** (sign-ups / installs) columns; user list in the campaign drawer | Call [`signup`](/sdk/react-native#user-identification-required) with `user_data.id` |
+| **Website → Install → Purchase** | Install + revenue | **Revenue**, **ROAS**, **Paying Users**, **Daywise Revenue** columns | [`trackEvent` with a payment](/sdk/react-native) (amount, payment ID, currency); map the event for Meta/Google ROAS |
+| **Website → Install → Onboarding** | Install + activation event | Custom **event column**; [Events](https://dashboard.linkrunner.io/dashboard/events) | Define the activation event and fire it with [`trackEvent`](/sdk/react-native#tracking-custom-events) |
+| **Specific page → Install → Same context** | Deferred deep link carrying the page context through the install | Campaign **Installs**; the link resolves via `getAttributionData().deeplink` | Enable deferred deep linking on the campaign; pass the path into the link; parse `deeplink` in-app |
+| **Referral link → Install** | Install + referral conversion | Campaign per referral; event column | [Referral tracking](/features/referral-codes); add `?referrer=` to the link; handle it in-app |
 
 <Note>
 

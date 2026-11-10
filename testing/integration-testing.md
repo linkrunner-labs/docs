@@ -29,7 +29,11 @@ You'll confirm that:
 
 <iframe width="100%" height="420" src="https://www.youtube.com/embed/tX05ioHJ6bc?start=315" title="Linkrunner SDK Integration Testing" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-<Note>The testing flow walkthrough starts at **5:16** in the video.</Note>
+<Note>
+
+The testing flow walkthrough starts at **5:16** in the video.
+
+</Note>
 
 ## Prerequisites
 

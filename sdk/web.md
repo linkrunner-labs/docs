@@ -168,6 +168,7 @@ The Web SDK initializes when the script loads. It uses `identify` for the custom
 | [`lr.track('signup', ...)`](/sdk/web#2-identify-users-and-track-events) | Required    | Signup or login flow, after `identify` | When you identify a signed-up user  |
 | [`lr.identify`](/sdk/web#2-identify-users-and-track-events)             | Required    | Authentication logic                   | When you know your user's stable ID |
 | [`lr.track`](/sdk/web#2-identify-users-and-track-events)                | Optional    | Event handlers throughout your website | When you record other user actions  |
+| [`lr.getAppDownloadURL`](/sdk/web#send-ad-visitors-from-your-website-to-your-app) | Optional | Your website's app download button | When the visitor taps the button |
 
 ## 3. Verify the integration
 
@@ -191,6 +192,66 @@ Then open your browser's developer tools:
 Debug logging turns on automatically on `localhost`, `127.0.0.1`, and `[::1]`. Remove `data-debug="true"` after testing.
 
 To confirm sign-ups, campaign attribution, custom events, and purchases end to end from your own browser, follow [Test the Web SDK](/testing/web-sdk-testing).
+
+## Send ad visitors from your website to your app
+
+Use this when your Meta or Google ads send visitors to your website first, and a button on your website, such as **Get the app**, sends them to the Play Store or App Store. The button opens your Linkrunner link with the visitor's ad click added, so the install is credited to that ad, however many pages the visitor went through first. `getAppDownloadURL` builds that link for you.
+
+If your ads should send visitors straight to the store instead, use [Meta Web to App](/ad-networks/meta-web-to-app).
+
+Before you start, you need:
+
+- A Linkrunner link domain, such as `link.your-app.com`. See [Subdomain Setup](/features/subdomain-setup).
+- The Linkrunner SDK in your app, so the install is recorded.
+- The Web SDK on every page from the landing page to the button. The script tag gets `getAppDownloadURL` automatically. If you import `lr` from npm, use `@linkrunner/web` 0.1.22 or later.
+
+### 1. Add the ad click to your landing page URL
+
+The SDK reads the ad click from your landing page URL and keeps it while the visitor moves through your website.
+
+- **Meta:** in Ads Manager, add these to the ad's **URL parameters**. Meta adds `fbclid` itself.
+
+  ```txt
+  utm_source=facebook&utm_medium=paid_social&campaign_id={{campaign.id}}&adset_id={{adset.id}}&ad_id={{ad.id}}&placement={{placement}}&site_source={{site_source_name}}
+  ```
+
+- **Google:** keep auto-tagging on. Google adds `gclid`, `gbraid`, `wbraid`, `gad_source`, and `gad_campaignid` itself. To pass your campaign name, add `utm_campaign=<your campaign name>` to the ad's **Final URL suffix**.
+
+### 2. Open the link from your button
+
+Call `getAppDownloadURL` with your Linkrunner link when the visitor taps the button, then open the URL it returns:
+
+```js
+import { lr } from '@linkrunner/web'
+
+document.getElementById('get-app').addEventListener('click', async () => {
+  window.location.href = await lr.getAppDownloadURL('https://link.your-app.com/')
+})
+```
+
+With the script tag, call `window.lr.getAppDownloadURL` instead.
+
+`getAppDownloadURL` returns a promise of your link with the parameters of the visitor's last touch, decided as in [Attribution storage](#attribution-storage):
+
+| Last touch      | Parameters added                                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Meta ad click   | `utm_source=facebook`, `utm_medium=paid_social`, `campaign_id`, `adset_id`, `ad_id`, `placement`, `site_source`, `fbclid`             |
+| Google ad click | `gad_campaignid`, `gad_source`, `gclid`, `gbraid`, `wbraid`, `utm_source=google`, `utm_campaign`                                     |
+| Anything else   | The visitor's last-touch `utm_*` parameters, if any                                                                                  |
+
+Parameters the ad click did not carry are left out, and your link's own path and parameters are kept. If the Meta ad sends Meta's default `utm_id={{campaign.id}}` instead of `campaign_id`, the SDK uses it as `campaign_id`.
+
+With the npm import, a call made before the SDK script loads waits for it. If the script has not loaded within 3 seconds, for example because an ad blocker stopped it, the promise returns your link unchanged so the button still works, but that install is not credited to the ad. The promise rejects if the link is not a full `https://` or `http://` URL.
+
+### 3. Check the link
+
+Open your landing page with test parameters, for example `https://your-website.com/?utm_source=facebook&campaign_id=123&fbclid=test_click`, go to the page with the button, and run this in the browser console:
+
+```js
+await window.lr.getAppDownloadURL('https://link.your-app.com/')
+```
+
+The result should be your link with `campaign_id=123` and `fbclid=test_click`. This confirms that the website passes the ad click to your link. The install is credited to the ad once the app opens with the Linkrunner SDK.
 
 ## Configuration
 

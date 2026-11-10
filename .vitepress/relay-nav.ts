@@ -126,14 +126,17 @@ const guides: Group[] = [
   group("Users and events", links("/features/users-tab", "/features/events-tab", "/features/retention", "/features/data-export"), false, "users-three"),
   group(
     "Measurement",
-    links(
+    [
+      page("What the Campaigns columns mean", "/features/campaign-metrics", "chart-bar"),
+      ...links(
       "/features/attribution-windows",
       "/features/ctv-attribution",
       "/features/fraud-control",
       "/features/uninstall-tracking",
       "/features/send-consent",
       "/features/meta-install-referrer"
-    ),
+      ),
+    ],
     false,
     "chart-line"
   ),
@@ -156,7 +159,19 @@ const guides: Group[] = [
 // Setup: for whoever wires Linkrunner into the app (SDKs, deep link
 // verification, testing, APIs).
 const setup: Group[] = [
-  group("Start here", [p("/quickstart"), p("/features/mcp"), p("/features/website-projects"), p("/ai-agent-skills")], true, "flag"),
+  group(
+    "Start here",
+    [
+      p("/quickstart"),
+      p("/features/mcp"),
+      page("Approve AI changes", "/features/mcp-changes", "shield-check"),
+      page("AI change tool reference", "/features/mcp-tools", "list-check"),
+      p("/features/website-projects"),
+      p("/ai-agent-skills"),
+    ],
+    true,
+    "flag",
+  ),
   group(
     "SDKs",
     links(
@@ -170,7 +185,9 @@ const setup: Group[] = [
       "/sdk/unity",
       "/sdk/web",
       "/sdk/shopify",
-      "/sdk/appbrew"
+      "/sdk/appbrew",
+      "/sdk/track-payments",
+      "/sdk/migrate-to-track-event"
     ),
     false,
     "code"
