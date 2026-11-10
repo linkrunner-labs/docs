@@ -11,8 +11,6 @@ description: "Run TikTok ads for your app with in-app event optimization and def
 
 TikTok Ads integration with Linkrunner enables you to run powerful app growth campaigns while optimizing on real in-app events and providing seamless deferred deep linking. This integration allows you to track installs, sign-ups, purchases, and custom events across both Android and iOS platforms.
 
-To send sign-ups and purchases from your website, see [Send website conversions to TikTok](/features/tiktok-web-conversions).
-
 **📱 Works for both Android & iOS Apps**
 
 ### What You'll Get
@@ -190,6 +188,24 @@ You can easily duplicate campaigns once created for every ad creative, making it
 </Warning>
 
 ![TikTok Campaign - Duplicate Campaign](/images/tiktok-ss/image%2021.png)
+
+## Website conversions
+
+Linkrunner also sends conversions from your **website** to the TikTok Events API 2.0, matched to the ad click with the `ttclid` click ID the Web SDK captured when the visitor landed. The same pixel and access token above are used, so there is nothing extra to connect.
+
+1. On this integration, switch to **Web** at the top and open the **Web Event Mapping** tab.
+2. Click **Add Mapping**.
+3. Under **Your Web Events**, pick your website event, such as `purchase`. The list shows the events Linkrunner has received from your website.
+4. Under **TikTok Ads Event**, pick the closest match, such as **Complete Payment**, **Registration**, **Add to Cart** or **Initiate Checkout**.
+5. For purchases, turn on **Send Revenue** and pick the **Currency** your website sends.
+
+![Web Event Mapping for TikTok with purchase mapped to Complete Payment](/images/tiktok-ss/web-event-mapping.webp)
+
+For each mapped event TikTok receives the event name, the time, the page, the `ttclid`, and the value and currency when **Send Revenue** is on, with `event_source` set to `web`.
+
+- **Only visits from a TikTok ad click are sent.** `ttclid` is the only identifier TikTok can match a website conversion on, so a conversion without one is recorded in Postback Logs and not sent.
+- **Website mappings have no test send.** These rows carry no paper plane icon, unlike Meta and Google Ads, because a TikTok test builds an app-shaped postback. Confirm delivery from a real conversion in Postback Logs instead.
+- Don't see your event in the list? Your website hasn't sent it yet. See [Track sign-ups and purchases on your website](/features/web-events-tracking).
 
 ## Deferred Deep Linking
 

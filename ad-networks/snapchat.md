@@ -11,8 +11,6 @@ description: "Run Snapchat ads for your app with in-app event optimization and d
 
 Linkrunner sends your app's installs and in-app events to Snapchat through Snapchat's Conversions API. Where they go depends on what you add to your Snapchat account in Linkrunner, and on how each user reached your app:
 
-To send sign-ups and purchases from your website, see [Send website conversions to Snapchat](/features/snapchat-web-conversions).
-
 | You add                                     | Snapchat receives           | Linkrunner sends                                                                                                                    | Use it for                            |
 | ------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
 | A **Snap App ID** for Android, iOS, or both | App events on your Snap App | Installs, sign ups, and mapped in-app events from that platform, from users who did not come through your Linkrunner campaign link. | Sharing your app events with Snapchat |
@@ -252,6 +250,27 @@ These steps create a web-to-app campaign that sends users through your Linkrunne
 1. Review your campaign settings and publish
 
 ![Snapchat Campaign - Publish](/images/snapchat-ss/image_21.png)
+
+## Website conversions
+
+Linkrunner also sends conversions from your **website** to the Snapchat Conversions API with `action_source` set to `WEB`, matched to the ad click with the click ID the Web SDK captured when the visitor landed. The same Pixel and Conversions API token above are used.
+
+Snapchat spells its click ID `ScCid` on the landing URL, and the Web SDK stores it as `sccid`. Capturing it needs **Web SDK 0.1.24 or later**. Sites on the hosted `v1` script already have it; a pinned or self-hosted copy needs updating, or Snapchat has no click ID to match and nothing is sent.
+
+1. On this integration, switch to **Web** at the top and open the **Web Event Mapping** tab.
+2. Click **Add Mapping**.
+3. Under **Your Web Events**, pick your website event, such as `purchase`.
+4. Under **Snapchat Ads Event**, pick the closest match, such as **Purchase**, **Sign Up**, **Add Cart** or **Start Checkout**.
+5. For purchases, turn on **Send Revenue** and pick the **Currency** your website sends.
+
+![Web Event Mapping for Snapchat with purchase mapped to Purchase](/images/snapchat-ss/web-event-mapping.webp)
+
+For each mapped event Snapchat receives the event name, the time, the click ID as `sc_click_id`, the page as `event_source_url`, and the value and currency when **Send Revenue** is on.
+
+- **Only visits from a Snapchat ad click are sent.** A conversion without `sccid` is recorded in Postback Logs and not sent.
+- **The page URL is required.** Snapchat needs `event_source_url`, so a conversion Linkrunner cannot tie to a page is skipped rather than sent incomplete.
+- **Website mappings have no test send.** These rows carry no paper plane icon, unlike Meta and Google Ads, because a Snapchat test builds an app-shaped postback. Confirm delivery from a real conversion in Postback Logs instead.
+- Don't see your event in the list? Your website hasn't sent it yet. See [Track sign-ups and purchases on your website](/features/web-events-tracking).
 
 ## Deferred Deep Linking
 

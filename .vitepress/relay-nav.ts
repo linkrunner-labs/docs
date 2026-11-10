@@ -118,10 +118,6 @@ const guides: Group[] = [
       "/features/web-creatives",
       "/features/meta-web-conversions",
       "/features/google-ads-web-conversions",
-      "/features/tiktok-web-conversions",
-      "/features/snapchat-web-conversions",
-      "/features/reddit-web-conversions",
-      "/features/linkedin-web-conversions",
       "/features/web-to-app-journeys"
     ),
     false,

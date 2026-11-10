@@ -11,8 +11,6 @@ description: "Run Reddit Ads with Linkrunner attribution, Reddit click IDs, Conv
 
 Use Reddit Ads with Linkrunner when you want to send Reddit traffic through one Linkrunner campaign link, attribute installs and in-app events, and send server-side conversions back to Reddit through the Reddit Conversions API.
 
-To send sign-ups and purchases from your website, see [Send website conversions to Reddit](/features/reddit-web-conversions).
-
 The recommended flow is:
 
 1. Create or prepare your Reddit Ads account.
@@ -241,6 +239,28 @@ Review the campaign, ad group, and ad before publishing.
 If you create multiple Reddit ads in the same ad group, create a separate Linkrunner campaign link for each ad when you want ad-level reporting in Linkrunner.
 
 </Tip>
+
+## Website conversions
+
+Linkrunner also sends conversions from your **website** to the Reddit Conversions API with `action_source` set to `WEBSITE`, matched to the ad click with the `rdt_cid` click ID the Web SDK captured when the visitor landed.
+
+Capturing `rdt_cid` needs **Web SDK 0.1.24 or later**. Sites on the hosted `v1` script already have it; a pinned or self-hosted copy needs updating, or Reddit has no click ID to match and nothing is sent.
+
+1. On this integration, switch to **Web** at the top and open the **Web Event Mapping** tab.
+2. Mapping is only available once the account has credentials. If the tab asks for them, click **Add Reddit Pixel** and add your Reddit Pixel ID and Conversions API access token.
+
+   ![The Web Event Mapping tab asking for Reddit CAPI credentials before events can be mapped](/images/reddit-ads/web-event-mapping.webp)
+
+3. Click **Add Mapping**.
+4. Under **Your Web Events**, pick your website event, such as `purchase`.
+5. Under **Reddit Ads Event**, pick the closest match, such as **Purchase**, **Sign Up**, **Add to Cart** or **Lead**.
+6. For purchases, turn on **Send Revenue** and pick the **Currency** your website sends.
+
+For each mapped event Reddit receives the event name, the time, the click ID as `click_id`, the page when it is available, and the value and currency when **Send Revenue** is on.
+
+- **Only visits from a Reddit ad click are sent.** A conversion without `rdt_cid` is recorded in Postback Logs and not sent.
+- **Website mappings have no test send.** These rows carry no paper plane icon, unlike Meta and Google Ads, because a Reddit test builds an app-shaped postback. Confirm delivery from a real conversion in Postback Logs instead.
+- Don't see your event in the list? Your website hasn't sent it yet. See [Track sign-ups and purchases on your website](/features/web-events-tracking).
 
 ## How attribution and CAPI work
 
