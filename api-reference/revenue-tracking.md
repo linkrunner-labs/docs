@@ -7,6 +7,14 @@ description: "Documentation for Linkrunner Revenue Tracking API"
 
 <p class="vp-lead">Documentation for Linkrunner Revenue Tracking API</p>
 
+<Badge type="warning" text="Deprecated for app payments" />
+
+<Warning>
+
+`POST /capture-payment` is deprecated for app payments. It keeps working for existing integrations, but new integrations should send app payments through `/capture-event`. Website payments still use `/capture-payment`, see [Website payments](#website-payments). See [Migrate payments to in-app events](/sdk/migrate-to-track-event).
+
+</Warning>
+
 <Note>
 
 Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Each request must identify the user with `user_id` or `install_instance_id`. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
@@ -92,12 +100,6 @@ These calls come from your server, so Linkrunner never sends your server's IP to
 1. **200** Payment captured. The response is the same as for a [custom event](/api-reference/event-capture#sample-response), including `processing_id`
 2. **400** Missing fields, or all three payment fields were sent but one is invalid
 3. **401** Invalid server key
-
-<Note>
-
-`POST /capture-payment` is deprecated for app payments. It keeps working for existing integrations, but new integrations should send app payments through `/capture-event`. Website payments still use `/capture-payment`, see [Website payments](#website-payments). See [Migrate payments to in-app events](/sdk/migrate-to-track-event).
-
-</Note>
 
 ## Website payments
 
