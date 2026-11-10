@@ -57,7 +57,11 @@ Include the campaign link in the notification's data payload under a key your ap
 }
 ```
 
-<Info>If your provider supports a "launch URL" or "deep link" field (OneSignal, Braze, CleverTap all do), you can put the campaign link there instead. The OS then opens your app with the link, and your existing deep link listeners receive it. Using CleverTap, WebEngage, or MoEngage? See [Push Notification Providers](/features/push-notification-providers) for exact steps.</Info>
+<Info>
+
+If your provider supports a "launch URL" or "deep link" field (OneSignal, Braze, CleverTap all do), you can put the campaign link there instead. The OS then opens your app with the link, and your existing deep link listeners receive it. Using CleverTap, WebEngage, or MoEngage? See [Push Notification Providers](/features/push-notification-providers) for exact steps.
+
+</Info>
 
 </Step>
 
@@ -155,7 +159,11 @@ if (initialLink != null) LinkRunner().handleDeeplink(initialLink);
 
 </Tabs>
 
-<Note>If your provider opens the campaign link as a launch URL instead, you don't need the code above. Your existing `handleDeeplink` deep link listeners already receive the link.</Note>
+<Note>
+
+If your provider opens the campaign link as a launch URL instead, you don't need the code above. Your existing `handleDeeplink` deep link listeners already receive the link.
+
+</Note>
 
 </Step>
 

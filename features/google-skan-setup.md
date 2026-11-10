@@ -46,7 +46,11 @@ Apple only generates SKAN postbacks for ad networks listed in your app's `Info.p
 </array>
 ```
 
-<Info>On Expo, add these under `ios.infoPlist.SKAdNetworkItems` in your `app.json`.</Info>
+<Info>
+
+On Expo, add these under `ios.infoPlist.SKAdNetworkItems` in your `app.json`.
+
+</Info>
 
 ### Add the Postback Copy Endpoints
 

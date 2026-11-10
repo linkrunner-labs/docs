@@ -94,7 +94,9 @@ These calls come from your server, so Linkrunner never sends your server's IP to
 3. **401** Invalid server key
 
 <Note>
-  `POST /capture-payment` is deprecated for app payments. It keeps working for existing integrations, but new integrations should send app payments through `/capture-event`. Website payments still use `/capture-payment`, see [Website payments](#website-payments). See [Migrate payments to in-app events](/sdk/migrate-to-track-event).
+
+`POST /capture-payment` is deprecated for app payments. It keeps working for existing integrations, but new integrations should send app payments through `/capture-event`. Website payments still use `/capture-payment`, see [Website payments](#website-payments). See [Migrate payments to in-app events](/sdk/migrate-to-track-event).
+
 </Note>
 
 ## Website payments

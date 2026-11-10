@@ -666,11 +666,15 @@ How `trackEvent` decides:
 Linkrunner keeps one payment per `paymentId`, event name, and status, so a retry with the same values is recorded once. See [Payment status](/sdk/track-payments#payment-status) for a full lifecycle example.
 
 <Note>
-    The event name is stored exactly as you send it. If you used one of the old payment types, pass it in uppercase exactly as before, such as `FIRST_PAYMENT` or `DEFAULT`, so your existing mappings and reports keep working. A different spelling such as `first_payment` is a new payment type. Any other name, such as `purchase`, is also stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
+
+The event name is stored exactly as you send it. If you used one of the old payment types, pass it in uppercase exactly as before, such as `FIRST_PAYMENT` or `DEFAULT`, so your existing mappings and reports keep working. A different spelling such as `first_payment` is a new payment type. Any other name, such as `purchase`, is also stored as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks.
+
 </Note>
 
 <Note>
-    `capturePayment` and `removePayment` are deprecated. They still work in 5.0.0 and show a deprecation warning, and they will be removed in a future major version. Use `trackEvent` with the payment keys instead. Apps on LinkrunnerKit 4.x keep working unchanged. To move, see [Migrate payments to in-app events](/sdk/migrate-to-track-event).
+
+`capturePayment` and `removePayment` are deprecated. They still work in 5.0.0 and show a deprecation warning, and they will be removed in a future major version. Use `trackEvent` with the payment keys instead. Apps on LinkrunnerKit 4.x keep working unchanged. To move, see [Migrate payments to in-app events](/sdk/migrate-to-track-event).
+
 </Note>
 
 ## Tracking Custom Events
