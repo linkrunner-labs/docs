@@ -68,6 +68,7 @@ These journeys go through the store. Deferred deep linking carries the original 
 | Journey | What Linkrunner tracks | Where in the dashboard | What to set up |
 | --- | --- | --- | --- |
 | **Website → Install** | Click → install, with the attributed campaign from `getAttributionData` | **Overview** stat cards (All / Attributed / Organic Installs); Campaigns → **Installs** | Linkrunner link as the store target; `init` + `getAttributionData` after first open |
+| **Meta or Google ad → Website → Install** | Ad click → install, credited to the ad the visitor clicked before reaching your website | Campaigns → **Installs** | Web SDK on your website; the download button opens the link from [`getAppDownloadURL`](/sdk/web#send-ad-visitors-from-your-website-to-your-app) |
 | **Website → Install → Signup** | Install + user registration | **Sign-ups** and **Conversion** (sign-ups / installs) columns; user list in the campaign drawer | Call [`signup`](/sdk/react-native#user-identification-required) with `user_data.id` |
 | **Website → Install → Purchase** | Install + revenue | **Revenue**, **ROAS**, **Paying Users**, **Daywise Revenue** columns | [`trackEvent` with a payment](/sdk/react-native) (amount, payment ID, currency); map the event for Meta/Google ROAS |
 | **Website → Install → Onboarding** | Install + activation event | Custom **event column**; [Events](https://dashboard.linkrunner.io/dashboard/events) | Define the activation event and fire it with [`trackEvent`](/sdk/react-native#tracking-custom-events) |
