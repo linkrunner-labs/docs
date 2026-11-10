@@ -41,6 +41,9 @@ channels:
     detail: OpenAI click IDs and Conversions API postbacks
     link: /ad-networks/chatgpt-ads
     logo: /images/logos/chatgpt.webp
+  - text: JioHotstar Ads for Web
+    detail: Click IDs and website conversions through the Web SDK
+    link: /ad-networks/jiohotstar-ads
   - text: ShareChat Ads
     detail: ShareChat and Moj installs with Conversions API postbacks
     link: /ad-networks/sharechat-ads
