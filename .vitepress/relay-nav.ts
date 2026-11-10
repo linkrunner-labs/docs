@@ -118,6 +118,7 @@ const guides: Group[] = [
       "/features/web-creatives",
       "/features/meta-web-conversions",
       "/features/google-ads-web-conversions",
+      "/features/web-attribution-windows",
       "/features/web-to-app-journeys"
     ),
     false,
