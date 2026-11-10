@@ -38,7 +38,7 @@ Upload your logo, enter your affiliate network name and description, then add th
 
 ![Affiliate setup, step 1: logo, network name, description and website](/images/agency-partners/add-affiliate-details.webp)
 
-![Affiliate setup, step 2: install postback URL and post-install event URL, then Complete setup](/images/agency-partners/add-affiliate-postbacks.webp)
+![Affiliate setup, step 2: install postback URL and event postback URL, then Complete setup](/images/agency-partners/add-affiliate-postbacks.webp)
 
 ## 3. Wait for approval
 

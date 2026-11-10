@@ -35,7 +35,7 @@ Keep the link exactly as it is, especially `utm_id` and `lr_click_id`. A convers
 
 ## What you see on Web Campaigns
 
-You see only the web campaigns credited to you, with their visitors, page views, sessions and sign-ups. Spend and revenue stay hidden, as they do for app campaigns. Custom events show only when the customer has shared them with you.
+You see only the web campaigns credited to you, with their visitors, page views and sessions. Sign-ups show unless the customer [hides them from you](/affiliate-partners/hide-sign-ups), which applies to app and web campaigns alike. Spend and revenue stay hidden, as they do for app campaigns. Custom events show only when the customer has shared them with you.
 
 ## Postbacks for website conversions
 
