@@ -48,7 +48,7 @@ For each mapped event, Linkrunner sends:
 
 - **Only visits from a Snapchat ad click are sent.** A conversion without `sccid` is recorded in Postback Logs and not sent.
 - **The page URL is required.** Snapchat needs `event_source_url`, so a conversion Linkrunner cannot tie to a page is skipped rather than sent incomplete.
-- **A website test send is not available for Snapchat.** Confirm delivery from a real conversion in Postback Logs instead.
+- **Website mappings have no test send.** These rows carry no paper plane icon, unlike Meta and Google Ads, because a Snapchat test builds an app-shaped postback. Confirm delivery from a real conversion in Postback Logs instead.
 
 ## Troubleshooting
 

@@ -40,7 +40,7 @@ For each mapped event, Linkrunner sends:
 ## Things to know
 
 - **`li_fat_id` is the only identifier.** LinkedIn matches a website conversion on it alone, so a conversion without one is recorded in Postback Logs and not sent.
-- **A website test send is not available for LinkedIn.** Confirm delivery from a real conversion in Postback Logs instead.
+- **Website mappings have no test send.** These rows carry no paper plane icon, unlike Meta and Google Ads, because a LinkedIn test builds an app-shaped postback. Confirm delivery from a real conversion in Postback Logs instead.
 
 ## Troubleshooting
 

@@ -44,7 +44,7 @@ For each mapped event, Linkrunner sends:
 ## Things to know
 
 - **Only visits from a Reddit ad click are sent.** A conversion without `rdt_cid` is recorded in Postback Logs and not sent.
-- **A website test send is not available for Reddit.** Confirm delivery from a real conversion in Postback Logs instead.
+- **Website mappings have no test send.** These rows carry no paper plane icon, unlike Meta and Google Ads, because a Reddit test builds an app-shaped postback. Confirm delivery from a real conversion in Postback Logs instead.
 
 ## Troubleshooting
 

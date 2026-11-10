@@ -11,6 +11,8 @@ description: "Run Snapchat ads for your app with in-app event optimization and d
 
 Linkrunner sends your app's installs and in-app events to Snapchat through Snapchat's Conversions API. Where they go depends on what you add to your Snapchat account in Linkrunner, and on how each user reached your app:
 
+To send sign-ups and purchases from your website, see [Send website conversions to Snapchat](/features/snapchat-web-conversions).
+
 | You add                                     | Snapchat receives           | Linkrunner sends                                                                                                                    | Use it for                            |
 | ------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
 | A **Snap App ID** for Android, iOS, or both | App events on your Snap App | Installs, sign ups, and mapped in-app events from that platform, from users who did not come through your Linkrunner campaign link. | Sharing your app events with Snapchat |

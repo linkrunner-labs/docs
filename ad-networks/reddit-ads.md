@@ -11,6 +11,8 @@ description: "Run Reddit Ads with Linkrunner attribution, Reddit click IDs, Conv
 
 Use Reddit Ads with Linkrunner when you want to send Reddit traffic through one Linkrunner campaign link, attribute installs and in-app events, and send server-side conversions back to Reddit through the Reddit Conversions API.
 
+To send sign-ups and purchases from your website, see [Send website conversions to Reddit](/features/reddit-web-conversions).
+
 The recommended flow is:
 
 1. Create or prepare your Reddit Ads account.

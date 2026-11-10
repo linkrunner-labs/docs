@@ -43,7 +43,7 @@ The event is sent with `event_source` set to `web`, against the same pixel as yo
 ## Things to know
 
 - **Only visits from a TikTok ad click are sent.** `ttclid` is the only identifier TikTok can match a website conversion on, so a conversion without one is recorded in Postback Logs and not sent.
-- **A website test send is not available for TikTok.** Confirm delivery from a real conversion in Postback Logs instead.
+- **Website mappings have no test send.** These rows carry no paper plane icon, unlike Meta and Google Ads, because a TikTok test builds an app-shaped postback. Confirm delivery from a real conversion in Postback Logs instead.
 
 ## Troubleshooting
 

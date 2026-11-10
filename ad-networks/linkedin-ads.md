@@ -11,6 +11,8 @@ description: "Run LinkedIn ads for your app with in-app event optimization and d
 
 LinkedIn Ads integration with Linkrunner enables you to run powerful app growth campaigns while optimizing on real in-app events and providing seamless deferred deep linking. This integration allows you to track installs, sign-ups, purchases, and custom events across both Android and iOS platforms.
 
+To send sign-ups and purchases from your website, see [Send website conversions to LinkedIn](/features/linkedin-web-conversions).
+
 **📱 Works for both Android & iOS Apps**
 
 ### What You'll Get
