@@ -11,16 +11,16 @@ Open **Fraud Control** from the left sidebar of the [dashboard](https://dashboar
 
 ## What you get
 
-| Feature                     | What it does for you                                                                                       |
-| :-------------------------- | :--------------------------------------------------------------------------------------------------------- |
-| **Fraud rate overview**     | Shows what share of your installs looks fraudulent, and which networks it comes from.                      |
-| **Protection from day one** | Linkrunner-managed rules run on every project, so you see a fraud rate before you write anything.          |
-| **Ready-made templates**    | One-click rules for click injection, install hijacking, SDK spoofing, and installs from fraudulent clicks. |
-| **Custom rules**            | Write a rule in plain English, or build it condition by condition, for clicks, installs, or in-app events. |
-| **Impact preview**          | Shows how much traffic a rule would flag over the last 7, 14, or 30 days before you save it.               |
-| **Tag or suppress**         | Only flag fraud for reporting, or also stop fraudulent conversions from being sent to ad networks.         |
-| **Affiliate rejections**    | Tells affiliate partners a conversion was rejected, so they can stop paying their publishers for it.       |
-| **Change history**          | Records who changed each rule, what changed, and when.                                                     |
+| Feature                     | What it does for you                                                                                                             |
+| :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------- |
+| **Fraud rate overview**     | Shows what share of your installs looks fraudulent, and which networks it comes from.                                            |
+| **Protection from day one** | Linkrunner-managed rules run on every project, so you see a fraud rate before you write anything.                                |
+| **Ready-made templates**    | Eight one-click rules for click injection, install hijacking, SDK spoofing, click flooding, and installs from fraudulent clicks. |
+| **Custom rules**            | Write a rule in plain English, or build it condition by condition, for clicks, installs, or in-app events.                       |
+| **Impact preview**          | Shows how much traffic a rule would flag over the last 7, 14, or 30 days before you save it.                                     |
+| **Tag or suppress**         | Only flag fraud for reporting, or also stop fraudulent conversions from being sent to ad networks.                               |
+| **Affiliate rejections**    | Tells affiliate partners a conversion was rejected, so they can stop paying their publishers for it.                             |
+| **Change history**          | Records who changed each rule, what changed, and when.                                                                           |
 
 <Info>
 
@@ -124,16 +124,20 @@ Select **Create rule**, then pick one of three ways to start:
 
 ### Start from a template
 
-![Rule builder with the template gallery open, showing click injection, install hijacking, SDK spoofing, and install from a fraudulent click](/images/fraud-control/fraud-templates.webp)
+<img src="/images/fraud-control/fraud-templates.webp" alt="The Templates panel in the rule builder, listing all eight templates from Click injection to Click flooding from one device" width="320" />
 
-| Template                            | What it flags                                                                                                                |
-| :---------------------------------- | :--------------------------------------------------------------------------------------------------------------------------- |
-| **Click injection**                 | Android installs that open within 3 seconds of their Play referrer click, faster than a real download.                       |
-| **Install hijacking**               | Android installs whose Play referrer click was recorded after the install had already started.                               |
-| **SDK spoofing**                    | Installs whose SDK signature check failed, meaning the request did not come from your app. Unverified requests are excluded. |
-| **Install from a fraudulent click** | Installs matched to a click that a click rule already flagged.                                                               |
+| Template                              | What it flags                                                                                                                                      |
+| :------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Click injection**                   | Android installs that open within 3 seconds of their Play referrer click, faster than a real download.                                             |
+| **Install hijacking**                 | Android installs whose Play referrer click was recorded after the install had already started.                                                     |
+| **SDK spoofing**                      | Installs whose SDK signature check failed, meaning the request did not come from your app. Unverified requests are excluded.                       |
+| **Install from a fraudulent click**   | Installs matched to a click that a click rule already flagged.                                                                                     |
+| **SDK spoofing with IP mismatch**     | Installs that failed the SDK signature check and whose device IP differs from the IP Linkrunner saw. An IP mismatch alone is not treated as fraud. |
+| **Reinstall from a fraudulent click** | Reinstalls matched to a click that a click rule already flagged.                                                                                   |
+| **Click flooding from one IP**        | More than 100 clicks from one IP address in 1 minute. Raise the limit if many real users share a network.                                          |
+| **Click flooding from one device**    | More than 20 clicks from one advertising ID in 1 minute.                                                                                           |
 
-Templates are a starting point. Adjust the threshold and check the impact before saving.
+Templates are a starting point. Adjust the threshold and check the impact before saving. The two click flooding templates cannot show an impact preview, because past click counts are not replayed, so start them on **Tag only**.
 
 ### Describe it in plain English
 
