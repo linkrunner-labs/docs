@@ -9,7 +9,11 @@ description: "Configure CleverTap, WebEngage, or MoEngage to send Linkrunner cam
 
 If you send push notifications through CleverTap, WebEngage, or MoEngage, you can track notification opens in Linkrunner without writing custom push-handling code. You set the campaign link as the notification's click action in the provider's dashboard, and your existing `handleDeeplink` setup does the rest.
 
-<Note>Start with [Push Notification Tracking](/features/push-notification-tracking) if you haven't yet. You need a Linkrunner campaign link and `handleDeeplink` implemented in your app before configuring a provider.</Note>
+<Note>
+
+Start with [Push Notification Tracking](/features/push-notification-tracking) if you haven't yet. You need a Linkrunner campaign link and `handleDeeplink` implemented in your app before configuring a provider.
+
+</Note>
 
 ## How it works with a provider
 
@@ -18,7 +22,11 @@ If you send push notifications through CleverTap, WebEngage, or MoEngage, you ca
 3. On tap, the OS opens your app with the link and your `handleDeeplink` listeners pass it to Linkrunner
 4. The open shows up in your campaign analytics
 
-<Warning>This flow relies on [deep linking](/features/deep-linking-setup) being set up for your campaign link domain. Without it, tapping the notification opens the browser instead of your app.</Warning>
+<Warning>
+
+This flow relies on [deep linking](/features/deep-linking-setup) being set up for your campaign link domain. Without it, tapping the notification opens the browser instead of your app.
+
+</Warning>
 
 ## Provider setup
 

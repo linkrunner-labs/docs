@@ -15,9 +15,13 @@
  * - relay-page: every file in relay-pages/ is listed in RELAY_PAGES (otherwise
  *   it is published at /relay-pages/<route>).
  * - sidebar: every page is in the docs.v2 sidebar (.vitepress/relay-nav.ts).
+ * - component-markdown: a component tag such as <Note> on its own line is
+ *   followed by a blank line, and Markdown inside a one-line component goes on
+ *   its own lines, or VitePress shows the Markdown as plain text.
  * Built-site rule, with --built (build:relay passes it after building):
  * - internal-link: every root-relative link in a page body resolves to a page,
  *   a redirect or a file.
+ * - raw-markdown: no Markdown link or bold syntax shows as plain text in a page.
  *
  * Gaps that already existed are counted per page and rule in
  * scripts/check-pages-baseline.json. The count may only go down: one more
@@ -42,7 +46,7 @@ const SKIP_TOP = new Set(["node_modules", "public", "scripts", "skills"]);
 const SKIP_FILES = new Set(["README.md", "AGENTS.md", "CLAUDE.md"]);
 const PLATFORMS = ["Android", "iOS", "React Native", "Flutter", "Expo", "Capacitor", "Cordova", "Web", "Unity"];
 
-type Rule = "frontmatter" | "em-dash" | "docs-link" | "relative-link" | "support-line" | "image" | "tab-order" | "relay-page" | "sidebar" | "internal-link";
+type Rule = "frontmatter" | "em-dash" | "docs-link" | "relative-link" | "support-line" | "image" | "tab-order" | "relay-page" | "sidebar" | "internal-link" | "component-markdown" | "raw-markdown";
 type Baseline = Partial<Record<Rule, Record<string, number>>>;
 
 function walk(dir: string, out: string[] = []): string[] {
@@ -131,6 +135,21 @@ for (const file of pages) {
 
   for (const m of text.matchAll(/\u2014/g)) hit("em-dash", file, `${at(m.index!)}: em dash (split the sentence or use a comma)`);
 
+  // A component tag on its own line starts an HTML block that runs to the next blank line,
+  // so Markdown written right below the tag is not rendered.
+  const textLines = text.split("\n");
+  const rawLines = body.split("\n");
+  textLines.forEach((line, i) => {
+    const raw = rawLines[i] ?? "";
+    const oneLine = raw.match(/^\s*<(Note|Tip|Warning|Info|Check|Accordion|Step)(\s[^>]*)?>(.*\S.*)<\/\1>\s*$/);
+    if (oneLine && /\*\*|\]\(|`/.test(oneLine[3]))
+      hit("component-markdown", file, `line ${i + 1 + offset}: put the Markdown inside <${oneLine[1]}> on its own lines, with blank lines around it`);
+    const tag = line.match(/^\s*<(Note|Tip|Warning|Info|Check|Accordion|Step|Tab|Card|Expandable)(\s[^>]*)?>\s*$/);
+    const next = rawLines[i + 1] ?? "";
+    if (tag && next.trim() && !/^\s*<\/?[A-Z][A-Za-z]*(\s[^>]*)?\/?>\s*$/.test(next))
+      hit("component-markdown", file, `line ${i + 1 + offset}: add a blank line after <${tag[1]}> and do not indent its content`);
+  });
+
   // Downloadable files (a Postman collection) keep their full URL.
   const isFile = (path = "") => /\.(?!md\b|html\b)[a-z\d]+$/i.test(path.split(/[?#]/)[0]);
   for (const m of text.matchAll(/(?:\]\(|href=["']|<)(https?:\/\/docs(?:\.v2)?\.linkrunner\.io(\/[^)"'>\s]*)?)/g))
@@ -204,6 +223,12 @@ if (BUILT) {
     const src = byRoute.get(routeOf(f.replace(/\.html$/, ".md")));
     if (!src) continue; // not a docs page (for example a generated index)
     const main = page.match(/<main\b[\s\S]*<\/main>/)?.[0] ?? "";
+    const visible = main
+      .replace(/<(pre|code|script|style)\b[^>]*>[\s\S]*?<\/\1>/g, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&amp;/g, "&");
+    for (const m of visible.matchAll(/\[[^\]\n]{1,120}\]\((?:\/|#|https?:|mailto:)[^)\s]*\)|\*\*[^*\n]{1,80}\*\*/g))
+      hit("raw-markdown", src, `shows Markdown as plain text: ${m[0].slice(0, 80)}`);
     for (const m of main.matchAll(/<a\b[^>]*?\shref="(\/[^"#?]*)/g)) {
       if (m[1].startsWith("//")) continue;
       let path = m[1];
