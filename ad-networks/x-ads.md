@@ -82,6 +82,12 @@ In Events manager, click **Install Pixel**, choose **Manual**, then **Conversion
 
 Then create each website event: with **X Pixel** as the event source, click **Add event**, choose **Define with code** and pick the event type. Copy the event id X gives it. It looks like `tw-<pixel id>-<event id>`, for example `tw-riu5i-riuu7`.
 
+<Warning>
+
+Use events you create with **Define with code**. X's auto-created **Landing page views** and **Site visits** events are not single event tags, so X refuses Conversion API conversions sent to them.
+
+</Warning>
+
 ![Create a website event in X Events manager](/images/x-ads/x-create-web-event.webp)
 
 ![The website event id](/images/x-ads/x-web-event-id.webp)
@@ -162,7 +168,7 @@ Once installs and events come in, open X Events manager. Each event Linkrunner s
 
 For app conversions, Linkrunner sends the app id, platform, X event name and conversion time, with the device advertising id (GAID or IDFA), and the IP address and user agent when they are known. A purchase carries its value and currency when **Send Revenue** is on.
 
-For website conversions, Linkrunner sends the X event id, conversion time, page URL and a conversion id, with the `twclid`, IP address and user agent. A purchase carries its value and currency when **Send Revenue** is on.
+For website conversions, Linkrunner sends the X event id, conversion time, page URL and a conversion id, with the `twclid`, IP address and user agent. A purchase carries its value and currency when **Send Revenue** is on. A website conversion without a `twclid` is not sent.
 
 X does not send attribution back to Linkrunner. Linkrunner attributes installs to your X campaigns from clicks on your Linkrunner campaign links.
 
