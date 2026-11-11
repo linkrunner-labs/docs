@@ -113,9 +113,11 @@ Three things decide what you see:
 
 - **The day boundary is your store's timezone**, not your Linkrunner project's, so the rows
   line up with the rest of your Shopify reporting.
-- **Spend is only sent when your store's currency matches your Linkrunner project's.** If
-  they differ, impressions and clicks are still sent and spend is left out, because
-  relabelling one currency as another would put a wrong ROAS in front of you.
+- **Spend is only sent when the ad account's currency matches your store's.** Each ad
+  account bills in its own currency, so this is decided per campaign, not once for the
+  project. A campaign whose ad account bills in a different currency still sends its
+  impressions and clicks, and leaves its spend out, because relabelling one currency as
+  another would put a wrong ROAS in front of you.
 - **Today is never sent.** A day is sent once it has finished.
 
 ## Set it up
