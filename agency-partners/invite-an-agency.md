@@ -129,6 +129,6 @@ You are viewing the project as a partner rather than as an admin. Agencies are m
 That address already belongs to an agency, or already has a pending invitation for this project. The error message names the company involved.
 
 **The agency says they cannot see a screen.**
-They only get what you have granted them, and a new engagement starts with everything off. Open **Settings → Members**, click the sliders icon on their row, and turn on what they need. See [Control agency access](/agency-partners/control-agency-access).
+They only get what you have granted them, and a new engagement starts with everything off except **Sign-ups**, which starts on. Open **Settings → Members**, click the sliders icon on their row, and turn on what they need. See [Control agency access](/agency-partners/control-agency-access).
 
 **Need help?** Contact <support@linkrunner.io>

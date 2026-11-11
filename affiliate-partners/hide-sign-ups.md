@@ -27,6 +27,12 @@ Only project admins and managers can change what partners see.
 
 </Info>
 
+<Note>
+
+This switch is for affiliate partners only. Agencies have their own **Sign-ups** switch in the [agency access panel](/agency-partners/control-agency-access). A company connected to your project both as an affiliate partner and as an agency has two separate settings, so to hide sign-ups from it completely, turn off both.
+
+</Note>
+
 ## Show or hide sign-ups for one partner
 
 <Steps>
