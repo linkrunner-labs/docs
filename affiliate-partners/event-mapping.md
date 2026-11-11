@@ -14,6 +14,12 @@ description: "Choose which of a customer's events reach you, what they are calle
 
 Open it from the left sidebar in the affiliate dashboard. You can also go straight to it: [dashboard.linkrunner.io/affiliate/event-mapping](https://dashboard.linkrunner.io/affiliate/event-mapping).
 
+<Note>
+
+This link is for **affiliate accounts**. If you are signed in to a customer (app) account, it opens your app's dashboard instead. To change what a partner receives for your app, see [Change What a Partner Receives](/affiliate-partners/map-partner-events).
+
+</Note>
+
 ![Event Mapping in the affiliate sidebar](/images/affiliate-partners/event-mapping-page.webp)
 
 <Note>

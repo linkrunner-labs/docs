@@ -11,6 +11,12 @@ description: "Check whether each conversion reached your endpoint, and what your
 
 Open it from the left sidebar in the affiliate dashboard, or go straight to it: [dashboard.linkrunner.io/affiliate/postback-logs](https://dashboard.linkrunner.io/affiliate/postback-logs).
 
+<Note>
+
+This link is for **affiliate accounts**. If you are signed in to a customer (app) account, it opens your app's dashboard instead.
+
+</Note>
+
 The log shows one customer at a time. Switch customers with the project picker at the top of the sidebar.
 
 <Info>
