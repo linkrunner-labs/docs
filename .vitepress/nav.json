@@ -8,7 +8,7 @@
     {
       "text": "Integrations",
       "link": "/ad-networks/google-ads",
-      "activeMatch": "^/(ad-networks/google-ads|features/google-icm|ad-networks/meta-ads|ad-networks/tiktok|ad-networks/snapchat|ad-networks/reddit-ads|ad-networks/chatgpt-ads|ad-networks/sharechat-ads|ad-networks/linkedin-ads|ad-networks/meta-web-to-app|analytics-integrations/amplitude|analytics-integrations/braze|analytics-integrations/clevertap|analytics-integrations/ga4|analytics-integrations/mixpanel|analytics-integrations/moengage|analytics-integrations/netcore|analytics-integrations/posthog|analytics-integrations/revenuecat|analytics-integrations/webengage|ecommerce-manager/meta-commerce-manager|ecommerce-manager/google-commerce-manager)$"
+      "activeMatch": "^/(ad-networks/google-ads|features/google-icm|ad-networks/meta-ads|ad-networks/tiktok|ad-networks/snapchat|ad-networks/reddit-ads|ad-networks/chatgpt-ads|ad-networks/sharechat-ads|ad-networks/x-ads|ad-networks/linkedin-ads|ad-networks/meta-web-to-app|analytics-integrations/amplitude|analytics-integrations/braze|analytics-integrations/clevertap|analytics-integrations/ga4|analytics-integrations/mixpanel|analytics-integrations/moengage|analytics-integrations/netcore|analytics-integrations/posthog|analytics-integrations/revenuecat|analytics-integrations/webengage|ecommerce-manager/meta-commerce-manager|ecommerce-manager/google-commerce-manager)$"
     },
     {
       "text": "API Reference",
@@ -593,6 +593,11 @@
             "text": "<span class=\"sidebar-icon\"><img class=\"sidebar-icon-img\" src=\"/images/logos/sharechat.svg\" alt=\"\"></span>ShareChat Ads",
             "link": "/ad-networks/sharechat-ads",
             "icon": "/images/logos/sharechat.svg"
+          },
+          {
+            "text": "<span class=\"sidebar-icon\"><img class=\"sidebar-icon-img\" src=\"/images/logos/x.svg\" alt=\"\"></span>X Ads",
+            "link": "/ad-networks/x-ads",
+            "icon": "/images/logos/x.svg"
           },
           {
             "text": "<span class=\"sidebar-icon\"><img class=\"sidebar-icon-img\" src=\"/images/logos/linkedin.png\" alt=\"\"></span>LinkedIn Ads",
