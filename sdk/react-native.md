@@ -953,6 +953,12 @@ const initializeAPNsToken = async () => {
 | [`linkrunner.enableTCFConsentCollection`](/sdk/react-native#tcf-consent-collection) | Optional | iOS consent configuration | On every launch before `init`, if you opt into TCF consent collection |
 | [`linkrunner.getPackageVersion`](/sdk/react-native#sdk-package-version) | Optional | Diagnostics | When you need the installed SDK package version |
 
+<Note>
+
+**Publishing to Google Play or the App Store?** See [Data the SDK collects](/sdk/data-collection) for what the SDK sends and the answers for the Play Data safety form and Apple's App Privacy questions.
+
+</Note>
+
 ## Next Steps
 
 <CardGroup :cols="2">

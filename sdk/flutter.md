@@ -1202,6 +1202,12 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 ```
 
+<Note>
+
+**Publishing to Google Play or the App Store?** See [Data the SDK collects](/sdk/data-collection) for what the SDK sends and the answers for the Play Data safety form and Apple's App Privacy questions.
+
+</Note>
+
 ## Next Steps
 
 <CardGroup :cols="2">

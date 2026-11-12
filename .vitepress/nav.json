@@ -150,6 +150,11 @@
             "text": "Migrate payments to in-app events",
             "link": "/sdk/migrate-to-track-event",
             "icon": "arrows-rotate"
+          },
+          {
+            "text": "Data the SDK collects",
+            "link": "/sdk/data-collection",
+            "icon": "shield-halved"
           }
         ]
       },
