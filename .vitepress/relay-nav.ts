@@ -187,7 +187,8 @@ const setup: Group[] = [
       "/sdk/shopify",
       "/sdk/appbrew",
       "/sdk/track-payments",
-      "/sdk/migrate-to-track-event"
+      "/sdk/migrate-to-track-event",
+      "/sdk/data-collection"
     ),
     false,
     "code"

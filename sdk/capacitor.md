@@ -748,6 +748,12 @@ PushNotifications.addListener('registration', async (token) => {
 | [`linkrunner.setPushToken`](/sdk/capacitor#uninstall-tracking) | Optional | Push notification setup | When push token is available |
 | [`linkrunner.enablePIIHashing`](/sdk/capacitor#enhanced-privacy-controls) | Optional | Privacy configuration | When enabling PII hashing |
 
+<Note>
+
+**Publishing to Google Play or the App Store?** See [Data the SDK collects](/sdk/data-collection) for what the SDK sends and the answers for the Play Data safety form and Apple's App Privacy questions.
+
+</Note>
+
 ## Next Steps
 
 <CardGroup :cols="2">

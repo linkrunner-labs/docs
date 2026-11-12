@@ -457,6 +457,12 @@ Do not trust client-side events for payments, entitlements, or other sensitive s
 
 </AccordionGroup>
 
+<Note>
+
+**Need to update your privacy policy or cookie banner?** See [Data the SDK collects](/sdk/data-collection#web) for what the Web SDK sends and stores.
+
+</Note>
+
 ## More resources
 
 <CardGroup :cols="2">

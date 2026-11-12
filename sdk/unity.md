@@ -1510,6 +1510,12 @@ For detailed testing steps, see the [Integration Testing Guide](/testing/integra
 
 ---
 
+<Note>
+
+**Publishing to Google Play or the App Store?** See [Data the SDK collects](/sdk/data-collection) for what the SDK sends and the answers for the Play Data safety form and Apple's App Privacy questions.
+
+</Note>
+
 ## Troubleshooting
 
 ### Android

@@ -307,6 +307,12 @@ Starting with version 3.0.0, the Expo SDK has been redesigned to use a new archi
 
    For detailed implementation instructions, see the [SDK Usage](#sdk-usage) section above.
 
+<Note>
+
+**Publishing to Google Play or the App Store?** See [Data the SDK collects](/sdk/data-collection) for what the SDK sends and the answers for the Play Data safety form and Apple's App Privacy questions.
+
+</Note>
+
 ## Next Steps
 
 <CardGroup :cols="2">
