@@ -17,12 +17,11 @@ Your **server** reports each impression with the TV's IP address and user agent.
 
 ## Before you start
 
-CTV is off by default. The advertiser turns on three switches for your partner account, on each app. Changes take up to 5 minutes to apply.
+CTV is off by default. The advertiser turns on two switches for your partner account, on each app. Changes take up to 5 minutes to apply.
 
 | Switch                             | Where the advertiser turns it on                                                                          | Rejection while off     |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------- |
-| **S2S clicks and impressions**     | **Integrations → Affiliate Partners → Configure**                                                         | `partner_not_enabled`   |
-| **Connected TV (CTV) impressions** | Under the S2S switch, same page ([steps](/affiliate-partners/turn-on-s2s-clicks#turn-on-ctv-impressions)) | `ctv_not_enabled`       |
+| **Connected TV (CTV) impressions** | **Integrations → Affiliate Partners → Configure** ([steps](/affiliate-partners/turn-on-s2s-clicks#turn-on-ctv-impressions)) | `ctv_not_enabled`       |
 | **View-through**, with its window  | **Settings → Attribution Windows** ([how](/features/attribution-windows#view-through-attribution))        | `view_through_disabled` |
 
 Send your advertiser the [CTV attribution guide](/features/ctv-attribution).
@@ -192,7 +191,7 @@ The [CTV Impression API reference](/api-reference/ctv-impressions) lists every p
 | Response or symptom                                               | What to do                                                                                                                                                                                                |
 | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `missing_ip`, `invalid_ip`, `datacenter_ip`, `missing_ua`         | Send the TV's own public IP address and user agent, not your ad server's. Private (`192.168.x.x`, `10.x.x.x`), carrier-grade NAT (`100.64.0.0/10`), loopback and cloud or hosting addresses are rejected. |
-| `partner_not_enabled`, `ctv_not_enabled`, `view_through_disabled` | Ask the advertiser to turn on the missing switch. See [Before you start](#before-you-start).                                                                                                              |
+| `ctv_not_enabled`, `view_through_disabled` | Ask the advertiser to turn on the missing switch. See [Before you start](#before-you-start).                                                                                                              |
 | Accepted, but no installs credited                                | Check each rule in [How it works](#how-it-works), and that the impression arrived before the install.                                                                                                     |
 
 **Need help?** Contact <support@linkrunner.io>

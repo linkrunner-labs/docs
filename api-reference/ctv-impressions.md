@@ -17,7 +17,7 @@ GET https://s2s.linkrunner.io/v1/ctv/impression?app_id={app_id}
 GET https://s2s.linkrunner.io/v1/ctv/impression?d={domain}
 ```
 
-The advertiser is identified by the app ID (or the tracking link's domain) and the campaign by `c`. The campaign must belong to your partner account. S2S traffic, view-through and CTV must all be on for you on this app. The advertiser turns them on.
+The advertiser is identified by the app ID (or the tracking link's domain) and the campaign by `c`. The campaign must belong to your partner account. View-through and CTV must both be on for you on this app. You don't need S2S clicks on. The advertiser turns them on.
 
 ## Authentication
 
@@ -108,14 +108,13 @@ The response is always JSON.
 | 400    | `impression_too_old`           | `impression_time` is more than 24 hours ago. A time in the future is treated as now.                                                                                                                      | No                       |
 | 400    | `invalid_viewthrough_lookback` | `vt_lookback` is `0`, negative, fractional, or not in hours or days.                                                                                                                                      | No                       |
 | 400    | `unknown_app`                  | No Linkrunner project has this app ID.                                                                                                                                                                    | No                       |
-| 400    | `ambiguous_app`                | More than one of the advertiser's projects with S2S on for you has this app ID and campaign code (for example test and live). Send `d` instead.                                                           | No                       |
+| 400    | `ambiguous_app`                | More than one of the advertiser's projects with CTV on for you has this app ID and campaign code (for example test and live). Send `d` instead.                                                           | No                       |
 | 400    | `unknown_domain`               | `d` is not a Linkrunner click domain.                                                                                                                                                                     | No                       |
 | 400    | `unknown_campaign`             | `c` does not match a campaign of that app or domain.                                                                                                                                                      | No                       |
 | 401    | `missing_token`                | No `X-Linkrunner-Token` header and no `lr_token` parameter.                                                                                                                                               | No                       |
 | 401    | `invalid_token`                | The token is wrong, revoked, or was rotated more than 24 hours ago, or your partner account is suspended.                                                                                                 | No                       |
-| 403    | `partner_not_enabled`          | The advertiser hasn't turned on S2S traffic for the partner that owns campaign `c`. See [Turn on S2S clicks for a partner](/affiliate-partners/turn-on-s2s-clicks).                                       | No                       |
-| 403    | `view_through_disabled`        | S2S traffic is on, but the advertiser hasn't turned on view-through for this partner. See [View-through attribution](/features/attribution-windows#view-through-attribution).                             | No                       |
-| 403    | `ctv_not_enabled`              | S2S traffic and view-through are on, but the advertiser hasn't turned on CTV for this partner on this app. See [Turn on CTV impressions](/affiliate-partners/turn-on-s2s-clicks#turn-on-ctv-impressions). | No                       |
+| 403    | `view_through_disabled`        | The advertiser hasn't turned on view-through for this partner. See [View-through attribution](/features/attribution-windows#view-through-attribution).                             | No                       |
+| 403    | `ctv_not_enabled`              | The advertiser hasn't turned on CTV impressions for this partner on this app. See [Turn on CTV impressions](/affiliate-partners/turn-on-s2s-clicks#turn-on-ctv-impressions). | No                       |
 | 404    | `s2s_disabled`                 | The S2S impression APIs are turned off.                                                                                                                                                                   | No                       |
 | 429    | `rate_limited`                 | Too many impressions for this campaign.                                                                                                                                                                   | Yes, after `Retry-After` |
 | 503    | `unavailable`                  | A temporary error.                                                                                                                                                                                        | Yes, after `Retry-After` |
