@@ -626,6 +626,29 @@ linkrunner.enablePIIHashing(true);
 
 When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
 
+## Privacy mode
+
+Use privacy mode for apps directed at children. It stops the native SDKs from collecting any device-level identifier. On Android: no Google Advertising ID, App Set ID or Android ID, no local IP address, no carrier name and no Meta install referrer. On iOS: no IDFA, no ATT prompt, no IDFV, no Google on-device conversion value, no user-assigned device name and no SKAdNetwork conversion values. Only the SDK's install instance ID identifies the install.
+
+It needs native Android SDK 5.1.0 and iOS SDK 5.1.0. Use `cordova-linkrunner` 2.1.0 or later.
+
+Set `privacyMode: true` in the `init` options:
+
+```javascript
+document.addEventListener('deviceready', function () {
+    linkrunner.init({
+        token: "YOUR_PROJECT_TOKEN",
+        privacyMode: true
+    });
+}, false);
+```
+
+The SDK saves the setting. `true` stays on across launches until you call `init` with `privacyMode: false`. If you leave `privacyMode` out, the SDK keeps the saved value.
+
+The plugin still adds `NSUserTrackingUsageDescription` and the SKAdNetwork keys to `Info.plist` (see [What the plugin auto-configures](#what-the-plugin-auto-configures)). In privacy mode the SDK never shows the ATT prompt and sets no SKAdNetwork conversion values. On Android, [remove the `AD_ID` permission](/sdk/android#removing-ad_id-permission) from your manifest, because the SDK still declares it.
+
+For everything privacy mode removes, what is still sent, and how it changes your store privacy answers, see [Privacy mode](/sdk/data-collection#privacy-mode).
+
 ## Uninstall Tracking
 
 ### Before you begin
