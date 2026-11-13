@@ -374,6 +374,31 @@ For more details, see the [Meta Install Referrer](/features/meta-install-referre
 
 Test the complete preview, install, and first attribution response with [Meta Android attribution testing](/testing/meta-android-attribution-testing).
 
+## 7. Send the Meta Anonymous ID (apps with the Meta SDK)
+
+If your app also has the Meta (Facebook) SDK, Meta credits far fewer of the in-app events Linkrunner sends it, because Meta matches those events against the anonymous ID its own SDK created on the device and Linkrunner had no way to send it.
+
+From the SDK versions below, Linkrunner reads that ID automatically and sends it with your events, and the backend passes it to Meta as `anon_id`. There is no code to write and no new dependency: apps without the Meta SDK are unaffected.
+
+| SDK | Version |
+| -- | -- |
+| [Android](/sdk/android#meta-anonymous-id) | 5.1.0 |
+| [iOS](/sdk/ios#meta-anonymous-id) | 5.1.0 |
+| [React Native](/sdk/react-native#meta-anonymous-id) | 4.1.0 |
+| [Expo](/sdk/expo#meta-anonymous-id) | 4.1.0 |
+| [Flutter](/sdk/flutter#meta-anonymous-id) | 5.1.0 |
+| [Capacitor](/sdk/capacitor#meta-anonymous-id) | 3.1.0 |
+| [Cordova](/sdk/cordova#meta-anonymous-id) | 2.1.0 |
+| [Unity](/sdk/unity#meta-anonymous-id) | 3.1.0 |
+
+<Note>
+
+Finish the setup by removing your own Meta `logEvent` calls for the events you already send through Linkrunner, so each event reaches Meta from one source instead of two.
+
+</Note>
+
+Your SDK page also covers how to turn the collection off, and what the ID is for a privacy review.
+
 ## FAQ and Discrepancies
 
 For answers to common questions and an explanation of why numbers in Meta Ads Manager may not exactly match Linkrunner, see [Meta Ads FAQ and Discrepancies](/ad-networks/meta-ads-discrepancies).
