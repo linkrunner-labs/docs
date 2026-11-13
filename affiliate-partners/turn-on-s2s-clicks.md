@@ -80,7 +80,7 @@ Once CTV is on, the dashboard shows the partner's **CTV impression URL** on thei
 
 Turn the same switch off. There is no confirmation. Within 6 minutes, the partner's server clicks and impressions are rejected, and their tracking links go back to recording the IP of whoever calls them. Their tracking links keep working. Turning S2S clicks off does not turn CTV impressions off.
 
-Disconnecting the partner also turns S2S clicks off. If you reconnect them later, turn it on again.
+Disconnecting the partner also turns S2S clicks and CTV impressions off. If you reconnect them later, turn them on again.
 
 ## Troubleshooting
 

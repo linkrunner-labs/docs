@@ -39,7 +39,7 @@ You need two switches on, per partner and per app. Only admins and managers can 
 
 Go to **Integrations → Affiliate Partners**, click **Configure** on the partner's card, and turn on **Connected TV (CTV) impressions**. This switch is separate from **S2S clicks and impressions**. You don't need to turn S2S on first.
 
-![The partner's Configure page with the Connected TV (CTV) impressions switch on](/images/ctv-attribution/ctv-switches-on.webp)
+![The partner's Configure page with S2S clicks and impressions off and Connected TV (CTV) impressions on](/images/ctv-attribution/ctv-switches-on.webp)
 
 </Step>
 
