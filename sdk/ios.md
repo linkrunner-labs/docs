@@ -44,7 +44,7 @@ Alternatively, you can add the package dependency to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "5.0.0")
+    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "5.1.0")
 ]
 ```
 
@@ -301,6 +301,7 @@ For enhanced security, the LinkRunner SDK requires the following signing paramet
 - **`keyId`**: A unique identifier for the key pair used in the signing process
 - **`disableIdfa`** (optional): Boolean flag to disable IDFA collection (defaults to false)
 - **`debug`** (optional): Boolean flag to enable debug mode for development (defaults to false)
+- **`privacyMode`** (optional): Boolean flag for apps directed at children. See [Privacy Mode](#privacy-mode)
 
 You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
 
@@ -840,6 +841,40 @@ let isHashingEnabled = LinkrunnerSDK.shared.isPIIHashingEnabled()
 
 When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
 
+## Privacy Mode
+
+<Note>
+
+**SDK Version Requirement:** Privacy mode requires LinkrunnerKit version 5.1.0 or higher.
+
+</Note>
+
+Use privacy mode if your app is directed at children. It is off by default.
+
+When privacy mode is on, the SDK:
+
+- Does not collect the IDFA or show the App Tracking Transparency prompt. `requestTrackingAuthorization` returns the current status without showing the prompt.
+- Does not send the IDFV, Google on-device measurement (ODM) info or the user-assigned device name.
+- Skips SKAdNetwork conversion value updates.
+
+The SDK-generated install instance ID is the only identifier left. The SDK still sends device metadata (model, OS and locale) and the AdServices attribution token, and every payload carries `privacy_mode: true`.
+
+To turn it on, pass `privacyMode: true` to `initialize`:
+
+```swift
+Task {
+    await LinkrunnerSDK.shared.initialize(
+        token: "YOUR_PROJECT_TOKEN",
+        privacyMode: true
+    )
+}
+
+// Check if privacy mode is on
+let isPrivacyMode = LinkrunnerSDK.shared.isPrivacyModeEnabled()
+```
+
+The SDK saves the value, so on later launches it applies from app start, even before `initialize` runs. Once on, privacy mode stays on until you call `initialize` with `privacyMode: false`. If you leave `privacyMode` out, the SDK keeps the saved value.
+
 ## Uninstall Tracking
 
 ### Before you begin
@@ -985,6 +1020,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 | [`LinkrunnerSDK.shared.setConsent`](/sdk/ios#consent) | Optional | App initialization or consent flow | Before `initialize`, and again when consent changes |
 | [`LinkrunnerSDK.shared.enablePIIHashing`](/sdk/ios#enhanced-privacy-controls) | Optional | Privacy settings | When you want to enable PII hashing |
 | [`LinkrunnerSDK.shared.isPIIHashingEnabled`](/sdk/ios#enhanced-privacy-controls) | Optional | Privacy settings or compliance checks | When you need to check PII hashing status |
+| [`LinkrunnerSDK.shared.isPrivacyModeEnabled`](/sdk/ios#privacy-mode) | Optional | Privacy settings or compliance checks | When you need to check if privacy mode is on |
 
 ## Complete Example
 

@@ -33,7 +33,7 @@ Add the Linkrunner SDK to your app's `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation 'io.linkrunner:android-sdk:5.0.0'
+    implementation 'io.linkrunner:android-sdk:5.1.0'
 }
 ```
 
@@ -217,6 +217,7 @@ For enhanced security, the LinkRunner SDK requires the following signing paramet
 - **`secretKey`**: A unique secret key used for request signing and authentication
 - **`keyId`**: A unique identifier for the key pair used in the signing process
 - **`debug`** (optional): Boolean flag to enable debug mode for development (defaults to false)
+- **`privacyMode`** (optional): Boolean flag for apps directed at children. See [Privacy Mode](#privacy-mode)
 
 You can find your project token, secret key, and key ID [here](https://dashboard.linkrunner.io/settings?s=sdk-signing).
 
@@ -882,6 +883,48 @@ When AAID collection is disabled, the SDK will not collect or send the Google Ad
 
 If you want to completely remove the `AD_ID` permission from your app's manifest (for example, for apps targeting children), you can override the SDK's permission declaration in your `AndroidManifest.xml`. For detailed instructions on revoking the AD_ID permission, including Google's policy requirements for apps targeting children and Android 13+ (API 33+), see the [Revoking the AD_ID Permission](#step-4-revoking-the-ad_id-permission-optional) section above.
 
+## Privacy Mode
+
+<Note>
+
+**SDK Version Requirement:** Privacy mode requires Android SDK version 5.1.0 or higher.
+
+</Note>
+
+Use privacy mode if your app is directed at children. It is off by default.
+
+When privacy mode is on, the SDK does not read or send:
+
+- Google Advertising ID (GAID)
+- App Set ID
+- Android ID
+- The device's local IP address
+- The carrier name
+- The Meta install referrer
+
+The SDK-generated install instance ID is the only identifier left. The SDK still sends device metadata (brand, model, OS and locale) and the Google Play install referrer, and every payload carries `privacy_mode: true`.
+
+To turn it on, pass `privacyMode = true` to `init`:
+
+```kotlin
+CoroutineScope(Dispatchers.IO).launch {
+    LinkRunner.getInstance().init(
+        context = applicationContext,
+        token = "YOUR_PROJECT_TOKEN",
+        privacyMode = true
+    )
+}
+
+// Check if privacy mode is on
+val isPrivacyMode = LinkRunner.getInstance().isPrivacyModeEnabled()
+```
+
+In Java, `privacyMode` is the last parameter of `LinkrunnerJava.getInstance().init`, after `callback`.
+
+The SDK saves the value, so it also applies to queued background requests. Once on, privacy mode stays on across app launches until you call `init` with `privacyMode = false`. If you leave `privacyMode` out, the SDK keeps the saved value.
+
+The SDK still declares the `AD_ID` permission. To remove it from your app, see [Removing AD_ID Permission](#removing-ad_id-permission).
+
 ## Uninstall Tracking
 
 ### Before you begin
@@ -1044,6 +1087,7 @@ Custom implementations of FCM's `onMessageReceived` method can unintentionally m
 | [`LinkRunner.getInstance().isPIIHashingEnabled`](/sdk/android#enhanced-privacy-controls) | Optional | Privacy settings or compliance checks | When you need to check PII hashing status |
 | [`LinkRunner.getInstance().setDisableAaidCollection`](/sdk/android#disable-aaid-collection) | Optional | App initialization or privacy settings | Before `init`, when you need to disable AAID collection |
 | [`LinkRunner.getInstance().isAaidCollectionDisabled`](/sdk/android#disable-aaid-collection) | Optional | Privacy settings or compliance checks | When you need to check AAID collection status |
+| [`LinkRunner.getInstance().isPrivacyModeEnabled`](/sdk/android#privacy-mode) | Optional | Privacy settings or compliance checks | When you need to check if privacy mode is on |
 
 ## Complete Example
 
