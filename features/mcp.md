@@ -29,6 +29,10 @@ confirm it in the chat. See
 
 Add the connector once. Your assistant asks you to sign in the first time it needs your Linkrunner account.
 
+**Website projects can connect too.** A project with no app is set up the same way, and its assistant answers about website visitors, conversions and revenue through the [website tools](#website-data). Set it up in **Settings → MCP** in the [dashboard](https://dashboard.linkrunner.io/dashboard/settings/mcp).
+
+![The MCP settings section on a website project, with the token scopes and the four connection steps](/images/mcp/mcp-website-project.webp)
+
 <Tabs>
 
 <Tab title="Claude">
@@ -266,6 +270,24 @@ will fetch it.
 
 </Note>
 
+### Website data
+
+These answer about your **website**, from the Web SDK. A project that runs an app and a website has both sets, and they are never mixed: a visitor is not an install, and no cross-device identity joins them.
+
+| Tool                   | Use it for                                                                                                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `get_web_overview`     | Website totals for a range plus a point per day: visitors, sessions, page views, identified users, sign-ups, purchases, revenue and conversion rate, with lifetime totals. |
+| `get_web_totals`       | The same totals with ad spend joined, so ROAS and cost per visitor. The only website tool that carries spend.                                                            |
+| `get_web_performance`  | One row per channel, campaign, source, referrer or Meta ad, sorted and paged. The Web Events table itself.                                                              |
+| `get_web_details`      | The users and events behind one row, read from raw events: exact visitor and session counts, top pages, and a sign-up to purchase funnel.                               |
+| `list_web_event_names` | Custom event names the Web SDK has recorded, most frequent first, so your assistant can name a real event instead of guessing one.                                       |
+
+<Note>
+
+Range totals dedupe visitors across the whole window while the daily series counts them per day, so the totals are **less** than the sum of the series. That is correct, and your assistant is told never to present the gap as a discrepancy.
+
+</Note>
+
 ### Setup and delivery checks
 
 | Tool                        | Use it for                                                                                                                                                                                                                                                                   |
@@ -299,6 +321,22 @@ assistant passes is checked against them before a request is made, so it cannot
 ask for a field that does not exist. A wrong name comes back with suggestions
 instead of a failed call. Almost everything the two reporting APIs expose for
 reading is reachable this way.
+
+### App numbers and website numbers
+
+Every tool that counts app installs and app SDK events says so in a `data_scope` field on its response, naming the website tools that answer the other half:
+
+```json
+"data_scope": {
+  "source": "app",
+  "covers": "app installs and app SDK events only",
+  "website_data": "website visitors and conversions are counted by the web tools, never by this one: get_web_overview, get_web_totals, get_web_performance, list_web_event_names, get_web_details"
+}
+```
+
+It exists because the failure it prevents is silent. For a customer who runs both, `get_project_stats` alone is the **app's** answer, and presenting it as the project's looks complete while leaving the website out. The marker lets your assistant notice that and fetch both sides, labelled.
+
+`search_event_log` deliberately carries no marker: it answers from either source depending on what you ask for.
 
 ### Which source answers which question
 
