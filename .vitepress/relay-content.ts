@@ -273,6 +273,7 @@ export const PAGE_TITLES: Record<string, PageTitle> = {
   "/testing/integration-testing": { title: "Test your SDK setup" },
   "/testing/event-and-revenue-testing": { title: "Test events and payments" },
   "/testing/web-sdk-testing": { title: "Test the Web SDK" },
+  "/testing/website-sdk-audit": { label: "Audit your website" },
   "/testing/meta-android-attribution-testing": { title: "Test Meta attribution on Android", label: "Test Meta on Android" },
   "/testing/testing-attribution-troubleshooting": {
     title: "Why is my test credited to the wrong campaign?",
