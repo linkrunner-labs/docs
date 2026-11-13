@@ -31,21 +31,15 @@ Turn on CTV only for partners you trust. A partner that reports impressions it d
 
 ## Turn it on for a partner
 
-You need three switches on, per partner and per app. Only admins and managers can change them. Changes take up to 5 minutes to apply.
+You need two switches on, per partner and per app. Only admins and managers can change them. Changes take up to 5 minutes to apply.
 
 <Steps>
 
-<Step title="Turn on S2S clicks and impressions">
-
-Go to **Integrations → Affiliate Partners**, click **Configure** on the partner's card, and turn on **S2S clicks and impressions**. See [Turn on S2S clicks for a partner](/affiliate-partners/turn-on-s2s-clicks) for the steps.
-
-</Step>
-
 <Step title="Turn on Connected TV (CTV) impressions">
 
-On the same page, turn on **Connected TV (CTV) impressions** under the S2S switch. It stays disabled until S2S is on. Turning S2S off also turns CTV off.
+Go to **Integrations → Affiliate Partners**, click **Configure** on the partner's card, and turn on **Connected TV (CTV) impressions**. This switch is separate from **S2S clicks and impressions**. You don't need to turn S2S on first.
 
-![The partner's Configure page with S2S clicks and impressions and Connected TV (CTV) impressions both on](/images/ctv-attribution/ctv-switches-on.webp)
+![The partner's Configure page with the Connected TV (CTV) impressions switch on](/images/ctv-attribution/ctv-switches-on.webp)
 
 </Step>
 
@@ -103,7 +97,7 @@ CTV installs appear in your campaign table as installs and as **View Through Att
 
 To stop CTV credit for a partner, turn off **Connected TV (CTV) impressions** on the partner's **Configure** page. Within 5 minutes Linkrunner rejects the partner's new CTV impressions. Installs already credited keep their attribution.
 
-You can also turn off view-through for the partner in **Settings → Attribution Windows**, which stops all impression credit for that partner. Turning off S2S clicks and impressions turns CTV off too.
+You can also turn off view-through for the partner in **Settings → Attribution Windows**, which stops all impression credit for that partner. Turning **S2S clicks and impressions** on or off does not change CTV.
 
 ## Troubleshooting
 
@@ -113,7 +107,6 @@ You can also turn off view-through for the partner in **Settings → Attribution
 
 The partner sees one of these reasons in the response:
 
-- `partner_not_enabled`: S2S clicks and impressions is off for this partner.
 - `ctv_not_enabled`: the CTV switch is off for this partner.
 - `view_through_disabled`: view-through is off for this partner in **Settings → Attribution Windows**.
 
@@ -135,7 +128,7 @@ Check these in order:
 
 <Accordion title="I don't see a CTV impression URL">
 
-The URL shows only for a partner's campaigns once CTV is on. Check that **S2S clicks and impressions** and **Connected TV (CTV) impressions** are both on for that partner, and that the partner is connected in **Integrations → Affiliate Partners**.
+The URL shows only for a partner's campaigns once CTV is on. Check that **Connected TV (CTV) impressions** is on for that partner, and that the partner is connected in **Integrations → Affiliate Partners**.
 
 </Accordion>
 
