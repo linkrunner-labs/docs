@@ -130,6 +130,22 @@ Revenue, ROAS and event columns can count on two bases. Pick one in **Edit colum
 
 Switch **Install Attribution** to **Retargeting** at the top of the page to see returning users instead of new installs. In this view, **Installs** shows reinstalls only, **Conversion** is blank, and **Reengagements** shows users who came back to the app through a retargeting link. See [web to app journeys](/features/web-to-app-journeys#metrics-and-where-they-live).
 
+## When ad network numbers update
+
+Clicks, impressions and spend come from each ad network's own reporting, which Linkrunner fetches on a schedule. The latest hours can be missing until the next fetch, so compare full days that ended at least 4 hours ago.
+
+| Network | How often it refreshes |
+| :-- | :-- |
+| Meta | Every hour for the last 2 days. Every 3 hours for the last 28 days, which also picks up Meta's late corrections. |
+| Google Ads | Every 4 hours |
+| TikTok | Every 2 hours |
+| Apple Search Ads | Every 3 hours |
+| Snapchat | Every hour |
+
+## The total row and the Organic row
+
+The total row counts installs credited to campaigns only. Organic installs have their own pinned **Organic** row and are not in the total. Add the two together when you compare with all installs in your own data or a store console.
+
 ## Why your numbers can differ from an ad network
 
 Linkrunner credits each install to one campaign and removes duplicates across networks. Ad networks count conversions with their own rules. For the expected gaps, see [Meta discrepancies](/ad-networks/meta-ads-discrepancies) and [Google discrepancies](/ad-networks/google-ads-discrepancies).
