@@ -193,6 +193,24 @@ You can easily duplicate campaigns once created for every ad creative, making it
 
 </Tip>
 
+## Website conversions
+
+Linkrunner also sends conversions from your **website** to the LinkedIn Conversions API, against one of your conversion rules. LinkedIn matches them with `li_fat_id`, the first-party cookie it sets on the click, which the Web SDK captures when the visitor lands. The same advertiser account and Conversions API token above are used.
+
+1. On this integration, switch to **Web** at the top and open the **Web Event Mapping** tab.
+2. Click **Add Mapping**.
+3. Under **Your Web Events**, pick your website event, such as `purchase`.
+4. Under **LinkedIn Conversion**, pick the conversion rule that should receive it. Unlike the other networks, LinkedIn maps to a rule you have created, not to a fixed event name.
+5. For purchases, turn on **Send Revenue** and pick the **Currency** your website sends.
+
+![Web Event Mapping for LinkedIn with purchase mapped to a Website purchase conversion rule](/images/linkedin-ss/web-event-mapping.webp)
+
+For each mapped event LinkedIn receives the conversion rule, the time, `li_fat_id`, and the value and currency when **Send Revenue** is on.
+
+- **`li_fat_id` is the only identifier.** LinkedIn matches a website conversion on it alone, so a conversion without one is recorded in Postback Logs and not sent.
+- **Website mappings have no test send.** These rows carry no paper plane icon, unlike Meta and Google Ads, because a LinkedIn test builds an app-shaped postback. Confirm delivery from a real conversion in Postback Logs instead.
+- Don't see your event in the list? Your website hasn't sent it yet. See [Track sign-ups and purchases on your website](/features/web-events-tracking).
+
 ## Deferred Deep Linking
 
 One of the powerful features of running LinkedIn ads with Linkrunner is deferred deep linking support:
