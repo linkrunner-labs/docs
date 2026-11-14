@@ -32,6 +32,7 @@ The SDK sends this device data with the `init` call, and again with `signup`, de
 | `app_set_id`, `app_set_id_scope` | Google's App Set ID and its scope | Fallback ID for Google Ads when there is no advertising ID | Yes, together with `gaid` |
 | `install_ref` and the other install referrer fields | Google Play Install Referrer: the referrer string, the click and install timestamps (device and server time), and the installer version | Attributes the install to the link or ad that led to it | No |
 | `meta_install_ref` | Meta's install referrer from the Facebook, Instagram or Facebook Lite app, when one exists | Attributes installs from Meta ads | Yes, with [privacy mode](#privacy-mode) |
+| `meta_anonymous_id` | The Meta (Facebook) SDK's anonymous app ID, read from the Meta SDK's own storage. Only present when your app bundles the Meta SDK | Lets Meta match the events Linkrunner sends it to the device its own SDK already knows. Sent only to Meta | Yes, see [Turn off collection](#turn-off-collection), or use [privacy mode](#privacy-mode) |
 | `brand`, `manufacturer`, `device_model`, `device_name` | Device make and model. `device_name` is make plus model, not the name the user gave the phone | Attribution matching and reporting | No |
 | `system_version` | Android version | Reporting | No |
 | `user_agent` | The device's default WebView user agent | Matches web clicks to installs | No |
@@ -57,6 +58,7 @@ The SDK sends this device data with most requests, including `initialize`, `sign
 | `att_status` | The user's ATT answer | Tells ad networks whether IDFA-based matching is allowed | No |
 | `adservices_attribution_token` | Apple's AdServices token | Attributes installs from Apple Search Ads | No |
 | `odm_info` | A value from Google's on-device conversion SDK. Only sent if your app includes that SDK | Attributes iOS installs from Google Ads | Remove Google's SDK, or use [privacy mode](#privacy-mode) |
+| `meta_anonymous_id` | The Meta (Facebook) SDK's anonymous app ID, read from the Meta SDK's own storage. Only present when your app bundles the Meta SDK | Lets Meta match the events Linkrunner sends it to the device its own SDK already knows. Sent only to Meta | Yes, see [Turn off collection](#turn-off-collection), or use [privacy mode](#privacy-mode) |
 | `device`, `device_model`, `device_name`, `brand`, `manufacturer` | Device type and hardware model. On iOS 15, `device_name` is the name the user gave the phone (for example "Mia's iPhone"). On iOS 16 and later Apple returns a generic name such as "iPhone" | Attribution matching and reporting | [Privacy mode](#privacy-mode) sends the generic model instead of the name |
 | `system_version` | iOS version | Reporting | No |
 | `device_display` | Screen width, height and scale | Attribution matching | No |
@@ -115,6 +117,7 @@ When an iOS user denies tracking, Linkrunner has no IDFA and tells Meta that tra
 | Android | Google Advertising ID, limit ad tracking and App Set ID | [`setDisableAaidCollection(true)`](/sdk/android#disabling-aaid-collection) before `init`. Available on Android, Flutter and Unity |
 | Android, any SDK | Google Advertising ID | [Remove the `AD_ID` permission](/sdk/android#removing-ad_id-permission) from your manifest. Use this from React Native, Expo, Capacitor and Cordova, which don't have `setDisableAaidCollection` yet. It blanks the ID on Android 13 and later when your app targets API 33 or higher. App Set ID is still collected |
 | iOS | IDFA and the SDK's ATT prompt | `disableIdfa: true` in `initialize` |
+| Android and iOS | Meta anonymous ID | `io.linkrunner.sdk.MetaAnonymousIdCollectionEnabled` set to `false` in `AndroidManifest.xml`, and `LinkrunnerMetaAnonymousIdCollectionEnabled` set to `NO` in `Info.plist`. Expo apps use the `collectMetaAnonymousId` plugin option. See your [SDK page](/sdk/android#meta-anonymous-id) |
 | Android and iOS, any SDK | Every device-level identifier, including the advertising IDs, Android ID, IDFV and the ATT prompt | `privacyMode: true` in `init` or `initialize`. See [Privacy mode](#privacy-mode) |
 | All mobile SDKs | Plain-text name, email and phone | `enablePIIHashing(true)` |
 | Android and iOS | Google Ads consent signals | `setConsent` sends your user's choices. Not available in Capacitor and Cordova yet |
