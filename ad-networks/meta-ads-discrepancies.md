@@ -21,6 +21,53 @@ Meta publishes its own explanation of how it attributes and reports conversions:
 
 <AccordionGroup>
 
+<Accordion title="Meta login fails: business assets were not granted the requested permissions">
+
+When you click **Add Meta Account**, Meta can stop the login with this message, followed by an ID and a code that starts with `#1349246`:
+
+> The following business assets were not granted the requested permissions.
+
+The message comes from Meta, before the login returns to Linkrunner. Meta did not give Linkrunner access to the asset with that ID, so no ad account is connected and nothing is saved in Linkrunner.
+
+Linkrunner connects through your Meta business portfolio, so the Meta login needs both of these:
+
+- A Meta account with **full control** of the business portfolio.
+- The ad account you want to connect, added to that business portfolio. See Meta's guide to [add an ad account to your business portfolio](https://www.facebook.com/business/help/910137316041095).
+
+<Steps>
+
+<Step title="Compare the ID in the message with your ad account ID">
+
+Find the ID of the ad account you want to connect in Meta Business Suite under **Settings → Accounts → Ad accounts**.
+
+</Step>
+
+<Step title="If the IDs match, check who does the login">
+
+Meta did not share the ad account you want. Check that the ad account is listed in the business portfolio you pick in the Meta popup, and that the person who logs in has full control of that portfolio.
+
+If another business portfolio owns the ad account, such as an agency's, ask a person with full control of that portfolio to do the Meta login. They need access to your Linkrunner project first, see [Add teammates](/features/add-teammates).
+
+</Step>
+
+<Step title="If the IDs differ, select only the ad account you need">
+
+Another asset selected in the popup stopped the login. Open [Ad Account Integration](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=ad_account), click **Add Meta Account** again, pick the business portfolio that owns the ad account, and select only that ad account.
+
+</Step>
+
+<Step title="Confirm the ad account is connected">
+
+When the login succeeds, Linkrunner lists the ad accounts Meta shared. Select yours and click **Import Accounts**. The ad account then appears on the **Ad Account Integration** tab.
+
+</Step>
+
+</Steps>
+
+If Meta shows the message again, contact [Meta Business Support](https://www.facebook.com/business-support-home/). Meta lists this as the fix for code `1349246`. You can also email <support@linkrunner.io> with a screenshot of the message and the ID of the ad account you want to connect.
+
+</Accordion>
+
 <Accordion title="Events aren't showing up in Meta Events Manager">
 
 Walk through this checklist.

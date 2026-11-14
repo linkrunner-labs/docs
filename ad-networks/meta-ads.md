@@ -73,11 +73,15 @@ in your Meta app settings.
 
 ### Step 4: Connect Meta Ad Account
 
+Linkrunner connects through your Meta business portfolio. Do this step with a Meta account that has full control of the business portfolio that owns the ad account.
+
 1. Go to [Ad Account Integration](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=ad_account)
 2. Click **Add Meta Account**
 3. Log in with Meta and connect your ad account
 
 <img src="/images/meta/ad-account-integration.png" alt="Meta Ad Account Integration tab in Linkrunner" />
+
+If Meta stops the login with **The following business assets were not granted the requested permissions**, see [Meta login fails](/ad-networks/meta-ads-discrepancies#q-meta-login-fails-business-assets-were-not-granted-the-requested-permissions) in the FAQ.
 
 ### Step 5: Configure CAPI
 
