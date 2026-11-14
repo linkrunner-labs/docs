@@ -143,6 +143,14 @@ Click the payment link in the **Pay Now** dialog. It opens a hosted payment page
 
 If your account has the wallet enabled, a pending invoice is settled from your balance automatically. See [Linkrunner Wallet](/billing/wallet).
 
+### Download an invoice or receipt
+
+Download links on the billing page are created when the page loads and expire after 15 minutes. If the tab has been open longer, refresh the page and download again. The PDF attached to the invoice email does not expire.
+
+### If an invoice is wrong
+
+If an invoice shows a different rate from your agreement, or the wrong company name, address, GST number or tax type, don't pay it. Email <support@linkrunner.io> with the invoice number and what needs to change, and attach your tax certificate for tax details. We cancel the invoice and issue a corrected one on your billing page.
+
 ## What happens when an invoice is overdue?
 
 | Timeline | Action                                                                                            |

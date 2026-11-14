@@ -153,7 +153,6 @@ const guides: Group[] = [
     page("Build an audience", "/features/remarketing-audiences", classic.get("/features/remarketing-audience-segments")?.icon),
   ], false, "arrows-clockwise"),
   group("Billing", links("/billing/overview", "/billing/wallet", "/billing/finance-role"), false, "credit-card"),
-  group("Troubleshooting", links("/testing/testing-attribution-troubleshooting"), false, "lifebuoy"),
 ];
 
 // Setup: for whoever wires Linkrunner into the app (SDKs, deep link
@@ -228,7 +227,48 @@ const partners: Group[] = (nav.sidebars as Group[][])[3].map((g) => {
   return group(name, classicGroup(3, name), true, PARTNER_ICONS[name] ?? "handshake");
 });
 
-export const relaySidebars: Group[][] = [guides, setup, integrations, partners];
+// Help: one page per problem a customer reports, titled the way they describe
+// it. Each article diagnoses the symptom and links to the guide that owns the
+// fix, so the guides stay the single source for how a feature works.
+const help: Group[] = [
+  group("Start here", [page("Help center", "/help/", "lifebuoy")], true, "lifebuoy"),
+  group("Installs and attribution", [
+    page("Paid installs show as organic", "/help/installs-showing-as-organic", "question"),
+    page("iOS campaign shows no installs", "/help/ios-campaign-no-installs", "apple-logo"),
+    page("Website installs not credited", "/help/website-visitors-not-credited", "browser"),
+    page("Reinstalls and re-engagement", "/help/reinstall-attribution", "arrows-clockwise"),
+    ...links("/testing/testing-attribution-troubleshooting"),
+  ], true, "target"),
+  group("Links and deep links", [
+    page("Which link to use", "/help/which-link-to-use", "link"),
+    page("Deep link opens the store", "/help/deep-link-opens-store", "link-break"),
+    page("No campaign data in the app", "/help/no-campaign-data-in-app", "device-mobile"),
+    page("Unexpected clicks on a link", "/help/unexpected-clicks", "shield-check"),
+  ], true, "link"),
+  group("SDK and events", [
+    page("SDK ready to go live?", "/help/sdk-ready-to-go-live", "list-checks"),
+    page("Build fails or app crashes", "/help/sdk-build-errors", "bug"),
+    page("Custom events not showing", "/help/custom-events-not-showing", "chart-bar"),
+    page("Uninstalls show 0", "/help/uninstall-tracking-not-working", "arrows-clockwise"),
+  ], true, "code"),
+  group("Ad networks and partners", [
+    page("Can't connect my ad account", "/help/cant-connect-ad-account", "plugs"),
+    page("Network gets no postbacks", "/help/network-postbacks-not-received", "broadcast"),
+    page("Partner can't see campaigns", "/help/affiliate-partner-not-tracking", "handshake"),
+    page("Analytics tool gets no data", "/help/integration-not-receiving-data", "plugs-connected"),
+  ], true, "megaphone"),
+  group("Dashboard and data", [
+    page("A dashboard number looks wrong", "/help/dashboard-numbers-look-wrong", "chart-bar"),
+    page("Spend or ROAS missing", "/help/spend-or-roas-missing", "currency-circle-dollar"),
+    page("Revenue doesn't match backend", "/help/revenue-doesnt-match", "currency-dollar"),
+    page("Exports or API don't match", "/help/exports-dont-match-dashboard", "file-csv"),
+  ], true, "chart-bar"),
+  group("Account and billing", [
+    page("Paid invoice still shows Pending", "/help/invoice-pending-after-payment", "credit-card"),
+  ], true, "credit-card"),
+];
+
+export const relaySidebars: Group[][] = [guides, setup, integrations, partners, help];
 
 const allLinks = (tab: Group[]) => {
   const out: string[] = [];
@@ -245,7 +285,7 @@ const allLinks = (tab: Group[]) => {
  */
 export const relaySidebarKeys: Record<string, number> = {};
 relaySidebars.forEach((tab, i) => {
-  for (const l of allLinks(tab)) relaySidebarKeys[l === "/" ? "/index.md" : `${l}.md`] ??= i;
+  for (const l of allLinks(tab)) relaySidebarKeys[l.endsWith("/") ? `${l}index.md` : `${l}.md`] ??= i;
 });
 for (const dir of Object.keys(nav.sidebarKeys).filter((k) => k.endsWith("/"))) {
   const tabs = Object.entries(relaySidebarKeys).filter(([k]) => k.startsWith(dir)).map(([, t]) => t);
@@ -267,5 +307,6 @@ export const relayNav: DefaultTheme.NavItem[] = [
   { text: "Setup", link: "/quickstart", activeMatch: activeMatch(1) },
   { text: "Integrations", link: "/ad-networks/overview", activeMatch: activeMatch(2) },
   { text: "Partners", link: "/affiliate-partners/getting-started", activeMatch: activeMatch(3) },
+  { text: "Help", link: "/help/", activeMatch: activeMatch(4) },
   { text: "Dashboard", link: "https://dashboard.linkrunner.io" },
 ];

@@ -179,6 +179,8 @@ Fields that are not available can be `null` or omitted from the payload.
 
 </Note>
 
+Timestamps such as `attributed_on` and `installed_at` are in UTC. The dashboard and exports group days in your project's time zone, so convert webhook timestamps before you compare daily counts.
+
 ### Install ID
 
 `lr_install_id` identifies a single install of your app. Both webhooks for that install carry the same value, so it is the join key between them: store it from the install webhook, then look it up when the signup webhook for the same install arrives.
