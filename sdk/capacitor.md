@@ -395,7 +395,7 @@ This method allows you to connect user identities across different analytics and
 
 ## Meta Anonymous ID
 
-If your app also has the Meta (Facebook) SDK, update to `capacitor-linkrunner` 3.1.0. Linkrunner reads the Meta SDK's anonymous ID automatically and sends it with your events, and the Linkrunner backend passes it to Meta as `anon_id`. Meta then matches those events to the same device it already knows from its own SDK. There is no code for you to write.
+If your app also has the Meta (Facebook) SDK, update to `capacitor-linkrunner` 3.2.0. Linkrunner reads the Meta SDK's anonymous ID automatically and sends it with your events, and the Linkrunner backend passes it to Meta as `anon_id`. Meta then matches those events to the same device it already knows from its own SDK. There is no code for you to write.
 
 No set-up order is required. Linkrunner and the Meta SDK can start in either order, and if the Meta SDK only starts later, for example after a consent prompt, the ID is picked up on the next event. In apps without the Meta SDK nothing is read and nothing extra is sent.
 
@@ -587,6 +587,36 @@ linkrunner.enablePIIHashing(true);
 ```
 
 When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
+
+## Privacy mode
+
+Use privacy mode for apps directed at children. It stops the native SDKs from collecting any device-level identifier. On Android: no Google Advertising ID, App Set ID or Android ID, no local IP address, no carrier name and no Meta install referrer. On iOS: no IDFA, no ATT prompt, no IDFV, no Google on-device conversion value, no user-assigned device name and no SKAdNetwork conversion values. Only the SDK's install instance ID identifies the install.
+
+It needs native Android SDK 5.1.0 and iOS SDK 5.1.0. Use `capacitor-linkrunner` 3.1.0 or later.
+
+Pass `true` as the sixth argument of `init`, after `debug`:
+
+```typescript
+import linkrunner from "capacitor-linkrunner";
+
+await linkrunner.init(
+    "YOUR_PROJECT_TOKEN",
+    undefined, // secretKey
+    undefined, // keyId
+    false, // disableIdfa
+    false, // debug
+    true // privacyMode
+);
+```
+
+The SDK saves the setting. `true` stays on across launches until you call `init` with `privacyMode` set to `false`. If you leave the argument out, the SDK keeps the saved value.
+
+When privacy mode is on:
+
+- On iOS, skip the `NSUserTrackingUsageDescription` key in [Step 3](#step-3-ios-configuration) and the SKAdNetwork keys in [Step 4](#step-4-skadnetwork-configuration).
+- On Android, [remove the `AD_ID` permission](/sdk/android#removing-ad_id-permission) from your manifest, because the SDK still declares it.
+
+For everything privacy mode removes, what is still sent, and how it changes your store privacy answers, see [Privacy mode](/sdk/data-collection#privacy-mode).
 
 ## Uninstall Tracking
 

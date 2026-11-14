@@ -617,7 +617,7 @@ This method allows you to connect user identities across different analytics and
 
 ## Meta Anonymous ID
 
-If your app also has the Meta (Facebook) SDK, update to `linkrunner` 5.1.0. Linkrunner reads the Meta SDK's anonymous ID automatically and sends it with your events, and the Linkrunner backend passes it to Meta as `anon_id`. Meta then matches those events to the same device it already knows from its own SDK. There is no code for you to write.
+If your app also has the Meta (Facebook) SDK, update to `linkrunner` 5.2.0. Linkrunner reads the Meta SDK's anonymous ID automatically and sends it with your events, and the Linkrunner backend passes it to Meta as `anon_id`. Meta then matches those events to the same device it already knows from its own SDK. There is no code for you to write.
 
 No set-up order is required. Linkrunner and the Meta SDK can start in either order, and if the Meta SDK only starts later, for example after a consent prompt, the ID is picked up on the next event. In apps without the Meta SDK nothing is read and nothing extra is sent.
 
@@ -952,7 +952,35 @@ When AAID collection is disabled, the SDK will not collect or send the Google Ad
 
 ### Removing AD_ID Permission
 
-If you want to completely remove the `AD_ID` permission from your app's manifest (for example, for apps targeting children), you can override the SDK's permission declaration in your `android/app/src/main/AndroidManifest.xml`. For detailed instructions on revoking the AD_ID permission, including Google's policy requirements for apps targeting children and Android 13+ (API 33+), see the [Revoking the AD_ID Permission](#revoking-the-ad-id-permission) section above.
+If you want to completely remove the `AD_ID` permission from your app's manifest (for example, for apps targeting children), you can override the SDK's permission declaration in your `android/app/src/main/AndroidManifest.xml`. For detailed instructions on revoking the AD_ID permission, including Google's policy requirements for apps targeting children and Android 13+ (API 33+), see the [Revoking the AD_ID Permission](#revoking-the-ad_id-permission) section above.
+
+## Privacy mode
+
+Use privacy mode for apps directed at children. It stops the native SDKs from collecting any device-level identifier. On Android: no Google Advertising ID, App Set ID or Android ID, no local IP address, no carrier name and no Meta install referrer. On iOS: no IDFA, no ATT prompt, no IDFV, no Google on-device conversion value, no user-assigned device name and no SKAdNetwork conversion values. Only the SDK's install instance ID identifies the install.
+
+It needs native Android SDK 5.1.0 and iOS SDK 5.1.0. Use `linkrunner` 5.1.0 or later.
+
+Pass `true` as the sixth argument of `init`, after `debug`:
+
+```dart
+await LinkRunner().init(
+  'YOUR_PROJECT_TOKEN',
+  null, // secretKey
+  null, // keyId
+  false, // disableIdfa
+  false, // debug
+  true, // privacyMode
+);
+```
+
+The SDK saves the setting. `true` stays on across launches until you call `init` with `privacyMode` set to `false`. If you leave the argument out, the SDK keeps the saved value.
+
+When privacy mode is on:
+
+- On iOS, skip the `NSUserTrackingUsageDescription` step in [iOS Configuration](#ios-configuration). You don't need the SKAdNetwork keys either.
+- On Android, [revoke the `AD_ID` permission](#revoking-the-ad_id-permission), because the SDK still declares it.
+
+For everything privacy mode removes, what is still sent, and how it changes your store privacy answers, see [Privacy mode](/sdk/data-collection#privacy-mode).
 
 ## Uninstall Tracking
 

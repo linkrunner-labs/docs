@@ -9,7 +9,7 @@ description: "What each Linkrunner SDK sends to Linkrunner, how to turn parts of
 
 Every app that ships the Linkrunner SDK has to declare its data collection on Google Play and the App Store. Use this page to fill in Linkrunner's part of those forms. Add what your app and your other SDKs collect before you submit.
 
-This page describes Android SDK 5.0.0 and iOS SDK 5.0.0, and the Web SDK as of November 2026.
+This page describes Android SDK 5.0.0 and iOS SDK 5.0.0, and the Web SDK as of November 2026. [Privacy mode](#privacy-mode) needs Android SDK 5.1.0 and iOS SDK 5.1.0.
 
 ## How the SDKs fit together
 
@@ -26,20 +26,20 @@ The SDK sends this device data with the `init` call, and again with `signup`, de
 | Field | What it is | Why Linkrunner needs it | Can you turn it off? |
 | --- | --- | --- | --- |
 | `install_instance_id` | A random ID the SDK creates on first launch and stores in your app | Ties all requests from one install together | No |
-| `device_id` | The Android ID (`Settings.Secure.ANDROID_ID`) | Recognises the device when no advertising ID is available | No |
+| `device_id` | The Android ID (`Settings.Secure.ANDROID_ID`) | Recognises the device when no advertising ID is available | Yes, with [privacy mode](#privacy-mode). The field is then sent empty |
 | `gaid` | Google Advertising ID. Empty when the user deleted it or opted out of ads personalisation | Matches installs to ad clicks on Google, Meta and other networks | Yes, see [Turn off collection](#turn-off-collection) |
 | `limit_ad_tracking` | Whether the user opted out of ads personalisation | Tells Google how it may use the conversion | Yes, together with `gaid` |
 | `app_set_id`, `app_set_id_scope` | Google's App Set ID and its scope | Fallback ID for Google Ads when there is no advertising ID | Yes, together with `gaid` |
 | `install_ref` and the other install referrer fields | Google Play Install Referrer: the referrer string, the click and install timestamps (device and server time), and the installer version | Attributes the install to the link or ad that led to it | No |
-| `meta_install_ref` | Meta's install referrer from the Facebook, Instagram or Facebook Lite app, when one exists | Attributes installs from Meta ads | No |
-| `meta_anonymous_id` | The Meta (Facebook) SDK's anonymous app ID, read from the Meta SDK's own storage. Only present when your app bundles the Meta SDK | Lets Meta match the events Linkrunner sends it to the device its own SDK already knows. Sent only to Meta | Yes, see [Turn off collection](#turn-off-collection) |
+| `meta_install_ref` | Meta's install referrer from the Facebook, Instagram or Facebook Lite app, when one exists | Attributes installs from Meta ads | Yes, with [privacy mode](#privacy-mode) |
+| `meta_anonymous_id` | The Meta (Facebook) SDK's anonymous app ID, read from the Meta SDK's own storage. Only present when your app bundles the Meta SDK | Lets Meta match the events Linkrunner sends it to the device its own SDK already knows. Sent only to Meta | Yes, see [Turn off collection](#turn-off-collection), or use [privacy mode](#privacy-mode) |
 | `brand`, `manufacturer`, `device_model`, `device_name` | Device make and model. `device_name` is make plus model, not the name the user gave the phone | Attribution matching and reporting | No |
 | `system_version` | Android version | Reporting | No |
 | `user_agent` | The device's default WebView user agent | Matches web clicks to installs | No |
 | `application_name`, `bundle_id`, `app_version`, `version`, `build_number` | Your app's name, package name and version | Reporting by app version | No |
 | `package_version`, `platform` | The SDK version and which SDK sent the request (for example `FLUTTER`) | Support and debugging | No |
-| `device_ip` | The IP address of the device's network connection. On Wi-Fi this is usually a private local address | Attribution matching | No |
-| `carrier` | Mobile network operator name | Reporting | No |
+| `device_ip` | The IP address of the device's network connection. On Wi-Fi this is usually a private local address | Attribution matching | Yes, with [privacy mode](#privacy-mode) |
+| `carrier` | Mobile network operator name | Reporting | Yes, with [privacy mode](#privacy-mode) |
 | `connectivity` | Wi-Fi, mobile network or Ethernet | Reporting | No |
 | `country`, `language`, `locale` | From the device's language and region settings, not from GPS | Reporting, and required by Google's App Conversion API | No |
 | `consent` | The consent values you pass with `setConsent` | Sent to Google Ads with each conversion | Only sent when you set it |
@@ -53,13 +53,13 @@ The SDK sends this device data with most requests, including `initialize`, `sign
 | Field | What it is | Why Linkrunner needs it | Can you turn it off? |
 | --- | --- | --- | --- |
 | `install_instance_id` | A random ID the SDK creates on first launch and stores in your app | Ties all requests from one install together | No |
-| `idfv` | Identifier for Vendor | Recognises the device across your apps | No |
-| `idfa` | Identifier for Advertisers. Only sent when the user allowed tracking in the App Tracking Transparency (ATT) prompt | Matches installs to ad clicks | Yes, pass `disableIdfa: true` to `initialize` |
+| `idfv` | Identifier for Vendor | Recognises the device across your apps | Yes, with [privacy mode](#privacy-mode) |
+| `idfa` | Identifier for Advertisers. Only sent when the user allowed tracking in the App Tracking Transparency (ATT) prompt | Matches installs to ad clicks | Yes, pass `disableIdfa: true` to `initialize`, or use [privacy mode](#privacy-mode) |
 | `att_status` | The user's ATT answer | Tells ad networks whether IDFA-based matching is allowed | No |
 | `adservices_attribution_token` | Apple's AdServices token | Attributes installs from Apple Search Ads | No |
-| `odm_info` | A value from Google's on-device conversion SDK. Only sent if your app includes that SDK | Attributes iOS installs from Google Ads | Remove Google's SDK |
-| `meta_anonymous_id` | The Meta (Facebook) SDK's anonymous app ID, read from the Meta SDK's own storage. Only present when your app bundles the Meta SDK | Lets Meta match the events Linkrunner sends it to the device its own SDK already knows. Sent only to Meta | Yes, see [Turn off collection](#turn-off-collection) |
-| `device`, `device_model`, `device_name`, `brand`, `manufacturer` | Device type and hardware model. On iOS 15, `device_name` is the name the user gave the phone (for example "Mia's iPhone"). On iOS 16 and later Apple returns a generic name such as "iPhone" | Attribution matching and reporting | No |
+| `odm_info` | A value from Google's on-device conversion SDK. Only sent if your app includes that SDK | Attributes iOS installs from Google Ads | Remove Google's SDK, or use [privacy mode](#privacy-mode) |
+| `meta_anonymous_id` | The Meta (Facebook) SDK's anonymous app ID, read from the Meta SDK's own storage. Only present when your app bundles the Meta SDK | Lets Meta match the events Linkrunner sends it to the device its own SDK already knows. Sent only to Meta | Yes, see [Turn off collection](#turn-off-collection), or use [privacy mode](#privacy-mode) |
+| `device`, `device_model`, `device_name`, `brand`, `manufacturer` | Device type and hardware model. On iOS 15, `device_name` is the name the user gave the phone (for example "Mia's iPhone"). On iOS 16 and later Apple returns a generic name such as "iPhone" | Attribution matching and reporting | [Privacy mode](#privacy-mode) sends the generic model instead of the name |
 | `system_version` | iOS version | Reporting | No |
 | `device_display` | Screen width, height and scale | Attribution matching | No |
 | `bundle_id`, `version`, `build_number`, `package_version` | Your app's bundle ID and version, and the SDK version | Reporting by app version | No |
@@ -71,7 +71,7 @@ The SDK sends this device data with most requests, including `initialize`, `sign
 
 <Warning>
 
-If you don't pass `disableIdfa: true`, the SDK asks for tracking permission (Apple's ATT prompt) during `initialize`, or a later call, while the user hasn't answered it yet. To choose when the prompt appears, show it yourself before you call `initialize`. You still need `NSUserTrackingUsageDescription` in `Info.plist`.
+If you don't pass `disableIdfa: true` or turn on [privacy mode](#privacy-mode), the SDK asks for tracking permission (Apple's ATT prompt) during `initialize`, or a later call, while the user hasn't answered it yet. To choose when the prompt appears, show it yourself before you call `initialize`. You still need `NSUserTrackingUsageDescription` in `Info.plist`.
 
 </Warning>
 
@@ -115,13 +115,82 @@ When an iOS user denies tracking, Linkrunner has no IDFA and tells Meta that tra
 | Platform | What you can turn off | How |
 | --- | --- | --- |
 | Android | Google Advertising ID, limit ad tracking and App Set ID | [`setDisableAaidCollection(true)`](/sdk/android#disabling-aaid-collection) before `init`. Available on Android, Flutter and Unity |
-| Android, any SDK | Google Advertising ID | [Remove the `AD_ID` permission](/sdk/android#removing-ad-id-permission) from your manifest. Use this from React Native, Expo, Capacitor and Cordova, which don't have `setDisableAaidCollection` yet. It blanks the ID on Android 13 and later when your app targets API 33 or higher. App Set ID is still collected |
+| Android, any SDK | Google Advertising ID | [Remove the `AD_ID` permission](/sdk/android#removing-ad_id-permission) from your manifest. Use this from React Native, Expo, Capacitor and Cordova, which don't have `setDisableAaidCollection` yet. It blanks the ID on Android 13 and later when your app targets API 33 or higher. App Set ID is still collected |
 | iOS | IDFA and the SDK's ATT prompt | `disableIdfa: true` in `initialize` |
 | Android and iOS | Meta anonymous ID | `io.linkrunner.sdk.MetaAnonymousIdCollectionEnabled` set to `false` in `AndroidManifest.xml`, and `LinkrunnerMetaAnonymousIdCollectionEnabled` set to `NO` in `Info.plist`. Expo apps use the `collectMetaAnonymousId` plugin option. See your [SDK page](/sdk/android#meta-anonymous-id) |
+| Android and iOS, any SDK | Every device-level identifier, including the advertising IDs, Android ID, IDFV and the ATT prompt | `privacyMode: true` in `init` or `initialize`. See [Privacy mode](#privacy-mode) |
 | All mobile SDKs | Plain-text name, email and phone | `enablePIIHashing(true)` |
 | Android and iOS | Google Ads consent signals | `setConsent` sends your user's choices. Not available in Capacitor and Cordova yet |
 
 Turning off the advertising ID lowers attribution accuracy. Only do it when you must, for example for apps in Google Play's Families program.
+
+## Privacy mode
+
+Privacy mode stops the SDK from collecting any device-level identifier. Only the install instance ID, a random ID the SDK creates for each install, identifies the install. Use it for apps directed at children, for example apps covered by COPPA, in Apple's Kids Category, or in Google Play's Families program.
+
+Privacy mode needs Android SDK 5.1.0 and iOS SDK 5.1.0. The wrappers need Flutter `linkrunner` 5.1.0, `rn-linkrunner` 4.1.0, `expo-linkrunner` 4.1.0, `capacitor-linkrunner` 3.1.0 or `cordova-linkrunner` 2.1.0. In Unity, update the bridge code as shown in the [Unity guide](/sdk/unity#privacy-mode).
+
+### What privacy mode turns off
+
+| Platform | What the SDK stops doing |
+| --- | --- |
+| Android | Does not collect the Google Advertising ID, limit ad tracking or App Set ID (`gaid` is sent empty). Never reads the Android ID (`device_id` is sent empty). Does not send `device_ip`, the carrier name or Meta's install referrer |
+| iOS | Does not collect the IDFA and never shows the ATT prompt. `requestTrackingAuthorization` reports the current status without showing the prompt. Does not send the IDFV or `odm_info`, and does not fetch Google's on-device conversion value. Sends the generic model, such as "iPhone", as `device_name`. Does not register for SKAdNetwork or update conversion values |
+
+### What is still sent
+
+- `install_instance_id`
+- Device and app details: brand, model, OS version, locale, language, country, connectivity, user agent and your app's version. On iOS also the screen size, time zone and `att_status`, which the SDK reads without asking for permission
+- The Google Play Install Referrer (Android) and Apple's AdServices token (iOS), so installs from Google Play links and Apple Search Ads are still attributed
+- `consent`, if you call `setConsent`
+- `privacy_mode: true`, on every request that carries device data
+- Everything your app passes in. Privacy mode does not block `signup`, `setUserData`, `trackEvent`, `setPushToken` or `setAdditionalData`. Don't send a child's name, email or phone number through them
+
+Linkrunner's servers still see the public IP address of each request, so IP-based install matching still works.
+
+### Turn it on
+
+Pass `privacyMode: true` when you initialize the SDK:
+
+| SDK | Call |
+| --- | --- |
+| [Android](/sdk/android#privacy-mode) | `LinkRunner.getInstance().init(..., privacyMode = true)` |
+| [iOS](/sdk/ios#privacy-mode) | `LinkrunnerSDK.shared.initialize(..., privacyMode: true)` |
+| [React Native](/sdk/react-native#privacy-mode) and [Expo](/sdk/expo#privacy-mode) | `linkrunner.init(token, secretKey, keyId, disableIdfa, debug, true)` |
+| [Flutter](/sdk/flutter#privacy-mode) | `LinkRunner().init(token, secretKey, keyId, disableIdfa, debug, true)` |
+| [Capacitor](/sdk/capacitor#privacy-mode) | `linkrunner.init(token, secretKey, keyId, disableIdfa, debug, true)` |
+| [Cordova](/sdk/cordova#privacy-mode) | `linkrunner.init({ token: "YOUR_PROJECT_TOKEN", privacyMode: true })` |
+| [Unity](/sdk/unity#privacy-mode) | `LinkrunnerSDK.Initialize(token, privacyMode: true)`, with the bridges in the Unity guide |
+
+The SDK saves the setting on the device:
+
+- `true` stays on across app launches until you initialize with `false`.
+- If you leave the parameter out, the SDK keeps the saved value. It is off until you turn it on.
+
+Also:
+
+- On iOS, don't add `NSUserTrackingUsageDescription` to `Info.plist`, because the SDK never asks for tracking permission. You don't need the SKAdNetwork keys `NSAdvertisingAttributionReportEndpoint` and `AttributionCopyEndpoint` either.
+- On Android, [remove the `AD_ID` permission](/sdk/android#removing-ad_id-permission) from your manifest. Privacy mode stops the SDK from reading the advertising ID, but the SDK still declares the permission.
+
+### What you give up
+
+- Ad networks can't match installs by advertising ID, so fewer installs are attributed to campaigns.
+- Google's iOS match rate drops, because the IDFV is Google's fallback ID when there is no IDFA.
+- On Android, installs from Meta ads can't be matched through Meta's install referrer.
+- On iOS, Linkrunner sets no SKAdNetwork conversion values.
+
+Privacy mode only changes what the Linkrunner SDK collects. Whether your app meets COPPA, Kids Category or Families rules also depends on the data you pass in, the ad networks you connect and your other SDKs.
+
+### Store answers with privacy mode on
+
+Start from the [Google Play](#google-play-data-safety-answers) and [Apple](#apple-app-privacy-answers) answers below. Privacy mode changes what falls under each data type, not which types you declare:
+
+| Form | Data type | With privacy mode on |
+| --- | --- | --- |
+| Google Play Data safety | Device or other IDs | Still **Yes**. The SDK sends no advertising ID, App Set ID or Android ID, but the install instance ID is an ID for one install of your app, and Google counts app-scoped IDs, such as Firebase installation IDs, in this type |
+| Google Play Data safety | Approximate location | Unchanged. Linkrunner still works it out from the IP address of each request |
+| Apple App Privacy | Identifiers → Device ID | Still declare it. The SDK sends no IDFA or IDFV, but the install instance ID still identifies the install |
+| Apple App Privacy | Used for tracking | Unchanged. If you send conversions to ad networks, answer **Yes**: the IP address and any contact details you pass still reach them. If you don't connect any ad network, answer **No** |
 
 ## Google Play Data safety answers
 

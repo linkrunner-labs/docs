@@ -382,13 +382,13 @@ From the SDK versions below, Linkrunner reads that ID automatically and sends it
 
 | SDK | Version |
 | -- | -- |
-| [Android](/sdk/android#meta-anonymous-id) | 5.1.0 |
-| [iOS](/sdk/ios#meta-anonymous-id) | 5.1.0 |
-| [React Native](/sdk/react-native#meta-anonymous-id) | 4.1.0 |
-| [Expo](/sdk/expo#meta-anonymous-id) | 4.1.0 |
-| [Flutter](/sdk/flutter#meta-anonymous-id) | 5.1.0 |
-| [Capacitor](/sdk/capacitor#meta-anonymous-id) | 3.1.0 |
-| [Cordova](/sdk/cordova#meta-anonymous-id) | 2.1.0 |
+| [Android](/sdk/android#meta-anonymous-id) | 5.2.0 |
+| [iOS](/sdk/ios#meta-anonymous-id) | 5.2.0 |
+| [React Native](/sdk/react-native#meta-anonymous-id) | 4.2.0 |
+| [Expo](/sdk/expo#meta-anonymous-id) | 4.2.0 |
+| [Flutter](/sdk/flutter#meta-anonymous-id) | 5.2.0 |
+| [Capacitor](/sdk/capacitor#meta-anonymous-id) | 3.2.0 |
+| [Cordova](/sdk/cordova#meta-anonymous-id) | 2.2.0 |
 | [Unity](/sdk/unity#meta-anonymous-id) | 3.1.0 |
 
 <Note>
