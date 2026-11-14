@@ -38,7 +38,7 @@ Linkrunner connects through your Meta business portfolio, so the Meta login need
 
 <Step title="Compare the ID in the message with your ad account ID">
 
-Find the ID of the ad account you want to connect in Meta Business Suite under **Settings → Accounts → Ad accounts**.
+Meta explains where to see the ID of the ad account you want to connect in [Find your ad account ID](https://www.facebook.com/business/help/1492627900875762). If the message lists several IDs, check each one.
 
 </Step>
 
@@ -46,13 +46,13 @@ Find the ID of the ad account you want to connect in Meta Business Suite under *
 
 Meta did not share the ad account you want. Check that the ad account is listed in the business portfolio you pick in the Meta popup, and that the person who logs in has full control of that portfolio.
 
-If another business portfolio owns the ad account, such as an agency's, ask a person with full control of that portfolio to do the Meta login. They need access to your Linkrunner project first, see [Add teammates](/features/add-teammates).
+If another business portfolio owns the ad account, such as an agency's, ask a person with full control of that portfolio to do the Meta login. They need Admin or Member access to your Linkrunner project first, see [Add teammates](/features/add-teammates).
 
 </Step>
 
-<Step title="If the IDs differ, select only the ad account you need">
+<Step title="If the IDs differ, log in again with only the ad account you need">
 
-Another asset selected in the popup stopped the login. Open [Ad Account Integration](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=ad_account), click **Add Meta Account** again, pick the business portfolio that owns the ad account, and select only that ad account.
+The ID is for something other than your ad account, and it may have stopped the whole login. First check that the person who logs in has full control of the business portfolio. Then open [Ad Account Integration](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=ad_account), click **Add Meta Account** again, pick the business portfolio that owns the ad account, and select only that ad account.
 
 </Step>
 
@@ -64,7 +64,7 @@ When the login succeeds, Linkrunner lists the ad accounts Meta shared. Select yo
 
 </Steps>
 
-If Meta shows the message again, contact [Meta Business Support](https://www.facebook.com/business-support-home/). Meta lists this as the fix for code `1349246`. You can also email <support@linkrunner.io> with a screenshot of the message and the ID of the ad account you want to connect.
+If Meta shows the message again, contact [Meta Business Support](https://www.facebook.com/business-support-home/). Meta's error reference lists contacting Business Support as the fix for code `1349246`. You can also email <support@linkrunner.io> with a screenshot of the message and the ID of the ad account you want to connect.
 
 </Accordion>
 
