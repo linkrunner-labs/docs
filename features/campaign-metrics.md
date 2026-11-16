@@ -132,7 +132,7 @@ Switch **Install Attribution** to **Retargeting** at the top of the page to see 
 
 ## When ad network numbers update
 
-Clicks, impressions and spend come from each ad network's own reporting, which Linkrunner fetches on a schedule. The latest hours can be missing until the next fetch, so compare full days that ended at least 4 hours ago.
+Clicks, impressions and spend come from each ad network's own reporting, which Linkrunner fetches on a schedule. The latest hours can be missing until the next fetch, so compare full days that ended at least 6 hours ago.
 
 | Network | How often it refreshes |
 | :-- | :-- |
