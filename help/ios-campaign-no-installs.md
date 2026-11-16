@@ -88,6 +88,6 @@ Email support with:
 - [Meta SKAN Setup](/features/meta-skan-setup)
 - [Google Ads SKAN Setup](/features/google-skan-setup)
 - [Conversion Values in SKAdNetwork](/features/skadnetwork-conversion-values)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

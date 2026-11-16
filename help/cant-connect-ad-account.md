@@ -92,6 +92,6 @@ To let support look at the account directly, give read-only access with [Give Li
 - [Meta Ads integration guide](/ad-networks/meta-ads)
 - [Google Ads integration guide](/ad-networks/google-ads)
 - [My paid installs show as organic](/help/installs-showing-as-organic)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

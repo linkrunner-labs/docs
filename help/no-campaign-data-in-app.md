@@ -81,6 +81,6 @@ Email support with:
 - [Deferred deep linking](/features/deferred-deep-linking)
 - [Create deep links for app destinations](/features/deep-link-management)
 - [Webhooks](/features/webhooks)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

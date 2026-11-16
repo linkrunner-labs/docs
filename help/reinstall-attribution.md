@@ -75,6 +75,6 @@ Email support with:
 - [Running Remarketing Campaigns](/features/remarketing-campaigns)
 - [Web to App Journeys](/features/web-to-app-journeys)
 - [What the Campaigns columns mean](/features/campaign-metrics)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

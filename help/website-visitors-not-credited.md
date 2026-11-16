@@ -68,6 +68,6 @@ Email support with:
 - [Web SDK](/sdk/web)
 - [Web to app journeys](/features/web-to-app-journeys)
 - [Meta web to app](/ad-networks/meta-web-to-app)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

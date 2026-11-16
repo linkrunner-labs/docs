@@ -65,6 +65,6 @@ Email support with:
 
 - [What the Campaigns columns mean](/features/campaign-metrics)
 - [My export, webhook or API numbers don't match the dashboard](/help/exports-dont-match-dashboard)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

@@ -75,6 +75,6 @@ Email support with:
 - [Attribution windows](/features/attribution-windows)
 - [Meta Ads integration guide](/ad-networks/meta-ads)
 - [Google Ads integration guide](/ad-networks/google-ads)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

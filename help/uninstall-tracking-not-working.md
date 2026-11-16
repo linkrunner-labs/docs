@@ -81,6 +81,6 @@ Never send your p8 key file, service account keys or any other credential over e
 
 - [Uninstall tracking](/features/uninstall-tracking)
 - [What the Campaigns columns mean](/features/campaign-metrics)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

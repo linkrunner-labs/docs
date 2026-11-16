@@ -56,6 +56,6 @@ Don't send card numbers or bank login details.
 - [Billing overview](/billing/overview)
 - [Linkrunner Wallet](/billing/wallet)
 - [Add your finance team](/billing/finance-role)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

@@ -81,6 +81,6 @@ Email support with:
 - [Test custom events and payments](/testing/event-and-revenue-testing)
 - [Set up deep links](/features/deep-linking-setup)
 - [AI agent skills](/ai-agent-skills)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

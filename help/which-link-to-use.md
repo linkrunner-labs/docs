@@ -85,6 +85,6 @@ Email support with:
 - [Create a trackable link](/features/create-trackable-link)
 - [Link redirection](/features/link-redirection)
 - [Set up your link domain](/features/subdomain-setup)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

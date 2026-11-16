@@ -85,6 +85,6 @@ Never send S2S partner tokens, passwords or postback secret keys over email or i
 - [Getting started as an affiliate partner](/affiliate-partners/getting-started)
 - [Agency campaigns for affiliates](/agency-partners/campaigns-for-affiliates)
 - [Postbacks and macros](/affiliate-partners/postbacks)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

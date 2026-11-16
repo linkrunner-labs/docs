@@ -231,7 +231,7 @@ const partners: Group[] = (nav.sidebars as Group[][])[3].map((g) => {
 // it. Each article diagnoses the symptom and links to the guide that owns the
 // fix, so the guides stay the single source for how a feature works.
 const help: Group[] = [
-  group("Start here", [page("Help center", "/help/", "lifebuoy")], true, "lifebuoy"),
+  group("Start here", [page("Help center", "/help", "lifebuoy")], true, "lifebuoy"),
   group("Installs and attribution", [
     page("Paid installs show as organic", "/help/installs-showing-as-organic", "question"),
     page("iOS campaign shows no installs", "/help/ios-campaign-no-installs", "apple-logo"),
@@ -307,6 +307,6 @@ export const relayNav: DefaultTheme.NavItem[] = [
   { text: "Setup", link: "/quickstart", activeMatch: activeMatch(1) },
   { text: "Integrations", link: "/ad-networks/overview", activeMatch: activeMatch(2) },
   { text: "Partners", link: "/affiliate-partners/getting-started", activeMatch: activeMatch(3) },
-  { text: "Help", link: "/help/", activeMatch: activeMatch(4) },
+  { text: "Help", link: "/help", activeMatch: activeMatch(4) },
   { text: "Dashboard", link: "https://dashboard.linkrunner.io" },
 ];

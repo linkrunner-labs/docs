@@ -61,6 +61,6 @@ Email support with:
 - [Fraud Control](/features/fraud-control)
 - [Deactivate a campaign link](/features/deactivate-campaign-link)
 - [Tracking links for affiliate partners](/affiliate-partners/tracking-links)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

@@ -70,6 +70,6 @@ Email support with:
 - [Events](/features/events-tab)
 - [Test custom events and payments](/testing/event-and-revenue-testing)
 - [Events Capture API](/api-reference/event-capture)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

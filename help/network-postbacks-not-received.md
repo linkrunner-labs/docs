@@ -82,6 +82,6 @@ Never send access tokens, S2S partner tokens or postback secret keys over email 
 - [TikTok Ads](/ad-networks/tiktok)
 - [Snapchat Ads](/ad-networks/snapchat)
 - [Postbacks and macros](/affiliate-partners/postbacks)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

@@ -95,6 +95,6 @@ Email support with:
 - [Test Custom Events and Payments](/testing/event-and-revenue-testing)
 - [What the Campaigns columns mean](/features/campaign-metrics)
 - [A number on my dashboard looks wrong](/help/dashboard-numbers-look-wrong)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

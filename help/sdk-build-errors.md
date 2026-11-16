@@ -72,6 +72,6 @@ Email support with:
 - [Is my SDK integration ready to go live?](/help/sdk-ready-to-go-live)
 - [SDK integration testing](/testing/integration-testing)
 - [Expo SDK](/sdk/expo)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

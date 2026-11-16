@@ -87,6 +87,6 @@ To let support compare with your ad account, give read-only access with [Give Li
 - [What the Campaigns columns mean](/features/campaign-metrics)
 - [A number on my dashboard looks wrong](/help/dashboard-numbers-look-wrong)
 - [iOS campaign data limitations](/features/ios-campaign-data-limitations)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

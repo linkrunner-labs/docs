@@ -62,6 +62,6 @@ Don't send your server key.
 - [Webhooks](/features/webhooks)
 - [Data APIs](/api-reference/data-apis)
 - [A number on my dashboard looks wrong](/help/dashboard-numbers-look-wrong)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).

@@ -73,6 +73,6 @@ Email support with:
 - [Deep linking setup](/features/deep-linking-setup)
 - [Deferred deep linking](/features/deferred-deep-linking)
 - [My app doesn't get the deep link or campaign data after install](/help/no-campaign-data-in-app)
-- [Help center](/help/)
+- [Help center](/help)
 
 **Need help?** Contact [support@linkrunner.io](mailto:support@linkrunner.io).
