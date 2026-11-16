@@ -101,6 +101,8 @@ This matches AppsFlyer, where you turn on view-through and set its lookback wind
 
 The click window governs **click matching only**. It does not change the view-through window above, or probabilistic attribution.
 
+It does not cover **website conversions**. Those have their own window, with a different default and ceiling, on the **Web** tab of the same page. See [website attribution windows](/features/web-attribution-windows).
+
 It is also separate from the **Lookback Window** on the Remarketing page. That one controls the reattribution window for users who already have your app. This one controls how a brand new install gets credited.
 
 **Need help?** Contact <support@linkrunner.io>.
