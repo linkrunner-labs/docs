@@ -31,7 +31,7 @@ The Web SDK reads the ad click from the landing page URL. If the ad doesn't add 
 
 ### 3. Is the Web SDK loaded on every page up to the button?
 
-**Check:** the SDK has to load on each page from the landing page to the download button. If an ad blocker stops the SDK, `getAppDownloadURL` returns your link without the ad click after 3 seconds, and that install isn't credited to the ad.
+**Check:** the SDK has to load on each page from the landing page to the download button. If an ad blocker stops the SDK, that install isn't credited to the ad. With the npm package, `getAppDownloadURL` returns your link without the ad click after 3 seconds. With the script tag, `window.lr` doesn't exist, so guard the call or the button does nothing.
 
 **Fix:** add the SDK to the pages that are missing it. To get past ad blockers, use [first-party collection](/sdk/web#first-party-collection).
 

@@ -19,7 +19,7 @@ description: "Line up dates, time zones and organic users so CSV exports, webhoo
 
 ### 1. Do you have the right server key?
 
-A `401` means the key is missing or belongs to another project. Each project has its own key. See [Obtaining your API key](/api-reference/data-apis#obtaining-your-api-key).
+A `401` means the key is missing or invalid. Each project has its own key, and a key from another project returns that project's numbers, not an error. See [Obtaining your API key](/api-reference/data-apis#obtaining-your-api-key).
 
 ### 2. Are you comparing the same days?
 

@@ -39,11 +39,11 @@ You may be on the **Cohort** basis, which keeps growing for recent installs. See
 
 ### 6. Retention looks empty, very high or very low?
 
-Recent cohorts haven't had time to come back, and small cohorts swing a lot. See [Which retention metric should you use?](/features/retention#which-retention-metric-should-you-use).
+Recent cohorts haven't had time to come back, and small cohorts swing a lot. See [Retention](/features/retention) for how each retention metric is counted.
 
 ### 7. Today's clicks, spend or Google installs look low?
 
-Ad network data arrives on a schedule, and Google installs can take up to about 5 hours to be credited. **Fix:** compare full days that ended at least 4 hours ago. See [When ad network numbers update](/features/campaign-metrics#when-ad-network-numbers-update).
+Ad network data arrives on a schedule, and Google installs can take up to about 5 hours to be credited. **Fix:** compare full days that ended at least 6 hours ago. See [When ad network numbers update](/features/campaign-metrics#when-ad-network-numbers-update).
 
 ### 8. The total row doesn't match all your installs?
 

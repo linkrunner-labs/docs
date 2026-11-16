@@ -19,7 +19,7 @@ description: "Find out why Mixpanel, Amplitude, CleverTap, RevenueCat or another
 
 ### 1. Are you looking for data the integration sends?
 
-Each integration sends a fixed set of attribution fields to the user profile, not your Linkrunner events. For example, Mixpanel gets `lr_campaign` and `lr_ad_network`, and CleverTap gets an install event with `utm_source` and `utm_campaign`. Each integration page lists its fields under **How it works**.
+Each integration sends a fixed set of attribution fields to the user profile, not your Linkrunner events. For example, Mixpanel gets `lr_campaign` and `lr_ad_network`, and CleverTap gets an install event with `utm_source` and `utm_campaign`. Each integration page lists the fields it sends near the top of the page.
 
 **Fix:** if you need more, such as Meta ad set or creative names, or you use a tool without an integration page (for example Segment), turn on [webhooks](/features/webhooks). Install webhooks carry the campaign details. Signup webhooks add your `user_id`. Forward them to your tool from your server.
 

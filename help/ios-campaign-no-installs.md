@@ -51,7 +51,7 @@ Meta only lists events it has received from your app in the past 90 days, and ma
 
 If the **SKAdNetwork for the Facebook SDK** toggle is on for your dataset, Meta reads conversion values from its own SDK, not from Linkrunner.
 
-**Fix:** see [Meta still attributes via the Facebook SDK](/features/meta-skan-setup#meta-still-attributes-via-the-facebook-sdk).
+**Fix:** first confirm your app ships LinkrunnerKit 4.3.2 or later. On older versions, turning the toggle off makes Meta receive installs with no conversion value. Then see [Meta still attributes via the Facebook SDK](/features/meta-skan-setup#meta-still-attributes-via-the-facebook-sdk).
 
 ### 7. Installs arrive, but conversion values are empty or wrong?
 

@@ -9,7 +9,7 @@ description: "Find out why your build fails or your app crashes after you add or
 
 <Info>
 
-**At a glance:** build failures usually come from a project below the SDK's minimum versions, a skipped install step (most often on Expo), or an SDK version with a known bug that a newer release fixes. Crashes and errors at runtime usually come from calling SDK methods before `init` has finished. Note your exact SDK version and error message first.
+**At a glance:** build failures usually come from a project below the SDK's minimum versions, a skipped install step (most often on Expo), or an SDK version with a known bug that a newer release fixes. Runtime errors and missing data usually come from calling SDK methods before `init` has finished. Note your exact SDK version and error message first.
 
 </Info>
 
@@ -45,9 +45,9 @@ If you're upgrading from `expo-linkrunner` 1.x or 2.x, follow the [Migration gui
 
 ### 4. Do other SDK calls wait for `init`?
 
-Calling SDK methods before `init` has finished can throw errors.
+A call made before `init` has finished can fail or be silently dropped, depending on the SDK. In React Native, the SDK logs "token not initialized" and drops the data.
 
-**Fix:** await `init` before you call `enablePIIHashing`, `setAdditionalData`, `getAttributionData` or `handleDeeplink`. The only calls that go before `init` are the ones your SDK's Function Placement Guide marks as **Before `init`**, such as `setConsent`. See the guide for [React Native](/sdk/react-native#function-placement-guide) or [Android](/sdk/android#function-placement-guide).
+**Fix:** await `init` before you call `setAdditionalData`, `getAttributionData` or `handleDeeplink`. Call `enablePIIHashing` before `signup`. The only calls that go before `init` are the ones your SDK's Function Placement Guide marks as **Before `init`**, such as `setConsent`. See the guide for [React Native](/sdk/react-native#function-placement-guide) or [Android](/sdk/android#function-placement-guide).
 
 ### 5. Is `debug = true` still on in production?
 

@@ -23,7 +23,7 @@ description: "Find out why the Spend, ROAS and cost columns on Linkrunner are em
 
 **Check:** open the network under **Integrations** and compare the connected ad accounts with the account IDs in your ad manager.
 
-**Fix:** connect the missing account. Spend fills in after the next sync. If connecting fails, see [I can't connect my ad account to Linkrunner](/help/cant-connect-ad-account). If an account you don't use is connected by mistake, email support to remove it.
+**Fix:** connect the missing account. Spend fills in after the next sync. If connecting fails, see [I can't connect my ad account to Linkrunner](/help/cant-connect-ad-account). If an account you don't use is connected by mistake, remove it from that network's integration page.
 
 ### 2. Has the campaign had its first install?
 
@@ -68,7 +68,7 @@ Linkrunner shows spend in your project's display currency, converted per campaig
 ## Confirm it's fixed
 
 - The ad account that runs the campaign is listed under **Integrations** for that network.
-- For a full day that ended at least 4 hours ago, the campaign's **Spend** in Linkrunner is close to the spend in your ad manager.
+- For a full day that ended at least 6 hours ago, the campaign's **Spend** in Linkrunner is close to the spend in your ad manager.
 - **Cost Per Install** and **ROAS** fill in for campaigns that have installs and revenue.
 
 ## Still stuck?

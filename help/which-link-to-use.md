@@ -9,7 +9,7 @@ description: "Pick the right Linkrunner link for each channel, set where desktop
 
 <Info>
 
-**At a glance:** Meta and Google app campaigns don't use a Linkrunner link at all. Every other place you share your app gets its own link from **App Campaigns → Create Link**. By default, a link sends Android users to the Play Store, iOS users to the App Store and desktop users to your website. Most link problems come from a value typed into the wrong field.
+**At a glance:** Meta and Google app campaigns don't use a Linkrunner link at all. Every other place you share your app gets its own link from **App Campaigns → Create Link**. By default, a link sends Android users to the Play Store, iOS users to the App Store and desktop users to your website, or to the store if no website is set. Most link problems come from a value typed into the wrong field.
 
 </Info>
 
@@ -47,7 +47,7 @@ Create one link for each place you share it, so each one has its own clicks, ins
 
 **Check:** a website address in **Deeplink Destination** doesn't send desktop users to that page. Use **Desktop URL**. Enter redirect URLs in full, starting with `https://`. Empty fields keep the default route. See [Link redirection](/features/link-redirection) for the full order.
 
-If the link refuses a website, your account may be under 7 days old with no paid invoice. See the [link domain FAQ](/features/subdomain-setup#faq).
+If a link on a Linkrunner sub-domain refuses a website, the project may be under 7 days old with no paid invoice. See the [link domain FAQ](/features/subdomain-setup#faq).
 
 ### 6. Adding your own parameters?
 

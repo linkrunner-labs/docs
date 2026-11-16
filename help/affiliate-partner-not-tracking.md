@@ -19,9 +19,14 @@ description: "Find out why an affiliate or agency partner is stuck in review, ca
 
 ### 1. Is the partner account still in review?
 
-**Check:** an affiliate account in review shows **Pending verification**. In the project picker, it shows **In review**. A new agency workspace shows **We are reviewing your workspace**.
+**Check:** the affiliate's screen shows one of two states. In the project picker, it shows **In review**. A new agency workspace shows **We are reviewing your workspace**.
 
-**Fix:** Linkrunner emails the partner when the review is done. Until then the partner can't start campaigns. If the review is taking longer than you expect, email support with the partner's sign-up email.
+| Screen title | What it means | Fix |
+| :-- | :-- | :-- |
+| **Pending verification** | Approval is waiting on the partner's postback URLs. | Fix the postback URLs the page links to. The account is approved straight away. |
+| **Your account is under review** | A person at Linkrunner is reviewing the account. | Wait for the approval email. Until then the partner can't start campaigns. |
+
+If the review is taking longer than you expect, email support with the partner's sign-up email.
 
 ### 2. Has the advertiser connected the partner?
 
@@ -43,7 +48,7 @@ A partner only sees campaigns attributed to it, and only gets postbacks for them
 
 **Check:** a link the advertiser created with no **Ad Channel**, or with another channel, is invisible to the partner.
 
-**Fix:** the affiliate creates its own link from **All Campaigns → Create Link**. See [Create an affiliate campaign link](/affiliate-partners/create-campaign-link). If the advertiser already shared a link, they can [assign the partner to it](/features/create-trackable-link#assign-a-partner-to-a-link). Postbacks start with the next install.
+**Fix:** the affiliate creates its own link from **All Campaigns → Create Link**. See [Create an affiliate campaign link](/affiliate-partners/create-campaign-link). If the advertiser already shared a link, they can [assign the partner to it](/features/create-trackable-link#assign-a-partner-to-a-link) from the notice on **App Campaigns**, once clicks with the partner's click ID reach the link. Postbacks start with the next install.
 
 ### 5. Does the clicked URL keep the campaign code and a real click ID?
 

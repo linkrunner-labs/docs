@@ -9,7 +9,7 @@ description: "Find out which campaign gets credit when an existing user reinstal
 
 <Info>
 
-**At a glance:** it depends on whether the user reinstalled. A **reinstall** is credited again from scratch, to whichever campaign matches now. A user who still has the app and **opens it from a new link** keeps their original install campaign, and the open is recorded as a **reengagement** for the new campaign. Both show in the **Retargeting** view, not in the default install view.
+**At a glance:** it depends on whether the user reinstalled. A **reinstall** is credited again from scratch, to whichever campaign matches now. A user who still has the app and **opens it from a new link** keeps their original install campaign, and the open is recorded as a **reengagement** for the new campaign. Reinstalls count in the default **Installs** and **Reinstalls** columns. Reengagements only show in the **Retargeting** view.
 
 </Info>
 
@@ -24,11 +24,11 @@ description: "Find out which campaign gets credit when an existing user reinstal
 | Deleted the app, then installed it again | A reinstall, credited to the campaign that matches now, or to organic. See [Reinstalls](/features/campaign-metrics#reinstalls). |
 | Opened the installed app through a Linkrunner link | A reengagement for that link's campaign. The install keeps its original campaign. |
 
-### 2. Are you looking at the Retargeting view?
+### 2. Looking for reengagements? Use the Retargeting view
 
-Reengagements and reinstalls are counted for returning users, so the default view doesn't show them.
+Reengagements are counted for returning users, so the default view doesn't show them. Reinstalls already count in the default **Installs** and **Reinstalls** columns. The Retargeting view narrows those to reinstalls that were reattributed.
 
-**Fix:** on the [Campaigns](https://dashboard.linkrunner.io/dashboard/campaigns) page, switch **Install Attribution** to **Retargeting**. See [Viewing Returning Users](/features/remarketing#viewing-returning-users). Exports and the reporting API have the same split. See [Install Attribution or Retargeting](/features/data-export#install-attribution-or-retargeting).
+**Fix:** on the [Campaigns](https://dashboard.linkrunner.io/dashboard/campaigns) page, switch **Install Attribution** to **Retargeting**. See [See returning users](/features/remarketing#see-returning-users). Exports and the reporting API have the same split. See [Install Attribution or Retargeting](/features/data-export#install-attribution-or-retargeting).
 
 ### 3. No reengagements at all?
 
@@ -49,7 +49,7 @@ Reinstalls are detected by the device's advertising ID.
 
 ### 6. Users who were active recently aren't reattributed?
 
-A returning user must have been inactive for at least the **inactivity window** before they can be reattributed. The default is 0 days. See [Inactivity Window](/features/remarketing#inactivity-window).
+A returning user must have been inactive for at least the **inactivity window** before they can be reattributed. The default is 0 days. For a reinstall, Linkrunner counts the days since the previous install. See [Understanding the windows](/features/remarketing#understanding-the-windows).
 
 ### 7. Linkrunner shows more installs than Meta for a retargeting campaign?
 

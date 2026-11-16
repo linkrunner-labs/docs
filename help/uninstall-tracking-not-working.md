@@ -9,7 +9,7 @@ description: "Find out why the Uninstalls column stays at 0 after you set up uni
 
 <Info>
 
-**At a glance:** Linkrunner checks each device once a day with a silent push through FCM (Android) or APNs (iOS), and records an uninstall after 3 failed days in a row. Uninstalls stay at 0 when Linkrunner can't send that push, or when your app never gave it a push token. Most cases are a missing Firebase permission or a missing `setPushToken` call.
+**At a glance:** Linkrunner checks each device once a day with a silent push through FCM (Android) or APNs (iOS), and records an uninstall on the first check where FCM or APNs reports the push token is gone. Uninstalls stay at 0 when Linkrunner can't send that push, or when your app never gave it a push token. Most cases are a missing Firebase permission or a missing `setPushToken` call.
 
 </Info>
 
@@ -53,9 +53,9 @@ Linkrunner can only check devices that sent it a push token. A device on an app 
 
 Only users who opened a version with `setPushToken` are covered. Uninstalls grow as users update.
 
-### 5. Have 3 days passed?
+### 5. Have a few days passed?
 
-An uninstall is recorded only after the daily check fails 3 days in a row. A user who removed your app today doesn't appear in **Uninstalls** for at least 3 days.
+The check runs once a day, and FCM and APNs can take a few days to report that a token is gone. A user who removed your app today won't appear in **Uninstalls** straight away. Temporary errors, such as rate limits or an outage at Google or Apple, never count as an uninstall.
 
 ## Confirm it's fixed
 
@@ -64,7 +64,7 @@ Test it on one device:
 1. Uninstall the app, then tap a Linkrunner link for a test campaign and install your build that calls `setPushToken`. Uninstalls of organic installs don't show on campaign rows.
 2. Open the app once so it sends the push token.
 3. Uninstall the app.
-4. After at least 3 days, check **Uninstalls** for the test campaign.
+4. After a few days, check **Uninstalls** for the test campaign.
 
 ## Still stuck?
 

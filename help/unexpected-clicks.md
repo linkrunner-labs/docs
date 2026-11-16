@@ -9,7 +9,7 @@ description: "Find out where unexpected or suspicious clicks on a Linkrunner lin
 
 <Info>
 
-**At a glance:** the **Clicks** column counts every tap on a campaign's link, from people and from automated traffic. A new link can collect clicks from bots or crawlers before you share it widely, and an affiliate can send far more clicks than real users. Fraud Control flags this traffic for reporting. It never removes clicks from your totals or changes attribution.
+**At a glance:** the **Clicks** column counts taps on a campaign's link from browsers. Known bots, crawlers and link previews (for example when a link is pasted in WhatsApp or Slack) are not counted. Automated traffic that looks like a real browser still counts, and an affiliate can send far more clicks than real users. Fraud Control flags this traffic for reporting. It never removes clicks from your totals or changes attribution.
 
 </Info>
 
@@ -19,7 +19,7 @@ description: "Find out where unexpected or suspicious clicks on a Linkrunner lin
 
 ### 1. Where has the link been shared?
 
-Every tap on the link counts, including taps from pages, chats and partners you didn't plan for. Automated traffic, such as bots, crawlers and server-generated clicks, also opens links, including new ones.
+Every tap on the link counts, including taps from pages, chats and partners you didn't plan for. Automated traffic that looks like a real browser, and clicks a partner's server makes on a user's behalf, count too.
 
 **Check:** list every place the link appears: ads, partner placements, posts, emails and QR codes.
 

@@ -31,7 +31,7 @@ Attribution isn't always finished when `init` returns. A call made immediately c
 
 ### 3. Is deferred deep linking on for that campaign?
 
-**Check:** `deeplink` is empty when the campaign has no destination.
+**Check:** when the campaign has no destination, `deeplink` is the Linkrunner link the user tapped, so your app gets the tracking URL instead of a screen.
 
 **Fix:** turn on **Enable Deferred deeplinking?** and enter a **Deeplink Destination**. See [Open a screen in your app](/features/create-trackable-link#3-open-a-screen-in-your-app-optional). Meta and Google campaigns have no Linkrunner link, so their deep links are set differently. See the notes in [Deferred deep linking](/features/deferred-deep-linking).
 

@@ -37,7 +37,7 @@ Snapchat receives events in two places. Users who clicked a Snapchat ad through 
 
 **Check:** in Snapchat Ads Manager, open **Events Manager** and check your Pixel, not only your Snap App.
 
-**Fix:** keep the **Pixel ID** saved in Linkrunner even if you add a Snap App ID. Then send a test event from the **Event Mapping** tab. See [Sending a test event](/ad-networks/snapchat#4-sending-a-test-event). For which users go where, see the [Snapchat overview](/ad-networks/snapchat#overview).
+**Fix:** keep the **Pixel ID** saved in Linkrunner even if you add a Snap App ID. To check the connection, send a test event from the **Event Mapping** tab. The test goes to your Snap App, and only goes to the Pixel when no Snap App ID is saved. See [Sending a test event](/ad-networks/snapchat#4-sending-a-test-event). For which users go where, see the [Snapchat overview](/ad-networks/snapchat#overview).
 
 ### 4. Affiliate: is the partner connected and assigned to the link?
 
@@ -47,13 +47,13 @@ A partner gets postbacks only for campaigns attributed to its network. A link cr
 
 ### 5. Affiliate: does the partner call your link from its own server?
 
-If the partner reports clicks from its server, or sends users straight to the store, its clicks are rejected until you turn on **S2S clicks and impressions** for it.
+If the partner reports clicks from its server, or sends users straight to the store, Linkrunner sees the server's IP, not the user's phone, and can't match the install. S2S API calls are rejected until you turn on **S2S clicks and impressions** for the partner.
 
-**Fix:** see [Turn on S2S clicks for a partner](/affiliate-partners/turn-on-s2s-clicks). The change takes effect within 6 minutes. Retest with a fresh click on a device that installs and opens an app build with the Linkrunner SDK.
+**Fix:** see [Turn on S2S clicks for a partner](/affiliate-partners/turn-on-s2s-clicks). The partner must then pass the user's public `ip` on each call. The change takes effect within 6 minutes. Retest with a fresh click on a device that installs and opens an app build with the Linkrunner SDK.
 
 ### 6. Is the event you expect mapped?
 
-Snapchat always receives install and sign-up, and affiliates always receive installs. Purchases and other in-app events are sent only after you map them.
+Snapchat and TikTok always receive install and sign-up, and affiliates always receive install and registration. Purchases and other in-app events are sent only after you map them.
 
 **Fix:**
 
@@ -63,7 +63,7 @@ Snapchat always receives install and sign-up, and affiliates always receive inst
 ## Confirm it's fixed
 
 - **TikTok:** the event appears in TikTok Events Manager for your pixel.
-- **Snapchat:** **Last Event Received** on the Pixel shows your test event.
+- **Snapchat:** **Last Event Received** on your Snap App shows the test event (on the Pixel if you saved no Snap App ID). Real installs from your Snapchat campaign link then show on the Pixel.
 - **Affiliates:** the partner sees the install with its click ID in [Postback logs](/affiliate-partners/postback-logs), with the status **Delivered**.
 
 ## Still stuck?

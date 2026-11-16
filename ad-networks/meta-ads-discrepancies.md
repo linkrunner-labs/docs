@@ -150,7 +150,7 @@ Meta measures iOS through Aggregated Event Measurement and SKAdNetwork: aggregat
 | View-through conversions | Counted by default                                                  | Android only, requires Meta Install Referrer; not measured on iOS                                       |
 | Attribution scope        | Meta engagements only; claims installs regardless of other networks | Last-touch across all networks; one source per install                                                  |
 | Cross-device             | Credits installs on a different device from the ad interaction      | Same-device signals only                                                                                |
-| Reinstalls               | Install events deduplicated within a 90-day window                  | One install per user; re-attribution possible only 90+ days after the original install                  |
+| Reinstalls               | Install events deduplicated within a 90-day window                  | Reinstalls within 90 days are detected and credited again to the campaign that matches now             |
 | Time zones               | Ad account time zone                                                | Project time zone (synced Meta spend and clicks stay on Meta's calendar day)                            |
 | Events sent to Meta      | Only mapped events, and only when under 7 days old                  | All SDK events appear in Linkrunner                                                                     |
 | iOS installs             | AEM and SKAN, includes modeled results, delayed 24+ hours           | SDK-attributed installs; Meta-reported counts shown for iOS App campaigns without SDK attribution       |

@@ -9,7 +9,7 @@ description: "Why a paid Linkrunner invoice can still show Pending or keep your 
 
 <Info>
 
-**At a glance:** card, UPI and netbanking payments clear straight away. A bank transfer stays **Pending** until you submit its reference. Access comes back automatically once every overdue invoice is paid, and attribution never stops in the meantime.
+**At a glance:** card, UPI and netbanking payments clear straight away. A bank transfer stays **Pending** until you submit its reference and we match it to our bank statement. Access comes back automatically once every overdue invoice is paid, and attribution never stops in the meantime.
 
 </Info>
 
@@ -19,7 +19,7 @@ description: "Why a paid Linkrunner invoice can still show Pending or keep your 
 
 ### 1. Did you pay by bank transfer without submitting the UTR?
 
-**Fix:** open the invoice, click **Pay Now** and submit the UTR. See [Pay by bank transfer](/billing/overview#pay-by-bank-transfer).
+**Fix:** open the invoice, click **Pay Now** and submit the UTR. The invoice stays **Pending** while we match the transfer to our bank statement, and you get a receipt by email once it clears. See [Pay by bank transfer](/billing/overview#pay-by-bank-transfer).
 
 ### 2. Did one transfer cover two invoices, or less than the full amount?
 

@@ -23,7 +23,7 @@ The account you log in with decides which ad accounts Linkrunner can see. A logi
 
 **Check:** for Meta, use a profile with full control and admin access of the business portfolio that owns the ad account. For Google, sign in with a Google account that has access to the Google Ads account running your campaigns.
 
-**Fix:** ask an admin of that business portfolio or Google Ads account to connect it, or to give your profile admin access first.
+**Fix:** ask an admin of that business portfolio or Google Ads account to connect it, or to give your profile admin access first. If Meta stops the login with "business assets were not granted the requested permissions", see the [Meta Ads FAQ](/ad-networks/meta-ads-discrepancies#meta-ads-faq).
 
 ### 2. Is the browser blocking the login window?
 
@@ -54,8 +54,8 @@ Connecting the ad account is one step. Each network needs more before attributio
 
 **Check:**
 
-- **Meta:** the **App ID** and **Install Referrer Decryption Key** are saved, and CAPI is configured. See [Configure Meta App Integration](/ad-networks/meta-ads#1-configure-meta-app-integration).
-- **Google Ads:** a link ID is saved for each platform. See [Create Link ID](/ad-networks/google-ads#2-create-link-id-for-android-ios-app).
+- **Meta:** the **App ID** and **Referrer Decryption Key** are saved, and CAPI is configured. See [Configure Meta App Integration](/ad-networks/meta-ads#1-configure-meta-app-integration).
+- **Google Ads:** a link ID is saved for each platform. See [Create Link ID](/ad-networks/google-ads#2-create-link-id-for-android/ios-app).
 - **TikTok:** the **Pixel ID** and **Access Token** are pasted on the TikTok account. See [Configure Pixel on Linkrunner](/ad-networks/tiktok#step-13-configure-pixel-on-linkrunner).
 - **Snapchat:** the Pixel or Snap App IDs and the Access Token are saved. See [Configuring Snapchat on Linkrunner](/ad-networks/snapchat#3-configuring-snapchat-on-linkrunner).
 
@@ -69,7 +69,7 @@ See [Campaigns not appearing in dashboard](/ad-networks/meta-ads#campaigns-not-a
 
 If Meta rejects the saved login, the ad account stops syncing until you reconnect it.
 
-**Fix:** click **Add Meta Account** and log in again with a profile from check 1. Reconnecting does not fix a paused Conversions API dataset. For that, see [CAPI delivery paused](/ad-networks/meta-ads#capi-delivery-paused).
+**Fix:** click **Reconnect** in the account's **Auth Status** column and log in again with a profile from check 1. Reconnecting does not fix a paused Conversions API dataset. For that, see [CAPI delivery paused](/ad-networks/meta-ads#capi-delivery-paused).
 
 ## Confirm it's fixed
 

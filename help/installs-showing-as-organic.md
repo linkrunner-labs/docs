@@ -21,9 +21,9 @@ description: "Find out why installs from Meta, Google, links or your website lan
 
 Meta app campaigns don't use tracking links. On Android, Linkrunner reads the campaign from the Meta install referrer, which it can only decrypt with your key.
 
-**Check:** open [Integrations → Meta Ads](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=integration) and confirm the **App ID** and **Install Referrer Decryption Key** are saved.
+**Check:** open [Integrations → Meta Ads](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=integration) and confirm the **App ID** and **Referrer Decryption Key** are saved.
 
-**Fix:** copy the key from your Meta app's settings and save it. See [Get your referrer decryption key](/ad-networks/meta-ads#step-2-get-your-referrer-decryption-key). Installs from the next day onward are credited. Don't put Linkrunner links in Meta app install ads. Meta campaigns are attributed through the integration and appear in Linkrunner after their first install.
+**Fix:** copy the key from your Meta app's settings and save it. See [Get your referrer decryption key](/ad-networks/meta-ads#step-2-get-your-referrer-decryption-key). Installs after you save the key are credited. Earlier installs stay organic. Don't put Linkrunner links in Meta app install ads. Meta campaigns are attributed through the integration and appear in Linkrunner after their first install.
 
 ### 2. Google installs: does each platform have a link ID?
 
@@ -31,11 +31,11 @@ Google Ads app campaigns are attributed through a link ID that you create in Goo
 
 **Check:** in [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads), open the account row menu, choose **Setup Link IDs** and confirm there's a link ID for each platform you advertise on.
 
-**Fix:** follow [Create a link ID](/ad-networks/google-ads#2-create-link-id-for-android-ios-app). A new link ID takes about 12 hours to start working, so installs before then can show as organic. If you removed and reconnected the Google Ads account, check the link IDs are still there.
+**Fix:** follow [Create a link ID](/ad-networks/google-ads#2-create-link-id-for-android/ios-app). A new link ID takes about 12 hours to start working, so installs before then can show as organic. If you removed and reconnected the Google Ads account, check the link IDs are still there.
 
 ### 3. iOS installs from your website or a social bio?
 
-iOS has no install referrer. Linkrunner can only credit an iOS install when the user tapped a Linkrunner link before going to the App Store. A website button that goes straight to the App Store gives Linkrunner nothing to match.
+iOS has no install referrer. For website and social bio traffic, Linkrunner can only credit an iOS install when the user tapped a Linkrunner link before going to the App Store. A website button that goes straight to the App Store gives Linkrunner nothing to match.
 
 **Fix:** point your website's download or "Open in app" button to a Linkrunner link, and pass the page's ad parameters through to it. See [Web to app journeys](/features/web-to-app-journeys). For Meta ads that send users to a website first, see [Meta web to app](/ad-networks/meta-web-to-app).
 
@@ -43,7 +43,7 @@ Some iOS installs stay organic by design: users who deny tracking permission oft
 
 ### 4. Did the install come before the campaign, or the click after the download?
 
-Installs from before the campaign was created or the integration was complete stay organic, and so do clicks after an Android download started or outside the [attribution window](/features/attribution-windows). **Check:** compare install dates with the campaign's **Created at** date. See [How it is credited to a campaign](/features/campaign-metrics#how-it-is-credited-to-a-campaign).
+Installs from before the integration was complete stay organic, and so do clicks after an Android download started or outside the [attribution window](/features/attribution-windows). **Check:** compare install dates with the date the integration was finished. See [How it is credited to a campaign](/features/campaign-metrics#how-it-is-credited-to-a-campaign).
 
 ### 5. Testing on your own device?
 
