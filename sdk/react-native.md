@@ -735,65 +735,6 @@ const trackPurchase = async () => {
 
 An `amount` in `eventData` is revenue only when `paymentId` and `currency` are there too. On its own it is ordinary event data. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
 
-## Shopify cart attribution
-
-Available from `rn-linkrunner` 4.3.0. Use it when your app builds a Shopify cart through the
-Storefront API and you want the campaign to appear on the order.
-
-Linkrunner writes the campaign onto the **cart**. Shopify copies it onto the order at checkout,
-and from there the [Shopify sync](/features/shopify-sync) can also tag the customer. Without the
-cart write the order carries no campaign, so nothing downstream has anything to read.
-
-Call it once per cart, after `init` has resolved and after the cart exists:
-
-```javascript
-import linkrunner from 'rn-linkrunner';
-
-const result = await linkrunner.setShopifyCartAttribution({
-  // Exactly as cartCreate returned it, including the ?key= part.
-  cartId: cart.id,
-  shopDomain: 'acme.myshopify.com',
-  storefrontAccessToken: STOREFRONT_ACCESS_TOKEN,
-});
-```
-
-### Parameters
-
-| Parameter | Type | Required | Description |
-| --- | --- | --- | --- |
-| `cartId` | `string` | Yes | The cart id exactly as `cartCreate` returned it, **including its `?key=` part**. Shopify answers `INVALID_OWNER` without it, so do not trim the query string. |
-| `shopDomain` | `string` | Yes | The store's `myshopify.com` domain. Other hosts are refused, so a typo cannot send your token elsewhere. |
-| `storefrontAccessToken` | `string` | Yes | The public Storefront API access token your app already uses to build the cart. |
-| `apiVersion` | `string` | No | Only to match an API version your storefront pins. Defaults to the version Linkrunner's backend talks to. |
-
-### Result
-
-It never throws and never rejects, because a cart write must not be able to break a checkout.
-Every outcome comes back on the result:
-
-| `reason` | Meaning |
-| --- | --- |
-| (none, `ok: true`) | The campaign is on the cart. |
-| `no_campaign` | This install has no campaign. Normal for an organic user, not a failure. |
-| `not_initialized` | `init` has not run yet. |
-| `invalid_params` | A missing or malformed argument. Nothing was sent. |
-| `rejected` | Shopify refused the write. `error` carries its code and field path. |
-| `request_failed` | Offline, timed out, or a non-200 from Shopify. |
-
-### Sending it yourself
-
-If your app already has its own Storefront client, ask for the metafield instead and send it
-with the rest of your cart mutation:
-
-```javascript
-const metafield = await linkrunner.getShopifyCartMetafield();
-// { key: 'custom.linkrunner_campaign', type: 'single_line_text_field', value: 'Diwali Prospecting' }
-// null when this install has no campaign.
-```
-
-The `key` is already in Shopify's composite `namespace.key` form, because
-`CartMetafieldsSetInput` has no separate namespace field.
-
 ## SDK Package Version
 
 Use `linkrunner.getPackageVersion()` in diagnostics when you need the installed `rn-linkrunner` package version.

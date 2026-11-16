@@ -15,6 +15,16 @@ Shopify admin.
 
 Each of the three is a separate switch and all three start off.
 
+<Note>
+
+Two of the three are not available yet. **Campaign on every order** and **Tag customers with the
+campaign that won them** both read the campaign off the order, and it only gets there from the
+cart, which needs a Linkrunner SDK release that is not out. Those two switches are disabled in
+your dashboard for now, so **Ad spend in your Shopify marketing reports** is the one you can turn
+on today.
+
+</Note>
+
 ## What Linkrunner writes to your store
 
 ### The campaign on every order
@@ -42,11 +52,7 @@ Carts created through the Storefront API can set it with Shopify's `cartMetafiel
 mutation. The key is the composite `custom.linkrunner_campaign`: `CartMetafieldsSetInput` has
 no separate namespace field.
 
-If your app is React Native, the SDK does it for you. See
-[Shopify cart attribution](/sdk/react-native#shopify-cart-attribution).
-
-A Liquid theme has no supported way to write a cart metafield today. If your store is on a
-Liquid theme, keep this switch off and use the other two, and ask
+A Liquid theme has no supported way to write a cart metafield today. Ask
 [support@linkrunner.io](mailto:support@linkrunner.io) about the storefront helper.
 
 </Warning>
@@ -178,24 +184,17 @@ Once it is approved the store shows as connected, with the client ID of the app 
 
 <Step title="Choose what Linkrunner writes">
 
-Back on the Shopify settings page, turn on the ones you want:
+Back on the Shopify settings page, turn on **Ad spend in Shopify's Growth reports**.
 
-- **Campaign on every order**
-- **Tag customers with the campaign that won them**
-- **Ad spend in Shopify's Growth reports**
-
-They start off, and you can turn any of them off again later.
+**Campaign on every order** and **Tag customers with the campaign that won them** are not
+available yet and stay off. It starts off, and you can turn it off again later.
 
 </Step>
 
 <Step title="Check it in Shopify">
 
-Give it one order and one day, then look in your Shopify admin:
-
-- **Orders** → open an order → the Linkrunner campaign metafield on the order page
-- **Customers** → open a customer → the campaign metafield and the `lr-` tag
-- **Analytics** → **Reports** → **Marketing**, or **Growth** → **Attribution**, for the
-  campaign rows
+Give it a day, then look in your Shopify admin under **Analytics** → **Reports** →
+**Marketing**, or **Growth** → **Attribution**, for the campaign rows.
 
 Marketing reports can take up to 24 hours to show a new day.
 
