@@ -118,7 +118,8 @@ const guides: Group[] = [
       "/features/web-creatives",
       "/features/meta-web-conversions",
       "/features/google-ads-web-conversions",
-      "/features/web-to-app-journeys"
+      "/features/web-to-app-journeys",
+      "/features/shopify-sync"
     ),
     false,
     "globe"
