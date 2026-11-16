@@ -247,6 +247,8 @@ Use `{event_time}` for the time of the event itself.
 
 </Note>
 
+A customer can ask Linkrunner to include one of their event parameters, such as a plan name, in your event postbacks. Linkrunner staff set this up for you; you cannot add it to your postback URL yourself.
+
 ### Time
 
 All three are Unix timestamps in seconds, UTC.
