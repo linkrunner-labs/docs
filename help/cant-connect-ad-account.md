@@ -23,7 +23,7 @@ The account you log in with decides which ad accounts Linkrunner can see. A logi
 
 **Check:** for Meta, use a profile with full control and admin access of the business portfolio that owns the ad account. For Google, sign in with a Google account that has access to the Google Ads account running your campaigns.
 
-**Fix:** ask an admin of that business portfolio or Google Ads account to connect it, or to give your profile admin access first. If Meta stops the login with "business assets were not granted the requested permissions", see the [Meta Ads FAQ](/ad-networks/meta-ads-discrepancies#meta-ads-faq).
+**Fix:** ask an admin of that business portfolio or Google Ads account to connect it, or to give your profile admin access first. If Meta stops the login with "business assets were not granted the requested permissions", see [Meta login fails: business assets were not granted](/ad-networks/meta-ads-discrepancies#meta-login-fails-business-assets-were-not-granted-the-requested-permissions).
 
 ### 2. Is the browser blocking the login window?
 
