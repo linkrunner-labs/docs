@@ -198,7 +198,13 @@ const setup: Group[] = [
   group("Deep links", links("/features/subdomain-setup", "/features/deep-linking-setup"), false, "link-simple"),
   group(
     "Test your setup",
-    links("/testing/integration-testing", "/testing/event-and-revenue-testing", "/testing/web-sdk-testing", "/testing/meta-android-attribution-testing"),
+    links(
+      "/testing/integration-testing",
+      "/testing/event-and-revenue-testing",
+      "/testing/web-sdk-testing",
+      "/testing/website-sdk-audit",
+      "/testing/meta-android-attribution-testing"
+    ),
     false,
     "flask"
   ),
