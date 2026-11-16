@@ -447,7 +447,7 @@ To fix a paused dataset:
 2. Click **Update token** in the alert, paste the token, choose the dataset and click **Save**. Project admins and members see this button.
 3. The status changes to **Waiting for first event**, then to **Sending** when Meta accepts your next conversion event.
 
-Reconnecting the ad account with **Add Meta Account** does not fix a paused dataset. Only a new token or dataset does.
+Reconnecting the ad account with **Reconnect** in the **Auth Status** column does not fix a paused dataset. Only a new token or dataset does.
 
 <Warning>
 

@@ -66,6 +66,8 @@ Google Ads then shows the generated link ID. Copy it.
 
 <Note>Link IDs are per platform. Repeat Step 2 for your other platform if you ship both Android and iOS.</Note>
 
+Allow 12 hours after you save a new link ID in Linkrunner before it is used, and longer if Google is slow to activate it. Google installs before then can show as organic.
+
 ### Step 3: Configure in Linkrunner Dashboard
 
 Now paste that link ID into Linkrunner.
