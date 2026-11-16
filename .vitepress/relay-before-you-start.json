@@ -318,7 +318,7 @@
     "for": "Marketers",
     "needs": [
       "Access to your app in Meta for Developers, for the App ID and decryption key",
-      "A Meta ad account and an Events Manager dataset for Conversions API",
+      "A Meta ad account in a business portfolio you have full control of, and an Events Manager dataset for Conversions API",
       "Your app live with the Linkrunner SDK"
     ],
     "time": "About 30 minutes"

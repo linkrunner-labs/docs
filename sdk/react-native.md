@@ -754,6 +754,36 @@ linkrunner.enablePIIHashing(true);
 
 When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
 
+## Privacy mode
+
+Use privacy mode for apps directed at children. It stops the native SDKs from collecting any device-level identifier. On Android: no Google Advertising ID, App Set ID or Android ID, no local IP address, no carrier name and no Meta install referrer. On iOS: no IDFA, no ATT prompt, no IDFV, no Google on-device conversion value, no user-assigned device name and no SKAdNetwork conversion values. Only the SDK's install instance ID identifies the install.
+
+It needs native Android SDK 5.1.0 and iOS SDK 5.1.0. Use `rn-linkrunner` 4.1.0 or later.
+
+Pass `true` as the sixth argument of `init`, after `debug`:
+
+```javascript
+await linkrunner.init(
+    "YOUR_PROJECT_TOKEN",
+    undefined, // secretKey
+    undefined, // keyId
+    false, // disableIdfa
+    false, // debug
+    true // privacyMode
+);
+```
+
+The SDK saves the setting. `true` stays on across launches until you call `init` with `privacyMode` set to `false`. If you leave the argument out, the SDK keeps the saved value.
+
+When privacy mode is on:
+
+- On iOS, skip the `NSUserTrackingUsageDescription` key in [Step 2](#step-2-ios-configuration) and the SKAdNetwork keys in [Step 3](#step-3-skadnetwork-configuration).
+- On Android, [remove the `AD_ID` permission](/sdk/android#removing-ad_id-permission) from your manifest, because the SDK still declares it.
+
+In Expo, also set `privacyMode` in the config plugin. See [Privacy mode in Expo](/sdk/expo#privacy-mode).
+
+For everything privacy mode removes, what is still sent, and how it changes your store privacy answers, see [Privacy mode](/sdk/data-collection#privacy-mode).
+
 ## Uninstall Tracking
 
 ### Before you begin

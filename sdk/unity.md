@@ -66,7 +66,7 @@ In your Unity project, create or edit the file `Assets/Plugins/Android/mainTempl
 
 ```gradle
 dependencies {
-    implementation 'io.linkrunner:android-sdk:5.0.0'
+    implementation 'io.linkrunner:android-sdk:5.1.0'
 }
 ```
 
@@ -80,6 +80,8 @@ dependencyResolutionManagement {
     }
 }
 ```
+
+The bridge below passes `privacyMode` to `init`, which needs Android SDK 5.1.0 or later.
 
 <Tip>
 
@@ -109,6 +111,8 @@ Disabling AAID collection is not recommended unless absolutely necessary. The GA
 <uses-permission android:name="com.google.android.gms.permission.AD_ID"
     tools:node="remove" />
 ```
+
+If you use [privacy mode](#privacy-mode), remove the `AD_ID` permission this way too. Privacy mode stops the SDK from reading the advertising ID, but the SDK still declares the permission.
 
 ### Step 3: Create the Java Bridge
 
@@ -166,8 +170,11 @@ public class LinkrunnerBridge {
 
     // ---- Public API called from Unity C# ----
 
-    public static void initialize(String token, String secretKey, String keyId, boolean debug) {
+    // privacyMode: -1 keeps the saved value, 0 turns privacy mode off, 1 turns it on.
+    public static void initialize(String token, String secretKey, String keyId, boolean debug,
+                                  int privacyMode) {
         Activity activity = UnityPlayer.currentActivity;
+        Boolean privacyModeValue = privacyMode < 0 ? null : Boolean.valueOf(privacyMode == 1);
         LinkrunnerJava lr = LinkrunnerJava.getInstance();
         lr.init(
             activity.getApplicationContext(),
@@ -185,7 +192,8 @@ public class LinkrunnerBridge {
                     Log.e(TAG, "Init failed: " + error);
                     sendToUnity("OnInitComplete", "error:" + error);
                 }
-            }
+            },
+            privacyModeValue  // null keeps the saved value
         );
     }
 
@@ -402,7 +410,7 @@ After building your Unity project for iOS and opening the generated Xcode projec
    ```
    https://github.com/linkrunner-labs/linkrunner-ios.git
    ```
-3. Select the latest version (5.0.0+)
+3. Select the latest version (5.1.0+). The bridge below passes `privacyMode` to `initialize`, which needs 5.1.0 or later
 4. Click **Add Package** and choose the **LinkrunnerKitStatic** library
 
 <Tip>
@@ -426,6 +434,8 @@ Add to your `Info.plist` (can also be done via Unity's `Assets/Plugins/iOS/Info.
 <key>AttributionCopyEndpoint</key>
 <string>https://linkrunner-skan.com</string>
 ```
+
+If you use [privacy mode](#privacy-mode), don't add `NSUserTrackingUsageDescription`, because the SDK never asks for tracking permission. You don't need the SKAdNetwork keys either, because the SDK sets no SKAdNetwork conversion values in privacy mode.
 
 ### Step 3: Create the Swift Bridge
 
@@ -506,10 +516,13 @@ func linkrunnerInitialize(_ token: UnsafePointer<CChar>,
                           _ secretKey: UnsafePointer<CChar>?,
                           _ keyId: UnsafePointer<CChar>?,
                           _ disableIdfa: Bool,
-                          _ debug: Bool) {
+                          _ debug: Bool,
+                          _ privacyMode: Int32) {
     let tokenStr = String(cString: token)
     let secretKeyStr = toOptionalString(secretKey)
     let keyIdStr = toOptionalString(keyId)
+    // -1 keeps the saved value (nil), 0 turns privacy mode off, 1 turns it on.
+    let privacyModeValue: Bool? = privacyMode < 0 ? nil : privacyMode == 1
 
     Task {
         await LinkrunnerSDK.shared.initialize(
@@ -517,7 +530,8 @@ func linkrunnerInitialize(_ token: UnsafePointer<CChar>,
             secretKey: secretKeyStr,
             keyId: keyIdStr,
             disableIdfa: disableIdfa,
-            debug: debug
+            debug: debug,
+            privacyMode: privacyModeValue
         )
         sendToUnity("OnInitComplete", "success")
     }
@@ -791,7 +805,7 @@ public class LinkrunnerSDK : MonoBehaviour
 #if UNITY_IOS && !UNITY_EDITOR
     [DllImport("__Internal")]
     private static extern void _LinkrunnerInitialize(string token, string secretKey,
-        string keyId, bool disableIdfa, bool debug);
+        string keyId, bool disableIdfa, bool debug, int privacyMode);
     [DllImport("__Internal")]
     private static extern void _LinkrunnerSignup(string userDataJson, string additionalDataJson);
     [DllImport("__Internal")]
@@ -843,14 +857,17 @@ public class LinkrunnerSDK : MonoBehaviour
     /// <summary>
     /// Initialize the Linkrunner SDK. Call once at app startup.
     /// Get your token from: https://dashboard.linkrunner.io/dashboard?s=members&m=documentation
+    /// privacyMode: true turns privacy mode on, false turns it off, null keeps the saved value.
     /// </summary>
     public static void Initialize(string token, string secretKey = "", string keyId = "",
-        bool disableIdfa = false, bool debug = false)
+        bool disableIdfa = false, bool debug = false, bool? privacyMode = null)
     {
+        // Crosses the native boundary as -1 (keep the saved value), 0 (off) or 1 (on).
+        int privacyModeValue = privacyMode.HasValue ? (privacyMode.Value ? 1 : 0) : -1;
 #if UNITY_ANDROID && !UNITY_EDITOR
-        Bridge.CallStatic("initialize", token, secretKey ?? "", keyId ?? "", debug);
+        Bridge.CallStatic("initialize", token, secretKey ?? "", keyId ?? "", debug, privacyModeValue);
 #elif UNITY_IOS && !UNITY_EDITOR
-        _LinkrunnerInitialize(token, secretKey, keyId, disableIdfa, debug);
+        _LinkrunnerInitialize(token, secretKey, keyId, disableIdfa, debug, privacyModeValue);
 #else
         Debug.Log("[Linkrunner] Initialize called (Editor — no-op)");
         OnInitialized?.Invoke(true, "editor");
@@ -1428,6 +1445,28 @@ LinkrunnerSDK.EnablePIIHashing(true);
 LinkrunnerSDK.SetDisableAaidCollection(true);
 ```
 
+### Privacy mode
+
+Use privacy mode for apps directed at children. It stops the native SDKs from collecting any device-level identifier. On Android: no Google Advertising ID, App Set ID or Android ID, no local IP address, no carrier name and no Meta install referrer. On iOS: no IDFA, no ATT prompt, no IDFV, no Google on-device conversion value, no user-assigned device name and no SKAdNetwork conversion values. Only the SDK's install instance ID identifies the install.
+
+It needs Android SDK 5.1.0 and LinkrunnerKit 5.1.0, with the bridges in this guide. Pass `privacyMode: true` to `Initialize`:
+
+```csharp
+LinkrunnerSDK.Initialize(
+    token: "YOUR_PROJECT_TOKEN",
+    privacyMode: true
+);
+```
+
+The native SDK saves the setting. `true` stays on across launches until you call `Initialize` with `privacyMode: false`. If you leave `privacyMode` out, it stays `null` and the SDK keeps the saved value. Privacy mode already stops advertising ID collection, so you don't need `SetDisableAaidCollection`.
+
+When privacy mode is on:
+
+- On iOS, leave `NSUserTrackingUsageDescription` and the SKAdNetwork keys out of [Info.plist](#step-2-info-plist-configuration) and the [post-build script](#automating-ios-dependency-with-a-post-build-script).
+- On Android, [remove the `AD_ID` permission](#step-2-permissions).
+
+For everything privacy mode removes, what is still sent, and how it changes your store privacy answers, see [Privacy mode](/sdk/data-collection#privacy-mode).
+
 ---
 
 ## Function Placement Guide
@@ -1447,6 +1486,7 @@ LinkrunnerSDK.SetDisableAaidCollection(true);
 | [`SetAdditionalData`](/sdk/unity#set-additional-data) | Optional | Integration setup | When the CleverTap ID is available |
 | [`EnablePIIHashing`](/sdk/unity#privacy-controls) | Optional | Privacy configuration | When enabling or disabling PII hashing |
 | [`SetDisableAaidCollection`](/sdk/unity#privacy-controls) | Optional | Android privacy configuration, before `Initialize` | When disabling advertising ID collection |
+| [`Initialize` with `privacyMode`](/sdk/unity#privacy-mode) | Optional | First scene / App startup, in place of the plain `Initialize` call | For apps directed at children |
 
 ---
 
@@ -1465,6 +1505,9 @@ using System.IO;
 
 public class LinkrunnerPostBuild
 {
+    // Set to true if you pass privacyMode: true to LinkrunnerSDK.Initialize.
+    private static readonly bool UsePrivacyMode = false;
+
     [PostProcessBuild(1)]
     public static void OnPostProcessBuild(BuildTarget target, string path)
     {
@@ -1475,12 +1518,17 @@ public class LinkrunnerPostBuild
         PlistDocument plist = new PlistDocument();
         plist.ReadFromFile(plistPath);
 
-        plist.root.SetString("NSUserTrackingUsageDescription",
-            "This identifier will be used to deliver personalized ads and improve your app experience.");
-        plist.root.SetString("NSAdvertisingAttributionReportEndpoint",
-            "https://linkrunner-skan.com");
-        plist.root.SetString("AttributionCopyEndpoint",
-            "https://linkrunner-skan.com");
+        // Privacy mode never asks for tracking permission or sets SKAdNetwork values,
+        // so it needs none of these keys.
+        if (!UsePrivacyMode)
+        {
+            plist.root.SetString("NSUserTrackingUsageDescription",
+                "This identifier will be used to deliver personalized ads and improve your app experience.");
+            plist.root.SetString("NSAdvertisingAttributionReportEndpoint",
+                "https://linkrunner-skan.com");
+            plist.root.SetString("AttributionCopyEndpoint",
+                "https://linkrunner-skan.com");
+        }
 
         plist.WriteToFile(plistPath);
     }
@@ -1533,7 +1581,7 @@ For detailed testing steps, see the [Integration Testing Guide](/testing/integra
 - **"Use of unresolved identifier 'LinkrunnerSDK'"**: The LinkrunnerKit SPM package hasn't been added to the Xcode project. Add it via File → Add Package Dependencies.
 - **Bridging header issues**: When Xcode prompts to create a bridging header after adding the first Swift file, accept it. Ensure `SWIFT_VERSION` is set to `5.0` or higher in UnityFramework build settings.
 - **Linker errors**: Ensure you selected **LinkrunnerKitStatic** (not the dynamic variant) when adding the SPM package.
-- **ATT dialog not showing**: The `NSUserTrackingUsageDescription` key must be present in Info.plist. The SDK handles requesting permission automatically during initialization.
+- **ATT dialog not showing**: The `NSUserTrackingUsageDescription` key must be present in Info.plist. The SDK handles requesting permission automatically during initialization. In privacy mode the SDK never shows the dialog.
 
 ### General
 
