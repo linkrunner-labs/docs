@@ -39,10 +39,15 @@ Shopify only copies a cart metafield it already has, so a storefront that never 
 produces orders with an empty campaign.
 
 Carts created through the Storefront API can set it with Shopify's `cartMetafieldsSet`
-mutation, using namespace `custom` and key `linkrunner_campaign`. A Liquid theme has no
-supported way to write a cart metafield today. If your store is on a Liquid theme, keep this
-switch off and use the other two, and ask [support@linkrunner.io](mailto:support@linkrunner.io)
-about the storefront helper.
+mutation. The key is the composite `custom.linkrunner_campaign`: `CartMetafieldsSetInput` has
+no separate namespace field.
+
+If your app is React Native, the SDK does it for you. See
+[Shopify cart attribution](/sdk/react-native#shopify-cart-attribution).
+
+A Liquid theme has no supported way to write a cart metafield today. If your store is on a
+Liquid theme, keep this switch off and use the other two, and ask
+[support@linkrunner.io](mailto:support@linkrunner.io) about the storefront helper.
 
 </Warning>
 
@@ -124,16 +129,50 @@ Three things decide what you see:
 
 <Steps>
 
-<Step title="Connect your store">
+<Step title="Create a Shopify app for your store">
+
+Shopify installs a custom app on a single store, so your store uses its own app rather than
+a shared Linkrunner one.
+
+In the [Shopify Dev Dashboard](https://shopify.dev/dashboard), create an app, choose **custom
+distribution** and pick your store. Open the app's **API credentials** and keep the **Client
+ID** and **Client secret** in front of you.
+
+<Warning>
+
+Distribution cannot be changed after you choose it. Pick custom distribution, not public.
+
+</Warning>
+
+</Step>
+
+<Step title="Add the app to Linkrunner">
 
 Open [Integrations](https://dashboard.linkrunner.io/dashboard/integrations) in your
 Linkrunner dashboard, go to the **Ecommerce** tab and click **Configure** on Shopify.
 
-Enter your store's `myshopify.com` domain, for example `acme.myshopify.com`, and click
-**Connect**. Shopify asks you to approve the app, then sends you back.
+Enter your store's `myshopify.com` domain, for example `acme.myshopify.com`, then the Client
+ID and Client secret from the previous step, and click **Save app details**.
+
+<img src="/images/shopify/dashboard-app-details.webp" alt="The Linkrunner Shopify settings page with the store domain, client ID and client secret filled in, and a Save app details button" />
+
+The secret is stored encrypted and is never shown again. To replace it later, open **App
+details** and paste a new one.
 
 You need to be an admin on the Linkrunner project and have permission to install apps on
 the Shopify store.
+
+</Step>
+
+<Step title="Connect your store">
+
+Click **Connect**. Shopify asks you to approve the app, then sends you back.
+
+<img src="/images/shopify/dashboard-saved-not-connected.webp" alt="The Linkrunner Shopify settings page showing the store saved but not connected yet, with a Connect button" />
+
+Once it is approved the store shows as connected, with the client ID of the app it is using.
+
+<img src="/images/shopify/dashboard-connected.webp" alt="The Linkrunner Shopify settings page showing the store connected, with its client ID, App details and Disconnect buttons" />
 
 </Step>
 
