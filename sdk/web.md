@@ -9,13 +9,12 @@ description: "Set up Linkrunner's beta Web Attribution SDK for page views, users
 
 The Linkrunner Web SDK tracks page views, known users, custom events, and the traffic sources that brought visitors to your website.
 
-<Warning>
+<Note>
 
-Web Attribution is currently in beta. To use it, [create a website project](/features/website-projects), or ask a
-project admin to turn on **Web Campaigns** in **Settings → Project Details** for your app project. Linkrunner then
-creates your Web project token.
+To get a Web project token, [create a website project](/features/website-projects), or ask a project admin to turn on
+**Web Campaigns** in **Settings → Project Details** for your app project. Linkrunner then creates your Web project token.
 
-</Warning>
+</Note>
 
 The SDK automatically captures:
 
