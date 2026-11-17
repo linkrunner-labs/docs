@@ -419,6 +419,16 @@ The value was not available for that conversion. For example, `{idfa}` is empty 
 **A macro arrives as literal text.**
 That macro is not supported by the current Linkrunner postback renderer. Use one of the macros listed on this page.
 
+**Settings shows a postback URL as Not live.**
+Nothing is sent to that URL yet. Open it from **Settings → Postback URLs** to see why:
+
+| What it says | What to do |
+|---|---|
+| Switched off | Click **Switch on**. For the Event Postback URL, only the events you map are then sent to you. |
+| No `{click_id}` | Add `{click_id}` (or `{tid}`) to the URL and save. It goes live as soon as it can be sent. |
+| Uses a secret value we do not have | Contact <support@linkrunner.io> and we will add it. |
+| Paused, or set to installs only | Contact <support@linkrunner.io>. |
+
 **You do not receive an in-app event.**
 In-app events are sent only after they are mapped. Ask the advertiser to map the event, or add the mapping yourself from **Event Mapping** in your affiliate dashboard. See [Event mapping](#event-mapping).
 
