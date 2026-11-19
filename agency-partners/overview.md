@@ -40,9 +40,9 @@ Once your workspace is approved, you appear in the agency list customers choose 
 
 ## What you can see
 
-Each customer decides what their engagement gives you, so the answer differs from one customer to the next. It ranges from the campaigns table on its own, narrowed to the campaigns your agency built, up to every screen across their whole project.
+Each customer decides what their engagement gives you, so the answer differs from one customer to the next. It ranges from the campaigns table on its own, narrowed to the campaigns your agency built or is credited with, up to every screen across their whole project.
 
-Campaigns you create are always attributed to your agency. Whether you also see the customer's own campaigns, and those of their other partners, is a setting they control.
+Campaigns you create are always attributed to your agency. Campaigns the customer credits to your agency are yours to see too. Whether you also see the customer's other campaigns, and those of their other partners, is a setting they control.
 
 A screen a customer has not granted you says so when you open it, rather than showing an empty page. Ask them to change it from **Settings → Members**, on your agency's row. See [Control agency access](/agency-partners/control-agency-access) for what they can choose.
 

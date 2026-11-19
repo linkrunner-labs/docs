@@ -99,7 +99,7 @@ Hover over a logo to see what it means. The affiliate's logo reads **Attributed 
 
 ### The agency
 
-The agency sees the campaigns it built, each with the affiliate's logo next to its name. Spend and revenue columns appear only if you turned on **Revenue & spend** for them.
+The agency sees the campaigns it built, each with the affiliate's logo next to its name, and the campaigns credited to it. Spend and revenue columns appear only if you turned on **Revenue & spend** for them.
 
 ![The agency's campaign list, limited to the campaigns it built](/images/agency-partners/campaigns-agency.webp)
 
@@ -113,7 +113,7 @@ The affiliate sees only the campaigns attributed to it, including those the agen
 
 |                                  | You (customer) | Agency                                                                                                                                | Affiliate                                                                                |
 | -------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Campaigns listed                 | All            | Only the ones it built. You can widen this in [Control agency access](/agency-partners/control-agency-access#3-choose-how-much-data). | Only the ones attributed to it                                                           |
+| Campaigns listed                 | All            | Only the ones it built or that are credited to it. You can widen this in [Control agency access](/agency-partners/control-agency-access#3-choose-how-much-data). | Only the ones attributed to it                                                           |
 | Clicks, installs, sign-ups       | Yes            | Sign-ups unless you turn off **Sign-ups** for the agency                                                                                                                                | Clicks and installs. Sign-ups only if you [show them](/affiliate-partners/hide-sign-ups) |
 | Spend, revenue, ROAS             | Yes            | Only with **Revenue & spend** on                                                                                                      | Never                                                                                    |
 | Channels tab and overview totals | Yes            | Only if you turn them on                                                                                                              | No                                                                                       |
