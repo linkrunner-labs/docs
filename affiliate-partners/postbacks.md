@@ -73,6 +73,8 @@ Each event in **Event Mapping** has the same test, from the paper plane button o
 1. Open one of your tracking links for that customer in the same browser as the dashboard. It is fine if it goes on to the app store.
 2. Come back to the dashboard. Linkrunner finds your click from the last 10 minutes, and you send the install postback for it.
 
+A click from a desktop browser has no platform, so `{platform}` is empty in this test. A click from an Android or iOS phone fills it in.
+
 If Linkrunner only finds clicks from another network, for example when you use a VPN, it asks you to confirm the click is yours before it sends. Only confirm a click you made. A postback for someone else's click records a conversion for them in your tracker.
 
 ### Limits
