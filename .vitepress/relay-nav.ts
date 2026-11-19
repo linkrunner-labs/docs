@@ -131,6 +131,7 @@ const guides: Group[] = [
       page("What the Campaigns columns mean", "/features/campaign-metrics", "chart-bar"),
       ...links(
       "/features/attribution-windows",
+      "/features/multi-touch-attribution",
       "/features/ctv-attribution",
       "/features/fraud-control",
       "/features/uninstall-tracking",
