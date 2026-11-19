@@ -60,14 +60,17 @@ If your endpoint needs one of the empty macros, use a separate **Web Postback UR
 
 ## Allowlist Linkrunner postback IPs
 
-If your endpoint restricts incoming traffic by source IP, allowlist both Linkrunner production egress addresses:
+If your endpoint restricts incoming traffic by source IP, allowlist all Linkrunner production egress addresses:
 
 ```
 8.234.94.188/32
 8.234.80.204/32
+4.213.10.200/30
 ```
 
-Postbacks may originate from either address. Add both before testing or activating your integration.
+`4.213.10.200/30` is one range of four addresses (`4.213.10.200` to `4.213.10.203`). If your firewall only accepts single addresses, add all four.
+
+Postbacks may originate from any of these addresses. Add all of them before testing or activating your integration.
 
 <Note>
 
