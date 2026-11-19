@@ -71,8 +71,8 @@ npx expo install expo-linkrunner
 
 When you add `expo-linkrunner` to your `app.json` plugins and run the Expo prebuild step, the config plugin automatically makes the following changes to your iOS project:
 
-- **Adds `NSUserTrackingUsageDescription`** in your iOS `Info.plist` if not already present (skipped when `disableIdfa` is set).
-- **Adds the SKAdNetwork postback keys** `NSAdvertisingAttributionReportEndpoint` and `AttributionCopyEndpoint` (both set to `https://linkrunner-skan.com`) in your iOS `Info.plist` if not already present, so Apple sends SKAN postback copies to Linkrunner.
+- **Adds `NSUserTrackingUsageDescription`** in your iOS `Info.plist` if not already present (skipped when `disableIdfa` or `privacyMode` is set).
+- **Adds the SKAdNetwork postback keys** `NSAdvertisingAttributionReportEndpoint` and `AttributionCopyEndpoint` (both set to `https://linkrunner-skan.com`) in your iOS `Info.plist` if not already present (skipped when `privacyMode` is set), so Apple sends SKAN postback copies to Linkrunner.
 
 These changes are required for IDFA (Identifier for Advertisers) tracking, Apple's App Tracking Transparency (ATT) compliance, and SKAN attribution. For complete SKAdNetwork integration details, see the [SKAdNetwork Integration Guide](/features/skadnetwork-integration).
 
@@ -186,6 +186,41 @@ See [Google Integrated Conversion Measurement](/sdk/react-native#google-integrat
 
 </Steps>
 
+## Meta Anonymous ID
+
+If your app also has the Meta (Facebook) SDK, update to `expo-linkrunner` 4.2.0. Linkrunner reads the Meta SDK's anonymous ID automatically and sends it with your events, and the Linkrunner backend passes it to Meta as `anon_id`. Meta then matches those events to the same device it already knows from its own SDK. There is no code for you to write.
+
+No set-up order is required. Linkrunner and the Meta SDK can start in either order, and if the Meta SDK only starts later, for example after a consent prompt, the ID is picked up on the next event. In apps without the Meta SDK nothing is read and nothing extra is sent.
+
+<Note>
+
+Finish the setup by removing your own Meta `logEvent` calls for the events you already send through Linkrunner, so each event reaches Meta from one source instead of two.
+
+</Note>
+
+**For a privacy review:** Linkrunner reads a single value, the Meta SDK's anonymous app ID. The Meta SDK creates it on the device, it is scoped to your app, and Linkrunner sends it only to Meta. Linkrunner creates no ID of its own and never writes to the Meta SDK's storage. Supported on Android and iOS.
+
+### Turning it off
+
+Expo apps do not edit the native files by hand, so the config plugin takes an option. Set `collectMetaAnonymousId` to `false` in `app.json` and the plugin writes both opt-out flags for you during prebuild:
+
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-linkrunner",
+        {
+          "collectMetaAnonymousId": false
+        }
+      ]
+    ]
+  }
+}
+```
+
+With the flag set, the SDK makes no lookup and sends no `meta_anonymous_id`.
+
 ## SDK Usage
 
 <Note>
@@ -250,6 +285,48 @@ const trackPurchase = async () => {
 
 Only `PAYMENT_COMPLETED` counts as revenue and is sent to ad networks. Plain strings such as `"PAYMENT_COMPLETED"` also work for `status`.
 
+## Privacy mode
+
+Use privacy mode for apps directed at children. It stops the native SDKs from collecting any device-level identifier, such as the advertising IDs, Android ID and IDFV, and the SDK never shows the ATT prompt. Only the SDK's install instance ID identifies the install. It needs native Android SDK 5.1.0 and iOS SDK 5.1.0. Use `expo-linkrunner` 4.1.0 and `rn-linkrunner` 4.1.0 or later.
+
+Turn it on in two places.
+
+First, set `privacyMode` in the plugin options in `app.json`, then run the prebuild step again:
+
+```json
+{
+    "expo": {
+        "plugins": [
+            [
+                "expo-linkrunner",
+                {
+                    "privacyMode": true
+                }
+            ]
+        ]
+    }
+}
+```
+
+With `privacyMode: true`, the plugin does not add `NSUserTrackingUsageDescription` or the SKAdNetwork keys on iOS, and it removes the `com.google.android.gms.permission.AD_ID` permission on Android.
+
+Then pass `true` as the sixth argument of `init` at runtime, after `debug`. See [Privacy mode](/sdk/react-native#privacy-mode) in the React Native guide:
+
+```javascript
+await linkrunner.init(
+    "YOUR_PROJECT_TOKEN",
+    undefined, // secretKey
+    undefined, // keyId
+    false, // disableIdfa
+    false, // debug
+    true // privacyMode
+);
+```
+
+The plugin option only changes your native project files. The `init` argument is what stops the collection.
+
+For everything privacy mode removes, what is still sent, and how it changes your store privacy answers, see [Privacy mode](/sdk/data-collection#privacy-mode).
+
 ## Function Placement Guide
 
 Expo uses the `rn-linkrunner` runtime. The function links below open the implementation details in the React Native guide.
@@ -306,6 +383,12 @@ Starting with version 3.0.0, the Expo SDK has been redesigned to use a new archi
    The `expo-linkrunner` package is now just a config plugin. All SDK methods and APIs are now provided by the `rn-linkrunner` package. You'll need to update your imports and usage accordingly.
 
    For detailed implementation instructions, see the [SDK Usage](#sdk-usage) section above.
+
+<Note>
+
+**Publishing to Google Play or the App Store?** See [Data the SDK collects](/sdk/data-collection) for what the SDK sends and the answers for the Play Data safety form and Apple's App Privacy questions.
+
+</Note>
 
 ## Next Steps
 

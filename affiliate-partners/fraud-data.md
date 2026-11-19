@@ -33,7 +33,7 @@ Both mean the same thing for payouts: do not pay out on the conversion. Your usu
 
 ## 1. List the rejected conversions
 
-1. Open **Postback Logs** from the left sidebar, or go to [dashboard.linkrunner.io/affiliate/postback-logs](https://dashboard.linkrunner.io/affiliate/postback-logs).
+1. Open **Postback Logs** from the left sidebar, or go to [dashboard.linkrunner.io/affiliate/postback-logs](https://dashboard.linkrunner.io/affiliate/postback-logs) while signed in to your affiliate account.
 2. Pick the customer with the project picker at the top of the sidebar. The log shows one customer at a time.
 3. Open the status filter and pick **Rejected (fraud)** or **Withheld (fraud)**.
 

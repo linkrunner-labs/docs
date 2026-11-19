@@ -7,7 +7,7 @@ description: "Choose which screens, actions, and data an agency can reach inside
 
 <p class="vp-lead">Choose which screens, actions, and data an agency can reach inside your project</p>
 
-An engaged agency starts with nothing. You decide, per agency, which screens they open, which actions they take, and how much of your project they measure. App campaigns and Web campaigns are set separately, so an agency can run your app installs without seeing your website, or the other way round.
+An engaged agency starts with every switch off except **Sign-ups**, which starts on. You decide, per agency, which screens they open, which actions they take, and how much of your project they measure. App campaigns and Web campaigns are set separately, so an agency can run your app installs without seeing your website, or the other way round.
 
 The panel comes to you when you connect an agency, and the sliders icon on their row in **Settings → Members** opens it again whenever you want to change your mind.
 
@@ -29,7 +29,7 @@ The panel also opens by itself the moment you connect an agency from **Integrati
 
 ## 2. Choose their screens and actions
 
-The top of the panel is **Manage integrations**, then a switch between **App campaigns** and **Web campaigns**. Each tab has its own switches and its own data scope. A new engagement has all of them off.
+The top of the panel is **Manage integrations**, then a switch between **App campaigns** and **Web campaigns**. Each tab has its own switches and its own data scope. A new engagement has every switch off except **Sign-ups**, which starts on and only shows once **Read** is on for that tab. Agencies you engaged before **Sign-ups** existed have it on too, so nothing changes for them until you turn it off.
 
 | Tab               | When you see it                                     |
 | ----------------- | --------------------------------------------------- |
@@ -46,7 +46,7 @@ It does not need **Read** on either side.
 
 ### App campaigns
 
-![The App campaigns tab of the access panel, with Read, Edit and every App switch turned on](/images/agency-partners/agency-access-app-tab.webp)
+![The App campaigns tab of the access panel for an example agency, with Read, Overview, Channels and Sign-ups turned on](/images/agency-partners/agency-access-app-tab.webp)
 
 | Switch                     | What it gives them                                                                                                                 |
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
@@ -55,18 +55,30 @@ It does not need **Read** on either side.
 | **Overview**               | The summary strip above the campaigns.                                                                                             |
 | **Channels**               | The channel breakdown tab.                                                                                                         |
 | **Export data**            | Downloading campaign data as a file.                                                                                               |
+| **Sign-ups**               | Sign-ups, Conversion and Cost per sign-up in the campaigns table and drawer, the Overview sign-up tiles, and sign-up figures in Channels. Needs **Read**. Off hides them, and also stops the agency exporting the list of users who signed up through a campaign (that export also needs **Export data**). |
 | **Revenue & spend**        | The Revenue tile in Overview, plus the Revenue, Spend, ROAS, Cost per install, and Cost per signup columns in the campaigns table. |
 
 ### Web campaigns
 
-![The Web campaigns tab of the access panel, with Read, Edit and Revenue and spend turned on](/images/agency-partners/agency-access-web-tab.webp)
+![The Web campaigns tab of the access panel for an example agency, with Read and Sign-ups turned on](/images/agency-partners/agency-access-web-tab.webp)
 
 | Switch                     | What it gives them                                                                     |
 | -------------------------- | -------------------------------------------------------------------------------------- |
 | **Web campaigns · Read**   | The Web campaigns table. Everything below depends on this.                              |
 | **Web campaigns · Edit**   | Creating and changing Web campaigns. Turning **Edit** on turns **Read** on.            |
 | **Export data**            | Downloading the Web campaigns table as a file. User lists stay with your team.         |
+| **Sign-ups**               | Sign-ups, unique users and Conversion for their Web campaigns. Needs **Read**. Off hides sign-up events from their web campaigns, drawer and exports. |
 | **Revenue & spend**        | The Revenue, Spend, and ROAS columns for their Web campaigns.                          |
+
+**Sign-ups does not turn Read on.** It only takes effect once **Read** is on for that tab. Postbacks don't change when you turn it off.
+
+![The App campaigns tab with Sign-ups turned off](/images/agency-partners/agency-access-app-signups-off.webp)
+
+<Note>
+
+**Sign-ups** is separate from the affiliate [**Show sign-ups**](/affiliate-partners/hide-sign-ups) switch. A company connected to your project both as an affiliate partner and as an agency has two separate settings. To hide sign-ups from it completely, turn off both.
+
+</Note>
 
 **Read governs the rest of its tab.** With **App campaigns · Read** off, every App switch below it is disabled, and the same goes for **Web campaigns · Read** on the Web tab. Turning one side on does not turn on the other.
 

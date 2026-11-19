@@ -14,6 +14,12 @@ description: "Choose which of a customer's events reach you, what they are calle
 
 Open it from the left sidebar in the affiliate dashboard. You can also go straight to it: [dashboard.linkrunner.io/affiliate/event-mapping](https://dashboard.linkrunner.io/affiliate/event-mapping).
 
+<Note>
+
+This link is for **affiliate accounts**. If you are signed in to a customer (app) account, it opens your app's dashboard instead. To change what a partner receives for your app, see [Change What a Partner Receives](/affiliate-partners/map-partner-events).
+
+</Note>
+
 ![Event Mapping in the affiliate sidebar](/images/affiliate-partners/event-mapping-page.webp)
 
 <Note>
@@ -42,6 +48,12 @@ The screenshots on this page have customer names, partner names, and custom even
 <Note>
 
 Installs and registrations are sent automatically. In-app events are not. If an event is missing from your postbacks, it usually has no mapping.
+
+</Note>
+
+<Note>
+
+Your customer can change or remove rules for their own app from their Linkrunner dashboard. Their change applies to their app only, and you can still edit the rule afterwards. The last change wins. Removing a rule for one app does not affect your other customers.
 
 </Note>
 
@@ -97,7 +109,7 @@ Click the bin icon at the end of a row.
 
 - For an in-app event, removing the rule stops that event being sent to you.
 - For an install or registration rule, the event falls back to your standing row.
-- Standing rows cannot be removed. Their bin icon is disabled.
+- Standing rows cannot be removed. Their bin icon is disabled. A customer can change them for their own app only.
 
 ## Web events
 

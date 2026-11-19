@@ -60,7 +60,7 @@ The flow is similar to a user opening the app via a Linkrunner link. The markete
 
 ### Inactivity Window
 
-The minimum number of days a user must be inactive before they can qualify for reattribution. Linkrunner determines inactivity based on the **last app open**. The time since the user last opened the app is compared against the configured inactivity window.
+The minimum number of days a user must be inactive before they can qualify for reattribution. Linkrunner determines inactivity based on the **last app open**. The time since the user last opened the app is compared against the configured inactivity window. For a reinstall, it is the time since the previous install.
 
 |             |        |
 | ----------- | ------ |

@@ -68,7 +68,7 @@ In Google Ads, go to **Tools** → **Data Manager** → **Third-party app analyt
 
 Then in Linkrunner, go to [Integrations → Google Ads](https://dashboard.linkrunner.io/dashboard/integrations/google-ads), open the three-dot menu on the Google Ads row, choose **Setup Link IDs**, and paste it into **iOS Link ID**. Click **Save Link IDs**.
 
-Full walkthrough with screenshots: [Create Link ID for Android/iOS App](/ad-networks/google-ads#2-create-link-id-for-androidios-app).
+Full walkthrough with screenshots: [Create Link ID for Android/iOS App](/ad-networks/google-ads#2-create-link-id-for-android/ios-app).
 
 </Step>
 

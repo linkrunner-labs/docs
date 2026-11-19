@@ -72,15 +72,15 @@ Each request to the S2S click API must carry the partner's own secret token, so 
 
 ## Turn on CTV impressions
 
-If the partner reports [connected TV (CTV) impressions](/affiliate-partners/ctv-impressions), turn on the **Connected TV (CTV) impressions** switch under the S2S switch on the same page. S2S clicks must be on first. CTV installs are credited only when view-through is also on for the partner. For all three switches, how much to trust CTV matches, and results, see the [CTV attribution guide](/features/ctv-attribution).
+If the partner reports [connected TV (CTV) impressions](/affiliate-partners/ctv-impressions), turn on the **Connected TV (CTV) impressions** switch on the same page. It is separate from the S2S switch, so S2S clicks don't need to be on. CTV installs are credited only when view-through is also on for the partner. For both switches, how much to trust CTV matches, and results, see the [CTV attribution guide](/features/ctv-attribution).
 
 Once CTV is on, the dashboard shows the partner's **CTV impression URL** on their campaigns, so you can copy it and send it to the partner.
 
 ## Turn it off
 
-Turn the same switch off. There is no confirmation. Within 6 minutes, the partner's server clicks and impressions are rejected, and their tracking links go back to recording the IP of whoever calls them. Their tracking links keep working. Turning S2S clicks off also turns CTV impressions off.
+Turn the same switch off. There is no confirmation. Within 6 minutes, the partner's server clicks and impressions are rejected, and their tracking links go back to recording the IP of whoever calls them. Their tracking links keep working. Turning S2S clicks off does not turn CTV impressions off.
 
-Disconnecting the partner also turns S2S clicks off. If you reconnect them later, turn it on again.
+Disconnecting the partner also turns S2S clicks and CTV impressions off. If you reconnect them later, turn them on again.
 
 ## Troubleshooting
 

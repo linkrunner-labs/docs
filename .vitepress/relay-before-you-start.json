@@ -77,7 +77,7 @@
   "/sdk/web": {
     "for": "App developers",
     "needs": [
-      "A Web SDK token from Linkrunner. Web Attribution is in beta, so email support for one",
+      "Your Web project token, from Settings → Project Details in the Linkrunner dashboard",
       "Access to edit your website's code, or its Next.js layout"
     ],
     "time": "About 20 minutes"
@@ -95,7 +95,7 @@
   "/sdk/shopify": {
     "for": "Marketers and developers",
     "needs": [
-      "A Web SDK token. Email Linkrunner support to get one, since Web Attribution is in beta",
+      "Your Web project token, from Settings → Project Details in the Linkrunner dashboard",
       "Shopify admin access to edit your theme code and add a custom pixel",
       "A backup copy of your live theme, made with Duplicate in Online Store → Themes"
     ],
@@ -318,7 +318,7 @@
     "for": "Marketers",
     "needs": [
       "Access to your app in Meta for Developers, for the App ID and decryption key",
-      "A Meta ad account and an Events Manager dataset for Conversions API",
+      "A Meta ad account in a business portfolio you have full control of, and an Events Manager dataset for Conversions API",
       "Your app live with the Linkrunner SDK"
     ],
     "time": "About 30 minutes"

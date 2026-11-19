@@ -124,7 +124,7 @@ Website page views and channel breakdowns are attribution inputs that feed the c
 
 **App opens the store even though it is installed?** Deep linking is not verified. Check [Deep Linking Setup](/features/deep-linking-setup) and confirm your domain's `assetlinks.json` and `apple-app-site-association` are saved in Linkrunner.
 
-**Deep link is null after install?** Confirm deferred deep linking is enabled on the campaign, and that you read `deeplink` from `getAttributionData` after `init` completes. See [Deferred Deep Linking](/features/deferred-deep-linking).
+**Deep link is null after install?** Check that the install is credited to the campaign and not to Organic, and that you read `deeplink` from `getAttributionData` after `init` completes. If the campaign has no deep link destination, `deeplink` is the link the user tapped, so turn on deferred deep linking and set a destination. See [Deferred Deep Linking](/features/deferred-deep-linking).
 
 **Events or revenue not showing for a user?** They are only stored for users registered through [`signup`](/sdk/react-native#user-identification-required). Register the user, then re-send the event.
 

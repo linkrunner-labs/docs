@@ -158,9 +158,10 @@ If this sub-tab is empty, nothing has arrived yet. The empty state links to the 
 
 <Accordion title="My event is not in the Events Log">
 
-Linkrunner only keeps data for users it has attributed, meaning it has matched their install back to the click
-or link that led to it. If the device never completed a click and install that Linkrunner could match, its
-actions are not recorded. Check the flow with [SDK Integration Testing](/testing/integration-testing).
+Linkrunner records events from organic and attributed users. Check that the attribution filter at the top of
+the Events Log is set to **All** or **Organic** if the user didn't come from a campaign. Organic events are
+available from 13th June 2026. If the event is still missing, check that the device recorded an install
+through the SDK with [SDK Integration Testing](/testing/integration-testing).
 
 </Accordion>
 

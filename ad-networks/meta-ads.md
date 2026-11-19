@@ -73,11 +73,15 @@ in your Meta app settings.
 
 ### Step 4: Connect Meta Ad Account
 
+Linkrunner connects through your Meta business portfolio. Do this step with a Meta account that has full control of the business portfolio that owns the ad account.
+
 1. Go to [Ad Account Integration](https://dashboard.linkrunner.io/dashboard/integrations/meta-ads?tab=ad_account)
 2. Click **Add Meta Account**
 3. Log in with Meta and connect your ad account
 
 <img src="/images/meta/ad-account-integration.png" alt="Meta Ad Account Integration tab in Linkrunner" />
+
+If Meta stops the login with **The following business assets were not granted the requested permissions**, see [Meta login fails](/ad-networks/meta-ads-discrepancies#q-meta-login-fails-business-assets-were-not-granted-the-requested-permissions) in the FAQ.
 
 ### Step 5: Configure CAPI
 
@@ -374,6 +378,31 @@ For more details, see the [Meta Install Referrer](/features/meta-install-referre
 
 Test the complete preview, install, and first attribution response with [Meta Android attribution testing](/testing/meta-android-attribution-testing).
 
+## 7. Send the Meta Anonymous ID (apps with the Meta SDK)
+
+If your app also has the Meta (Facebook) SDK, Meta credits far fewer of the in-app events Linkrunner sends it, because Meta matches those events against the anonymous ID its own SDK created on the device and Linkrunner had no way to send it.
+
+From the SDK versions below, Linkrunner reads that ID automatically and sends it with your events, and the backend passes it to Meta as `anon_id`. There is no code to write and no new dependency: apps without the Meta SDK are unaffected.
+
+| SDK | Version |
+| -- | -- |
+| [Android](/sdk/android#meta-anonymous-id) | 5.2.0 |
+| [iOS](/sdk/ios#meta-anonymous-id) | 5.2.0 |
+| [React Native](/sdk/react-native#meta-anonymous-id) | 4.2.0 |
+| [Expo](/sdk/expo#meta-anonymous-id) | 4.2.0 |
+| [Flutter](/sdk/flutter#meta-anonymous-id) | 5.2.0 |
+| [Capacitor](/sdk/capacitor#meta-anonymous-id) | 3.2.0 |
+| [Cordova](/sdk/cordova#meta-anonymous-id) | 2.2.0 |
+| [Unity](/sdk/unity#meta-anonymous-id) | 3.1.0 |
+
+<Note>
+
+Finish the setup by removing your own Meta `logEvent` calls for the events you already send through Linkrunner, so each event reaches Meta from one source instead of two.
+
+</Note>
+
+Your SDK page also covers how to turn the collection off, and what the ID is for a privacy review.
+
 ## FAQ and Discrepancies
 
 For answers to common questions and an explanation of why numbers in Meta Ads Manager may not exactly match Linkrunner, see [Meta Ads FAQ and Discrepancies](/ad-networks/meta-ads-discrepancies).
@@ -418,7 +447,7 @@ To fix a paused dataset:
 2. Click **Update token** in the alert, paste the token, choose the dataset and click **Save**. Project admins and members see this button.
 3. The status changes to **Waiting for first event**, then to **Sending** when Meta accepts your next conversion event.
 
-Reconnecting the ad account with **Add Meta Account** does not fix a paused dataset. Only a new token or dataset does.
+Reconnecting the ad account with **Reconnect** in the **Auth Status** column does not fix a paused dataset. Only a new token or dataset does.
 
 <Warning>
 

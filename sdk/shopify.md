@@ -14,6 +14,9 @@ your checkout gets a custom pixel.
 Once both are in, every sign-up and purchase is linked back to the ad, campaign, or link
 that brought the shopper in.
 
+To send that campaign back the other way, onto your Shopify orders, customers and marketing
+reports, see [Shopify sync](/features/shopify-sync).
+
 <Note>
 
 This takes about 30 minutes and needs no developer access to your servers. Everything

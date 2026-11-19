@@ -392,6 +392,42 @@ linkrunner.setAdditionalData({
 
 This method allows you to connect user identities across different analytics and marketing platforms.
 
+## Meta Anonymous ID
+
+If your app also has the Meta (Facebook) SDK, update to `cordova-linkrunner` 2.2.0. Linkrunner reads the Meta SDK's anonymous ID automatically and sends it with your events, and the Linkrunner backend passes it to Meta as `anon_id`. Meta then matches those events to the same device it already knows from its own SDK. There is no code for you to write.
+
+No set-up order is required. Linkrunner and the Meta SDK can start in either order, and if the Meta SDK only starts later, for example after a consent prompt, the ID is picked up on the next event. In apps without the Meta SDK nothing is read and nothing extra is sent.
+
+<Note>
+
+Finish the setup by removing your own Meta `logEvent` calls for the events you already send through Linkrunner, so each event reaches Meta from one source instead of two.
+
+</Note>
+
+**For a privacy review:** Linkrunner reads a single value, the Meta SDK's anonymous app ID. The Meta SDK creates it on the device, it is scoped to your app, and Linkrunner sends it only to Meta. Linkrunner creates no ID of its own and never writes to the Meta SDK's storage. Supported on Android and iOS.
+
+### Turning it off
+
+Cordova regenerates the native projects, so declare the flags in `config.xml` rather than editing them by hand:
+
+```xml
+<platform name="android">
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+        <meta-data
+            android:name="io.linkrunner.sdk.MetaAnonymousIdCollectionEnabled"
+            android:value="false" />
+    </config-file>
+</platform>
+
+<platform name="ios">
+    <config-file target="*-Info.plist" parent="LinkrunnerMetaAnonymousIdCollectionEnabled">
+        <false/>
+    </config-file>
+</platform>
+```
+
+With the flag set, the SDK makes no lookup and sends no `meta_anonymous_id`.
+
 ## Revenue Tracking
 
 <Note>
@@ -626,6 +662,29 @@ linkrunner.enablePIIHashing(true);
 
 When PII hashing is enabled, sensitive user data like name, email, and phone number are hashed using SHA-256 before being sent to Linkrunner servers.
 
+## Privacy mode
+
+Use privacy mode for apps directed at children. It stops the native SDKs from collecting any device-level identifier. On Android: no Google Advertising ID, App Set ID or Android ID, no local IP address, no carrier name and no Meta install referrer. On iOS: no IDFA, no ATT prompt, no IDFV, no Google on-device conversion value, no user-assigned device name and no SKAdNetwork conversion values. Only the SDK's install instance ID identifies the install.
+
+It needs native Android SDK 5.1.0 and iOS SDK 5.1.0. Use `cordova-linkrunner` 2.1.0 or later.
+
+Set `privacyMode: true` in the `init` options:
+
+```javascript
+document.addEventListener('deviceready', function () {
+    linkrunner.init({
+        token: "YOUR_PROJECT_TOKEN",
+        privacyMode: true
+    });
+}, false);
+```
+
+The SDK saves the setting. `true` stays on across launches until you call `init` with `privacyMode: false`. If you leave `privacyMode` out, the SDK keeps the saved value.
+
+The plugin still adds `NSUserTrackingUsageDescription` and the SKAdNetwork keys to `Info.plist` (see [What the plugin auto-configures](#what-the-plugin-auto-configures)). In privacy mode the SDK never shows the ATT prompt and sets no SKAdNetwork conversion values. On Android, [remove the `AD_ID` permission](/sdk/android#removing-ad_id-permission) from your manifest, because the SDK still declares it.
+
+For everything privacy mode removes, what is still sent, and how it changes your store privacy answers, see [Privacy mode](/sdk/data-collection#privacy-mode).
+
 ## Uninstall Tracking
 
 ### Before you begin
@@ -823,6 +882,12 @@ push.on('registration', function (data) {
 | [`linkrunner.trackEvent` with payment keys](/sdk/cordova#tracking-payments) | Optional | Payment processing, including ecommerce purchases | When user makes a payment, including Purchase events with ecommerce data |
 | [`linkrunner.setPushToken`](/sdk/cordova#uninstall-tracking) | Optional | Push notification setup | When push token is available |
 | [`linkrunner.enablePIIHashing`](/sdk/cordova#enhanced-privacy-controls) | Optional | Privacy configuration | When enabling PII hashing |
+
+<Note>
+
+**Publishing to Google Play or the App Store?** See [Data the SDK collects](/sdk/data-collection) for what the SDK sends and the answers for the Play Data safety form and Apple's App Privacy questions.
+
+</Note>
 
 ## Next Steps
 
