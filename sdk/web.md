@@ -1,0 +1,489 @@
+---
+title: "Web SDK"
+description: "Set up Linkrunner's beta Web Attribution SDK for page views, users, events, and traffic-source attribution"
+---
+
+# Web SDK
+
+<p class="vp-lead">Set up Linkrunner's beta Web Attribution SDK for page views, users, events, and traffic-source attribution</p>
+
+The Linkrunner Web SDK tracks page views, known users, custom events, and the traffic sources that brought visitors to your website.
+
+<Note>
+
+To get a Web project token, [create a website project](/features/website-projects), or ask a project admin to turn on
+**Web Campaigns** in **Settings → Project Details** for your app project. Linkrunner then creates your Web project token.
+
+</Note>
+
+The SDK automatically captures:
+
+- Page views, including single-page app navigation
+- First-touch and last-touch UTM attribution
+- Ad click IDs such as `gclid`, `fbclid`, and `ttclid`
+- Paid, organic, social, AI search, referral, and direct traffic
+- Browser, device, geography, and performance data
+
+## 1. Add the SDK
+
+We recommend loading the browser SDK from the Linkrunner CDN. This lets Linkrunner ship fixes and updates without requiring you to change or redeploy your integration.
+
+The direct script tag and the Next.js helper both load `https://cdn.linkrunner.io/web/v1/lr.js` by default. The [npm package](https://www.npmjs.com/package/@linkrunner/web) provides the typed Next.js component and event methods, while the browser SDK still stays current through the CDN.
+
+<Tabs>
+
+<Tab title="CDN script (preferred)">
+
+Add this script before the closing `</head>` tag. Replace `YOUR_WEB_SDK_TOKEN` with your **Web project token** from **Settings → Project Details**.
+
+```html
+<script
+  src="https://cdn.linkrunner.io/web/v1/lr.js"
+  data-token="YOUR_WEB_SDK_TOKEN"
+  defer
+></script>
+```
+
+</Tab>
+
+<Tab title="Next.js App Router">
+
+Install the package:
+
+```bash
+npm install @linkrunner/web
+```
+
+Add `LinkrunnerScript` to your root layout so it loads once and stays active across navigation:
+
+```tsx
+// app/layout.tsx
+import { LinkrunnerScript } from '@linkrunner/web/next'
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <LinkrunnerScript token="YOUR_WEB_SDK_TOKEN" />
+      </body>
+    </html>
+  )
+}
+```
+
+`LinkrunnerScript` loads the browser SDK from the Linkrunner CDN by default.
+
+</Tab>
+
+<Tab title="Next.js Pages Router">
+
+Install the package:
+
+```bash
+npm install @linkrunner/web
+```
+
+Add `LinkrunnerScript` to `_app.tsx`, not `_document.tsx` or an individual page:
+
+```tsx
+// pages/_app.tsx
+import { LinkrunnerScript } from '@linkrunner/web/next'
+
+export default function App({ Component, pageProps }) {
+  return (
+    <>
+      <LinkrunnerScript token="YOUR_WEB_SDK_TOKEN" />
+      <Component {...pageProps} />
+    </>
+  )
+}
+```
+
+`LinkrunnerScript` loads the browser SDK from the Linkrunner CDN by default.
+
+</Tab>
+
+</Tabs>
+
+The SDK tracks the first page view when it loads. Single-page app navigation is tracked by default.
+
+## 2. Identify users and track events
+
+Call `identify` after a user signs in or when you otherwise know their identity. Use a stable internal user ID rather than an email address or phone number.
+
+```js
+import { lr } from '@linkrunner/web'
+
+lr.identify(String(user.id))
+```
+
+With the script tag, use the global object:
+
+```js
+window.lr.identify(String(user.id))
+```
+
+The SDK saves this ID in `localStorage` and includes it as `user_id` on later events.
+
+Which events to send, and the exact names Linkrunner counts as sign-ups and purchases, are in [Track sign-ups and purchases on your website](/features/web-events-tracking).
+
+Track a custom event with `track`:
+
+```js
+lr.track('purchase', {
+  amount: 49.99,
+  currency: 'USD',
+})
+```
+
+To show a signed-up user's details in the Web Events dashboard, identify the user and then send a `signup` event:
+
+```js
+lr.identify(String(user.id))
+
+lr.track('signup', {
+  name: user.name,
+  email: user.email,
+  phone: user.phone,
+})
+```
+
+Only send personal data when you have permission to do so. Calling `identify` does not add the user ID to events that were already captured.
+
+<Note>
+
+Calls made before the SDK finishes loading are queued and replayed after initialization.
+
+</Note>
+
+## Function Placement Guide
+
+The Web SDK initializes when the script loads. It uses `identify` for the customer user ID and `track('signup', ...)` for signup, rather than the mobile SDK method names. It captures incoming URL attribution automatically and does not expose `handleDeeplink`.
+
+| Function                                                                | Requirement | Where to Place                         | When to Call                        |
+| ----------------------------------------------------------------------- | ----------- | -------------------------------------- | ----------------------------------- |
+| [SDK script / `LinkrunnerScript`](/sdk/web#1-add-the-sdk)               | Required    | HTML head, root layout, or `_app.tsx`  | Once when your website loads        |
+| [`lr.track('signup', ...)`](/sdk/web#2-identify-users-and-track-events) | Required    | Signup or login flow, after `identify` | When you identify a signed-up user  |
+| [`lr.identify`](/sdk/web#2-identify-users-and-track-events)             | Required    | Authentication logic                   | When you know your user's stable ID |
+| [`lr.track`](/sdk/web#2-identify-users-and-track-events)                | Optional    | Event handlers throughout your website | When you record other user actions  |
+| [`lr.getAppDownloadURL`](/sdk/web#send-ad-visitors-from-your-website-to-your-app) | Optional | Your website's app download button | When the visitor taps the button |
+
+## 3. Verify the integration
+
+Set `data-debug="true"` while testing:
+
+```html
+<script
+  src="https://cdn.linkrunner.io/web/v1/lr.js"
+  data-token="YOUR_WEB_SDK_TOKEN"
+  data-debug="true"
+  defer
+></script>
+```
+
+Then open your browser's developer tools:
+
+1. In **Console**, confirm that messages start with `[Linkrunner]` and include `Initialized`.
+2. In **Network**, confirm that page views and events send a `POST` request to `/web/ingest`.
+3. Trigger a test event and confirm the console reports `Sent via fetch`.
+
+Debug logging turns on automatically on `localhost`, `127.0.0.1`, and `[::1]`. Remove `data-debug="true"` after testing.
+
+To confirm sign-ups, campaign attribution, custom events, and purchases end to end from your own browser, follow [Test the Web SDK](/testing/web-sdk-testing).
+
+## Send ad visitors from your website to your app
+
+Use this when your Meta or Google ads send visitors to your website first, and a button on your website, such as **Get the app**, sends them to the Play Store or App Store. The button opens your Linkrunner link with the visitor's ad click added, so the install is credited to that ad, however many pages the visitor went through first. `getAppDownloadURL` builds that link for you.
+
+If your ads should send visitors straight to the store instead, use [Meta Web to App](/ad-networks/meta-web-to-app).
+
+Before you start, you need:
+
+- A Linkrunner link domain, such as `link.your-app.com`. See [Subdomain Setup](/features/subdomain-setup).
+- The Linkrunner SDK in your app, so the install is recorded.
+- The Web SDK on every page from the landing page to the button. The script tag gets `getAppDownloadURL` automatically. If you import `lr` from npm, use `@linkrunner/web` 0.1.22 or later.
+
+### 1. Add the ad click to your landing page URL
+
+The SDK reads the ad click from your landing page URL and keeps it while the visitor moves through your website.
+
+- **Meta:** in Ads Manager, add these to the ad's **URL parameters**. Meta adds `fbclid` itself.
+
+  ```txt
+  utm_source=facebook&utm_medium=paid_social&campaign_id={{campaign.id}}&adset_id={{adset.id}}&ad_id={{ad.id}}&placement={{placement}}&site_source={{site_source_name}}
+  ```
+
+- **Google:** keep auto-tagging on. Google adds `gclid`, `gbraid`, `wbraid`, `gad_source`, and `gad_campaignid` itself. To pass your campaign name, add `utm_campaign=<your campaign name>` to the ad's **Final URL suffix**.
+
+### 2. Open the link from your button
+
+Call `getAppDownloadURL` with your Linkrunner link when the visitor taps the button, then open the URL it returns:
+
+```js
+import { lr } from '@linkrunner/web'
+
+document.getElementById('get-app').addEventListener('click', async () => {
+  window.location.href = await lr.getAppDownloadURL('https://link.your-app.com/')
+})
+```
+
+With the script tag, call `window.lr.getAppDownloadURL` instead.
+
+`getAppDownloadURL` returns a promise of your link with the parameters of the visitor's last touch, decided as in [Attribution storage](#attribution-storage):
+
+| Last touch      | Parameters added                                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Meta ad click   | `utm_source=facebook`, `utm_medium=paid_social`, `campaign_id`, `adset_id`, `ad_id`, `placement`, `site_source`, `fbclid`             |
+| Google ad click | `gad_campaignid`, `gad_source`, `gclid`, `gbraid`, `wbraid`, `utm_source=google`, `utm_campaign`                                     |
+| Anything else   | The visitor's last-touch `utm_*` parameters, if any                                                                                  |
+
+Parameters the ad click did not carry are left out, and your link's own path and parameters are kept. If the Meta ad sends Meta's default `utm_id={{campaign.id}}` instead of `campaign_id`, the SDK uses it as `campaign_id`.
+
+With the npm import, a call made before the SDK script loads waits for it. If the script has not loaded within 3 seconds, for example because an ad blocker stopped it, the promise returns your link unchanged so the button still works, but that install is not credited to the ad. The promise rejects if the link is not a full `https://` or `http://` URL.
+
+### 3. Check the link
+
+Open your landing page with test parameters, for example `https://your-website.com/?utm_source=facebook&campaign_id=123&fbclid=test_click`, go to the page with the button, and run this in the browser console:
+
+```js
+await window.lr.getAppDownloadURL('https://link.your-app.com/')
+```
+
+The result should be your link with `campaign_id=123` and `fbclid=test_click`. This confirms that the website passes the ad click to your link. The install is credited to the ad once the app opens with the Linkrunner SDK.
+
+## Configuration
+
+### Script tag attributes
+
+| Attribute       | Required | Description                                                    | Default                  |
+| --------------- | -------- | -------------------------------------------------------------- | ------------------------ |
+| `data-token`    | Yes      | Your Web project token                                         | None                     |
+| `data-domain`   | No       | Your first-party collection hostname, such as `lr.example.com` | None                     |
+| `data-endpoint` | No       | A full URL or same-origin path for a proxy you operate         | None                     |
+| `data-spa`      | No       | Set to `"false"` to disable automatic SPA page views           | `true`                   |
+| `data-debug`    | No       | Set to `"true"` or `"false"` to control console logging        | On for local development |
+
+You can also set the same options before the script loads:
+
+```html
+<script>
+  window.LinkrunnerConfig = {
+    token: 'YOUR_WEB_SDK_TOKEN',
+    spa: true,
+    debug: false,
+  }
+</script>
+<script src="https://cdn.linkrunner.io/web/v1/lr.js" defer></script>
+```
+
+Without `data-domain` or `data-endpoint`, events go to `https://api.linkrunner.io/web/ingest`.
+
+## First-party collection
+
+Some ad blockers stop requests to analytics domains. First-party collection sends events through your own domain instead.
+
+### Proxy through your website
+
+This is the most reliable option because both the SDK and event endpoint use paths on your website. For Next.js, add two rewrites:
+
+```js
+// next.config.js
+module.exports = {
+  async rewrites() {
+    return [
+      {
+        source: '/lr/lr.js',
+        destination: 'https://cdn.linkrunner.io/web/v1/lr.js',
+      },
+      {
+        source: '/lr/ingest',
+        destination: 'https://api.linkrunner.io/web/ingest',
+      },
+    ]
+  },
+}
+```
+
+Point `LinkrunnerScript` at those routes:
+
+```tsx
+<LinkrunnerScript
+  token="YOUR_WEB_SDK_TOKEN"
+  scriptSrc="/lr/lr.js"
+  endpoint="/lr/ingest"
+/>
+```
+
+For a plain script tag:
+
+```html
+<script
+  src="/lr/lr.js"
+  data-token="YOUR_WEB_SDK_TOKEN"
+  data-endpoint="/lr/ingest"
+  defer
+></script>
+```
+
+<Warning>
+
+Your proxy must preserve the visitor's IP address. Forward `X-Forwarded-For` with the visitor's address first, or set `X-Linkrunner-Visitor-IP` explicitly. If the proxy drops it, geographic data will identify your proxy instead of the visitor.
+
+</Warning>
+
+### Point a subdomain at Linkrunner
+
+Use this option when you cannot add proxy routes to your website.
+
+<Steps>
+
+<Step title="Register the subdomain">
+
+In the Linkrunner dashboard, open **Settings → Manage Domains** and add the collection subdomain you want to use, such as `lr.example.com`.
+
+</Step>
+
+<Step title="Add the DNS record">
+
+Add a CNAME record with your DNS provider:
+
+```text
+lr.example.com.  CNAME  api.linkrunner.io.
+```
+
+Linkrunner issues the TLS certificate on the first request for a registered subdomain.
+
+</Step>
+
+<Step title="Configure the SDK">
+
+Add `data-domain` to the script tag:
+
+```html
+<script
+  src="https://cdn.linkrunner.io/web/v1/lr.js"
+  data-token="YOUR_WEB_SDK_TOKEN"
+  data-domain="lr.example.com"
+  defer
+></script>
+```
+
+For Next.js, use the `domain` prop:
+
+```tsx
+<LinkrunnerScript token="YOUR_WEB_SDK_TOKEN" domain="lr.example.com" />
+```
+
+</Step>
+
+<Step title="Verify the endpoint">
+
+Run this request before relying on the subdomain:
+
+```bash
+curl -i -X OPTIONS \
+  -H 'Origin: https://example.com' \
+  -H 'Access-Control-Request-Method: POST' \
+  https://lr.example.com/web/ingest
+```
+
+Expect a `204` response with an `access-control-allow-origin` header. Then confirm in your browser's **Network** tab that event requests go to `https://lr.example.com/web/ingest`.
+
+</Step>
+
+</Steps>
+
+<Note>
+
+Set `data-domain` to a hostname, not a URL. The SDK accepts a scheme or trailing slash, but it always normalizes the value to `https://HOST/web/ingest`. Use `data-endpoint` only when you control the full proxy path.
+
+</Note>
+
+<Warning>
+
+If each event creates one request to your subdomain and another to `api.linkrunner.io`, the first-party endpoint is failing and the SDK is using its fallback. Check the CNAME, domain registration, and any firewall or authentication rules in front of the subdomain.
+
+</Warning>
+
+## Attribution storage
+
+| Data                           | Storage                             | Lifetime                         |
+| ------------------------------ | ----------------------------------- | -------------------------------- |
+| First-touch UTMs and click IDs | `localStorage`                      | Until browser storage is cleared |
+| Last-touch click IDs           | `localStorage`                      | 90 days                          |
+| Last-touch UTMs                | `sessionStorage` and `localStorage` | 24 hours from the campaign click |
+| Visitor ID and user ID         | `localStorage`                      | Until browser storage is cleared |
+| Session ID and page count      | `sessionStorage`                    | Current tab session              |
+
+The 24-hour `localStorage` copy preserves last-touch UTMs when a payment gateway or 3D Secure flow returns the visitor in a new tab.
+
+Last-touch credit goes to the visitor's latest tagged touch:
+
+- The most recent ad click, whichever network it came from. A Meta ad clicked after a Google ad is Meta.
+- A later visit from a tagged link with no ad click ID, such as an email or partner link with a `utm_source`, for 24 hours from that visit. After that, the last ad click gets the credit again for the rest of its 90 days.
+- A reload, the browser's back or forward button, or a link on your own site is not a new touch, even when the URL carries UTMs.
+
+Every stored ad click ID is still sent with each event, so each connected ad network's conversion postback still gets its own click ID. First-touch attribution never changes.
+
+## Troubleshooting
+
+<AccordionGroup>
+
+<Accordion title="The SDK says the token is invalid">
+
+Confirm that you are using the **Web project token** from **Settings → Project Details**. Mobile SDK project tokens do not work with the Web SDK. If the Web project token is not shown, turn on **Web Campaigns** first, as described in [Track your website in an app project](/features/website-projects#track-your-website-in-an-app-project).
+
+</Accordion>
+
+<Accordion title="Page views are duplicated">
+
+Load the SDK once. In Next.js, put `LinkrunnerScript` in the root layout or `_app.tsx`, not on individual pages. The SDK already tracks SPA navigation by default.
+
+</Accordion>
+
+<Accordion title="Events are blocked in the browser">
+
+Use [first-party collection](#first-party-collection). A same-origin proxy is the strongest option. A CNAME may still be detected by browsers that inspect DNS records.
+
+</Accordion>
+
+<Accordion title="A payment or other trusted event can be sent from the browser">
+
+Do not trust client-side events for payments, entitlements, or other sensitive state changes. Send those events from your backend with the [Event Capture API](/api-reference/event-capture#website-events) or [Revenue Tracking API](/api-reference/revenue-tracking#website-payments), with `"source": "web"` and the `user_id` you pass to `lr.identify`.
+
+</Accordion>
+
+</AccordionGroup>
+
+<Note>
+
+**Need to update your privacy policy or cookie banner?** See [Data the SDK collects](/sdk/data-collection#web) for what the Web SDK sends and stores.
+
+</Note>
+
+## More resources
+
+<CardGroup :cols="2">
+
+<Card title="npm package" icon="npm" href="https://www.npmjs.com/package/@linkrunner/web">
+
+View the package, current version, and full SDK reference.
+
+</Card>
+
+<Card title="GitHub repository" icon="github" href="https://github.com/linkrunner-labs/web-sdk">
+
+Read the source code and release history.
+
+</Card>
+
+<Card title="Shopify setup" icon="shopping-bag" href="/sdk/shopify">
+
+Install Web Attribution on a Shopify storefront and checkout.
+
+</Card>
+
+</CardGroup>
+
+**Need help?** Contact <support@linkrunner.io>.
