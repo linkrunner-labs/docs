@@ -72,14 +72,15 @@ Your endpoint must be publicly accessible. Linkrunner retries failed requests up
 
 If your endpoint sits behind a firewall or IP allowlist, allow inbound requests from these addresses. All Linkrunner webhooks are sent from one of them:
 
-| IP Address     |
-| -------------- |
-| `8.234.94.188` |
-| `8.234.80.204` |
+| IP address or range | Addresses                          |
+| ------------------- | ---------------------------------- |
+| `8.234.94.188`      | 1                                  |
+| `8.234.80.204`      | 1                                  |
+| `4.213.10.200/30`   | 4 (`4.213.10.200` to `4.213.10.203`) |
 
 <Note>
 
-These are static and will not change without advance notice. Allowlist both, because webhooks may be sent from either one.
+These are static and will not change without advance notice. Allowlist all of them, because webhooks may be sent from any one.
 
 </Note>
 

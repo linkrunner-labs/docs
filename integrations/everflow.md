@@ -169,7 +169,7 @@ In Everflow, open your offer, edit **Tracking**, and paste the link as the **Def
 
 <img src="/images/integrations/everflow/everflow-conversions.png" alt="Everflow Conversion Report with install and event conversions sent by Linkrunner" />
 
-If your Everflow network restricts postbacks by IP, allowlist `8.234.94.188` and `8.234.80.204`.
+If your Everflow network restricts postbacks by IP, allowlist `8.234.94.188`, `8.234.80.204` and the range `4.213.10.200/30` (`4.213.10.200` to `4.213.10.203`).
 
 ### Postbacks Linkrunner sends
 
