@@ -63,6 +63,7 @@ The postback carries the `tid` you sent on the impression, and `{touch_type}` is
 | **Install**      | A new app install is attributed to your click, or to your impression if you use [view-through](#view-through-optional). Sent automatically. |
 | **Signup**       | The user completes registration, as defined by the advertiser. Sent automatically once a signup postback is set up.                         |
 | **In-app event** | A post-install event the advertiser tracks (for example a purchase). Sent only for events that have an event mapping.                       |
+| **Website conversion** | A sign-up or purchase on the advertiser's website from your web link. Sent only for mapped website events, once the advertiser connects you for [Web campaigns](/affiliate-partners/web-campaigns). |
 
 In-app events are not sent by default. Linkrunner sends an in-app event only after it is mapped, either by the advertiser (**Integrations →** your network **→ Event Mapping**) or by you (**Event Mapping** in your affiliate dashboard). A mapping can rename the event to your goal name and can include revenue.
 
@@ -117,6 +118,12 @@ Report ad impressions so installs without a click can be credited to your views.
 <Card title="Connected TV impressions" icon="tv" href="/affiliate-partners/ctv-impressions">
 
 Report TV ad impressions so installs from the same home can be credited to them.
+
+</Card>
+
+<Card title="Web Campaigns" icon="globe" href="/affiliate-partners/web-campaigns">
+
+Send traffic to an advertiser's website and get postbacks for its sign-ups and purchases.
 
 </Card>
 

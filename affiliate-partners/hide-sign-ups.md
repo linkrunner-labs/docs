@@ -18,6 +18,7 @@ When sign-ups are hidden, the partner doesn't see:
 
 - The **Sign-ups** and **Conversion** columns on its campaigns, ad sets, creatives and keywords
 - The **Sign Ups** figure, chart line and sign-up flow in the campaign details
+- On **Web Campaigns**, the **Sign-ups**, **Unique Users** and **Conversion** columns and overview cards, and the sign-up figures, chart line and flow in a web campaign's details
 
 It still sees clicks, installs and the [events you share](#share-events-with-a-partner) in its campaigns table. Disconnecting a partner resets this, so tell the partner before you connect it again. Postbacks don't change: if a partner receives sign-up postbacks today, it keeps receiving them.
 

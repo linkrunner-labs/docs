@@ -312,6 +312,7 @@ export const PAGE_TITLES: Record<string, PageTitle> = {
   "/features/send-consent": { title: "Send user consent" },
   "/features/ios-campaign-data-limitations": { title: "Why some iOS campaign data is missing", label: "Missing iOS data" },
   "/features/attribution-windows": { title: "Attribution windows" },
+  "/features/multi-touch-attribution": { title: "Multi-touch attribution" },
   "/features/ctv-attribution": { title: "Connected TV attribution", label: "Connected TV" },
   "/features/fraud-control": { title: "Fraud control" },
   "/features/skadnetwork-integration": { title: "Set up SKAN" },

@@ -23,6 +23,7 @@ Linkrunner is the Mobile Measurement Partner (MMP) for the apps you run traffic 
 | **Event mapping**                           | Choose which in-app events reach you, rename them to your goal names, and include revenue.                                      | [Event mapping](/affiliate-partners/event-mapping)                         |
 | **Postback logs**                           | See every postback Linkrunner sent you and what your endpoint answered.                                                         | [Postback logs](/affiliate-partners/postback-logs)                         |
 | **Rejection postbacks**                     | Get told when an advertiser's Fraud Control rejects a conversion, with the reason.                                              | [Rejected conversions](/affiliate-partners/postbacks#rejected-conversions) |
+| **Web campaigns**                           | Links to an advertiser's website, with a postback for each mapped sign-up or purchase they bring.                               | [Web Campaigns](/affiliate-partners/web-campaigns)                         |
 
 ## What you need to do
 
@@ -44,6 +45,8 @@ The advertiser connects your workspace to their app. Their project then appears 
 
 In the advertiser's project, open **All Campaigns → Create Link** and copy the generated template. Don't build the URL by hand. See [Create a campaign link](/affiliate-partners/create-campaign-link).
 
+If the advertiser connected you for Web campaigns, create web links in **Web Campaigns** too. See [Web Campaigns for affiliate partners](/affiliate-partners/web-campaigns).
+
 </Step>
 
 <Step title="Add the link to your platform">
@@ -62,7 +65,7 @@ Every S2S click and impression must carry your partner token. Generate it once i
 
 <Step title="Set up your postbacks">
 
-Installs are sent automatically, and signups once a signup postback is set up. In-app events are sent only after they are mapped, so map the ones you want in [Event mapping](/affiliate-partners/event-mapping).
+Installs are sent automatically, and signups once a signup postback is set up. In-app events are sent only after they are mapped, so map the ones you want in [Event mapping](/affiliate-partners/event-mapping). Website conversions are sent only for mapped [web events](/affiliate-partners/event-mapping#web-events).
 
 If your endpoint filters incoming traffic, [allowlist Linkrunner's postback IPs](/affiliate-partners/postbacks#allowlist-linkrunner-postback-ips).
 
@@ -72,11 +75,19 @@ If your endpoint filters incoming traffic, [allowlist Linkrunner's postback IPs]
 
 Send a test click from a device, then install and open the app on it. In [Postback logs](/affiliate-partners/postback-logs), confirm the install postback reached your endpoint with your click ID.
 
+For a web link, open it in a browser and sign up or buy on the advertiser's website, then check the **Web** side of Postback Logs.
+
 </Step>
 
 </Steps>
 
 For how a click becomes a postback, see [How attribution works](/affiliate-partners/overview).
+
+## Track your setup in the dashboard
+
+**Get Started** in your affiliate dashboard lists these steps with what is done, what is next and what you are waiting on, and the progress for each advertiser connected to you. Steps tick themselves off as Linkrunner sees your links, mappings and postbacks.
+
+You can click **Mark as done** on a step you have finished in a way the dashboard can't see. A step you mark counts toward your progress, but the page says **Setup complete** only once Linkrunner sees each required step done on its own. **Postback URLs added** can't be marked by hand: it is done once your postback URLs are saved.
 
 ## Common questions
 

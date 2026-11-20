@@ -28,6 +28,8 @@ In the dashboard, go to [Web Campaigns](https://dashboard.linkrunner.io/dashboar
 
 Leave **UTM ID** empty. Linkrunner creates a unique ID for the link. You can leave the other fields empty too.
 
+**Referral code** adds `referrer=<code>` to the link for your own referral tracking. It does not credit a partner. To credit one, see [Credit the link to an affiliate partner](#credit-the-link-to-an-affiliate-partner).
+
 Use the same **UTM Source** on every link you give this partner, so their links group together.
 
 ![Create Web Campaign form with Name, UTM Source, UTM Medium and UTM Campaign filled in](/images/web-partner-link/name-and-source.webp)
@@ -115,9 +117,47 @@ Click **Download CSV** to share the numbers with your partner. The numbers follo
 
 <Note>
 
-Partners don't get automatic postbacks for website sign-ups or purchases yet. Share results with the CSV from **Partner breakdown**.
+A partner gets automatic postbacks for website sign-ups and purchases only when the link is credited to them. See [Credit the link to an affiliate partner](#credit-the-link-to-an-affiliate-partner). Otherwise, share results with the CSV from **Partner breakdown**.
 
 </Note>
+
+## Credit the link to an affiliate partner
+
+If your partner has a Linkrunner affiliate account, credit the link to them. They then see the link and its visitors in their own dashboard, and get a postback for each mapped sign-up or purchase it brings. Spend and revenue stay hidden from them.
+
+<Steps>
+
+<Step title="Connect the partner for Web campaigns">
+
+Go to **Integrations → Affiliate Partners** and click **Connect** on the partner's card. Under **Connect for**, tick **Web campaigns**, and **App campaigns** too if they also run your app campaigns. Then click **Connect**.
+
+![The Connect dialog with Web campaigns marked under Connect for](/images/web-partner-link/connect-for-web.webp)
+
+For a partner you already connected, click **Configure** on their card and tick **Web campaigns** under **Campaigns**. Only admins and managers can change it. On a website-only project, partners are connected for web campaigns without the choice.
+
+![The partner's Configure page with Web campaigns marked under Campaigns](/images/web-partner-link/partner-campaigns-web.webp)
+
+</Step>
+
+<Step title="Share and map your website events">
+
+The partner gets a postback only for website events that are mapped to them. On the partner's **Configure** page, click **Share events** and pick the website events they can see. Then map the ones they should receive: under **Event mapping**, switch to **Web** and click **Add Mapping**. The partner can also map the events you shared, from their own dashboard.
+
+</Step>
+
+<Step title="Create the link for the partner">
+
+In [Web Campaigns](https://dashboard.linkrunner.io/dashboard/web-events), click **Create Campaign** and pick the partner under **Affiliate partner**. Only partners connected for web campaigns are listed.
+
+![Create Web Campaign with Pia Deals Hub picked under Affiliate partner](/images/web-partner-link/affiliate-partner-picker.webp)
+
+**UTM ID** is generated for you. The **URL Preview** ends with `lr_click_id=` and the partner's click ID macro. The partner's platform fills in a real click ID on every click, and Linkrunner sends it back on the postback. Fill in the rest as in [step 2](#2-name-the-link-and-tag-the-partner), click **Create** and send the link to the partner.
+
+</Step>
+
+</Steps>
+
+Links credited to a partner show the partner's mark next to their name on the **Campaigns** tab, and you can filter the table by **Affiliate partner**. The partner can also create web links from their own dashboard, which are always credited to them. For the partner's side, see [Web Campaigns for affiliate partners](/affiliate-partners/web-campaigns).
 
 ## Rename a label
 
