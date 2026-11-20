@@ -131,6 +131,7 @@ const guides: Group[] = [
       page("What the Campaigns columns mean", "/features/campaign-metrics", "chart-bar"),
       ...links(
       "/features/attribution-windows",
+      "/features/multi-touch-attribution",
       "/features/ctv-attribution",
       "/features/fraud-control",
       "/features/uninstall-tracking",
@@ -211,7 +212,7 @@ const integrations: Group[] = [
     page("All ad channels", "/ad-networks/overview", "list"),
     sub("Meta", links("/ad-networks/meta-ads", "/ad-networks/meta-web-to-app", "/ad-networks/meta-ads-discrepancies", "/ad-networks/meta-view-through-attribution", "/ad-networks/meta-support-access")),
     sub("Google", links("/ad-networks/google-ads", "/features/google-icm", "/ad-networks/google-ads-discrepancies", "/ad-networks/google-support-access")),
-    ...links("/ad-networks/tiktok", "/ad-networks/snapchat", "/ad-networks/reddit-ads", "/ad-networks/linkedin-ads", "/ad-networks/chatgpt-ads", "/ad-networks/sharechat-ads"),
+    ...links("/ad-networks/apple-search-ads", "/ad-networks/tiktok", "/ad-networks/snapchat", "/ad-networks/reddit-ads", "/ad-networks/linkedin-ads", "/ad-networks/chatgpt-ads", "/ad-networks/sharechat-ads", "/ad-networks/x-ads"),
   ], true, "megaphone"),
   group("Analytics tools", classicGroup(1, "Analytics Integrations"), true, "chart-bar"),
   group("Product catalogues", classicGroup(1, "Ecommerce Manager"), true, "shopping-cart"),
