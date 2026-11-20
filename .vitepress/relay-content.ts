@@ -303,6 +303,7 @@ export const PAGE_TITLES: Record<string, PageTitle> = {
 
   "/features/users-tab": { title: "Users" },
   "/features/events-tab": { title: "Events" },
+  "/features/event-parameters": { title: "Event parameters" },
   "/features/data-export": { title: "Export data as CSV", label: "Export data" },
 
   "/features/uninstall-tracking": { title: "Track uninstalls" },

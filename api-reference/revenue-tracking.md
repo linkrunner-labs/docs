@@ -59,7 +59,11 @@ POST: /capture-event
   "amount": 250.96,
   "payment_id": "ORD-12345",
   "currency": "USD",
-  "user_id": "user_12345"
+  "user_id": "user_12345",
+  "event_data": {
+    "plan": "gold",
+    "billing_period": "yearly"
+  }
 }
 ```
 
@@ -72,7 +76,7 @@ POST: /capture-event
 | status | string | **Optional**. Defaults to `PAYMENT_COMPLETED` |
 | user_id | string | **Required** unless `install_instance_id` is sent. Links the payment to your user. The SDKs always send it with a payment, so send it whenever you have it |
 | install_instance_id | string | **Required** unless `user_id` is sent. Linkrunner's ID for the install |
-| event_data | object | **Optional**. Additional data, such as ecommerce fields |
+| event_data | object | **Optional**. [Event parameters](/features/event-parameters) for the payment, such as `plan`, and ecommerce fields. You can filter and break down payments by them in the dashboard |
 | client_ip_address | string | **Optional**. See [End-user IP address](#end-user-ip-address) |
 
 Send `amount`, `payment_id`, and `currency` together. If you send none of them, or only one or two, the request is stored as a custom event, not a payment. An `amount` inside `event_data` does not make the event a payment.
@@ -134,7 +138,7 @@ If you are tracking `Purchase` events to sync with Meta Catalog Sales, **you mus
 
 _Note: Any payment you send should be mapped with **Purchase** for Commerce Event Manager. For example, map **purchase_completed** with **Purchase**._
 
-While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events to correctly attribute catalog sales. Your `event_data` object should include the following fields:
+While you can include any event parameters in the `event_data` object, Meta requires specific fields for ecommerce events to correctly attribute catalog sales. Your `event_data` object should include the following fields:
 
 For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event_data) documentation.
 

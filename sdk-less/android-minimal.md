@@ -141,7 +141,7 @@ object LinkrunnerMinimal {
     suspend fun trackEvent(
         context: Context,
         name: String,
-        data: JSONObject? = null,
+        eventData: JSONObject? = null,
         amount: Double? = null,
         paymentId: String? = null,
         currency: String? = null
@@ -149,7 +149,7 @@ object LinkrunnerMinimal {
         post(
             "/api/client/capture-event",
             base(context).put("event_name", name).apply {
-                if (data != null) put("event_data", data)
+                if (eventData != null) put("event_data", eventData)
                 if (amount != null && paymentId != null && currency != null) {
                     put("amount", amount).put("payment_id", paymentId).put("currency", currency)
                 }
@@ -194,7 +194,7 @@ CoroutineScope(Dispatchers.IO).launch {
 
 // 4. Track an event
 CoroutineScope(Dispatchers.IO).launch {
-    LinkrunnerMinimal.trackEvent(context, "purchase_initiated", JSONObject().put("amount", 99.99))
+    LinkrunnerMinimal.trackEvent(context, "purchase_initiated", eventData = JSONObject().put("amount", 99.99))
 }
 
 // 5. Track a payment

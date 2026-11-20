@@ -124,7 +124,7 @@ const guides: Group[] = [
     false,
     "globe"
   ),
-  group("Users and events", links("/features/users-tab", "/features/events-tab", "/features/retention", "/features/data-export"), false, "users-three"),
+  group("Users and events", links("/features/users-tab", "/features/events-tab", "/features/event-parameters", "/features/retention", "/features/data-export"), false, "users-three"),
   group(
     "Measurement",
     [
