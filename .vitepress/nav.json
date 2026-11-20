@@ -584,6 +584,11 @@
             "icon": "/images/logos/meta.webp"
           },
           {
+            "text": "<span class=\"sidebar-icon\"><img class=\"sidebar-icon-img\" src=\"/images/logos/apple-search-ads.png\" alt=\"\"></span>Apple Search Ads",
+            "link": "/ad-networks/apple-search-ads",
+            "icon": "/images/logos/apple-search-ads.png"
+          },
+          {
             "text": "<span class=\"sidebar-icon\"><img class=\"sidebar-icon-img\" src=\"/images/logos/tiktok.webp\" alt=\"\"></span>TikTok Ads",
             "link": "/ad-networks/tiktok",
             "icon": "/images/logos/tiktok.webp"

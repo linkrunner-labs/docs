@@ -21,6 +21,10 @@ channels:
     detail: Recover Google App Campaign attribution on iOS
     link: /features/google-icm
     logo: /images/logos/google.webp
+  - text: Apple Search Ads
+    detail: iOS install attribution with spend, taps and keywords
+    link: /ad-networks/apple-search-ads
+    logo: /images/logos/apple-search-ads.png
   - text: TikTok Ads
     detail: In-app event optimisation and deferred deep links
     link: /ad-networks/tiktok
