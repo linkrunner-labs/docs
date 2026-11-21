@@ -86,7 +86,7 @@ It does not need **Read** on either side.
 
 The bottom of each tab narrows what that side's screens are allowed to show. App and Web keep separate settings, so you can limit one without touching the other.
 
-**Only campaigns they built.** On, the agency sees and measures only the campaigns their own agency created on that side. Off, they get every campaign on that side, including ones your team and your other partners built.
+**Only campaigns they built or that are credited to them.** On, the agency sees and measures the campaigns their own agency created on that side, plus the campaigns credited to their agency, even when your team built them. With **Edit** on, they can change those credited campaigns too. Off, they get every campaign on that side, including ones your team and your other partners built.
 
 **Only certain networks.** On, the agency sees campaigns only on the networks you tick. On the App tab they can also create campaigns only on those networks. Pick at least one, or turn the control off. A restriction with nothing ticked would show them nothing at all, so Linkrunner refuses to save it.
 
@@ -124,7 +124,7 @@ Ask them to refresh. If it persists, check that **Read** is on for the tab that 
 **Only certain networks** is on for App campaigns. The channel breakdown is not shown while access is limited to named networks.
 
 **The agency sees campaigns your team built.**
-**Only campaigns they built** is off on that tab. Turn it on to limit them to their own work.
+**Only campaigns they built or that are credited to them** is off on that tab, or your team credited those campaigns to the agency. Turn the switch on to limit them to the campaigns they built and the ones credited to them.
 
 **Save is greyed out.**
 **Only certain networks** is on with no network ticked, on the App or the Web tab. Tick at least one, or turn the control off.

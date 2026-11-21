@@ -63,7 +63,7 @@ Removing a member cuts their access to all of your customers' projects immediate
 
 Each customer that engages you appears in your project picker. Switch between them there, and the campaigns, installs, and events on screen follow the customer you have selected.
 
-You only see the campaigns your agency created. A customer's own campaigns, and those of their other partners, are not in your workspace.
+You only see the campaigns your agency created or that are credited to your agency. A customer's other campaigns, and those of their other partners, are not in your workspace.
 
 ## When an engagement ends
 
