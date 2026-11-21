@@ -23,7 +23,7 @@ Use this API to send custom events and payments from your backend. To track them
 
 <Note>
 
-Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Each request must identify the user with `user_id` or `install_instance_id`. If Linkrunner has not seen the `user_id` yet (your app has not called `signup` for that user), the event is held and shows up once that user signs up. Held events are kept for up to 30 days. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, send the [payment fields](#payment-fields) with the event.
+Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Each request must identify the user with `user_id`. If Linkrunner has not seen the `user_id` yet (your app has not called `signup` for that user), the event is held and shows up once that user signs up. Held events are kept for up to 30 days. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, send the [payment fields](#payment-fields) with the event.
 
 </Note>
 
@@ -74,8 +74,7 @@ POST: /capture-event
 | ---------- | ------ | ------------------------------------------------------------------------------------- |
 | event_name | string | **Required**. Name of the event to track                                              |
 | event_data | object | **Optional**. Additional data associated with the event                               |
-| user_id    | string | **Required** unless `install_instance_id` is sent. User identifier to associate with the event |
-| install_instance_id | string | **Required** unless `user_id` is sent. Linkrunner's ID for the install |
+| user_id    | string | **Required**. User identifier to associate with the event. Use the same ID your app passes to `signup` |
 | event_id   | string | **Optional**. Your own unique identifier for the event, useful for deduplication and correlating with your backend |
 | client_ip_address | string | **Optional**. Public IP of the user's device when the event happened. See [End-user IP address](#end-user-ip-address) |
 | source     | string | **Optional**. `app` (default) or `web`. Send `web` for a user of your website. See [Website events](#website-events) |
@@ -110,7 +109,7 @@ Send `amount`, `payment_id`, and `currency` at the top level of the request, nex
 - **`currency`** must be a 3-letter ISO 4217 code. Lowercase is accepted and stored in uppercase.
 - **`status`** accepts `PAYMENT_INITIATED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, or `PAYMENT_CANCELLED`. If you leave it out, the payment is `PAYMENT_COMPLETED`.
 - **`event_data`**, if sent, must be a JSON object.
-- **`user_id`** links the payment to your user. The SDKs always send it with a payment, so send it from your backend too. A payment identified only by `install_instance_id` is still accepted.
+- **`user_id`** links the payment to your user. The SDKs always send it with a payment, so send it from your backend too.
 
 Only `PAYMENT_COMPLETED` payments are sent to ad networks as revenue. An `amount` inside `event_data` does not make the event a payment on its own.
 
@@ -152,14 +151,14 @@ If the event comes from a user of your website rather than your app, send `"sour
 }
 ```
 
-- **Identify the user with `user_id`.** Use the same ID your website passes to `lr.identify`. `install_instance_id` does not apply to website users, so `user_id` is required.
+- **Identify the user with `user_id`.** Use the same ID your website passes to `lr.identify`.
 - **Attribution.** Linkrunner credits the event to the channel and campaign of that user's latest visit recorded by the Web SDK in the last 90 days. If the Web SDK has not recorded a visit from that user, the event shows as Direct.
 - **No deduplication.** Every request is stored, including retries. Send your own `event_id` so repeated requests for the same action carry the same ID.
 
 ### Responses
 
 1. **200** Event or payment captured successfully
-2. **400** Missing required parameters, neither `user_id` nor `install_instance_id` was sent, `event_timestamp` is not a valid time or is out of range, all three payment fields are sent but one is invalid, `source` is not `app` or `web`, or `source` is `web` and `user_id` is missing or website tracking is not enabled for the project
+2. **400** Missing required parameters, `user_id` was not sent, `event_timestamp` is not a valid time or is out of range, all three payment fields are sent but one is invalid, `source` is not `app` or `web`, or `source` is `web` and `user_id` is missing or website tracking is not enabled for the project
 3. **401** Invalid server key
 
 #### Sample Response
@@ -203,7 +202,7 @@ Put each event, in the same format as the [Capture Event](#capture-event) reques
     },
     {
       "event_name": "cart_added",
-      "install_instance_id": "f2b1c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+      "user_id": "user_12345",
       "event_id": "evt_12346"
     }
   ]

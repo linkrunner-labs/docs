@@ -17,7 +17,7 @@ description: "Documentation for Linkrunner Revenue Tracking API"
 
 <Note>
 
-Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Each request must identify the user with `user_id` or `install_instance_id`. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
+Revenue is stored for all users, including organic ones. Payments from users with no matching click are stored without campaign attribution. Each request must identify the user with `user_id`. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page.
 
 </Note>
 
@@ -70,8 +70,7 @@ POST: /capture-event
 | payment_id | string | **Required** for a payment. Your unique transaction ID |
 | currency | string | **Required** for a payment. 3-letter ISO 4217 code, for example `USD` or `INR` |
 | status | string | **Optional**. Defaults to `PAYMENT_COMPLETED` |
-| user_id | string | **Required** unless `install_instance_id` is sent. Links the payment to your user. The SDKs always send it with a payment, so send it whenever you have it |
-| install_instance_id | string | **Required** unless `user_id` is sent. Linkrunner's ID for the install |
+| user_id | string | **Required**. Links the payment to your user. Use the same ID your app passes to `signup` |
 | event_data | object | **Optional**. Additional data, such as ecommerce fields |
 | client_ip_address | string | **Optional**. See [End-user IP address](#end-user-ip-address) |
 
@@ -98,7 +97,7 @@ These calls come from your server, so Linkrunner never sends your server's IP to
 ### Responses
 
 1. **200** Payment captured. The response is the same as for a [custom event](/api-reference/event-capture#sample-response), including `processing_id`
-2. **400** Missing fields, or all three payment fields were sent but one is invalid
+2. **400** Missing fields (including `user_id`), or all three payment fields were sent but one is invalid
 3. **401** Invalid server key
 
 ## Website payments
@@ -121,7 +120,7 @@ POST: /capture-payment
 }
 ```
 
-- **Identify the user with `user_id`.** Use the same ID your website passes to `lr.identify`. `install_instance_id` does not apply to website users, so `user_id` is required.
+- **Identify the user with `user_id`.** Use the same ID your website passes to `lr.identify`.
 - **Status decides how it counts.** A `PAYMENT_COMPLETED` payment is recorded as a `purchase` event, the same event the Web SDK sends with `lr.track('purchase', …)`, and counts as a purchase and revenue. Other statuses are recorded as `payment_initiated`, `payment_failed`, or `payment_cancelled` and do not count as revenue.
 - **Stored details.** `amount`, `currency`, `payment_id`, `type`, and `status` are added to the event's `event_data`, together with any `event_data` you send. The amount is stored as both `amount` and `value`, so a `value` in your `event_data` is replaced.
 - **Attribution.** Linkrunner credits the payment to the channel and campaign of that user's latest visit recorded by the Web SDK in the last 90 days. If the Web SDK has not recorded a visit from that user, the payment shows as Direct.
