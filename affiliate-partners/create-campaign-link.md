@@ -129,7 +129,8 @@ It should not reach Linkrunner with placeholders such as `{click_id}` or `{campa
 2. Confirm the final URL contains a unique, resolved click ID.
 3. Check that the link redirects to the advertiser's intended destination.
 4. Confirm the click appears under the campaign in Linkrunner.
-5. Use [Postbacks and Macros](/affiliate-partners/postbacks) to test install and event postbacks before increasing traffic. In-app events need a mapping before they are sent.
+5. In **All Campaigns**, hover over the link in the **Content** column and click **Check a final link**. Paste the link your platform sends. Linkrunner checks it in your browser and sends nothing.
+6. [Send a test postback](/affiliate-partners/postbacks#send-a-test-postback) before you increase traffic. In-app events need a mapping before they are sent.
 
 ## Troubleshooting
 
