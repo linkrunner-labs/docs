@@ -331,11 +331,11 @@ not 9.99 cents. Parse it as a decimal amount.
 
 ### Attribution
 
-| Macro                | Description                                                                                                                    | Example |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------- |
-| `{is_reinstall}`     | `1` if the user had installed the app before, `0` if this is a first install.                                                  | `0`     |
-| `{is_reattribution}` | `1` if the conversion was credited to a re-engagement of a user who had the app before. See the note below for what `0` means. | `0`     |
-| `{touch_type}`       | The type of touch the conversion was attributed to: `click`, or `impression` for a view-through install.                       | `click` |
+| Macro                | Description                                                                                                                                                                                                           | Example |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `{is_reinstall}`     | `1` if the user had installed the app before, `0` if this is a first install.                                                                                                                                         | `0`     |
+| `{is_reattribution}` | `1` if the install was re-attributed: the user had the app before, reinstalled it, and the reinstall was credited to a new click inside the advertiser's re-engagement window. See the note below for what `0` means. | `0`     |
+| `{touch_type}`       | The type of touch the conversion was attributed to: `click`, or `impression` for a view-through install.                                                                                                              | `click` |
 
 <Note>
 
@@ -355,6 +355,12 @@ with `is_reattribution=0`.
 Do not read `is_reattribution=0` as "new user". It covers new users, reinstalls
 outside the window, and re-engagements attributed through a deeplink rather than a
 reinstall. Treat `1` as a positive signal and `0` as "not this specific case".
+
+A user re-engaged through a deeplink keeps their install. Their later events go to
+the partner credited with the install, with the install's `{is_reattribution}` value.
+
+For users who installed before this macro was available, event postbacks can send
+`{is_reattribution}` empty until their cached attribution is refreshed.
 
 </Note>
 
@@ -380,7 +386,7 @@ Do not use `{secret.postbackKey}`. If your endpoint requires a secret key, confi
 
 - **Country code.** There is no country macro. Derive it from `{ip}` if you need one.
 - **App store ID.** Use `{bundle_id}`. On Android it is the same value as the Play Store listing ID.
-- **Retargeting and re-engagement conversions.** Linkrunner does not send affiliate postbacks for these.
+- **Deeplink re-engagements.** When a user who already has the app installed comes back through a deeplink, Linkrunner does not send an affiliate postback for the re-engagement. A reinstall credited to your click inside the re-engagement window is a new install: it is sent, with `{is_reattribution}` set to `1`.
 
 ## Examples
 
