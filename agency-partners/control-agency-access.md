@@ -88,7 +88,7 @@ The bottom of each tab narrows what that side's screens are allowed to show. App
 
 **Only campaigns they built or that are credited to them.** On, the agency sees and measures the campaigns their own agency created on that side, plus the campaigns credited to their agency, even when your team built them. With **Edit** on, they can change those credited campaigns too. Off, they get every campaign on that side, including ones your team and your other partners built.
 
-**Only certain networks.** On, the agency sees campaigns only on the networks you tick. They still see the campaigns credited to their own agency. On the App tab they can also create campaigns only on the networks you tick. On the Web tab they also see the campaigns they built without crediting a partner. They can create Web campaigns credited to a partner you ticked or to no partner, but not to a partner you did not tick. Pick at least one network, or turn the control off. Linkrunner does not save a restriction with nothing ticked.
+**Only certain networks.** On, the agency sees campaigns only on the networks you tick. They still see the campaigns credited to their own agency, and the campaigns they built without crediting a network. They can create campaigns for a network you ticked or for no network, but not for a network you did not tick. This works the same on the App and Web tabs. Pick at least one network, or turn the control off. Linkrunner does not save a restriction with nothing ticked.
 
 ![The access panel with a network restriction applied to Meta and Google](/images/agency-partners/agency-access-networks.png)
 

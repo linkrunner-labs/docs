@@ -55,7 +55,7 @@ For Web campaigns, they turn on **Edit** on the **Web campaigns** tab instead. S
 
 <Note>
 
-If the customer turns on **Only certain networks**, you can only create campaigns on the networks they pick, and every campaign must name one of them.
+If the customer turns on **Only certain networks**, you can create campaigns for the networks they pick, or with no ad channel.
 
 </Note>
 
@@ -167,9 +167,9 @@ Same fix as a missing **Create Link** button. Ask the customer to turn on **App 
 
 </Accordion>
 
-<Accordion title="&quot;Your access is limited to specific networks&quot;" description="The customer limited you to certain networks.">
+<Accordion title="&quot;You can only create campaigns for the networks this customer has given you access to&quot;" description="The customer limited you to certain networks.">
 
-Pick one of the networks shown under **Ad Channel**. If the network you need is not listed, ask the customer to add it under **Only certain networks**.
+Pick one of the networks shown under **Ad Channel**, or leave it empty. If the network you need is not listed, ask the customer to add it under **Only certain networks**.
 
 </Accordion>
 
