@@ -25,7 +25,7 @@ You'll confirm that:
 
 </Note>
 
-For an Android app, you can also upload a build to [SDK Health](/testing/sdk-health). A test phone uses the app and you get a report of what the SDK sends, with a fix for each problem.
+On Android, you can also [check a build with SDK Health](/testing/sdk-health) and get a report with fixes.
 
 ## Video walkthrough
 

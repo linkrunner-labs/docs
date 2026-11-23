@@ -58,7 +58,7 @@ You only need `debug = true` when SDK Console can't read the device's advertisin
 
 If your device never appears, see [Test device not showing in SDK Console](/testing/integration-testing#test-device-not-showing-in-sdk-console).
 
-On Android, you can also upload a build to [SDK Health](/testing/sdk-health), which reports the problems it finds with a fix for each. Read its note on test data first: the audit's installs and events count in the project you run it from.
+On Android, you can also [check a build with SDK Health](/testing/sdk-health), which reports problems with fixes. Its installs and events count in the project you run it from.
 
 ### 8. Is the build you're releasing the one you tested?
 

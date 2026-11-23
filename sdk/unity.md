@@ -1600,7 +1600,7 @@ Unity's `PBXProject` API does not natively support adding SPM packages. After th
 
 For detailed testing steps, see the [Integration Testing Guide](/testing/integration-testing).
 
-For an Android build, you can also upload it to [SDK Health](/testing/sdk-health) and get a report of what the SDK sends, with a fix for each problem.
+For an Android build, you can also [check it with SDK Health](/testing/sdk-health) for a report with fixes.
 
 ---
 

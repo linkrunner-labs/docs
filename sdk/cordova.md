@@ -919,7 +919,7 @@ Configure deep links for your app
 
 <Card title="Check Your Android Build" icon="shield-check" href="/testing/sdk-health">
 
-Upload a build and get a report with fixes
+Get a report with fixes
 
 </Card>
 
