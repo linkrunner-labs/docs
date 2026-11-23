@@ -1,0 +1,5 @@
+# CI and deploy config: the deploy workflow can mint Firebase Hosting admin
+# credentials for the whole GCP project (ops firebase-docs-v2-hosting-deployer),
+# so changes here need Darshil's review. Pages need no code owner review.
+/.github/        @RathodDarshil
+/firebase.json   @RathodDarshil

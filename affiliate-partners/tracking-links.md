@@ -1,0 +1,194 @@
+---
+title: "Tracking Links"
+description: "Parameters you append to your Linkrunner click tracking links"
+---
+
+# Tracking Links
+
+<p class="vp-lead">Parameters you append to your Linkrunner click tracking links</p>
+
+## Overview
+
+Create each campaign link from **All Campaigns → Create Link** in the affiliate dashboard. Linkrunner generates a tracking-link template with the parameters configured for your affiliate account.
+
+Copy the exact template into your platform. Do not build the URL or add parameters manually. A generated template may look like this:
+
+```
+https://track.example.com/?c=CAMPAIGN_ID&tid={click_id}&s2={campaign_id}
+```
+
+The domain belongs to the advertiser. `c` is the Linkrunner campaign identifier. Values such as `{click_id}` and `{campaign_id}` are your platform's macros, using the syntax configured for your affiliate account.
+
+Your platform replaces those macros before it sends the click to Linkrunner. Linkrunner does not expand them for you.
+
+<Warning>
+
+Only the values after each `=` come from your platform. Keep everything else exactly as generated:
+
+- `c` stays as it is. Do not add a campaign or publisher name to it. `c=OgWmhiSXhG_MyCampaign` does not match any campaign, so those clicks are lost.
+- Parameter names stay as they are. Send your click ID as `tid={your_macro}`, not `CLICK_ID={tid}` or `clickid={tid}`.
+
+A link the advertiser created without selecting your network does not send you postbacks. Create the link from your own dashboard, or ask the advertiser to select your network when they create it.
+
+</Warning>
+
+<Tip>
+
+Does your placement send the user straight to the store without opening a browser (OEM icons, preloads)? Report those clicks from your server instead. See [Server-to-Server Clicks](/affiliate-partners/s2s-clicks).
+
+To get credit for users who see your ad but don't tap it, report impressions too. See [Server-to-Server Impressions](/affiliate-partners/s2s-impressions).
+
+</Tip>
+
+## The two forms of the link
+
+The same link exists in two states, and mixing them up is the most common cause of missing attribution.
+
+**The template you configure**, carrying your macros:
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}
+```
+
+**The URL that actually reaches Linkrunner**, after your platform substitutes them:
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid=a1b2c3d4e5&s2=camp_88
+```
+
+Macro syntax varies by platform. `{click_id}`, `{TID}`, `##CLICKID##` and `[clickid]` are all common. Use whatever your own platform expands; Linkrunner never expands it for you.
+
+<Warning>
+
+Your platform must replace its own click macros before the click reaches Linkrunner. If the final URL still contains a value like `{click_id}` or `{campaign_id}`, Linkrunner stores it as text and the conversion cannot be matched back to your click. Linkrunner only fills macros in the server-to-server postback URL.
+
+</Warning>
+
+## Parameters
+
+You fill each parameter with your own value at click time.
+
+### Required
+
+| Parameter | Description                                                                                                                                                           |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tid`     | A unique ID you generate for every click. Linkrunner returns this value in the `{click_id}` and `{tid}` postback macros, so you can match conversions back to clicks. |
+
+### Passthrough values
+
+| Parameter | Description                                                                                               |
+| --------- | --------------------------------------------------------------------------------------------------------- |
+| `s2`      | Optional campaign, source, or publisher value. Linkrunner returns this in the `{s2}` postback macro.      |
+| `s3`      | Optional ad set, placement, or sub-publisher value. Linkrunner returns this in the `{s3}` postback macro. |
+| `s4`      | Optional deduplication or extra tracking value. Linkrunner returns this in the `{s4}` postback macro.     |
+
+### Device and request
+
+Pass device advertising IDs when you have them. They improve match rates, especially for device-ID matching.
+
+| Parameter   | Description                                                                           |
+| ----------- | ------------------------------------------------------------------------------------- |
+| `gaid`      | Google Advertising ID (Android).                                                      |
+| `idfa`      | iOS Advertising ID (Apple).                                                           |
+| `device_id` | Optional fallback. Linkrunner treats it as GAID or IDFA based on the device platform. |
+
+<Note>
+
+URL-encode every value before appending it. Linkrunner stores values as received.
+
+</Note>
+
+## Links for your sub-publishers
+
+Use one campaign link for all your sub-publishers. Pass each sub-publisher's ID in `s2` or `s3` through your platform's macro. Linkrunner returns both in your postbacks, so you can split conversions by sub-publisher.
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid={click_id}&s2={campaign_id}&s3={sub_publisher_id}
+```
+
+Create a separate link only when you want a separate campaign in the Linkrunner dashboard.
+
+## Calling the link from your server
+
+Some platforms call the tracking link from their own server instead of sending the user's browser to it. Linkrunner then sees your server's IP address, not the user's, and the click can't be matched to an install.
+
+If you do this, pass the user's device IP and user agent on the link:
+
+| Parameter  | Also accepted         | Description                                                                         |
+| ---------- | --------------------- | ----------------------------------------------------------------------------------- |
+| `ip`       | `af_ip`, `ip_address` | The user's public device IP address, IPv4 or IPv6.                                  |
+| `ua`       | `af_ua`, `user_agent` | The user's device user agent, URL-encoded.                                          |
+| `redirect` |                       | Optional. Set to `false` to get a JSON response instead of a redirect to the store. |
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid=a1b2c3d4e5&ip=49.204.110.61&ua=Mozilla%2F5.0%20%28Linux%3B%20Android%2014%3B%20Pixel%208%29...&redirect=false
+```
+
+With `redirect=false`, Linkrunner records the click before it answers, and responds `200` with:
+
+```json
+{"status": "accepted", "click_id": "8f6d2a1e-3c4b-4d5e-9f60-7a8b9c0d1e2f"}
+```
+
+If Linkrunner could not record the click, it responds `503` with `{"status": "rejected", "reason": "unavailable"}`. Retry the same request later.
+
+If the click is not recorded, the response says why, for example `{"status": "ignored", "reason": "invalid_ip"}`:
+
+| `reason`        | What to fix                                                                                            |
+| --------------- | ------------------------------------------------------------------------------------------------------ |
+| `missing_ip`    | Send the user's IP in `ip`.                                                                            |
+| `invalid_ip`    | `ip` is not a public address. Send the device's public IP, not a private, loopback or carrier-NAT one. |
+| `not_a_browser` | Send the user's user agent in `ua`.                                                                    |
+| `declared_bot`  | The user agent belongs to a crawler or bot.                                                            |
+
+<Warning>
+
+Linkrunner reads `ip` and `ua` only after the advertiser turns on **S2S clicks** for your partner account. Send them [these steps](/affiliate-partners/turn-on-s2s-clicks). Until then, these parameters are ignored and the click records your server's IP.
+
+</Warning>
+
+Notes:
+
+- Always send `ip` with a public address. If your server sends its own `User-Agent` header, a click without a valid `ip` is not recorded. If your server forwards the user's user agent as its `User-Agent` header, Linkrunner keeps that header, and a click without a valid `ip` records your server's IP.
+- Don't add `ip` or `ua` to links that open in the user's browser. Linkrunner already sees the right values there.
+- Building a new integration? Use [Server-to-Server Clicks](/affiliate-partners/s2s-clicks) instead. It authenticates each request with your partner token and returns errors you can act on.
+
+## What not to put in the tracking link
+
+Do not add postback-only values to the tracking link.
+
+| Value                                      | Where it belongs                                                       |
+| ------------------------------------------ | ---------------------------------------------------------------------- |
+| `postbackKey` or another secret key        | Your postback URL template, not the user-facing tracking link.         |
+| `{event_name}`                             | The postback URL template. There is no event name at click time.       |
+| `{revenue}`, `{sale_amount}`, `{currency}` | The postback URL template. These values exist only after a conversion. |
+
+## Example
+
+A complete click tracking link:
+
+```
+https://track.example.com/?c=OgWmhiSXhG&tid=a1b2c3d4e5&s2=camp_88&s3=pub_4471&gaid=38400000-8cf0-11bd-b23e-10b96e40000d
+```
+
+## Troubleshooting
+
+**Conversions arrive with an empty click ID.**
+You did not send `tid` on the click, sent it under another name (such as `CLICK_ID` or `clickid`), or the value was empty. Confirm the final clicked URL includes `tid=` with a unique value.
+
+**Clicks do not show up on the campaign.**
+The `c` value was changed. Use the exact value from the generated link, with nothing added to it.
+
+**Installs show up, but you get no postbacks.**
+The campaign link was not created under your network. Create it from your own dashboard, or ask the advertiser to recreate it with your network selected. Also check that your postback URLs are set up. See [Postbacks](/affiliate-partners/postbacks).
+
+**The final URL still shows `{click_id}` or another macro.**
+Your platform did not replace that macro before redirecting the user. Replace it in your platform first, then send the resolved value to Linkrunner.
+
+**Installs are not attributed to your clicks.**
+Check that traffic actually passes through the Linkrunner tracking link and that the campaign identifier (`c`) is correct. If you rely on device-ID matching, make sure `gaid` or `idfa` is present on the click.
+
+**Your server calls the link and installs are not attributed.**
+Pass the user's `ip` and `ua` on the link, and ask the advertiser to turn on S2S clicks for your account. See [Calling the link from your server](#calling-the-link-from-your-server).
+
+**Need help?** Contact <support@linkrunner.io>

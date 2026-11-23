@@ -1,0 +1,36 @@
+---
+title: "Affiliate APIs"
+description: "Server-to-server APIs for affiliate partners"
+---
+
+# Affiliate APIs
+
+<p class="vp-lead">Server-to-server APIs for affiliate partners</p>
+
+Use these APIs to send Linkrunner traffic from your server instead of through a tracking link. The advertiser's app ID or link domain, plus your campaign code, identify the traffic. Every request must also carry your partner token in the `X-Linkrunner-Token` header. Generate it in your affiliate dashboard under [**Settings → S2S Credentials**](https://dashboard.linkrunner.io/affiliate/settings?tab=s2s).
+
+<CardGroup :cols="2">
+
+<Card title="S2S Click API" icon="server" href="/api-reference/s2s-clicks">
+
+Report a click from your server when the user goes straight to the store. Accepts AppsFlyer parameter names.
+
+</Card>
+
+<Card title="S2S Impression API" icon="eye" href="/api-reference/s2s-impressions">
+
+Report an ad impression so an install without a click can be credited to your view.
+
+</Card>
+
+<Card title="CTV Impression API" icon="tv" href="/api-reference/ctv-impressions">
+
+Report a connected TV ad impression with the TV's IP address so installs from the same home can be credited to it.
+
+</Card>
+
+</CardGroup>
+
+For setup steps and how attribution works, start with the guides: [Server-to-Server Clicks](/affiliate-partners/s2s-clicks), [Server-to-Server Impressions](/affiliate-partners/s2s-impressions) and [Connected TV Impressions](/affiliate-partners/ctv-impressions).
+
+**Need help?** Contact <support@linkrunner.io>

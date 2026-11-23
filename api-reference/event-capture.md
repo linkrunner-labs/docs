@@ -1,0 +1,378 @@
+---
+title: "Events Capture API"
+description: "Documentation for Linkrunner Event Capture API"
+---
+
+# Events Capture API
+
+<p class="vp-lead">Documentation for Linkrunner Event Capture API</p>
+
+<Note>
+
+**Using an AI coding agent?** Let it instrument your events and revenue correctly (taxonomy, dedupe, refunds, and these server-side APIs):
+
+```bash
+npx @linkrunner/skills add events
+```
+
+See [Linkrunner Agent Skills](/ai-agent-skills).
+
+</Note>
+
+Use this API to send custom events and payments from your backend. To track them from your app, use `trackEvent` in your platform's SDK, for example [Android](/sdk/android), [iOS](/sdk/ios), [React Native](/sdk/react-native), or [Flutter](/sdk/flutter).
+
+<Note>
+
+Events are stored for all users, including organic ones. Events from users with no matching click are stored without campaign attribution. Each request must identify the user with `user_id` or `install_instance_id`. If Linkrunner has not seen the `user_id` yet (your app has not called `signup` for that user), the event is held and shows up once that user signs up. Held events are kept for up to 30 days. You can verify your events are being captured on the [Events](https://dashboard.linkrunner.io/dashboard/events) page. To record revenue, send the [payment fields](#payment-fields) with the event.
+
+</Note>
+
+Use [Test Custom Events and Payments](/testing/event-and-revenue-testing) to decide whether an action is a custom event or a payment.
+
+## Base URL
+
+```
+https://api.linkrunner.io/api/v1
+```
+
+## Authentication
+
+Generate your server key from [https://dashboard.linkrunner.io/settings?s=data-apis](https://dashboard.linkrunner.io/settings?p_id=4&s=data-apis)
+
+In the request header add the below attribute:
+
+```
+linkrunner-key: YOUR-SERVER-KEY
+```
+
+## Capture Event
+
+```
+POST: /capture-event
+```
+
+### Request Body
+
+```json
+{
+  "event_name": "product_viewed",
+  "event_data": {
+    "product_id": "ABC123",
+    "category": "electronics",
+    "amount": 249.99,
+    "currency": "USD",
+    "is_featured": true
+  },
+  "user_id": "user_12345",
+  "event_id": "evt_12345",
+  "event_timestamp": "2026-01-31T10:15:30Z", // optional: when the event happened
+  "source": "app" // optional: "app" (default) or "web"
+}
+```
+
+| Parameter  | Type   | Description                                                                            |
+| ---------- | ------ | ------------------------------------------------------------------------------------- |
+| event_name | string | **Required**. Name of the event to track                                              |
+| event_data | object | **Optional**. Additional data associated with the event                               |
+| user_id    | string | **Required** unless `install_instance_id` is sent. User identifier to associate with the event |
+| install_instance_id | string | **Required** unless `user_id` is sent. Linkrunner's ID for the install |
+| event_id   | string | **Optional**. Your own unique identifier for the event, useful for deduplication and correlating with your backend |
+| client_ip_address | string | **Optional**. Public IP of the user's device when the event happened. See [End-user IP address](#end-user-ip-address) |
+| source     | string | **Optional**. `app` (default) or `web`. Send `web` for a user of your website. See [Website events](#website-events) |
+| event_timestamp      | string | **Optional**. When the event happened, in ISO 8601 with a timezone. See [Event time](#event-time)                     |
+| amount | number | **Optional**. Payment amount. Send with `payment_id` and `currency` to record a payment. See [Payment fields](#payment-fields) |
+| payment_id | string | **Optional**. Your unique transaction ID. Send with `amount` and `currency` |
+| currency | string | **Optional**. 3-letter ISO 4217 code of `amount`, for example `USD` or `INR`. Send with `amount` and `payment_id` |
+| status | string | **Optional**. Payment status. Used only when the payment fields are sent. Defaults to `PAYMENT_COMPLETED` |
+
+### Payment fields
+
+Send `amount`, `payment_id`, and `currency` at the top level of the request, next to `event_name`, when the event is a payment. Linkrunner then stores the event as revenue, and `event_name` becomes the payment type you see in reports. Without these fields, the request is a custom event.
+
+`event_name` is stored exactly as you send it. To keep existing event mappings, reports, and affiliate templates working, send an old payment type in uppercase, exactly as before, such as `FIRST_PAYMENT`, `SUBSCRIPTION_RENEWED`, or `DEFAULT`. A different spelling such as `first_payment` is a new payment type. Any other name is also stored exactly as sent, and you need to add a mapping for it in the dashboard before it reaches ad networks. See [Old payment types](/sdk/migrate-to-track-event#old-payment-types) for the full list.
+
+```json
+{
+  "event_name": "purchase_completed",
+  "amount": 149.99,
+  "payment_id": "ORD-12345",
+  "currency": "USD",
+  "event_data": {
+    "product_id": "ABC123"
+  },
+  "user_id": "user_12345"
+}
+```
+
+- **Send all three.** If you send only one or two of `amount`, `payment_id`, and `currency`, the request is stored as a normal custom event, not a payment, and the API returns `200`.
+- **`amount`** must be a number of zero or more. A numeric string such as `"149.99"` is also accepted.
+- **`payment_id`** must be a non-empty string. Use a unique value for each transaction. Retrying a request with the same `payment_id`, `event_name`, and `status` does not create a second payment, and the API still returns `200`.
+- **`currency`** must be a 3-letter ISO 4217 code. Lowercase is accepted and stored in uppercase.
+- **`status`** accepts `PAYMENT_INITIATED`, `PAYMENT_COMPLETED`, `PAYMENT_FAILED`, or `PAYMENT_CANCELLED`. If you leave it out, the payment is `PAYMENT_COMPLETED`.
+- **`event_data`**, if sent, must be a JSON object.
+- **`user_id`** links the payment to your user. The SDKs always send it with a payment, so send it from your backend too. A payment identified only by `install_instance_id` is still accepted.
+
+Only `PAYMENT_COMPLETED` payments are sent to ad networks as revenue. An `amount` inside `event_data` does not make the event a payment on its own.
+
+Older SDKs send payment keys in camelCase inside `event_data`. When no top-level payment field is sent and `event_data` has `paymentId`, `amount`, `currency`, and `userId`, the event is stored as a payment. See [Older SDK versions](/sdk/migrate-to-track-event#older-sdk-versions).
+
+`event_timestamp` also sets the time of a payment, and each event in a [batch](#capture-events-in-a-batch) follows the same payment rules.
+
+Payment fields apply to app events. For a payment from a user of your website, use [capture-payment with `"source": "web"`](/api-reference/revenue-tracking#website-payments).
+
+### Event time
+
+By default Linkrunner records an event at the time it receives the request. If you queue events and send them later, for example in a [batch](#capture-events-in-a-batch), pass `event_timestamp` so each event keeps the time it actually happened. Reports, cohorts and ad-network postbacks then use that time.
+
+- Send it as a string in ISO 8601 (RFC 3339) format with a timezone, for example `2026-01-31T10:15:30Z` or `2026-01-31T15:45:30+05:30`. Fractional seconds are accepted; the time is stored to the second.
+- It can be at most 7 days in the past and at most 10 minutes in the future. Anything else is rejected with a 400.
+- Leave it out if the event is happening now. Linkrunner then uses the time it receives the request.
+- For website events (`"source": "web"`) the time is saved with the event, but Web Events reports and ad-network postbacks still use the time Linkrunner received it.
+
+### End-user IP address
+
+These calls come from your server, so Linkrunner never sends your server's IP to ad networks as the user's IP. By default it sends the device IP captured when the app was installed. If you know the IP of the user's device at the time of the action, pass it as `client_ip_address`. Linkrunner forwards it to ad networks (for example Meta `client_ip_address`) to improve matching.
+
+- Send only the device's public IP. Private, loopback and link-local addresses are ignored.
+- Leave it out if you don't have it. Linkrunner then uses the install-time device IP.
+
+### Website events
+
+If the event comes from a user of your website rather than your app, send `"source": "web"`. Your website must be tracked with the [Web SDK](/sdk/web), and the event then shows up on the [Web Events](https://dashboard.linkrunner.io/dashboard/web-events) page instead of the app dashboards. Leave `source` out, or send `app`, for app users. Existing integrations do not need to change.
+
+```json
+{
+  "event_name": "plan_upgraded",
+  "event_data": {
+    "plan": "pro"
+  },
+  "user_id": "user_12345",
+  "event_id": "evt_12345",
+  "source": "web"
+}
+```
+
+- **Identify the user with `user_id`.** Use the same ID your website passes to `lr.identify`. `install_instance_id` does not apply to website users, so `user_id` is required.
+- **Attribution.** Linkrunner credits the event to the channel and campaign of that user's latest visit recorded by the Web SDK in the last 90 days. If the Web SDK has not recorded a visit from that user, the event shows as Direct.
+- **No deduplication.** Every request is stored, including retries. Send your own `event_id` so repeated requests for the same action carry the same ID.
+
+### Responses
+
+1. **200** Event or payment captured successfully
+2. **400** Missing required parameters, neither `user_id` nor `install_instance_id` was sent, `event_timestamp` is not a valid time or is out of range, all three payment fields are sent but one is invalid, `source` is not `app` or `web`, or `source` is `web` and `user_id` is missing or website tracking is not enabled for the project
+3. **401** Invalid server key
+
+#### Sample Response
+
+Upon successful event capture, the API returns:
+
+```json
+{
+  "msg": "Event capture request received!",
+  "status": 200,
+  "processing_id": "6f1c2a9e-3b7d-4c55-9a0e-2f8d1b4e7c10",
+  "data": {
+    "message": "Event capture request received!"
+  }
+}
+```
+
+`processing_id` identifies this request. Log it on your side and share it with Linkrunner support if an event does not show up. If you did not send an `event_id`, Linkrunner also uses `processing_id` as the event's ID.
+
+## Capture Events in a Batch
+
+Use the batch endpoint when your backend sends many events, for example from a queue or an event pipeline. One request carries up to 100 events, and each event is processed exactly as if you had sent it to `/capture-event` on its own.
+
+```
+POST: /capture-event/batch
+```
+
+### Request Body
+
+Put each event, in the same format as the [Capture Event](#capture-event) request body, in an `events` array:
+
+```json
+{
+  "events": [
+    {
+      "event_name": "product_viewed",
+      "event_data": { "product_id": "ABC123" },
+      "user_id": "user_12345",
+      "event_id": "evt_12345",
+      "event_timestamp": "2026-01-31T10:15:30Z"
+    },
+    {
+      "event_name": "cart_added",
+      "install_instance_id": "f2b1c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d",
+      "event_id": "evt_12346"
+    }
+  ]
+}
+```
+
+- Send between 1 and 100 events. The whole request body must be at most 1 MB (1,048,576 bytes).
+- Events are processed in the order you send them.
+- Each event can carry its own `event_timestamp`. Events without one are recorded at the time the batch is received. See [Event time](#event-time).
+- A batch counts as one request towards the API rate limit. Each server key can also send at most 5 batches per second, which is up to 500 events per second.
+
+### Responses
+
+1. **200** The batch was processed. Check each event's result: a 200 response can still contain rejected or failed events, even when every event failed.
+2. **400** The body is not valid JSON, `events` is missing or empty, or it has more than 100 events. No event in the batch was captured.
+3. **401** Invalid server key
+4. **413** The request body is larger than 1 MB
+5. **429** Too many requests, including more than 5 batches in one second from the same server key. Wait a second and resend the batch; see [Error Handling](#error-handling)
+
+#### Sample Response
+
+```json
+{
+  "msg": "Event batch processed!",
+  "status": 200,
+  "processing_id": "0d9b8f1e-6a2c-4d3b-9e7f-1c2b3a4d5e6f",
+  "data": {
+    "accepted": 1,
+    "rejected": 1,
+    "results": [
+      {
+        "index": 0,
+        "status": 200,
+        "msg": "Event capture request received!",
+        "processing_id": "6f1c2a9e-3b7d-4c55-9a0e-2f8d1b4e7c10",
+        "data": { "message": "Event capture request received!" }
+      },
+      {
+        "index": 1,
+        "status": 400,
+        "msg": "Event name is required!"
+      }
+    ]
+  }
+}
+```
+
+- `results` has one entry per event, in request order. `index` is the event's position in `events`, starting at 0.
+- Each result has the same `status` and `msg` that `/capture-event` returns for that event. A captured event has its own `processing_id`, which works the same as on a single request.
+- The top-level `processing_id` identifies the batch request. Share it with Linkrunner support together with the event's own `processing_id` if an event does not show up.
+- **Retrying.** Do not resend events with a 400 result without fixing them. A 500 result can be retried: resend only the events that failed, not the whole batch, because the other events are already captured. Send your own `event_id` on every event, so a resent event carries the same ID as the first attempt.
+
+## Common Event Names
+
+Here are some common event names you might want to track:
+
+| Event Name             | Description                        |
+| ---------------------- | ---------------------------------- |
+| `purchase_initiated`   | User starts a purchase             |
+| `purchase_completed`   | User completes a purchase          |
+| `item_viewed`          | User views an item/product         |
+| `cart_added`           | User adds item to cart             |
+| `checkout_started`     | User starts checkout               |
+| `search_performed`     | User performs a search             |
+| `content_viewed`       | User views content                 |
+| `level_completed`      | User completes a level (for games) |
+| `achievement_unlocked` | User unlocks an achievement        |
+| `user_referred`        | User refers someone                |
+
+## Revenue Sharing with Ad Networks
+
+Send revenue as a payment with the [payment fields](#payment-fields). Meta and Google receive the value and currency from the top-level `amount` and `currency`, so send the order total as `amount`. Linkrunner does not add up item prices.
+
+Put product details in `event_data`. Meta receives `content_ids`, `contents`, `content_type`, `num_items`, and `order_id`. Google receives `content_ids` as item IDs.
+
+An `amount` inside `event_data` is not sent to ad networks as revenue. Revenue is shared only when **Send Revenue** is turned on for the event's mapping in the dashboard. See [Meta Ads](/ad-networks/meta-ads) and [Google Ads](/ad-networks/google-ads).
+
+<Note>
+
+`POST /capture-payment` is deprecated. It keeps working for existing integrations, but new integrations should send payments through `/capture-event`. See [Migrate payments to in-app events](/sdk/migrate-to-track-event).
+
+</Note>
+
+## Best Practices
+
+1. **Consistent naming**: Use consistent naming conventions for your events (snake_case is recommended)
+2. **Structured data**: Include structured data with each event to get more insights
+3. **Meaningful events**: Track events that provide valuable insights into user behavior
+4. **Data efficiency**: Don't include sensitive or unnecessary data in event payloads
+
+## Example
+
+### Tracking a Purchase
+
+```javascript
+// Using fetch API
+fetch("https://api.linkrunner.io/api/v1/capture-event", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "linkrunner-key": "YOUR-SERVER-KEY",
+  },
+  body: JSON.stringify({
+    event_name: "purchase_completed",
+    amount: 125.99,
+    payment_id: "ORD-12345",
+    currency: "USD",
+    event_data: {
+      product_ids: ["P-001", "P-002"],
+      payment_method: "credit_card",
+    },
+    user_id: "user_12345",
+  }),
+})
+  .then((response) => response.json())
+  .then((data) => console.log(data))
+  .catch((error) => console.error("Error:", error));
+```
+
+## Error Handling
+
+The API will return appropriate HTTP status codes along with error messages when issues occur:
+
+- **400 Bad Request**: Check your request parameters
+- **401 Unauthorized**: Verify your server key
+- **429 Too Many Requests**: You've exceeded the rate limit, please try again later
+- **500 Internal Server Error**: Contact support if this persists
+
+
+## Meta Ecommerce Events
+
+If you are tracking Ecommerce events (like `add_to_cart` or `view_content`) to sync with Meta Catalog Sales, **you must first map your custom event with the standard commerce event in the Linkrunner Dashboard** before sending the event.
+
+*Note: Any event you want to send for an add to cart action should be mapped with **AddToCart** for Commerce Event Manager. For example, map **add_to_cart** with **AddToCart**.*
+
+*Similarly, any event you want to send for viewing a product should be mapped with **ViewContent**. For example, map **item_viewed** with **ViewContent** or **view_content** with **ViewContent**.*
+
+While you can include any custom attributes in the `event_data` object, Meta requires specific fields for ecommerce events in order to correctly attribute catalog sales and optimize campaigns.
+
+### Example Ecommerce Payload
+
+Here is an example of the exact `event_data` structure you need to send for Meta Commerce Manager:
+
+For comprehensive details on each field requirement, refer to our [Meta Commerce Manager](/ecommerce-manager/meta-commerce-manager#understanding-event_data) documentation.
+
+```json
+{
+  "event_name": "add_to_cart",
+  "event_data": {
+    "content_ids": ["whshct4mwc"],
+    "contents": [
+      {
+        "id": "whshct4mwc",
+        "quantity": 2,
+        "item_price": 1000
+      }
+    ],
+    "content_type": "product",
+    "currency": "INR",
+    "value": 2000.0,
+    "num_items": 2,
+    "order_id": "order_id_1234"
+  },
+  "user_id": "user_12345"
+}
+```
+
+For a purchase, send the same `event_data` together with the [payment fields](#payment-fields), and map the event name with **Purchase**.
+
+To verify your events are being correctly received by Meta, please follow our [Testing Ecommerce Events](/ecommerce-manager/meta-commerce-manager#testing-ecommerce-events) guide.
+
+**Need help?** Contact <support@linkrunner.io>.

@@ -49,13 +49,13 @@ For punctuation-only edits, use the shared style rules without running this enti
 
    Done when every main-path paragraph affects the reader's action or understanding. Do not turn all investigation limitations into customer-facing warnings.
 
-For MDX mechanics, use [Mintlify authoring](references/mintlify.md). For actual image capture, read [screenshot guidance](references/screenshots.md). Do not load these references merely to copyedit prose.
+For page mechanics, use [VitePress and Relay authoring](references/vitepress-relay.md). Check [where to edit](../../AGENTS.md#where-to-edit-read-first) before changing a page. For actual image capture, read [screenshot guidance](references/screenshots.md). Do not load these references merely to copyedit prose.
 
 ## Verify and hand off
 
-8. **Exercise what changed.** Run `npm run check:agents` and `npm run check:routes -- origin/main` from the repo root. For public-page edits, inspect the rendered page and changed links. Follow procedural examples from their stated starting point in an authorized local or sandbox environment where feasible.
+8. **Exercise what changed.** Run `bun run check` and `bun run build:relay` from the repo root. For public-page edits, inspect the rendered page and changed links in `bun run dev:relay`. Follow procedural examples from their stated starting point in an authorized local or sandbox environment where feasible.
 
-   Test code extracted from the actual documented block, not a hand-maintained replacement. Pin the package versions used by the test. A fragment needs a labelled minimal fixture for its stated context; the fixture must not silently repair missing imports or required inputs. Typechecking and mocked tests do not prove native execution or delivery. These repo checks currently do not run SDK examples or test the docs renderer.
+   Test code extracted from the actual documented block, not a hand-maintained replacement. Pin the package versions used by the test. A fragment needs a labelled minimal fixture for its stated context; the fixture must not silently repair missing imports or required inputs. Typechecking and mocked tests do not prove native execution or delivery. These repo checks build the site and check pages, links, and old URLs; they do not run SDK examples.
 
    Done when the exact checks and outcomes are recorded, with untested platforms and unavailable runtimes listed separately. A docs build is not a substitute for a behavioral test.
 

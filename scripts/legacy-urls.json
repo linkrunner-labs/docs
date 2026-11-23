@@ -1,0 +1,2715 @@
+{
+ "about": "URLs served by docs.linkrunner.io (Mintlify). Refresh with `bun run scripts/legacy-urls.ts`; `bun run build:relay` fails if one stops resolving (scripts/check-legacy-urls.ts). See README.",
+ "site": "https://docs.linkrunner.io",
+ "fetched": "2026-11-03",
+ "pages": [
+  {
+   "path": "/ad-networks/chatgpt-ads",
+   "anchors": [
+    "overview",
+    "what-you-need",
+    "how-chatgpt-ads-manager-is-organized",
+    "1-create-a-pixel-and-conversions-api-key",
+    "2-add-chatgpt-ads-credentials-in-linkrunner",
+    "3-map-events-for-chatgpt-ads",
+    "custom-events",
+    "4-create-a-linkrunner-campaign-link",
+    "5-create-the-chatgpt-campaign",
+    "step-1-create-campaign",
+    "step-2-create-ad-group-&-ads",
+    "step-3-create-the-ad",
+    "step-4-review-and-publish",
+    "6-open-a-specific-screen-with-deep-linking",
+    "test-it-before-you-spend",
+    "how-attribution-and-capi-work",
+    "frequently-asked-questions",
+    "why-are-my-chatgpt-campaigns-not-showing-up-on-linkrunner",
+    "what-is-oppref-and-why-is-it-important",
+    "why-are-ios-devices-not-matched-by-device-id",
+    "why-were-some-of-my-events-not-sent",
+    "is-view-through-attribution-supported",
+    "which-countries-can-run-chatgpt-ads",
+    "can-i-track-revenue-and-purchase-events",
+    "how-do-i-verify-linkrunner-is-sending-events-to-openai",
+    "related-setup"
+   ]
+  },
+  {
+   "path": "/ad-networks/google-ads",
+   "anchors": [
+    "overview",
+    "setup-process",
+    "1-connect-your-google-ads-account",
+    "2-create-link-id-for-android/ios-app",
+    "step-1-access-third-party-app-analytics",
+    "step-2-add-app-analytics-provider",
+    "step-3-configure-in-linkrunner-dashboard",
+    "3-set-up-event-mapping",
+    "4-importing-events-for-conversion-actions-setup",
+    "step-1-access-conversions-dashboard",
+    "step-2-create-conversion-action",
+    "step-3-import-events",
+    "4-manage-google-conversion-actions",
+    "5-create-your-first-campaign",
+    "step-1-start-a-new-campaign",
+    "step-2-choose-subtype-and-select-your-app",
+    "step-3-set-locations-and-languages",
+    "step-4-add-ad-assets",
+    "step-5-set-bidding-and-budget",
+    "step-6-verify-the-campaign-in-linkrunner",
+    "important-notes",
+    "faq-and-discrepancies",
+    "troubleshooting",
+    "campaign-not-showing-in-linkrunner",
+    "events-not-showing-up",
+    "action-is-enabled-but-not-used-for-bidding",
+    "re-enabling-previously-deleted-events",
+    "step-1-navigate-to-all-conversion-actions",
+    "step-2-set-filter-to-show-all-conversions",
+    "step-3-re-enable-the-deleted-event",
+    "link-id-creation-issues"
+   ]
+  },
+  {
+   "path": "/ad-networks/google-ads-discrepancies",
+   "anchors": [
+    "google-ads-faq",
+    "installs-arent-showing-up-in-google-ads",
+    "first-open-conversions-are-missing-in-google-ads",
+    "in-app-events-arent-appearing-in-the-google-ads-dashboard",
+    "do-i-need-to-import-session-start",
+    "using-multiple-google-ads-accounts",
+    "mcc-level-vs-account-level-link-ids",
+    "how-android-and-ios-attribution-differs",
+    "what-causes-discrepancies",
+    "row-by-row-comparison",
+    "troubleshooting-checklist"
+   ]
+  },
+  {
+   "path": "/ad-networks/google-support-access",
+   "anchors": [
+    "1-open-access-settings",
+    "2-invite-linkrunner",
+    "3-confirm-access",
+    "remove-access-after-support",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/ad-networks/linkedin-ads",
+   "anchors": [
+    "overview",
+    "what-you’ll-get",
+    "setup-process",
+    "1-creating-conversions",
+    "step-1-access-linkedin-campaign-manager",
+    "step-2-create-conversion",
+    "step-3-configure-conversion-details",
+    "step-4-select-data-source",
+    "step-5-review-and-create",
+    "step-6-create-additional-conversions",
+    "2-configuring-ad-accounts-in-linkrunner",
+    "step-1-access-linkedin-integration-on-linkrunner",
+    "step-2-add-linkedin-account",
+    "step-3-generate-access-token-in-linkedin",
+    "step-4-configure-capi-on-linkrunner",
+    "step-5-repeat-for-additional-accounts",
+    "3-setting-up-your-first-linkedin-campaign",
+    "step-1-create-campaign-link-in-linkrunner",
+    "step-2-access-linkedin-campaign-manager",
+    "step-3-create-campaign",
+    "step-4-configure-ad-set",
+    "step-5-create-ad",
+    "deferred-deep-linking",
+    "why-run-web-to-app-ads"
+   ]
+  },
+  {
+   "path": "/ad-networks/meta-ads",
+   "anchors": [
+    "overview",
+    "what-you’ll-get",
+    "setup-process",
+    "1-configure-meta-app-integration",
+    "step-1-get-your-meta-app-id",
+    "step-2-get-your-referrer-decryption-key",
+    "step-3-configure-in-linkrunner-dashboard",
+    "step-4-connect-meta-ad-account",
+    "step-5-configure-capi",
+    "2-set-up-event-mapping",
+    "3-configure-events-in-meta-events-manager",
+    "4-create-your-first-campaign",
+    "step-1-start-a-new-campaign",
+    "step-2-configure-the-ad-set",
+    "step-3-create-the-ad",
+    "step-4-verify-the-campaign-in-linkrunner",
+    "5-deferred-deep-linking",
+    "meta-app-promotion-deep-links",
+    "priority-order",
+    "campaign-level-deep-links",
+    "ad-set-level-deep-links",
+    "ad-creative-level-deep-links",
+    "6-enable-meta-view-through-attribution-android",
+    "how-it-works",
+    "setup",
+    "without-facebook-sdk",
+    "with-facebook-sdk",
+    "requirements",
+    "faq-and-discrepancies",
+    "troubleshooting",
+    "capi-dataset-access-errors",
+    "capi-delivery-paused",
+    "events-not-showing-up-in-meta",
+    "campaigns-not-appearing-in-dashboard",
+    "revenue-data-not-tracking"
+   ]
+  },
+  {
+   "path": "/ad-networks/meta-ads-discrepancies",
+   "anchors": [
+    "meta-ads-faq",
+    "events-arent-showing-up-in-meta-events-manager",
+    "installs-show-in-linkrunner-but-not-in-meta",
+    "meta-reports-more-installs-than-linkrunner",
+    "linkrunner-reports-more-meta-installs-than-meta",
+    "do-i-need-the-facebook-sdk",
+    "how-android-and-ios-attribution-differs",
+    "how-web-to-app-campaigns-are-attributed",
+    "what-causes-discrepancies",
+    "row-by-row-comparison",
+    "troubleshooting-checklist"
+   ]
+  },
+  {
+   "path": "/ad-networks/meta-support-access",
+   "anchors": [
+    "1-open-people-settings",
+    "2-enter-the-support-email",
+    "3-keep-basic-access",
+    "4-share-the-affected-ad-account",
+    "share-an-app-or-dataset-when-needed",
+    "app-analytics",
+    "dataset-or-pixel-events",
+    "remove-access-after-support",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/ad-networks/meta-view-through-attribution",
+   "anchors": [
+    "when-meta-shares-view-through-data",
+    "meta-view-through-faq",
+    "meta-shows-view-through-conversions-but-linkrunner-shows-none-why",
+    "my-campaign-drives-app-installs-from-the-app-store-isnt-that-an-app-campaign",
+    "does-this-affect-click-through-attribution",
+    "which-attribution-setting-should-my-ad-sets-use",
+    "does-view-through-attribution-work-on-ios",
+    "how-do-i-get-view-through-data-flowing",
+    "references"
+   ]
+  },
+  {
+   "path": "/ad-networks/meta-web-to-app",
+   "anchors": [
+    "overview",
+    "what-you’ll-get",
+    "how-it-works",
+    "setup",
+    "set-up-conversions-api-for-event-sending",
+    "generate-an-access-token",
+    "why-run-meta-web-to-app-ads",
+    "important-notes",
+    "troubleshooting",
+    "conversions-not-tracking",
+    "campaign-not-appearing-in-linkrunner-dashboard",
+    "spend-not-syncing"
+   ]
+  },
+  {
+   "path": "/ad-networks/reddit-ads",
+   "anchors": [
+    "overview",
+    "what-you-need",
+    "1-prepare-your-reddit-ads-account",
+    "2-add-reddit-capi-credentials-in-linkrunner",
+    "3-map-events-for-reddit",
+    "4-create-a-linkrunner-campaign-link",
+    "5-create-the-reddit-campaign",
+    "step-1-open-ads-manager",
+    "step-2-use-advanced-create",
+    "step-3-configure-campaign-details",
+    "step-4-configure-the-ad-group",
+    "step-5-create-the-ad",
+    "step-6-review-and-publish",
+    "how-attribution-and-capi-work",
+    "frequently-asked-questions",
+    "why-are-my-reddit-campaigns-not-showing-up-on-linkrunner",
+    "why-are-my-reddit-events-not-appearing-in-reddit-events-manager",
+    "do-reddit-campaigns-appear-automatically-like-meta-campaigns",
+    "what-is-rdt-cid-and-why-is-it-important",
+    "can-i-use-the-same-campaign-link-for-multiple-reddit-ads",
+    "the-ad-click-opens-the-wrong-destination",
+    "can-i-track-revenue-and-purchase-events-from-reddit-campaigns",
+    "how-do-i-verify-linkrunner-is-sending-events-to-reddit",
+    "related-setup"
+   ]
+  },
+  {
+   "path": "/ad-networks/sharechat-ads",
+   "anchors": [
+    "overview",
+    "what-you-need",
+    "1-register-your-app-in-sharechat-direct-integration",
+    "find-your-advid",
+    "2-add-the-advid-in-linkrunner",
+    "3-map-events-for-sharechat",
+    "4-get-your-postbacks-verified-by-sharechat",
+    "5-create-a-linkrunner-campaign-link",
+    "6-create-and-run-the-ad-in-sharechat",
+    "campaign-info",
+    "set-up-campaign",
+    "creatives",
+    "7-check-that-it-works",
+    "how-postbacks-work",
+    "frequently-asked-questions",
+    "why-are-installs-from-my-sharechat-ads-showing-as-organic",
+    "do-i-need-to-finish-the-integration-type-test-links-validation-and-verification-steps-in-sharechat",
+    "why-is-the-conversion-objective-locked",
+    "will-installs-from-my-existing-sharechat-campaigns-show-up-in-linkrunner",
+    "what-is-the-advid-and-where-do-i-find-it",
+    "why-is-an-event-not-sent-to-sharechat",
+    "is-view-through-attribution-supported",
+    "does-linkrunner-import-sharechat-spend",
+    "related-setup"
+   ]
+  },
+  {
+   "path": "/ad-networks/snapchat",
+   "anchors": [
+    "overview",
+    "setup-process",
+    "1-configuring-pixel-in-snapchat-ads-manager",
+    "step-1-connect-snapchat-account-on-linkrunner",
+    "step-2-add-snapchat-account",
+    "step-3-navigate-to-snapchat-ads-manager",
+    "step-4-create-pixel",
+    "step-5-name-your-pixel",
+    "step-6-skip-website-url",
+    "step-7-select-manual-setup",
+    "step-8-select-conversion-api",
+    "step-9-choose-manual-set-up-method",
+    "step-10-select-events-to-track",
+    "step-11-select-event-parameters",
+    "step-12-copy-credentials",
+    "2-creating-a-snap-app-id",
+    "step-1-open-apps",
+    "step-2-create-your-snap-app",
+    "step-3-copy-the-snap-app-id",
+    "step-4-check-your-store-links-in-linkrunner",
+    "3-configuring-snapchat-on-linkrunner",
+    "step-1-open-the-configuration",
+    "step-2-enter-your-ids-and-access-token",
+    "4-sending-a-test-event",
+    "5-setting-up-your-first-snapchat-campaign",
+    "step-1-navigate-to-manage-ads",
+    "step-2-choose-campaign-objective",
+    "step-3-select-manual-build",
+    "step-4-add-campaign-info",
+    "step-5-add-ad-set-details",
+    "step-6-create-linkrunner-campaign-links",
+    "step-7-add-website-url-for-the-creative",
+    "step-8-publish-the-campaign",
+    "deferred-deep-linking"
+   ]
+  },
+  {
+   "path": "/ad-networks/tiktok",
+   "anchors": [
+    "overview",
+    "what-you’ll-get",
+    "setup-process",
+    "1-configuring-pixel-in-tiktok-events-manager",
+    "step-1-connect-tiktok-account-on-linkrunner",
+    "step-2-add-tiktok-account",
+    "step-3-navigate-to-tiktok-ads-manager",
+    "step-4-access-events-manager",
+    "step-5-connect-data-source",
+    "step-6-select-web-as-data-source",
+    "step-7-add-your-website",
+    "step-8-choose-manual-setup",
+    "step-9-select-events-api",
+    "step-10-name-your-pixel",
+    "step-11-select-template",
+    "step-12-copy-credentials",
+    "step-13-configure-pixel-on-linkrunner",
+    "step-14-paste-credentials",
+    "2-setting-up-your-first-tiktok-campaign",
+    "step-1-switch-to-full-version",
+    "step-2-configure-campaign-settings",
+    "step-3-configure-optimization-and-bidding",
+    "step-4-create-linkrunner-campaign-links",
+    "step-5-add-destination-urls",
+    "step-6-add-more-ads-to-ad-group",
+    "deferred-deep-linking",
+    "why-run-web-to-app-ads",
+    "frequently-asked-questions",
+    "why-are-my-tiktok-campaigns-not-showing-up-on-linkrunner",
+    "why-are-my-events-not-showing-up-in-tiktok-events-manager",
+    "do-tiktok-campaigns-appear-automatically-like-meta-campaigns",
+    "what-is-ttclid-and-why-is-it-important",
+    "can-i-use-the-same-campaign-link-for-multiple-tiktok-ads",
+    "can-i-track-revenue-and-purchase-events-from-tiktok-campaigns",
+    "why-should-i-select-website-instead-of-app-as-the-destination-type",
+    "do-i-need-to-create-a-new-pixel-for-every-campaign"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/add-agency-account",
+   "anchors": [
+    "affiliate-and-agency-accounts-stay-separate",
+    "1-ask-a-customer-to-invite-you-as-an-agency",
+    "2-open-the-invitation",
+    "3-add-your-agency-details",
+    "4-wait-for-review",
+    "5-switch-between-your-accounts",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/affiliate-apis",
+   "anchors": []
+  },
+  {
+   "path": "/affiliate-partners/create-account",
+   "anchors": [
+    "1-start-your-registration",
+    "2-add-your-network-details",
+    "3-add-your-postback-urls",
+    "4-wait-for-approval",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/create-campaign-link",
+   "anchors": [
+    "before-you-start",
+    "1-open-the-advertiser-project",
+    "2-create-the-campaign",
+    "3-copy-the-generated-template",
+    "4-configure-your-platform",
+    "5-test-before-launch",
+    "troubleshooting",
+    "the-advertiser-project-does-not-appear",
+    "a-campaign-link-does-not-appear-in-your-dashboard",
+    "the-generated-link-is-missing-a-required-parameter",
+    "the-final-click-url-still-contains-placeholders",
+    "postbacks-have-an-empty-click-id"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/ctv-impressions",
+   "anchors": [
+    "before-you-start",
+    "how-it-works",
+    "set-it-up",
+    "build-the-url-by-hand",
+    "see-your-results",
+    "authenticate-your-requests",
+    "coming-from-appsflyer",
+    "retries",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/edit-campaign",
+   "anchors": [
+    "what-you-can-change",
+    "rename-a-campaign",
+    "troubleshooting",
+    "you-need-to-change-the-deep-link-redirects-or-another-setting",
+    "you-cant-make-this-change",
+    "the-campaign-has-the-wrong-ad-channel",
+    "the-campaign-is-not-in-your-list"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/event-mapping",
+   "anchors": [
+    "reading-the-table",
+    "the-reaches-dropdown",
+    "which-one-to-use",
+    "add-a-mapping",
+    "remove-a-mapping",
+    "troubleshooting",
+    "an-event-never-arrives-at-my-endpoint",
+    "the-event-arrives-under-the-wrong-name",
+    "i-cannot-select-only-for-this-customer",
+    "the-table-is-empty-or-the-page-asks-for-a-customer",
+    "revenue-is-missing-from-an-event",
+    "next-steps"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/fraud-data",
+   "anchors": [
+    "where-fraud-shows-up",
+    "1-list-the-rejected-conversions",
+    "2-see-why-a-conversion-was-rejected",
+    "3-get-rejections-on-your-own-server",
+    "see-it-from-the-customer’s-side",
+    "troubleshooting",
+    "i-think-a-conversion-was-rejected-by-mistake",
+    "all-my-rejections-show-withheld-fraud",
+    "i-cannot-edit-rejection-postbacks",
+    "my-endpoint-returned-an-error-on-a-rejection",
+    "a-rejection-arrived-for-an-event-i-never-mapped"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/getting-started",
+   "anchors": [
+    "what-linkrunner-offers-you",
+    "what-you-need-to-do",
+    "common-questions",
+    "which-conversions-do-i-get-by-default",
+    "how-do-i-match-a-postback-to-my-click",
+    "can-i-reuse-my-appsflyer-templates",
+    "do-i-need-to-integrate-an-sdk"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/overview",
+   "anchors": [
+    "overview",
+    "how-attribution-works",
+    "view-through-optional",
+    "what-you-can-receive-postbacks-for",
+    "next-steps"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/postback-logs",
+   "anchors": [
+    "reading-the-log",
+    "statuses",
+    "see-the-details-of-a-postback",
+    "conversions-rejected-by-fraud-control",
+    "troubleshooting",
+    "a-postback-shows-failed",
+    "a-postback-shows-not-sent",
+    "a-postback-shows-rejected-fraud-or-withheld-fraud",
+    "an-event-i-expect-is-not-in-the-log-at-all",
+    "an-install-from-my-traffic-is-not-in-the-log",
+    "the-click-id-is-empty",
+    "the-log-says-no-postbacks-match"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/postbacks",
+   "anchors": [
+    "overview",
+    "event-mapping",
+    "allowlist-linkrunner-postback-ips",
+    "rejected-conversions",
+    "rejection-macros",
+    "reason-codes",
+    "click-tracking-link",
+    "macro-syntax",
+    "macro-reference",
+    "identifiers",
+    "event",
+    "time",
+    "app",
+    "revenue",
+    "device",
+    "network",
+    "attribution",
+    "click-passthrough",
+    "static-values",
+    "not-available",
+    "examples",
+    "install-postback",
+    "signup-postback",
+    "purchase-postback-with-revenue",
+    "device-and-attribution-detail",
+    "deduplication",
+    "formatting-reference",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/s2s-clicks",
+   "anchors": [
+    "when-to-use-s2s-clicks",
+    "how-it-works",
+    "set-it-up",
+    "authenticate-your-requests",
+    "rotate-or-revoke-your-token",
+    "coming-from-appsflyer",
+    "retries",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/s2s-impressions",
+   "anchors": [
+    "when-to-use-s2s-impressions",
+    "how-it-works",
+    "set-it-up",
+    "authenticate-your-requests",
+    "rotate-or-revoke-your-token",
+    "coming-from-appsflyer",
+    "retries",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/tracking-links",
+   "anchors": [
+    "overview",
+    "the-two-forms-of-the-link",
+    "parameters",
+    "required",
+    "passthrough-values",
+    "device-and-request",
+    "links-for-your-sub-publishers",
+    "calling-the-link-from-your-server",
+    "what-not-to-put-in-the-tracking-link",
+    "example",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/affiliate-partners/turn-on-s2s-clicks",
+   "anchors": [
+    "before-you-start",
+    "turn-it-on",
+    "what-the-partner-can-do",
+    "turn-on-ctv-impressions",
+    "turn-it-off",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/agency-partners/accept-invitation",
+   "anchors": [
+    "1-open-the-invitation",
+    "2-sign-in-with-the-invited-address",
+    "3-add-your-agency-details",
+    "4-add-your-contact-details",
+    "5-wait-for-review",
+    "6-start-working",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/agency-partners/add-affiliate-account",
+   "anchors": [
+    "agency-and-affiliate-accounts-stay-separate",
+    "1-open-the-affiliate-sign-up-page",
+    "2-add-your-network-details-and-postback-urls",
+    "3-wait-for-approval",
+    "4-switch-between-your-accounts",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/agency-partners/campaigns-for-affiliates",
+   "anchors": [
+    "1-connect-your-affiliate-partners",
+    "2-engage-your-agency-and-let-it-create-campaigns",
+    "3-the-agency-creates-a-campaign-for-the-affiliate",
+    "4-what-each-of-you-sees-on-the-campaigns-page",
+    "you-the-customer",
+    "the-agency",
+    "the-affiliate",
+    "side-by-side",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/agency-partners/control-agency-access",
+   "anchors": [
+    "1-open-the-access-panel",
+    "2-choose-their-screens-and-actions",
+    "3-choose-how-much-data",
+    "4-save",
+    "what-the-agency-sees-when-a-switch-is-off",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/agency-partners/create-campaign-link",
+   "anchors": [
+    "before-you-start",
+    "1-ask-the-customer-to-turn-on-link-creation",
+    "2-open-the-customer’s-project",
+    "3-create-the-campaign",
+    "4-pick-the-ad-channel",
+    "5-copy-your-link",
+    "6-test-before-launch",
+    "troubleshooting",
+    "the-create-link-button-is-missing",
+    "the-customers-project-does-not-appear",
+    "this-customer-has-not-granted-your-agency-permission-to-create-campaigns",
+    "your-access-is-limited-to-specific-networks",
+    "ads-accounts-are-not-shared-with-you",
+    "ads-account-required"
+   ]
+  },
+  {
+   "path": "/agency-partners/edit-campaign",
+   "anchors": [
+    "before-you-start",
+    "1-open-the-campaign",
+    "2-change-the-details",
+    "3-save",
+    "what-you-can’t-change",
+    "troubleshooting",
+    "you-cant-make-this-change",
+    "the-campaign-is-not-in-your-list",
+    "deep-link-error",
+    "you-need-to-switch-off-or-delete-the-campaign"
+   ]
+  },
+  {
+   "path": "/agency-partners/invite-an-agency",
+   "anchors": [
+    "1-open-the-members-page",
+    "2-pick-an-agency-or-invite-a-new-one",
+    "from-the-directory",
+    "by-email",
+    "3-track-the-engagement",
+    "4-give-them-access",
+    "from-the-integrations-page",
+    "invite-one-that-is-not-on-linkrunner-yet",
+    "end-an-engagement",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/agency-partners/manage-workspace",
+   "anchors": [
+    "agency-details",
+    "your-team",
+    "working-across-customers",
+    "when-an-engagement-ends",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/agency-partners/overview",
+   "anchors": [
+    "overview",
+    "how-an-engagement-starts",
+    "what-you-can-see",
+    "next-steps"
+   ]
+  },
+  {
+   "path": "/ai-agent-skills",
+   "anchors": [
+    "install",
+    "supported-platforms",
+    "beyond-sdk-integration",
+    "create-the-project-from-a-chat",
+    "options",
+    "what-gets-installed"
+   ]
+  },
+  {
+   "path": "/analytics-integrations/amplitude",
+   "anchors": [
+    "how-attribution-properties-work",
+    "configure-the-automatic-integration",
+    "1-add-your-amplitude-api-key",
+    "2-match-the-user-ids-at-signup-or-login",
+    "android-kotlin",
+    "ios-swift",
+    "react-native",
+    "flutter",
+    "send-attribution-before-login",
+    "apply-the-available-campaign",
+    "android-kotlin-2",
+    "ios-swift-2",
+    "react-native-2",
+    "flutter-2",
+    "handle-attribution-that-is-not-ready",
+    "verify-event-level-attribution",
+    "troubleshooting",
+    "the-profile-has-attribution-but-the-chart-shows-none",
+    "the-properties-are-missing-on-later-events-too",
+    "does-sync-with-amplitude-repair-earlier-events"
+   ]
+  },
+  {
+   "path": "/analytics-integrations/braze",
+   "anchors": [
+    "how-it-works",
+    "example",
+    "prerequisites",
+    "steps-to-setup",
+    "android-kotlin",
+    "ios-swift",
+    "react-native",
+    "flutter",
+    "viewing-attribution-data"
+   ]
+  },
+  {
+   "path": "/analytics-integrations/clevertap",
+   "anchors": [
+    "how-it-works",
+    "example",
+    "prerequisites",
+    "steps-to-setup",
+    "android-kotlin",
+    "ios-swift",
+    "react-native",
+    "flutter",
+    "viewing-attribution-data"
+   ]
+  },
+  {
+   "path": "/analytics-integrations/ga4",
+   "anchors": [
+    "how-does-it-work",
+    "minimum-sdk-versions",
+    "steps-to-setup",
+    "1-set-ga4-integration-in-linkrunner",
+    "2-retrieve-app-instance-id-in-linkrunner-sdk",
+    "android-kotlin",
+    "ios-swift",
+    "react-native",
+    "flutter",
+    "3-retrieve-ga4-session-id-in-linkrunner-sdk",
+    "android-kotlin-2",
+    "ios-swift-2",
+    "react-native-2",
+    "flutter-2",
+    "4-validate-the-ga4-integration"
+   ]
+  },
+  {
+   "path": "/analytics-integrations/mixpanel",
+   "anchors": [
+    "how-it-works",
+    "example",
+    "prerequisites",
+    "steps-to-setup",
+    "android-kotlin",
+    "ios-swift",
+    "react-native",
+    "flutter",
+    "viewing-attribution-data"
+   ]
+  },
+  {
+   "path": "/analytics-integrations/moengage",
+   "anchors": [
+    "how-it-works",
+    "example",
+    "prerequisites",
+    "steps-to-setup",
+    "android-kotlin",
+    "ios-swift",
+    "react-native",
+    "flutter",
+    "viewing-attribution-data"
+   ]
+  },
+  {
+   "path": "/analytics-integrations/netcore",
+   "anchors": [
+    "how-it-works",
+    "example",
+    "prerequisites",
+    "steps-to-setup",
+    "android-kotlin",
+    "ios-swift",
+    "react-native",
+    "flutter",
+    "viewing-attribution-data"
+   ]
+  },
+  {
+   "path": "/analytics-integrations/posthog",
+   "anchors": [
+    "how-it-works",
+    "example",
+    "prerequisites",
+    "steps-to-setup",
+    "android-kotlin",
+    "ios-swift",
+    "react-native",
+    "flutter",
+    "viewing-attribution-data"
+   ]
+  },
+  {
+   "path": "/analytics-integrations/revenuecat",
+   "anchors": [
+    "how-it-works",
+    "prerequisites",
+    "steps-to-setup",
+    "event-type-mapping",
+    "event-status-mapping",
+    "viewing-revenue-data"
+   ]
+  },
+  {
+   "path": "/analytics-integrations/webengage",
+   "anchors": [
+    "how-it-works",
+    "example",
+    "prerequisites",
+    "steps-to-set-up",
+    "viewing-attribution-data"
+   ]
+  },
+  {
+   "path": "/api-reference/campaign-apis",
+   "anchors": [
+    "base-url",
+    "authentication",
+    "api-key-header",
+    "obtaining-your-api-key",
+    "error-responses",
+    "rate-limit-details",
+    "endpoints",
+    "1-list-campaigns",
+    "2-create-campaign",
+    "request",
+    "request-body-examples",
+    "request-parameters",
+    "domain-and-store-listing-features",
+    "response",
+    "response-properties",
+    "3-edit-campaign",
+    "request-2",
+    "request-body",
+    "responses",
+    "success-response",
+    "error-responses-2",
+    "4-delete-campaign",
+    "request-3",
+    "responses-2",
+    "success-response-2",
+    "error-responses-3",
+    "best-practices",
+    "examples",
+    "creating-a-new-campaign",
+    "editing-a-campaign",
+    "deleting-a-campaign",
+    "error-handling",
+    "domain-and-store-listing-specific-errors",
+    "custom-channel-specific-errors"
+   ]
+  },
+  {
+   "path": "/api-reference/ctv-impressions",
+   "anchors": [
+    "endpoint",
+    "authentication",
+    "parameters",
+    "responses",
+    "status-codes",
+    "examples",
+    "retries-and-deduplication"
+   ]
+  },
+  {
+   "path": "/api-reference/data-apis",
+   "anchors": [
+    "base-url",
+    "authentication",
+    "error-responses",
+    "rate-limit-details",
+    "authentication-2",
+    "api-key-header",
+    "obtaining-your-api-key",
+    "endpoints",
+    "1-list-campaigns",
+    "request",
+    "query-parameters",
+    "channel-filter-behavior"
+   ]
+  },
+  {
+   "path": "/api-reference/event-capture",
+   "anchors": [
+    "base-url",
+    "authentication",
+    "capture-event",
+    "request-body",
+    "end-user-ip-address",
+    "website-events",
+    "responses",
+    "sample-response",
+    "common-event-names",
+    "revenue-sharing-with-ad-networks",
+    "best-practices",
+    "example",
+    "tracking-a-purchase-event",
+    "error-handling",
+    "meta-ecommerce-events",
+    "example-ecommerce-payload"
+   ]
+  },
+  {
+   "path": "/api-reference/reporting-campaigns",
+   "anchors": [
+    "base-url",
+    "authentication",
+    "postman-collection",
+    "rate-limit-and-freshness",
+    "endpoint",
+    "example-request",
+    "curl",
+    "google-apps-script",
+    "response",
+    "query-parameters",
+    "event-columns",
+    "example-two-events-with-cost-per-and-distinct-users",
+    "errors",
+    "troubleshooting",
+    "campaigns-created-outside-my-from-to-range-are-in-the-response",
+    "429-too-many-requests-on-the-second-call",
+    "numbers-dont-match-the-dashboard",
+    "typescript-types"
+   ]
+  },
+  {
+   "path": "/api-reference/reporting-web-campaigns",
+   "anchors": [
+    "base-url",
+    "authentication",
+    "postman-collection",
+    "rate-limit-and-freshness",
+    "endpoint",
+    "example-request",
+    "curl",
+    "google-apps-script",
+    "response",
+    "query-parameters",
+    "grouping",
+    "row-fields",
+    "custom-events",
+    "ad-network-hierarchy",
+    "errors",
+    "troubleshooting",
+    "403-web-campaigns-not-enabled-for-this-project",
+    "429-too-many-requests-on-the-second-call",
+    "pagination-truncated-is-true",
+    "numbers-dont-match-the-dashboard",
+    "typescript-types"
+   ]
+  },
+  {
+   "path": "/api-reference/revenue-tracking",
+   "anchors": [
+    "base-url",
+    "authentication",
+    "capture-payment",
+    "request-body",
+    "payment-types",
+    "payment-status",
+    "end-user-ip-address",
+    "website-payments",
+    "responses",
+    "sample-response",
+    "remove-captured-payment",
+    "request-body-2",
+    "responses-2",
+    "meta-ecommerce-events"
+   ]
+  },
+  {
+   "path": "/api-reference/s2s-clicks",
+   "anchors": [
+    "endpoint",
+    "authentication",
+    "parameters",
+    "responses",
+    "status-codes",
+    "examples",
+    "retries-and-deduplication"
+   ]
+  },
+  {
+   "path": "/api-reference/s2s-impressions",
+   "anchors": [
+    "endpoint",
+    "authentication",
+    "parameters",
+    "responses",
+    "status-codes",
+    "examples",
+    "retries-and-deduplication"
+   ]
+  },
+  {
+   "path": "/billing/finance-role",
+   "anchors": [
+    "what-a-finance-member-can-do",
+    "what-a-finance-member-cannot-see",
+    "add-a-finance-member",
+    "good-to-know"
+   ]
+  },
+  {
+   "path": "/billing/overview",
+   "anchors": [
+    "pricing-plans",
+    "billable-installs",
+    "retargeting-&-reattribution",
+    "free-installs",
+    "volume-based-pricing",
+    "pay-after-you-use-not-before",
+    "invoices-&-payments",
+    "pay-by-bank-transfer",
+    "pay-by-card-upi-or-netbanking",
+    "pay-from-your-wallet",
+    "what-happens-when-an-invoice-is-overdue",
+    "billing-setup"
+   ]
+  },
+  {
+   "path": "/billing/wallet",
+   "anchors": [
+    "1-add-funds",
+    "2-how-invoices-settle",
+    "3-available-vs-locked-balance",
+    "4-withdraw-funds",
+    "troubleshooting",
+    "i-added-funds-but-my-invoice-is-still-pending",
+    "my-bank-transfer-has-not-been-credited",
+    "why-cant-i-withdraw-my-whole-balance",
+    "can-i-use-the-wallet-for-a-usd-account",
+    "does-the-wallet-change-my-rate"
+   ]
+  },
+  {
+   "path": "/ecommerce-manager/google-commerce-manager",
+   "anchors": [
+    "overview",
+    "step-1-create-a-google-merchant-center-account-and-link-to-google-ads",
+    "step-2-add-products-to-google-merchant-center",
+    "step-3-match-product-ids-with-your-backend",
+    "step-4-event-mapping",
+    "understanding-event_data-for-google",
+    "required-fields",
+    "view_item",
+    "add_to_cart",
+    "ecommerce_purchase",
+    "verifying-events-in-google-ads"
+   ]
+  },
+  {
+   "path": "/ecommerce-manager/meta-commerce-manager",
+   "anchors": [
+    "overview",
+    "step-1-select-catalogue-products",
+    "step-2-verify-dataset-id-connection",
+    "step-3-required-events",
+    "understanding-event_data",
+    "required-fields-for-ecommerce-events",
+    "testing-ecommerce-events",
+    "creating-a-catalog-sales-campaign"
+   ]
+  },
+  {
+   "path": "/features/attribution-windows",
+   "anchors": [
+    "default-windows",
+    "change-a-window",
+    "limits",
+    "view-through-attribution",
+    "turn-it-on-for-a-partner",
+    "what-your-partner-can-change",
+    "what-this-does-not-cover"
+   ]
+  },
+  {
+   "path": "/features/create-trackable-link",
+   "anchors": [
+    "where-to-use-a-link",
+    "before-you-start",
+    "1-open-create-link",
+    "2-name-the-link",
+    "3-open-a-screen-in-your-app-optional",
+    "4-pick-the-ad-channel",
+    "5-set-the-link-preview-optional",
+    "6-choose-where-people-go-optional",
+    "7-advanced-options-then-create",
+    "8-share-the-link-or-qr-code",
+    "what-happens-when-someone-taps-it",
+    "assign-a-partner-to-a-link",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/features/ctv-attribution",
+   "anchors": [
+    "how-much-to-trust-it",
+    "turn-it-on-for-a-partner",
+    "send-the-partner-their-ctv-impression-url",
+    "see-your-results",
+    "turn-it-off",
+    "troubleshooting",
+    "the-partners-requests-are-rejected",
+    "impressions-are-accepted-but-no-installs-are-credited",
+    "i-dont-see-a-ctv-impression-url"
+   ]
+  },
+  {
+   "path": "/features/custom-landing-page",
+   "anchors": [
+    "when-your-pages-are-shown",
+    "how-your-page-differs-from-the-linkrunner-page",
+    "before-you-upload",
+    "add-and-approve-a-page",
+    "choose-where-each-page-shows",
+    "what-linkrunner-fixes-and-what-needs-you",
+    "change-or-stop-using-a-page",
+    "troubleshooting",
+    "i-dont-see-landing-pages-in-settings",
+    "the-report-says-something-needs-me",
+    "my-page-shows-check-failed",
+    "i-cant-pick-my-page-for-an-ad-or-campaign",
+    "a-meta-ad-set-or-ad-shows-a-different-page-than-i-picked",
+    "my-page-shows-fix-failed",
+    "there-is-no-qr-code-or-my-links-still-show-the-linkrunner-page",
+    "a-google-web-to-app-campaign-shows-the-linkrunner-page",
+    "the-wrong-element-is-used-as-the-download-button",
+    "fewer-visitors-reach-the-store-than-with-the-linkrunner-page",
+    "a-link-still-shows-the-linkrunner-page"
+   ]
+  },
+  {
+   "path": "/features/custom-store-listing",
+   "anchors": [
+    "overview",
+    "custom-store-listings",
+    "google-play-custom-store-listings",
+    "app-store-custom-product-pages",
+    "how-it-works",
+    "setting-up-custom-store-listings",
+    "step-1-create-a-custom-listing-on-google-play-/-app-store",
+    "step-2-access-store-listings-in-linkrunner",
+    "step-3-add-the-custom-store-listing",
+    "step-4-manage-your-store-listings",
+    "using-custom-store-listings-in-campaigns",
+    "when-creating-a-campaign",
+    "best-practices"
+   ]
+  },
+  {
+   "path": "/features/data-export",
+   "anchors": [
+    "export-a-whole-project",
+    "export-a-single-campaign",
+    "install-attribution-or-retargeting",
+    "the-four-datasets",
+    "which-overall-data-should-i-pick",
+    "sample-files",
+    "reading-the-numbers-correctly",
+    "ad-set-and-creative-totals-come-out-lower-than-the-dashboard",
+    "sign-ups-shows-a-number-on-one-row-and-0-on-the-rest",
+    "columns-marked-per-day-not-summable",
+    "rows-showing-0",
+    "meta-and-google-ios-campaigns-stop-at-campaign-level",
+    "apple-search-ads-shows-keywords-instead-of-creatives",
+    "gaid-is-empty-for-ios-users-and-idfa-is-empty-for-most-of-them",
+    "campaign-columns-in-a-project-level-user-export-say-latest",
+    "how-the-file-reaches-you",
+    "limits",
+    "currency",
+    "who-can-export",
+    "common-questions",
+    "how-long-does-an-export-take",
+    "can-i-export-more-than-3-months-at-once",
+    "why-did-i-get-an-email-saying-no-rows-matched",
+    "do-filters-apply-to-the-export",
+    "my-export-failed-and-the-email-said-it-was-too-large",
+    "i-clicked-export-several-times-and-nothing-happened"
+   ]
+  },
+  {
+   "path": "/features/deactivate-campaign-link",
+   "anchors": [
+    "before-you-start",
+    "choose-how-to-deactivate",
+    "deactivate-a-link",
+    "check-the-result",
+    "reactivate-a-link",
+    "webhooks-and-the-data-api",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/features/deep-link-management",
+   "anchors": [
+    "before-you-start",
+    "choose-a-link-type",
+    "track-the-link-as-a-campaign",
+    "use-a-deep-link-without-campaign-reporting",
+    "get-attribution-data",
+    "testing",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/features/deep-linking-setup",
+   "anchors": [
+    "http/https-deep-linking",
+    "step-1-create-verification-config-files",
+    "android",
+    "ios",
+    "create-the-digital-asset-links-file",
+    "get-your-app’s-sha-256-fingerprint",
+    "create-the-apple-app-site-association-file",
+    "step-2-save-verification-config-in-linkrunner",
+    "step-3-update-native-configuration",
+    "android-2",
+    "ios-2",
+    "enable-install-detection-continue-to-app-popup",
+    "step-4-configure-navigation",
+    "react-native",
+    "flutter",
+    "custom-uri-schemes",
+    "native-configuration",
+    "android-3",
+    "ios-3",
+    "testing-your-deep-links",
+    "android-4",
+    "ios-4",
+    "web",
+    "debugging-domain-verification",
+    "android-5",
+    "ios-5",
+    "troubleshooting",
+    "links-open-in-the-browser-instead-of-the-app-android",
+    "works-with-a-debug-build-but-not-the-release-build-android",
+    "universal-links-dont-open-the-app-ios",
+    "i-updated-the-verification-files-but-nothing-changed",
+    "custom-uri-scheme-doesnt-open-the-app"
+   ]
+  },
+  {
+   "path": "/features/deferred-deep-linking",
+   "anchors": [
+    "quick-example",
+    "setup",
+    "1-create-campaign-with-deep-link",
+    "2-handle-in-your-app",
+    "android",
+    "ios",
+    "react-native",
+    "flutter",
+    "expo",
+    "common-use-cases",
+    "testing",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/features/events-tab",
+   "anchors": [
+    "events-funnel",
+    "building-a-funnel",
+    "reading-the-chart",
+    "managing-saved-funnels",
+    "events-log",
+    "inspecting-a-single-event",
+    "payment-events",
+    "your-events",
+    "what-to-use-this-for",
+    "troubleshooting",
+    "my-event-is-not-in-the-events-log",
+    "i-cannot-save-my-funnel",
+    "an-event-shows-in-your-events-but-my-funnel-returns-no-users",
+    "payment-fields-are-empty-on-a-payment-event"
+   ]
+  },
+  {
+   "path": "/features/fraud-control",
+   "anchors": [
+    "what-you-get",
+    "get-started-in-five-steps",
+    "choose-what-happens-when-a-rule-matches",
+    "read-the-overview",
+    "see-where-it-comes-from",
+    "create-a-rule",
+    "start-from-a-template",
+    "describe-it-in-plain-english",
+    "build-it-by-hand",
+    "check-the-impact-before-you-save",
+    "manage-rules",
+    "rules-managed-by-linkrunner",
+    "how-a-flag-carries-over",
+    "affiliate-partners",
+    "change-history",
+    "who-can-change-rules",
+    "troubleshooting",
+    "a-rule-i-saved-is-flagging-nothing",
+    "a-click-to-install-rule-is-flagging-ios-installs",
+    "my-fraud-rate-looks-too-high",
+    "an-ad-network-reports-fewer-conversions-than-before"
+   ]
+  },
+  {
+   "path": "/features/google-icm",
+   "anchors": [
+    "what-it-is",
+    "prerequisites",
+    "minimum-sdk-versions",
+    "platform-support",
+    "consent-signals",
+    "set-it-up",
+    "deferred-deep-links",
+    "upgrade-from-a-pre-icm-sdk-version",
+    "android",
+    "ios",
+    "react-native",
+    "flutter",
+    "expo",
+    "unity"
+   ]
+  },
+  {
+   "path": "/features/google-skan-setup",
+   "anchors": [
+    "prerequisites",
+    "1-prepare-your-app",
+    "update-the-sdk",
+    "add-google’s-ad-network-identifier",
+    "add-the-postback-copy-endpoints",
+    "2-create-an-ios-link-id",
+    "3-connect-your-google-ads-account",
+    "4-configure-the-skan-schema-in-linkrunner",
+    "5-map-events-to-google-ads",
+    "6-verify-the-setup",
+    "troubleshooting",
+    "no-postbacks-in-the-skan-dashboard",
+    "conversions-not-showing-in-google-ads",
+    "ios-campaign-numbers-differ-from-linkrunner"
+   ]
+  },
+  {
+   "path": "/features/ios-campaign-data-limitations",
+   "anchors": [
+    "what-changed-with-ios-privacy",
+    "affected-metrics",
+    "revenue-and-cost",
+    "user-activity",
+    "retention-and-engagement",
+    "custom-events",
+    "what-you-can-still-measure",
+    "tips-for-better-ios-measurement"
+   ]
+  },
+  {
+   "path": "/features/link-redirection",
+   "anchors": [
+    "how-it-works",
+    "routing-by-platform",
+    "in-app-browser",
+    "ios-%2F-android",
+    "desktop",
+    "what-happens",
+    "timeout-behavior",
+    "ios",
+    "android",
+    "open-in-app-popup",
+    "redirect-priority",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/features/mcp",
+   "anchors": [
+    "connect",
+    "claude",
+    "claude-code",
+    "other-mcp-clients",
+    "what-happens-when-you-sign-in",
+    "set-up-a-new-app-from-a-chat",
+    "rules-for-new-projects",
+    "what-you-can-ask",
+    "built-in-prompts",
+    "tool-reference",
+    "before-you-sign-in",
+    "account-and-setup",
+    "project-data",
+    "setup-and-delivery-checks",
+    "what-the-connector-can-read-from-your-ad-accounts",
+    "which-source-answers-which-question",
+    "what-the-connector-can-change",
+    "projects",
+    "campaigns",
+    "funnels",
+    "domains-and-store-listings",
+    "webhooks",
+    "postback-event-mappings",
+    "connect-with-a-token-existing-setups-and-chatgpt",
+    "prerequisites",
+    "1-generate-a-token",
+    "2-connect-your-client",
+    "claude-code-2",
+    "claude-desktop-and-web",
+    "codex-cli",
+    "chatgpt-web",
+    "manage-tokens",
+    "security",
+    "sign-in-connections",
+    "token-connections",
+    "both-connection-types",
+    "troubleshooting",
+    "what-this-is-not"
+   ]
+  },
+  {
+   "path": "/features/meta-install-referrer",
+   "anchors": [
+    "overview",
+    "meta-install-referrer-basic-flow",
+    "prerequisites",
+    "configure-meta-install-referrer-support",
+    "with-facebook-sdk-integrated",
+    "without-facebook-sdk-integration"
+   ]
+  },
+  {
+   "path": "/features/meta-skan-setup",
+   "anchors": [
+    "prerequisites",
+    "1-prepare-your-app",
+    "update-the-sdk",
+    "add-meta’s-ad-network-identifiers",
+    "add-the-postback-copy-endpoints",
+    "2-configure-the-skan-schema-in-linkrunner",
+    "3-map-events-to-meta",
+    "4-configure-skan-in-meta-events-manager",
+    "step-1-turn-on-skadnetwork-4-0",
+    "step-2-choose-custom-integration",
+    "step-3-add-the-fine-conversion-values",
+    "step-4-add-the-coarse-conversion-values",
+    "step-5-review-and-apply",
+    "5-create-an-ios-campaign-in-meta-ads-manager",
+    "campaign-settings",
+    "ad-set-settings",
+    "6-grant-access-to-linkrunner-optional",
+    "7-verify-the-setup",
+    "troubleshooting",
+    "no-postbacks-in-the-skan-dashboard",
+    "an-event-is-missing-from-the-meta-event-list",
+    "meta-skan-configuration-asks-for-event-mappings",
+    "conversion-values-look-wrong-in-meta",
+    "meta-still-attributes-via-the-facebook-sdk"
+   ]
+  },
+  {
+   "path": "/features/push-notification-providers",
+   "anchors": [
+    "how-it-works-with-a-provider",
+    "provider-setup",
+    "clevertap",
+    "webengage",
+    "moengage",
+    "other-providers",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/features/push-notification-tracking",
+   "anchors": [
+    "how-it-works",
+    "prerequisites",
+    "setup",
+    "android",
+    "ios",
+    "react-native",
+    "flutter",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/features/referral-codes",
+   "anchors": [
+    "before-you-start",
+    "1-create-a-referral-link",
+    "2-share-the-link",
+    "3-read-the-referral-code",
+    "android",
+    "ios",
+    "react-native",
+    "flutter",
+    "4-record-the-referral",
+    "see-referral-results",
+    "testing",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/features/remarketing",
+   "anchors": [
+    "how-reattribution-works",
+    "reattribution-triggers",
+    "viewing-returning-users",
+    "push-notification-campaigns",
+    "understanding-the-windows",
+    "inactivity-window",
+    "reattribution-window"
+   ]
+  },
+  {
+   "path": "/features/remarketing-audience-events",
+   "anchors": [
+    "meta",
+    "prerequisites",
+    "steps",
+    "google",
+    "prerequisites-2",
+    "steps-2"
+   ]
+  },
+  {
+   "path": "/features/remarketing-audience-segments",
+   "anchors": []
+  },
+  {
+   "path": "/features/remarketing-audience-upload",
+   "anchors": [
+    "google",
+    "1-prepare-your-data",
+    "2-upload-to-google-ads",
+    "navigate-to-audience-manager",
+    "create-a-new-customer-list",
+    "configure-the-list",
+    "meta",
+    "1-prepare-your-data-2",
+    "2-upload-to-meta-ads",
+    "navigate-to-the-audiences-dashboard",
+    "create-a-custom-audience",
+    "choose-your-source",
+    "set-up-your-list",
+    "map-your-identifiers"
+   ]
+  },
+  {
+   "path": "/features/remarketing-campaigns",
+   "anchors": [
+    "meta",
+    "prerequisites",
+    "steps",
+    "google",
+    "prerequisites-2",
+    "steps-2"
+   ]
+  },
+  {
+   "path": "/features/remarketing-guide",
+   "anchors": []
+  },
+  {
+   "path": "/features/retention",
+   "anchors": [
+    "what-is-app-retention-rate",
+    "how-is-retention-rate-calculated",
+    "cumulative-vs-classic-vs-rolling-retention-what-is-the-difference",
+    "a-worked-retention-example",
+    "day-1",
+    "day-7",
+    "what-does-a-date-filter-do",
+    "which-retention-metric-should-you-use",
+    "which-retention-windows-are-available",
+    "what-details-affect-the-retention-numbers",
+    "how-is-the-cohort-size-counted",
+    "glossary",
+    "frequently-asked-questions",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/features/send-consent",
+   "anchors": [
+    "what-this-consent-is-for",
+    "the-three-signals",
+    "what-to-report",
+    "user-outside-the-eea%2C-uk%2C-switzerland",
+    "user-inside-the-eea%2C-uk%2C-switzerland",
+    "you-do-not-know-yet",
+    "collecting-consent",
+    "android",
+    "ios",
+    "react-native",
+    "flutter",
+    "expo",
+    "unity"
+   ]
+  },
+  {
+   "path": "/features/skadnetwork-conversion-values",
+   "anchors": [
+    "what-are-conversion-values",
+    "how-conversion-values-work-in-skan-4-0",
+    "three-measurement-windows",
+    "conversion-value-updates",
+    "fine-vs-coarse-conversion-values",
+    "fine-conversion-values",
+    "coarse-conversion-values",
+    "privacy-thresholds",
+    "designing-your-conversion-value-schema",
+    "step-1-identify-key-user-actions",
+    "step-2-prioritize-actions-by-business-value",
+    "step-3-map-actions-to-conversion-values",
+    "step-4-align-with-coarse-values",
+    "example-conversion-value-schemas",
+    "e-commerce-app-example",
+    "subscription-app-example",
+    "gaming-app-example",
+    "best-practices",
+    "common-pitfalls-to-avoid",
+    "privacy-considerations",
+    "next-steps"
+   ]
+  },
+  {
+   "path": "/features/skadnetwork-integration",
+   "anchors": [
+    "1-prepare-your-app",
+    "minimum-sdk-versions",
+    "how-the-sdk-updates-conversion-values",
+    "add-ad-network-identifiers",
+    "configure-postback-copies-to-linkrunner",
+    "native-ios-flutter-and-react-native",
+    "expo",
+    "2-configure-the-skan-schema",
+    "3-complete-your-ad-network-setup",
+    "support"
+   ]
+  },
+  {
+   "path": "/features/skan-dashboard/conversion-table",
+   "anchors": [
+    "overview",
+    "table-structure",
+    "column-descriptions",
+    "postback-sequence-toggle",
+    "postback-1-0-2-days",
+    "postback-2-3-7-days",
+    "postback-3-8-35-days",
+    "how-to-read-the-table",
+    "simple-event-names",
+    "events-with-ranges",
+    "special-case-install-event",
+    "comparing-across-postbacks",
+    "common-questions",
+    "why-do-i-not-have-data-in-2nd-and-3rd-postback-filters",
+    "related-components",
+    "need-help"
+   ]
+  },
+  {
+   "path": "/features/skan-dashboard/conversion-values",
+   "anchors": [
+    "overview",
+    "postback-sequences",
+    "postback-1-p1--days-0-2",
+    "postback-2-p2--days-3-7",
+    "postback-3-p3--days-8-35",
+    "conversion-value-types",
+    "fine-conversion-values-0-63",
+    "coarse-conversion-values-low/medium/high",
+    "switching-between-views",
+    "setting-up-conversion-values",
+    "common-questions",
+    "why-are-there-no-fine-conversion-values-in-p2-and-p3",
+    "what-do-the-numbers-0-63-in-the-grid-mean",
+    "what-do-high-medium-and-low-mean",
+    "why-do-i-not-have-data-in-2nd-and-3rd-postback-filters",
+    "related"
+   ]
+  },
+  {
+   "path": "/features/skan-dashboard/overview",
+   "anchors": [
+    "skan-dashboard",
+    "dashboard-components",
+    "1-stats-overview-cards",
+    "2-privacy-tier-breakdown",
+    "3-conversion-value-distribution",
+    "4-install-trends-over-time",
+    "5-all-conversion-values-table",
+    "dashboard-filters",
+    "date-range-filter",
+    "channel-filter",
+    "faqs",
+    "why-are-my-conversion-values-null",
+    "can-i-see-skan-dashboard-even-if-skan-configuration-is-not-done-on-linkrunner",
+    "i-have-set-up-conversion-values-but-still-there-is-no-data-on-the-skan-dashboard",
+    "related-resources",
+    "need-help"
+   ]
+  },
+  {
+   "path": "/features/skan-dashboard/privacy-tiers",
+   "anchors": [
+    "what-is-crowd-anonymity",
+    "how-apple-determines-your-privacy-tier",
+    "what-data-you-receive-at-each-tier",
+    "tier-3-best-data",
+    "tier-2",
+    "tier-1",
+    "tier-0-minimal-data",
+    "related"
+   ]
+  },
+  {
+   "path": "/features/skan-dashboard/stats-cards",
+   "anchors": [
+    "overview",
+    "metrics",
+    "installs-skan",
+    "reinstalls-skan",
+    "conversion-value-null-count",
+    "conversion-value-null-rate",
+    "related-components"
+   ]
+  },
+  {
+   "path": "/features/skan-dashboard/trend-graph",
+   "anchors": [
+    "overview",
+    "filtering-by-events",
+    "how-to-filter-by-events",
+    "understanding-event-filters",
+    "multiple-event-selection",
+    "special-filter-“install”-event",
+    "removing-event-filters",
+    "related-components"
+   ]
+  },
+  {
+   "path": "/features/social-media-intermediary-page",
+   "anchors": [
+    "the-problem",
+    "how-linkrunner-solves-this",
+    "customising-the-page"
+   ]
+  },
+  {
+   "path": "/features/subdomain-setup",
+   "anchors": [
+    "step-1-—-choose-a-subdomain",
+    "step-2-—-add-a-cname-record",
+    "provider-specific-guides",
+    "godaddy",
+    "aws-route-53",
+    "namecheap",
+    "cloudflare",
+    "step-3-—-verification",
+    "troubleshooting",
+    "managing-subdomains"
+   ]
+  },
+  {
+   "path": "/features/uninstall-tracking",
+   "anchors": [
+    "how-does-it-work",
+    "setup"
+   ]
+  },
+  {
+   "path": "/features/users-tab",
+   "anchors": [
+    "finding-a-user",
+    "the-user-profile",
+    "user-information",
+    "journey",
+    "hashed-and-identified-users",
+    "exporting-users",
+    "cohorts",
+    "saving-a-cohort-from-your-filters",
+    "building-a-cohort-from-scratch",
+    "using-a-cohort",
+    "what-to-use-this-for",
+    "troubleshooting",
+    "a-user-i-expect-to-see-is-not-in-the-table",
+    "every-row-shows-hashed",
+    "the-journey-is-empty-for-a-user",
+    "my-cohort-has-more-users-in-it-than-the-table-showed"
+   ]
+  },
+  {
+   "path": "/features/web-to-app-journeys",
+   "anchors": [
+    "how-linkrunner-bridges-web-and-app",
+    "prerequisites",
+    "app-already-installed",
+    "app-not-installed",
+    "reading-the-full-journey",
+    "metrics-and-where-they-live",
+    "troubleshooting",
+    "related-guides"
+   ]
+  },
+  {
+   "path": "/features/webhooks",
+   "anchors": [
+    "overview",
+    "configuration",
+    "allowlisting-linkrunner-ips",
+    "webhook-events",
+    "install-webhook",
+    "signup-webhook",
+    "payload-structure",
+    "headers",
+    "body-parameters",
+    "install-id",
+    "meta-campaign-details",
+    "google-campaign-details",
+    "apple-search-ads-details",
+    "campaign-details",
+    "device-data",
+    "location-data",
+    "additional-data",
+    "example-payloads",
+    "install-event",
+    "install-event-organic",
+    "signup-event",
+    "website-events",
+    "website-payload",
+    "website-sign-up-example",
+    "authentication",
+    "slack-integration",
+    "retry-behavior",
+    "best-practices",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/features/website-projects",
+   "anchors": [
+    "create-a-website-project",
+    "add-your-app-later",
+    "track-your-website-in-an-app-project",
+    "find-your-web-project-token"
+   ]
+  },
+  {
+   "path": "/integrations/everflow",
+   "anchors": [
+    "overview",
+    "how-it-works",
+    "what-you-need-from-everflow",
+    "1-connect-everflow-in-linkrunner",
+    "which-conversion-is-your-base-conversion",
+    "2-create-your-events-in-everflow",
+    "3-map-your-events-in-linkrunner",
+    "4-create-an-everflow-campaign-and-copy-the-link",
+    "5-add-the-link-to-your-everflow-offer",
+    "6-test",
+    "postbacks-linkrunner-sends",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/introduction",
+   "anchors": [
+    "key-features",
+    "get-started",
+    "sdks",
+    "mobile",
+    "hybrid",
+    "web",
+    "ad-network-integrations",
+    "analytics-&-martech",
+    "build-with-the-api",
+    "stay-in-touch"
+   ]
+  },
+  {
+   "path": "/quickstart",
+   "anchors": [
+    "1-create-a-project-&-get-your-token",
+    "2-install-the-sdk",
+    "react-native",
+    "flutter",
+    "ios",
+    "android",
+    "expo",
+    "capacitor",
+    "cordova",
+    "unity",
+    "3-initialize-the-sdk-required",
+    "react-native-2",
+    "flutter-2",
+    "ios-2",
+    "android-2",
+    "web",
+    "4-identify-the-user-required",
+    "react-native-3",
+    "flutter-3",
+    "ios-3",
+    "android-3",
+    "5-handle-deep-links",
+    "6-verify-your-setup",
+    "what-to-build-next",
+    "need-help"
+   ]
+  },
+  {
+   "path": "/sdk-less/android-device-data",
+   "anchors": [
+    "dependencies",
+    "permissions-and-queries",
+    "what-to-send",
+    "advertising-id-gaid",
+    "google-play-install-referrer",
+    "meta-install-referrer",
+    "everything-else"
+   ]
+  },
+  {
+   "path": "/sdk-less/android-minimal",
+   "anchors": [
+    "dependencies",
+    "permissions",
+    "linkrunnerminimal-kt",
+    "using-it"
+   ]
+  },
+  {
+   "path": "/sdk-less/android-quickstart",
+   "anchors": [
+    "1-add-dependencies",
+    "2-add-permissions-and-queries",
+    "3-add-the-device-data-collector",
+    "4-add-the-client",
+    "5-initialize-and-read-attribution",
+    "6-identify-the-user",
+    "7-track-events-and-payments",
+    "other-endpoints",
+    "retries-and-idempotency",
+    "troubleshooting",
+    "attribution-data-is-always-organic",
+    "events-or-payments-do-not-appear",
+    "every-install-looks-like-the-same-device-or-location",
+    "429-responses"
+   ]
+  },
+  {
+   "path": "/sdk-less/api-reference",
+   "anchors": [
+    "authentication",
+    "common-fields",
+    "rules",
+    "init",
+    "attribution-data",
+    "trigger-signup",
+    "set-user-data",
+    "capture-event",
+    "capture-payment",
+    "remove-captured-payment",
+    "update-push-token",
+    "integrations",
+    "handle-deeplink",
+    "errors"
+   ]
+  },
+  {
+   "path": "/sdk-less/introduction",
+   "anchors": [
+    "how-it-works",
+    "key-concepts",
+    "project-token",
+    "install-instance-id",
+    "two-things-that-break-attribution",
+    "integrate-on-android",
+    "integrate-on-ios",
+    "reference"
+   ]
+  },
+  {
+   "path": "/sdk-less/ios-device-data",
+   "anchors": [
+    "info-plist",
+    "what-to-send",
+    "apple-search-ads-attribution-token",
+    "advertising-id-idfa",
+    "vendor-id-idfv",
+    "skadnetwork",
+    "everything-else"
+   ]
+  },
+  {
+   "path": "/sdk-less/ios-minimal",
+   "anchors": [
+    "linkrunnerminimal-swift",
+    "using-it"
+   ]
+  },
+  {
+   "path": "/sdk-less/ios-quickstart",
+   "anchors": [
+    "1-configure-info-plist",
+    "2-add-the-client",
+    "3-initialize-and-read-attribution",
+    "4-identify-the-user",
+    "5-track-events-and-payments",
+    "other-endpoints",
+    "skadnetwork",
+    "retries-and-idempotency",
+    "troubleshooting",
+    "attribution-data-is-always-organic",
+    "idfa-is-always-empty",
+    "events-or-payments-do-not-appear",
+    "every-install-looks-like-the-same-device-or-location"
+   ]
+  },
+  {
+   "path": "/sdk/android",
+   "anchors": [
+    "requirements",
+    "installation",
+    "step-1-gradle-setup",
+    "step-2-required-permissions",
+    "step-3-backup-configuration",
+    "adding-backup-rules-to-your-app",
+    "merging-backup-rules",
+    "step-4-encrypted-sharedpreferences",
+    "step-5-revoking-the-ad_id-permission-optional",
+    "importing-in-kotlin/java",
+    "initialization-required",
+    "sdk-signing-parameters-optional",
+    "setting-the-customer-user-id",
+    "user-identification-required",
+    "handle-deeplink",
+    "getting-attribution-data",
+    "setting-user-data",
+    "setting-clevertap-id",
+    "revenue-tracking",
+    "capturing-payments",
+    "available-payment-types",
+    "available-payment-statuses",
+    "removing-payments",
+    "tracking-custom-events",
+    "parameters-for-linkrunner-getinstance-trackevent",
+    "revenue-sharing-with-ad-networks",
+    "ecommerce-events",
+    "add-to-cart-example",
+    "view-content-example",
+    "payment-/-purchase-example",
+    "google-ads-consent",
+    "enhanced-privacy-controls",
+    "disabling-aaid-collection",
+    "disable-aaid-collection",
+    "removing-ad_id-permission",
+    "uninstall-tracking",
+    "before-you-begin",
+    "android",
+    "fcm-http-v1-api",
+    "linkrunner-dashboard",
+    "integrate-with-linkrunner-sdk",
+    "function-placement-guide",
+    "complete-example",
+    "next-steps",
+    "support"
+   ]
+  },
+  {
+   "path": "/sdk/appbrew",
+   "anchors": [
+    "requirements",
+    "1-install",
+    "2-register-the-tracker",
+    "3-configure-in-the-appbrew-dashboard",
+    "4-native-setup",
+    "android",
+    "ios",
+    "what-the-tracker-does-on-its-own",
+    "using-the-attribution-api",
+    "getting-attribution-data",
+    "consent",
+    "push-notifications",
+    "handling-deep-links-yourself",
+    "extra-user-fields",
+    "function-placement-guide",
+    "testing",
+    "troubleshooting"
+   ]
+  },
+  {
+   "path": "/sdk/capacitor",
+   "anchors": [
+    "installation",
+    "step-1-install-the-package",
+    "step-2-sync-native-projects",
+    "step-3-ios-configuration",
+    "step-4-skadnetwork-configuration",
+    "step-5-android-backup-configuration",
+    "step-6-android-kotlin-configuration",
+    "initialization-required",
+    "sdk-signing-parameters-optional",
+    "setting-the-customer-user-id",
+    "user-identification-required",
+    "handle-deeplink",
+    "getting-attribution-data",
+    "setting-user-data",
+    "setting-clevertap-id",
+    "parameters-for-linkrunner-setadditionaldata",
+    "revenue-tracking",
+    "capture-payment",
+    "parameters-for-linkrunner-capturepayment",
+    "removing-payments",
+    "parameters-for-linkrunner-removepayment",
+    "tracking-custom-events",
+    "parameters-for-linkrunner-trackevent",
+    "revenue-sharing-with-ad-networks",
+    "enhanced-privacy-controls",
+    "uninstall-tracking",
+    "before-you-begin",
+    "android",
+    "fcm-http-v1-api",
+    "linkrunner-dashboard",
+    "integrate-with-linkrunner-sdk",
+    "ios",
+    "apple-developer-portal",
+    "linkrunner-dashboard-1",
+    "integrate-with-linkrunner-sdk-1",
+    "function-placement-guide",
+    "next-steps",
+    "support"
+   ]
+  },
+  {
+   "path": "/sdk/cordova",
+   "anchors": [
+    "installation",
+    "step-1-add-prerequisites-to-config-xml",
+    "step-2-install-the-plugin",
+    "what-the-plugin-auto-configures",
+    "initialization-required",
+    "sdk-signing-parameters-optional",
+    "setting-the-customer-user-id",
+    "user-identification-required",
+    "handle-deeplink",
+    "cold-start",
+    "warm-start",
+    "getting-attribution-data",
+    "setting-user-data",
+    "setting-clevertap-id",
+    "parameters-for-linkrunner-setadditionaldata",
+    "revenue-tracking",
+    "capture-payment",
+    "parameters-for-linkrunner-capturepayment",
+    "removing-payments",
+    "parameters-for-linkrunner-removepayment",
+    "ecommerce-events",
+    "add-to-cart-example",
+    "view-content-example",
+    "payment-/-purchase-example",
+    "tracking-custom-events",
+    "parameters-for-linkrunner-trackevent",
+    "revenue-sharing-with-ad-networks",
+    "enhanced-privacy-controls",
+    "uninstall-tracking",
+    "before-you-begin",
+    "android",
+    "fcm-http-v1-api",
+    "linkrunner-dashboard",
+    "integrate-with-linkrunner-sdk",
+    "ios",
+    "apple-developer-portal",
+    "linkrunner-dashboard-1",
+    "integrate-with-linkrunner-sdk-1",
+    "function-placement-guide",
+    "next-steps",
+    "support"
+   ]
+  },
+  {
+   "path": "/sdk/expo",
+   "anchors": [
+    "requirements",
+    "installation",
+    "step-1-install-both-packages",
+    "step-2-add-plugin-to-app-json",
+    "what-the-expo-linkrunner-plugin-does",
+    "step-3-prebuild-your-project",
+    "step-4-android-backup-configuration",
+    "google-integrated-conversion-measurement-optional",
+    "sdk-usage",
+    "function-placement-guide",
+    "migration-guide",
+    "architecture-changes",
+    "breaking-changes",
+    "migration-steps",
+    "next-steps",
+    "support"
+   ]
+  },
+  {
+   "path": "/sdk/flutter",
+   "anchors": [
+    "installation",
+    "requirements",
+    "step-1-add-the-package",
+    "step-2-platform-specific-setup",
+    "android-configuration",
+    "revoking-the-ad_id-permission",
+    "backup-configuration",
+    "encrypted-sharedpreferences",
+    "ios-configuration",
+    "google-integrated-conversion-measurement-optional",
+    "verifying-your-setup",
+    "initialization-required",
+    "sdk-signing-parameters-optional",
+    "platform-specific-sdk-signing",
+    "setting-the-customer-user-id",
+    "user-identification-required",
+    "handle-deeplink",
+    "getting-attribution-data",
+    "setting-user-data",
+    "setting-clevertap-id",
+    "parameters-for-linkrunner-setadditionaldata",
+    "revenue-tracking",
+    "capturing-payments",
+    "parameters-for-lrcapturepayment",
+    "removing-payments",
+    "parameters-for-lrremovepayment",
+    "ecommerce-events",
+    "add-to-cart-example",
+    "view-content-example",
+    "payment-/-purchase-example",
+    "tracking-custom-events",
+    "parameters-for-linkrunner-trackevent",
+    "revenue-sharing-with-ad-networks",
+    "enhanced-privacy-controls",
+    "disabling-aaid-collection",
+    "disable-aaid-collection",
+    "removing-ad_id-permission",
+    "uninstall-tracking",
+    "before-you-begin",
+    "android",
+    "fcm-http-v1-api",
+    "linkrunner-dashboard",
+    "integrate-with-linkrunner-sdk",
+    "ios",
+    "apple-developer-portal",
+    "linkrunner-dashboard-1",
+    "integrate-with-linkrunner-sdk-1",
+    "function-placement-guide",
+    "complete-example",
+    "next-steps",
+    "support"
+   ]
+  },
+  {
+   "path": "/sdk/ios",
+   "anchors": [
+    "requirements",
+    "installation",
+    "swift-package-manager",
+    "importing-in-swift",
+    "required-permissions",
+    "app-tracking-transparency",
+    "skadnetwork-configuration",
+    "network-access",
+    "google-integrated-conversion-measurement-optional",
+    "cocoapods",
+    "consent",
+    "verifying-your-setup",
+    "initialization-required",
+    "sdk-signing-parameters-optional",
+    "setting-the-customer-user-id",
+    "user-identification-required",
+    "handle-deeplink",
+    "getting-attribution-data",
+    "setting-user-data",
+    "setting-clevertap-id",
+    "revenue-tracking",
+    "capturing-payments",
+    "available-payment-types",
+    "available-payment-statuses",
+    "removing-payments",
+    "tracking-custom-events",
+    "parameters-for-linkrunnersdk-shared-trackevent",
+    "revenue-sharing-with-ad-networks",
+    "ecommerce-events",
+    "add-to-cart-example",
+    "view-content-example",
+    "payment-/-purchase-example",
+    "enhanced-privacy-controls",
+    "uninstall-tracking",
+    "before-you-begin",
+    "ios",
+    "apple-developer-portal",
+    "linkrunner-dashboard",
+    "integrate-with-linkrunner-sdk",
+    "function-placement-guide",
+    "complete-example",
+    "next-steps",
+    "support"
+   ]
+  },
+  {
+   "path": "/sdk/react-native",
+   "anchors": [
+    "installation",
+    "step-1-install-the-package",
+    "step-2-ios-configuration",
+    "step-3-skadnetwork-configuration",
+    "step-4-android-backup-configuration",
+    "step-5-encrypted-sharedpreferences-android",
+    "expo-support",
+    "google-integrated-conversion-measurement-optional",
+    "verifying-your-setup",
+    "initialization-required",
+    "sdk-signing-parameters-optional",
+    "setting-the-customer-user-id",
+    "user-identification-required",
+    "handle-deeplink",
+    "getting-attribution-data",
+    "setting-user-data",
+    "setting-clevertap-id",
+    "parameters-for-linkrunner-setadditionaldata",
+    "revenue-tracking",
+    "capture-payment",
+    "parameters-for-linkrunner-capturepayment",
+    "removing-payments",
+    "parameters-for-linkrunner-removepayment",
+    "ecommerce-events",
+    "add-to-cart-example",
+    "view-content-example",
+    "payment-/-purchase-example",
+    "tracking-custom-events",
+    "parameters-for-linkrunner-trackevent",
+    "revenue-sharing-with-ad-networks",
+    "sdk-package-version",
+    "tcf-consent-collection",
+    "enhanced-privacy-controls",
+    "uninstall-tracking",
+    "before-you-begin",
+    "android",
+    "fcm-http-v1-api",
+    "linkrunner-dashboard",
+    "integrate-with-linkrunner-sdk",
+    "ios",
+    "apple-developer-portal",
+    "linkrunner-dashboard-1",
+    "integrate-with-linkrunner-sdk-1",
+    "function-placement-guide",
+    "next-steps",
+    "support"
+   ]
+  },
+  {
+   "path": "/sdk/shopify",
+   "anchors": [
+    "before-you-start",
+    "check-where-your-checkout-runs",
+    "get-your-web-project-token",
+    "back-up-your-theme",
+    "installation",
+    "function-placement-guide",
+    "track-custom-events",
+    "collect-from-your-own-subdomain",
+    "limitations-and-constraints",
+    "shop-pay-checkouts-run-on-a-different-domain",
+    "the-pixel-only-runs-on-your-published-theme",
+    "customer-privacy-settings-can-block-the-pixel",
+    "password-protected-stores",
+    "safari-clears-stored-data-after-7-days",
+    "ad-blockers-and-tracking-prevention",
+    "sdk-updates-need-no-changes",
+    "troubleshooting",
+    "no-events-at-all",
+    "page-views-appear-but-purchases-dont",
+    "purchases-appear-but-show-no-campaign",
+    "sign-ups-dont-appear",
+    "revenue-is-missing-or-zero",
+    "what-gets-tracked"
+   ]
+  },
+  {
+   "path": "/sdk/unity",
+   "anchors": [
+    "prerequisites",
+    "architecture-overview",
+    "android-setup",
+    "step-1-add-the-sdk-dependency",
+    "step-2-permissions",
+    "step-3-create-the-java-bridge",
+    "ios-setup",
+    "step-1-add-the-sdk",
+    "step-2-info-plist-configuration",
+    "step-3-create-the-swift-bridge",
+    "google-integrated-conversion-measurement-optional",
+    "verifying-your-setup",
+    "c#-wrapper",
+    "usage",
+    "scene-setup",
+    "initialization-required",
+    "user-identification-required",
+    "set-customer-user-id",
+    "handle-deeplinks",
+    "android",
+    "ios",
+    "set-user-data-on-app-open",
+    "get-attribution-data",
+    "track-events",
+    "capture-payment",
+    "remove-payment-refunds",
+    "push-token",
+    "set-additional-data",
+    "set-consent",
+    "privacy-controls",
+    "function-placement-guide",
+    "automating-ios-dependency-with-a-post-build-script",
+    "testing",
+    "troubleshooting",
+    "general"
+   ]
+  },
+  {
+   "path": "/sdk/web",
+   "anchors": [
+    "1-add-the-sdk",
+    "cdn-script-preferred",
+    "next-js-app-router",
+    "next-js-pages-router",
+    "2-identify-users-and-track-events",
+    "function-placement-guide",
+    "3-verify-the-integration",
+    "configuration",
+    "script-tag-attributes",
+    "first-party-collection",
+    "proxy-through-your-website",
+    "point-a-subdomain-at-linkrunner",
+    "attribution-storage",
+    "troubleshooting",
+    "the-sdk-says-the-token-is-invalid",
+    "page-views-are-duplicated",
+    "events-are-blocked-in-the-browser",
+    "a-payment-or-other-trusted-event-can-be-sent-from-the-browser",
+    "more-resources"
+   ]
+  },
+  {
+   "path": "/testing/event-and-revenue-testing",
+   "anchors": [
+    "choose-the-right-method",
+    "usually-send-as-a-custom-event",
+    "usually-send-with-capturepayment",
+    "before-you-test",
+    "test-flow",
+    "expected-classification",
+    "test-meta-purchase-forwarding",
+    "test-payment-removal",
+    "troubleshooting",
+    "nothing-appears-in-the-events-log",
+    "the-purchase-appears-as-a-custom-event",
+    "a-new-payment-is-missing",
+    "the-same-payment-appears-more-than-once",
+    "the-payment-status-did-not-change",
+    "meta-does-not-show-the-purchase-event"
+   ]
+  },
+  {
+   "path": "/testing/integration-testing",
+   "anchors": [
+    "overview",
+    "video-walkthrough",
+    "prerequisites",
+    "1-domain-setup-required",
+    "2-sdk-integrated-in-your-app",
+    "3-register-a-test-device-in-sdk-console",
+    "test-with-sdk-console-beta",
+    "test-flow-click-→-install-→-signup",
+    "step-1-get-a-test-device",
+    "step-2-create-a-test-campaign-in-linkrunner",
+    "step-3-test-the-click",
+    "step-4-test-the-install",
+    "step-5-test-the-signup-event-recommended",
+    "testing-remarketing",
+    "prerequisites-2",
+    "test-1-reengagement-deep-link-open",
+    "test-2-install-reattribution",
+    "troubleshooting",
+    "click-count-not-increasing",
+    "install-count-not-increasing",
+    "signup-count-not-increasing",
+    "test-device-not-showing-in-sdk-console"
+   ]
+  },
+  {
+   "path": "/testing/meta-android-attribution-testing",
+   "anchors": [
+    "before-you-start",
+    "1-prepare-a-clean-android-device",
+    "2-send-the-meta-ad-preview-to-the-device",
+    "3-install-and-open-your-app",
+    "4-call-getattributiondata",
+    "android",
+    "react-native",
+    "flutter",
+    "expected-response",
+    "troubleshooting",
+    "the-first-response-is-organic",
+    "campaign-data-is-present-but-deeplink-is-empty",
+    "the-sdk-cannot-read-meta-install-referrer",
+    "the-wrong-campaign-is-returned"
+   ]
+  },
+  {
+   "path": "/testing/testing-attribution-troubleshooting",
+   "anchors": [
+    "the-problem",
+    "why-this-happens",
+    "how-to-fix-it",
+    "1-uninstall-the-app-before-each-test",
+    "2-enable-debug-mode",
+    "react-native",
+    "flutter",
+    "ios",
+    "android",
+    "3-run-the-test-flow",
+    "still-seeing-issues"
+   ]
+  },
+  {
+   "path": "/testing/web-sdk-testing",
+   "anchors": [
+    "1-register-your-test-browser",
+    "2-test-a-sign-up",
+    "3-test-campaign-attribution",
+    "4-test-a-custom-event",
+    "5-test-a-purchase",
+    "if-something-does-not-show-up"
+   ]
+  }
+ ],
+ "redirects": [
+  {
+   "source": "/",
+   "destination": "/introduction"
+  },
+  {
+   "source": "/sdk/react-native/installation",
+   "destination": "/sdk/react-native"
+  },
+  {
+   "source": "/sdk/react-native/usage",
+   "destination": "/sdk/react-native"
+  },
+  {
+   "source": "/sdk/flutter/installation",
+   "destination": "/sdk/flutter"
+  },
+  {
+   "source": "/sdk/flutter/usage",
+   "destination": "/sdk/flutter"
+  },
+  {
+   "source": "/sdk/flutter/uninstall-tracking",
+   "destination": "/sdk/flutter"
+  },
+  {
+   "source": "/sdk/ios/installation",
+   "destination": "/sdk/ios"
+  },
+  {
+   "source": "/sdk/ios/usage",
+   "destination": "/sdk/ios"
+  },
+  {
+   "source": "/sdk/android/installation",
+   "destination": "/sdk/android"
+  },
+  {
+   "source": "/sdk/android/usage",
+   "destination": "/sdk/android"
+  },
+  {
+   "source": "/sdk/expo/installation",
+   "destination": "/sdk/expo"
+  },
+  {
+   "source": "/sdk/expo/migration-guide",
+   "destination": "/sdk/expo"
+  },
+  {
+   "source": "/sdk/deep-linking/setup",
+   "destination": "/features/deep-linking-setup"
+  },
+  {
+   "source": "/sdk/deep-linking/verification",
+   "destination": "/features/deep-linking-setup"
+  },
+  {
+   "source": "/features/deep-linking-verification",
+   "destination": "/features/deep-linking-setup"
+  },
+  {
+   "source": "/sdk/skadnetwork/integration",
+   "destination": "/features/skadnetwork-integration"
+  },
+  {
+   "source": "/sdk/skadnetwork/conversion-values",
+   "destination": "/features/skadnetwork-conversion-values"
+  },
+  {
+   "source": "/sdk/integration-testing",
+   "destination": "/testing/integration-testing"
+  },
+  {
+   "source": "/feature/custom-store-listing",
+   "destination": "/features/custom-store-listing"
+  },
+  {
+   "source": "/feature/referral-codes",
+   "destination": "/features/referral-codes"
+  },
+  {
+   "source": "/feature/deferred-deep-linking",
+   "destination": "/features/deferred-deep-linking"
+  },
+  {
+   "source": "/feature/uninstall-tracking",
+   "destination": "/features/uninstall-tracking"
+  },
+  {
+   "source": "/web-to-app/google",
+   "destination": "/ad-networks/google-ads"
+  },
+  {
+   "source": "/ad-networks/google-web-to-app",
+   "destination": "/ad-networks/google-ads"
+  },
+  {
+   "source": "/ecommerce-manager/google-merchant-center",
+   "destination": "/ecommerce-manager/google-commerce-manager"
+  },
+  {
+   "source": "/api-reference/introduction",
+   "destination": "/api-reference/data-apis"
+  }
+ ],
+ "files": [
+  "/api-reference/openapi.json",
+  "/api-reference/reporting-campaigns.postman_collection.json",
+  "/api-reference/reporting-web-campaigns.postman_collection.json"
+ ],
+ "platform": [
+  "/llms.txt",
+  "/llms-full.txt",
+  "/skill.md",
+  "/sitemap.xml",
+  "/robots.txt",
+  "/mcp"
+ ]
+}
