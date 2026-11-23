@@ -47,7 +47,7 @@ On the **Web campaigns** tab, they turn on **Edit** next to **Web campaigns**. T
 
 <Note>
 
-If the customer turns on **Only certain networks** on the Web campaigns tab, they must include your agency's own network. Otherwise you can see web campaigns but cannot create one.
+If the customer turns on **Only certain networks** on the Web campaigns tab, you can still create web campaigns. You can credit one to a partner they ticked or to no partner, but not to a partner they did not tick.
 
 </Note>
 
@@ -113,7 +113,7 @@ Ask the customer to turn on **Web campaigns → Edit** for your agency. You may 
 
 <Accordion title="&quot;The customer has turned off your access to this&quot;" description="Creating was refused when you clicked Create.">
 
-Either **Web campaigns → Edit** was turned off, or **Only certain networks** on the Web campaigns tab leaves out your agency's network. Ask the customer to check your agency's access in **Settings → Members**.
+**Web campaigns → Edit** was turned off for your agency. Ask the customer to check your agency's access in **Settings → Members**.
 
 </Accordion>
 
