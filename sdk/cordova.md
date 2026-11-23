@@ -917,6 +917,12 @@ Configure deep links for your app
 
 </Card>
 
+<Card title="Check Your Android Build" icon="shield-check" href="/testing/sdk-health">
+
+Get a report with fixes
+
+</Card>
+
 </CardGroup>
 
 ## Support

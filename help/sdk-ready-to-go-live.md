@@ -58,6 +58,8 @@ You only need `debug = true` when SDK Console can't read the device's advertisin
 
 If your device never appears, see [Test device not showing in SDK Console](/testing/integration-testing#test-device-not-showing-in-sdk-console).
 
+On Android, you can also [check a build with SDK Health](/testing/sdk-health), which reports problems with fixes. Its installs and events count in the project you run it from.
+
 ### 8. Is the build you're releasing the one you tested?
 
 **Check:** confirm the store build includes the Linkrunner SDK at the same version you tested. A release cut from a branch without the SDK reports nothing.
@@ -78,6 +80,7 @@ Email support with:
 ## Related
 
 - [SDK integration testing](/testing/integration-testing)
+- [Check your Android build with SDK Health](/testing/sdk-health)
 - [Test custom events and payments](/testing/event-and-revenue-testing)
 - [Set up deep links](/features/deep-linking-setup)
 - [AI agent skills](/ai-agent-skills)

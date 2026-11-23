@@ -25,6 +25,8 @@ You'll confirm that:
 
 </Note>
 
+On Android, you can also [check a build with SDK Health](/testing/sdk-health) and get a report with fixes.
+
 ## Video walkthrough
 
 <iframe width="100%" height="420" src="https://www.youtube.com/embed/tX05ioHJ6bc?start=315" title="Linkrunner SDK Integration Testing" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
