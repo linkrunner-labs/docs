@@ -651,7 +651,7 @@ private fun trackEvent() {
         try {
             val result = LinkRunner.getInstance().trackEvent(
                 eventName = "purchase_initiated", // Event name
-                eventData = mapOf( // Optional: Event data
+                eventData = mapOf( // Optional: event parameters
                     "product_id" to "12345",
                     "category" to "electronics"
                 ),
@@ -673,8 +673,25 @@ private fun trackEvent() {
 #### Parameters for `LinkRunner.getInstance().trackEvent`
 
 - `eventName`: `String` (required) - Name of the event to track
-- `eventData`: `Map<String, Any>` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties. Add `amount`, `paymentId`, `currency`, and `userId` to make it a payment. See [Tracking Payments](#tracking-payments).
+- `eventData`: `Map<String, Any>` (optional) - [Event parameters](/features/event-parameters): key-value pairs that describe the event, including the Meta and Google ecommerce keys. Add `amount`, `paymentId`, `currency`, and `userId` to make it a payment. See [Tracking Payments](#tracking-payments).
 - `eventId`: `String` (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
+
+### Event parameters
+
+Put details that change from one event to the next, such as a plan or a product category, in `eventData` instead of creating one event per variant. Track `purchase` with a `plan` parameter, not `purchase_gold` and `purchase_silver`. You can then filter and break down the event by each parameter in the dashboard. See [Event parameters](/features/event-parameters) for value types, limits, and reserved keys.
+
+```kotlin
+LinkRunner.getInstance().trackEvent(
+    eventName = "purchase",
+    eventData = mapOf(
+        "plan" to "gold",
+        "billing_period" to "yearly",
+        "is_trial" to false
+    )
+)
+```
+
+Call it inside a coroutine, as in the example above.
 
 ### Revenue Sharing with Ad Networks
 
