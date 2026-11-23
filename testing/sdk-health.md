@@ -31,14 +31,14 @@ Open [SDK Console → Health](https://dashboard.linkrunner.io/dashboard/sdk-cons
 
 <Tab title="Upload your build">
 
-![Upload your app form](/images/sdk-health/sdk-health-upload-apk.webp)
+<img src="/images/sdk-health/sdk-health-upload-apk.webp" alt="Upload your app form" width="598" />
 
 1. Click **Start run** → **Upload APK**.
 2. Under **App File** (1), choose an `.apk`, `.apks` or `.xapk` file up to 512 MB. `.aab` files can't be uploaded.
 3. Add **Notes for the audit (optional)** (2): a test login or anything else it needs, up to 2,000 characters, deleted when the audit finishes.
 4. Read the warning (3) and click **Start run** (4). Keep the tab open until the upload finishes; one that doesn't finish within an hour stops and doesn't count.
 
-Get Started's [App SDK testing](https://dashboard.linkrunner.io/dashboard/get-started?task=app_sdk) task also has **Upload APK**, without notes.
+Get Started's [App SDK testing](https://dashboard.linkrunner.io/dashboard/get-started?task=app_sdk) task also has **Upload APK**, with the same optional notes.
 
 </Tab>
 
@@ -46,10 +46,12 @@ Get Started's [App SDK testing](https://dashboard.linkrunner.io/dashboard/get-st
 
 For free apps that Google Play offers for download.
 
+<img src="/images/sdk-health/sdk-health-play-store-url.webp" alt="Play Store URL form" width="598" />
+
 1. Click **Start run** → **Use Play Store URL**.
-2. Check **Google Play URL**: this app's link, like `https://play.google.com/store/apps/details?id=com.example.app`. It starts with your project's Play Store link.
-3. Add **Notes for the audit (optional)**, as for an upload.
-4. Click **Start run**. If this app already has a report, the dashboard offers it first.
+2. Check **Google Play URL** (1): this app's link, like `https://play.google.com/store/apps/details?id=com.example.app`. It starts with your project's Play Store link.
+3. Add **Notes for the audit (optional)** (2), as for an upload.
+4. Click **Start run** (3). If this app already has a report, the dashboard offers it first.
 
 </Tab>
 
@@ -111,7 +113,7 @@ List statuses: **Waiting for upload**, **Queued**, **Starting**, **Checking** an
 
 In [SDK Console → Health](https://dashboard.linkrunner.io/dashboard/sdk-console), click **Version monitoring**.
 
-![Version monitoring form](/images/sdk-health/sdk-health-version-monitoring.webp)
+<img src="/images/sdk-health/sdk-health-version-monitoring.webp" alt="Version monitoring form" width="448" />
 
 1. Check the **Google Play URL**.
 2. Turn on **Automatic checks**, with the next and last check in your project's time zone.
