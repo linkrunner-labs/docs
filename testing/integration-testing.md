@@ -25,6 +25,8 @@ You'll confirm that:
 
 </Note>
 
+For an Android app, you can also upload a build to [SDK Health](/testing/sdk-health). A test phone uses the app and you get a report of what the SDK sends, with a fix for each problem.
+
 ## Video walkthrough
 
 <iframe width="100%" height="420" src="https://www.youtube.com/embed/tX05ioHJ6bc?start=315" title="Linkrunner SDK Integration Testing" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
