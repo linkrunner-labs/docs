@@ -97,11 +97,11 @@ enum LinkrunnerMinimal {
 
     // Send amount, paymentId, and currency together to record a payment; leave them out for a custom event
     @discardableResult
-    static func trackEvent(_ name: String, data: [String: Any]? = nil,
+    static func trackEvent(_ name: String, eventData: [String: Any]? = nil,
                            amount: Double? = nil, paymentId: String? = nil, currency: String? = nil) async throws -> [String: Any] {
         var body = base()
         body["event_name"] = name
-        if let data { body["event_data"] = data }
+        if let eventData { body["event_data"] = eventData }
         if let amount, let paymentId, let currency {
             body["amount"] = amount
             body["payment_id"] = paymentId
@@ -151,7 +151,7 @@ Then identify the user and track activity.
 Task { try? await LinkrunnerMinimal.signup(userId: "user_123") }
 
 // 4. Track an event
-Task { try? await LinkrunnerMinimal.trackEvent("purchase_initiated", data: ["amount": 99.99]) }
+Task { try? await LinkrunnerMinimal.trackEvent("purchase_initiated", eventData: ["amount": 99.99]) }
 
 // 5. Track a payment
 Task { try? await LinkrunnerMinimal.trackEvent("purchase_completed", amount: 99.99, paymentId: "payment_123", currency: "USD") }

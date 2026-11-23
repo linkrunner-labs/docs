@@ -285,6 +285,22 @@ const trackPurchase = async () => {
 
 Only `PAYMENT_COMPLETED` counts as revenue and is sent to ad networks. Plain strings such as `"PAYMENT_COMPLETED"` also work for `status`.
 
+### Event parameters
+
+Put details that change from one event to the next, such as a plan or a product category, in the event's parameters instead of creating one event per variant. Track `purchase` with a `plan` parameter, not `purchase_gold` and `purchase_silver`:
+
+```javascript
+import linkrunner from "rn-linkrunner";
+
+await linkrunner.trackEvent("purchase", {
+    plan: "gold",
+    billing_period: "yearly",
+    is_trial: false,
+});
+```
+
+You can then filter and break down the event by each parameter in the dashboard. See [Event parameters](/features/event-parameters) for value types, limits, and reserved keys.
+
 ## Privacy mode
 
 Use privacy mode for apps directed at children. It stops the native SDKs from collecting any device-level identifier, such as the advertising IDs, Android ID and IDFV, and the SDK never shows the ATT prompt. Only the SDK's install instance ID identifies the install. It needs native Android SDK 5.1.0 and iOS SDK 5.1.0. Use `expo-linkrunner` 4.1.0 and `rn-linkrunner` 4.1.0 or later.
