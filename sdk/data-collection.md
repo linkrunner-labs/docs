@@ -235,13 +235,18 @@ Only declare **User ID**, **Contact Info** and **Purchase History** if your app 
 
 ### Privacy manifest
 
-iOS SDK 5.3.1 and later include a privacy manifest (`PrivacyInfo.xcprivacy`). It declares the data types in the table above and the SDK's use of `UserDefaults` (reason `CA92.1`), so you don't need to add them to your app's own manifest. To check it, archive your app in Xcode, then open the archive in the Organizer and choose **Generate Privacy Report**.
+Apple asks every app to declare the data it collects and why it calls certain "required reason" APIs, including the code its SDKs add. If an SDK has no privacy manifest, you declare its use yourself, or App Store Connect can warn with `ITMS-91053: Missing API declaration`.
 
-The wrappers include it from Flutter `linkrunner` 5.3.1, `rn-linkrunner` 4.3.1 and `expo-linkrunner` with `rn-linkrunner` 4.3.1. `capacitor-linkrunner` 3.3.0 and `cordova-linkrunner` 2.3.0 pick it up after `pod update LinkrunnerKit`.
+iOS SDK 5.3.1 and later ship a privacy manifest (`PrivacyInfo.xcprivacy`), so you add nothing to your own manifest. It declares:
+
+- The data types in the table above, linked to the user and used for tracking.
+- `UserDefaults` with reason `CA92.1`. The SDK reads and writes only its own settings.
+
+To check it, archive your app in Xcode, then open the archive in the Organizer and choose **Generate Privacy Report**.
 
 The manifest doesn't fill in App Store Connect for you. You still answer the App Privacy questions above.
 
-The manifest marks the SDK as tracking but lists no tracking domains. iOS blocks requests to listed domains when the user denies ATT, so the SDK keeps reaching Linkrunner either way.
+It marks the SDK as tracking but lists no tracking domains, because iOS blocks listed domains when the user denies ATT.
 
 ## Web
 
