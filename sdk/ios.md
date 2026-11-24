@@ -44,7 +44,7 @@ Alternatively, you can add the package dependency to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "5.1.0")
+    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "5.3.0")
 ]
 ```
 
