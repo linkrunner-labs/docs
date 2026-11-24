@@ -58,17 +58,11 @@ macros before sending traffic to Linkrunner.
 
 ## Send a test postback
 
-Test your Install Postback URL from **Settings → Postback URLs**. Pick a customer at the top of the page first. The test goes to the URL Linkrunner would use for that customer's installs, with the macros filled in.
+Test your Install Postback URL from **Settings → Postback URLs**. Pick a customer at the top of the page first, then click **Test** beside the URL. The test goes to the URL Linkrunner would use for that customer's installs, with the macros filled in. Choose **With a real click** or **Quick check without a click**.
 
-### Send test
+### With a real click
 
-**Send test** sends one install postback with a click ID that starts with `lr_test_`, so it cannot match a real click in your tracker. You see what your server answered, including the start of its reply. Search your tracker for the click ID shown.
-
-Each event in **Event Mapping** has the same test, from the paper plane button on its row.
-
-### Test end to end
-
-**Test end to end** sends the install postback for a click you make yourself, so your tracker shows a conversion on your own click.
+**With a real click** sends the install postback for a click you make yourself, so your tracker shows a conversion on your own click.
 
 1. Open one of your tracking links for that customer in the same browser as the dashboard. It is fine if it goes on to the app store.
 2. Come back to the dashboard. Linkrunner finds your click from the last 10 minutes, and you send the install postback for it.
@@ -77,14 +71,20 @@ A click from a desktop browser has no platform, so `{platform}` is empty in this
 
 If Linkrunner only finds clicks from another network, for example when you use a VPN, it asks you to confirm the click is yours before it sends. Only confirm a click you made. A postback for someone else's click records a conversion for them in your tracker.
 
+### Quick check without a click
+
+**Quick check without a click** sends one install postback with a click ID that starts with `lr_test_`, so it cannot match a real click in your tracker. You see what your server answered, including the start of its reply. Search your tracker for the click ID shown.
+
+In **Event Mapping**, the paper plane button on an in-app event's row runs a quick check for that event. On the install row it offers the same two tests as Settings.
+
 ### Limits
 
 - You can send a few tests every 10 minutes, and there is a daily cap. If you hit a limit, wait and try again.
-- Each click can be tested once.
+- Each click can be tested once. If the postback could not be sent, you can try the same click again.
 
 <Note>
 
-**Test end to end** uses a real click. If a real install from the same click comes in later, your tracker can show a second conversion for it. Most trackers count a click once, so check how yours handles it.
+A test **With a real click** can count twice. If a real install from the same click comes in later, your tracker can show a second conversion for it. Most trackers count a click once, so check how yours handles it.
 
 </Note>
 
