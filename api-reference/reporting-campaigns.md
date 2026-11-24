@@ -293,6 +293,7 @@ Each result comes back under its `name`, in `custom_events` for custom columns a
 | `422` | `limit` is non-numeric, less than 1, or greater than 100. Or `granularity` is not `day`, or a `granularity=day` request is missing `from` or `to`, has `to` before `from`, or covers more than 31 days. |
 | `429` | Rate limit exceeded. |
 | `500` | Unexpected server error. Retry after a short backoff. |
+| `503` | A `granularity=day` request took too long (about 50 seconds). Use a shorter range, a smaller `limit` or fewer event columns. |
 
 ## Troubleshooting
 
