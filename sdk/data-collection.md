@@ -233,6 +233,21 @@ On App Store Connect, declare each data type below. For every one, choose the pu
 
 Only declare **User ID**, **Contact Info** and **Purchase History** if your app sends them through the SDK. Apple counts sending this data to ad networks for ad measurement as tracking. Answer **Yes** even if you pass `disableIdfa: true` or the user denies ATT, because the IP address, IDFV and hashed contact details still reach ad networks.
 
+### Privacy manifest
+
+Apple asks every app to declare the data it collects and why it calls certain "required reason" APIs, including the code its SDKs add. If an SDK has no privacy manifest, you declare its use yourself, or App Store Connect can warn with `ITMS-91053: Missing API declaration`.
+
+iOS SDK 5.3.1 and later ship a privacy manifest (`PrivacyInfo.xcprivacy`), so you add nothing to your own manifest. It declares:
+
+- The data types in the table above, linked to the user and used for tracking.
+- `UserDefaults` with reason `CA92.1`. The SDK reads and writes only its own settings.
+
+To check it, archive your app in Xcode, then open the archive in the Organizer and choose **Generate Privacy Report**.
+
+The manifest doesn't fill in App Store Connect for you. You still answer the App Privacy questions above.
+
+It marks the SDK as tracking but lists no tracking domains, because iOS blocks listed domains when the user denies ATT.
+
 ## Web
 
 The Web SDK collects data from the browser, not the device. Google Play and Apple forms don't apply, but your cookie or consent banner might. Load the SDK only after the visitor agrees if your consent rules require it.
