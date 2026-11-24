@@ -232,9 +232,9 @@ Only declare **User ID**, **Contact Info** and **Purchase History** if your app 
 
 ### Privacy manifest
 
-iOS SDK 5.2.1 and later include a privacy manifest (`PrivacyInfo.xcprivacy`). It declares the data types in the table above and the SDK's use of `UserDefaults` (reason `CA92.1`), so you don't need to add them to your app's own manifest. To check it, archive your app in Xcode, then open the archive in the Organizer and choose **Generate Privacy Report**.
+iOS SDK 5.3.1 and later include a privacy manifest (`PrivacyInfo.xcprivacy`). It declares the data types in the table above and the SDK's use of `UserDefaults` (reason `CA92.1`), so you don't need to add them to your app's own manifest. To check it, archive your app in Xcode, then open the archive in the Organizer and choose **Generate Privacy Report**.
 
-The wrappers include it from Flutter `linkrunner` 5.2.1, `rn-linkrunner` 4.2.1 and `expo-linkrunner` with `rn-linkrunner` 4.2.1. `capacitor-linkrunner` 3.2.0 and `cordova-linkrunner` 2.2.0 pick it up after `pod update LinkrunnerKit`.
+The wrappers include it from Flutter `linkrunner` 5.3.1, `rn-linkrunner` 4.3.1 and `expo-linkrunner` with `rn-linkrunner` 4.3.1. `capacitor-linkrunner` 3.3.0 and `cordova-linkrunner` 2.3.0 pick it up after `pod update LinkrunnerKit`.
 
 The manifest doesn't fill in App Store Connect for you. You still answer the App Privacy questions above.
 
