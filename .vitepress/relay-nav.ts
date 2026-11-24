@@ -166,6 +166,7 @@ const setup: Group[] = [
       p("/quickstart"),
       p("/features/mcp"),
       page("Approve AI changes", "/features/mcp-changes", "shield-check"),
+      page("Ask on WhatsApp", "/features/whatsapp-ask-ai", "whatsapp"),
       page("AI change tool reference", "/features/mcp-tools", "list-check"),
       p("/features/website-projects"),
       p("/ai-agent-skills"),
