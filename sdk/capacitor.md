@@ -630,6 +630,10 @@ When privacy mode is on:
 
 For everything privacy mode removes, what is still sent, and how it changes your store privacy answers, see [Privacy mode](/sdk/data-collection#privacy-mode).
 
+## Privacy manifest (iOS)
+
+`capacitor-linkrunner` 3.3.1 and later include it. See [Privacy manifest](/sdk/data-collection#privacy-manifest).
+
 ## Uninstall Tracking
 
 ### Before you begin

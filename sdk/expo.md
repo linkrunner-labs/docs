@@ -343,6 +343,10 @@ The plugin option only changes your native project files. The `init` argument is
 
 For everything privacy mode removes, what is still sent, and how it changes your store privacy answers, see [Privacy mode](/sdk/data-collection#privacy-mode).
 
+## Privacy manifest (iOS)
+
+Included with `rn-linkrunner` 4.3.1 and later. Run prebuild again after upgrading. See [Privacy manifest](/sdk/data-collection#privacy-manifest).
+
 ## Function Placement Guide
 
 Expo uses the `rn-linkrunner` runtime. The function links below open the implementation details in the React Native guide.

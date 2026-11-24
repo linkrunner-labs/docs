@@ -44,7 +44,7 @@ Alternatively, you can add the package dependency to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "5.3.0")
+    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "5.3.1")
 ]
 ```
 
@@ -901,6 +901,10 @@ The SDK saves the setting. `true` stays on across launches until you call `initi
 Don't add `NSUserTrackingUsageDescription` to `Info.plist`. You don't need the SKAdNetwork keys either.
 
 For everything privacy mode removes, what is still sent, and how it changes your App Privacy answers, see [Privacy mode](/sdk/data-collection#privacy-mode).
+
+## Privacy manifest
+
+LinkrunnerKit 5.3.1 and later ship a privacy manifest (`PrivacyInfo.xcprivacy`), so you don't declare the SDK's data or `UserDefaults` use yourself. See [Privacy manifest](/sdk/data-collection#privacy-manifest).
 
 ## Uninstall Tracking
 
