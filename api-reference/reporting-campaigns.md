@@ -103,19 +103,20 @@ Numeric fields are returned as **formatted strings** (`"3,201"`, `"$12,540.50"`)
 
 ### Query parameters
 
-| Parameter         | Type   | Default            | Notes                                                                                                                                                                                              |
-| ----------------- | ------ | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `from`, `to`      | string | (none)             | `YYYY-MM-DD`, inclusive, in your project's timezone. `start_date` / `end_date` are accepted aliases. Sets the metrics window; never filters the campaign list (see note below).                    |
-| `active`          | string | (all)              | `true` or `false`.                                                                                                                                                                                 |
-| `network`         | string | (all)              | `meta`, `google`, `apple_search_ads`, `tiktok`, `snapchat`, `sandbox_ads`, etc. Separate several with commas (`meta,google`, up to 50) to get the campaigns of any of them, each counted once. |
-| `meta_account_id` | number | (none)             | Restrict to a single Meta network account.                                                                                                                                                         |
-| `platform`        | string | (both)             | `ios` or `android`.                                                                                                                                                                                |
-| `search`          | string | (none)             | Matches name, display ID, domain, deeplink, or full tracking URL.                                                                                                                                  |
-| `view`            | string | `user_acquisition` | `user_acquisition` (new users: `installs`, `cost_per_install`) or `retargeting` (returning users, matching the dashboard's Retargeting view: `reinstalls`, `reengagements`, `cost_per_reinstall`). |
-| `sort_field`      | string | `installs`         | `clicks`, `installs`, `signups`, `revenue`, `spend`, `created_at`, `uninstalls`, `conversion`, `suspicious_installs`, `roas`.                                                                      |
-| `sort_order`      | string | `descending`       | `ascending` or `descending`.                                                                                                                                                                       |
-| `page`            | number | `1`                | 1-indexed.                                                                                                                                                                                         |
-| `limit`           | number | `10`               | **Max 100.** Larger values return `422`.                                                                                                                                                           |
+| Parameter | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `from`, `to` | string | (none) | `YYYY-MM-DD`, inclusive, in your project's timezone. `start_date` / `end_date` are accepted aliases. Sets the metrics window; never filters the campaign list (see note below). |
+| `active` | string | (all) | `true` or `false`. |
+| `network` | string | (all) | `meta`, `google`, `apple_search_ads`, `tiktok`, `snapchat`, `sandbox_ads`, etc. Separate several with commas (`meta,google`, up to 50) to get the campaigns of any of them, each counted once. |
+| `meta_account_id` | number | (none) | Restrict to a single Meta network account. |
+| `platform` | string | (both) | `ios` or `android`. |
+| `search` | string | (none) | Matches name, display ID, domain, deeplink, or full tracking URL. |
+| `view` | string | `user_acquisition` | `user_acquisition` (new users: `installs`, `cost_per_install`) or `retargeting` (returning users, matching the dashboard's Retargeting view: `reinstalls`, `reengagements`, `cost_per_reinstall`). |
+| `sort_field` | string | `installs` | `clicks`, `installs`, `signups`, `revenue`, `spend`, `created_at`, `uninstalls`, `conversion`, `suspicious_installs`, `roas`. |
+| `sort_order` | string | `descending` | `ascending` or `descending`. |
+| `page` | number | `1` | 1-indexed. |
+| `limit` | number | `10` | **Max 100.** Larger values return `422`. |
+| `granularity` | string | (none) | `day` adds a `daily` array to each campaign, one row per day of `from` to `to`. Needs both `from` and `to`, at most 31 days. See [Day-level breakdown](#day-level-breakdown). |
 
 <Note>
 
@@ -125,18 +126,49 @@ Numeric fields are returned as **formatted strings** (`"3,201"`, `"$12,540.50"`)
 
 See [Event columns](#event-columns) below for `events`, `payment_events`, `unique_user_events`, `cost_per_event`, and `active_users`, and [Event columns with parameter filters](#event-columns-with-parameter-filters) for `event_columns`.
 
+### Day-level breakdown
+
+Add `granularity=day` to get each campaign's numbers per day in the same call. `from` and `to` are required and can cover at most 31 days. For a longer period, make one call per month.
+
+```bash
+curl 'https://api.linkrunner.io/api/v1/reporting/campaigns?granularity=day&from=2026-11-01&to=2026-11-30&limit=100' \
+  -H 'linkrunner-key: YOUR_API_KEY'
+```
+
+Each campaign keeps its totals for the whole range and gets a `daily` array, oldest day first. `data.granularity` is `"day"`.
+
+```json
+{
+    "id": 4182,
+    "name": "Summer sale",
+    "installs": "1,234",
+    "sign-ups": "410",
+    "spend": "52,300",
+    "daily": [
+        { "date": "2026-11-01", "installs": "40", "sign-ups": "13", "spend": "1,710" },
+        { "date": "2026-11-02", "installs": "38", "sign-ups": "12", "spend": "1,690" }
+    ]
+}
+```
+
+- A day row has the same metric fields as the campaign, as formatted strings: counts, `revenue`, `spend`, `roas`, `cost_per_install`, `cost_per_signup`, `conversion`, and the [event columns](#event-columns) you asked for. Fields that need a longer window, such as retention and `active_users`, are only on the campaign.
+- Days are in your project's timezone, like `from` and `to`.
+- All other parameters work as usual. Filters and `page` / `limit` choose the campaigns, and the days cover exactly those campaigns.
+- Counts, revenue and spend add up across days to the campaign total. Distinct-user counts (`sign-ups`, columns in `unique_user_events`) can add up to slightly more than the total, because a user counted on two days is counted once for the range. Ratios such as `roas` and `conversion` are per day; don't add them.
+- A day-level request is still one request for the rate limit.
+
 ### Event columns
 
 Event columns are opt-in. Name the events you want and the response carries those and no others, which keeps the payload small and the query fast.
 
-| Parameter            | Effect                                                                                                                                            | Example                            |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `events`             | Return `custom_events` for these event names.                                                                                                     | `events=Purchase,AddToCart`        |
-| `payment_events`     | Return `payment_events` for these revenue types.                                                                                                  | `payment_events=PURCHASE`          |
-| `cost_per_event`     | Add `cost_per_custom_events` / `cost_per_payment_events` for these names (spend divided by that event's count).                                   | `cost_per_event=Purchase,PURCHASE` |
-| `unique_user_events` | Make these events' `count` distinct users instead of total occurrences. The field name stays `count`.                                             | `unique_user_events=Purchase`      |
-| `active_users`       | Override the active-users window, in days. Defaults to 7.                                                                                         | `active_users=14`                  |
-| `event_columns`      | Return event counts filtered by [event parameters](/features/event-parameters). A JSON array. See [below](#event-columns-with-parameter-filters). | `event_columns=[{...}]`            |
+| Parameter | Effect | Example |
+| --- | --- | --- |
+| `events` | Return `custom_events` for these event names. | `events=Purchase,AddToCart` |
+| `payment_events` | Return `payment_events` for these revenue types. | `payment_events=PURCHASE` |
+| `cost_per_event` | Add `cost_per_custom_events` / `cost_per_payment_events` for these names (spend divided by that event's count). | `cost_per_event=Purchase,PURCHASE` |
+| `unique_user_events` | Make these events' `count` distinct users instead of total occurrences. The field name stays `count`. | `unique_user_events=Purchase` |
+| `active_users` | Override the active-users window, in days. Defaults to 7. | `active_users=14` |
+| `event_columns` | Return event counts filtered by [event parameters](/features/event-parameters). A JSON array. See [below](#event-columns-with-parameter-filters). | `event_columns=[{...}]` |
 
 The first five take a comma-separated list. Unknown event names are dropped silently, since they match no rows.
 
@@ -197,24 +229,24 @@ Each campaign, ad set and ad creative in the response then carries:
 
 `event_columns` counts only the events whose [event parameters](/features/event-parameters) match, for example purchases where `plan` is gold. It matches the filtered columns you can add in the dashboard's App Campaigns table. Send it as a URL-encoded JSON array of up to 10 columns:
 
-| Field        | Required | Description                                                                                                                           |
-| ------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`       | Yes      | The key the result comes back under. Up to 256 characters. Must be unique and must not repeat a name in `events` or `payment_events`. |
-| `event_name` | Yes      | The event to count. For a payment column, the payment type, such as `FIRST_PAYMENT`.                                                  |
-| `event_type` | No       | `custom` (default) or `payment`.                                                                                                      |
-| `filters`    | Yes      | Up to 10 filters, each `{ "key": "...", "op": "...", "values": [...] }`.                                                              |
-| `combinator` | No       | `and` (default) needs every filter to match. `or` needs any one of them.                                                              |
+| Field | Required | Description |
+| --- | --- | --- |
+| `name` | Yes | The key the result comes back under. Up to 256 characters. Must be unique and must not repeat a name in `events` or `payment_events`. |
+| `event_name` | Yes | The event to count. For a payment column, the payment type, such as `FIRST_PAYMENT`. |
+| `event_type` | No | `custom` (default) or `payment`. |
+| `filters` | Yes | Up to 10 filters, each `{ "key": "...", "op": "...", "values": [...] }`. |
+| `combinator` | No | `and` (default) needs every filter to match. `or` needs any one of them. |
 
 Each filter compares one top-level parameter key. Keys are case sensitive and up to 128 characters. Values are strings of up to 256 characters, at most 50 per filter. Across all columns in one request, send at most 60 filters and 1,000 filter values in total.
 
-| `op`                                  | `values`  | Matches events where the parameter                                                                                            |
-| ------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `is`, `is_not`                        | 1 or more | equals any listed value / equals none of them, case sensitive. `is_not` also matches events without the key                   |
-| `contains`, `not_contains`            | 1         | contains the text / does not contain it, ignoring case. Lists and objects match on their JSON text. The value cannot be empty |
-| `eq`, `neq`, `gt`, `gte`, `lt`, `lte` | 1         | compares as a number. A stored value that is not a number never matches, except with `neq`. The filter value must be a number |
-| `between`, `not_between`              | 2         | is inside / outside the range, both ends included. Both values must be numbers, lower bound first                             |
-| `is_true`, `is_false`                 | 0         | is `true` / `false`, or the text `"true"` / `"false"` in any case                                                             |
-| `is_set`, `is_not_set`                | 0         | is present / is missing                                                                                                       |
+| `op` | `values` | Matches events where the parameter |
+| --- | --- | --- |
+| `is`, `is_not` | 1 or more | equals any listed value / equals none of them, case sensitive. `is_not` also matches events without the key |
+| `contains`, `not_contains` | 1 | contains the text / does not contain it, ignoring case. Lists and objects match on their JSON text. The value cannot be empty |
+| `eq`, `neq`, `gt`, `gte`, `lt`, `lte` | 1 | compares as a number. A stored value that is not a number never matches, except with `neq`. The filter value must be a number |
+| `between`, `not_between` | 2 | is inside / outside the range, both ends included. Both values must be numbers, lower bound first |
+| `is_true`, `is_false` | 0 | is `true` / `false`, or the text `"true"` / `"false"` in any case |
+| `is_set`, `is_not_set` | 0 | is present / is missing |
 
 Values are compared as text, so `"5"` and `5` match the same events.
 
@@ -253,14 +285,15 @@ Each result comes back under its `name`, in `custom_events` for custom columns a
 
 ### Errors
 
-| Status | When                                                                                                                                                                                                                                                                                       |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `400`  | `event_columns` is invalid: not a JSON array, more than 10 columns, a missing or repeated `name`, an unknown `op`, a filter missing the values its `op` needs, a non-number value for a number `op`, a filter over its limits, or more than 60 filters or 1,000 values across all columns. |
-| `401`  | Missing or invalid `linkrunner-key`.                                                                                                                                                                                                                                                       |
-| `402`  | Billing account suspended. Body includes `payment_link`.                                                                                                                                                                                                                                   |
-| `422`  | `limit` is non-numeric, less than 1, or greater than 100.                                                                                                                                                                                                                                  |
-| `429`  | Rate limit exceeded.                                                                                                                                                                                                                                                                       |
-| `500`  | Unexpected server error. Retry after a short backoff.                                                                                                                                                                                                                                      |
+| Status | When |
+| --- | --- |
+| `400` | `event_columns` is invalid: not a JSON array, more than 10 columns, a missing or repeated `name`, an unknown `op`, a filter missing the values its `op` needs, a non-number value for a number `op`, a filter over its limits, or more than 60 filters or 1,000 values across all columns. |
+| `401` | Missing or invalid `linkrunner-key`. |
+| `402` | Billing account suspended. Body includes `payment_link`. |
+| `422` | `limit` is non-numeric, less than 1, or greater than 100. Or `granularity` is not `day`, or a `granularity=day` request is missing `from` or `to`, has `to` before `from`, or covers more than 31 days. |
+| `429` | Rate limit exceeded. |
+| `500` | Unexpected server error. Retry after a short backoff. |
+| `503` | A `granularity=day` request took too long (about 50 seconds). Use a shorter range, a smaller `limit` or fewer event columns. |
 
 ## Troubleshooting
 
@@ -269,6 +302,12 @@ Each result comes back under its `name`, in `custom_events` for custom columns a
 <Accordion title="Campaigns created outside my from/to range are in the response">
 
 This is expected. `from` and `to` set the metrics window; they never remove campaigns from the list. To keep only campaigns created in a range, request `sort_field=created_at&sort_order=descending`, then drop rows client-side once `created_at` falls before `from`.
+
+</Accordion>
+
+<Accordion title="422 when I ask for 90 days by day">
+
+`granularity=day` covers at most 31 days per request. Split the period into months and make one call each, one minute apart: 90 days is 3 calls.
 
 </Accordion>
 
@@ -297,6 +336,7 @@ export interface ReportingCampaignsResponse {
         pagination: { total: number; pages: number; page: number; limit: number };
         display_currency?: string;
         view?: "user_acquisition" | "retargeting";
+        granularity?: "day"; // present when you sent granularity=day
     };
 }
 
@@ -375,6 +415,36 @@ export interface Campaign {
 
     // Hierarchy: campaign → adSets → adCreatives + keywords
     adSets?: AdSet[];
+
+    // Present when you sent granularity=day, oldest day first
+    daily?: DailyRow[];
+}
+
+// One day of a campaign. Same field names and formatting as Campaign.
+export interface DailyRow {
+    date: string; // YYYY-MM-DD, project timezone
+    clicks?: string;
+    impressions?: string;
+    installs?: string;
+    reinstalls?: string;
+    reengagements?: string;
+    "sign-ups"?: string;
+    uninstalls?: string;
+    suspicious_installs?: string;
+    click_through_attribution?: string;
+    view_through_attribution?: string;
+    conversion?: string;
+    revenue?: string;
+    revenue_event_count?: string;
+    spend?: string;
+    roas?: string;
+    cost_per_install?: string;
+    cost_per_reinstall?: string;
+    cost_per_signup?: string;
+    custom_events?: Campaign["custom_events"];
+    payment_events?: Campaign["payment_events"];
+    cost_per_custom_events?: Campaign["cost_per_custom_events"];
+    cost_per_payment_events?: Campaign["cost_per_payment_events"];
 }
 
 export interface AdSet {
