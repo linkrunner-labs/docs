@@ -829,6 +829,10 @@ In Expo, also set `privacyMode` in the config plugin. See [Privacy mode in Expo]
 
 For everything privacy mode removes, what is still sent, and how it changes your store privacy answers, see [Privacy mode](/sdk/data-collection#privacy-mode).
 
+## Privacy manifest (iOS)
+
+`rn-linkrunner` 4.3.1 and later include it. Run `pod install` after upgrading. See [Privacy manifest](/sdk/data-collection#privacy-manifest).
+
 ## Uninstall Tracking
 
 ### Before you begin
