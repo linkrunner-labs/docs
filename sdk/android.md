@@ -33,7 +33,7 @@ Add the Linkrunner SDK to your app's `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation 'io.linkrunner:android-sdk:5.1.0'
+    implementation 'io.linkrunner:android-sdk:5.3.0'
 }
 ```
 

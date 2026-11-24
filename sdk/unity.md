@@ -66,7 +66,7 @@ In your Unity project, create or edit the file `Assets/Plugins/Android/mainTempl
 
 ```gradle
 dependencies {
-    implementation 'io.linkrunner:android-sdk:5.1.0'
+    implementation 'io.linkrunner:android-sdk:5.3.0'
 }
 ```
 
