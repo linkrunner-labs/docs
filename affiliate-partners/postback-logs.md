@@ -87,7 +87,7 @@ Click a row to expand it.
 
 1. **Attempts.** Every call Linkrunner made, with the time, the response code, how long it took, and whether it would retry.
 2. **Request sent.** The exact URL Linkrunner called, with your macros filled in. Secret values are removed.
-3. **Last response received.** The start of your endpoint's answer to the last attempt, up to 512 characters. Secret values, IDs and IPs are hidden. HTML, binary and answers over 2 KB are not shown.
+3. **Last response received.** The start of your endpoint's answer to the last attempt, up to 512 characters. Secret values, IDs and IPs are hidden. An HTML page shows as its plain text; binary answers and answers over 2 KB are not shown.
 4. **Click ID.** The `tid` you sent on the click. Use it to find the conversion in your own system.
 
 The expanded row also shows the final response code, the time of the first and last attempt, the campaign, and the **Install instance** ID. Share the install instance ID with Linkrunner support when you ask about a specific conversion.
