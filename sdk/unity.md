@@ -66,7 +66,7 @@ In your Unity project, create or edit the file `Assets/Plugins/Android/mainTempl
 
 ```gradle
 dependencies {
-    implementation 'io.linkrunner:android-sdk:5.1.0'
+    implementation 'io.linkrunner:android-sdk:5.3.0'
 }
 ```
 
@@ -1334,13 +1334,32 @@ The result arrives as a JSON string on the `OnAttributionData` event. With the r
 // Simple event
 LinkrunnerSDK.TrackEvent("level_complete");
 
-// Event with data (pass as JSON string)
-string eventData = JsonUtility.ToJson(new { level = 5, score = 1200, time_seconds = 45 });
+// Event with parameters (pass them as a JSON string)
+var levelParams = new LevelParams { level = 5, score = 1200, time_seconds = 45 };
+string eventData = JsonUtility.ToJson(levelParams);
 LinkrunnerSDK.TrackEvent("level_complete", eventData);
 
 // Event with deduplication ID
-LinkrunnerSDK.TrackEvent("purchase", eventData, eventId: "purchase_abc123");
+LinkrunnerSDK.TrackEvent("level_complete", eventData, eventId: "level_5_run_abc123");
 ```
+
+`JsonUtility.ToJson` only serializes a class or struct marked `[System.Serializable]` with public fields. Declare one for each set of parameters:
+
+```csharp
+[System.Serializable]
+public class LevelParams
+{
+    public int level;
+    public int score;
+    public int time_seconds;
+}
+```
+
+An anonymous object such as `new { level = 5 }` serializes to `{}`, so the event arrives with no parameters. You can also write the JSON string by hand, as in the [Track Payments](#track-payments) example below.
+
+#### Event parameters
+
+Put details that change from one event to the next, such as a level or a difficulty, in the event's JSON instead of creating one event per variant. Track `level_complete` with a `level` parameter, not `level_5_complete`. You can then filter and break down the event by each parameter in the dashboard. See [Event parameters](/features/event-parameters) for value types, limits, and reserved keys.
 
 <Note>
 
@@ -1469,6 +1488,31 @@ For everything privacy mode removes, what is still sent, and how it changes your
 
 ---
 
+## Meta Anonymous ID
+
+If your app also has the Meta (Facebook) SDK, update to the Linkrunner Unity SDK 3.1.0. Linkrunner reads the Meta SDK's anonymous ID automatically and sends it with your events, and the Linkrunner backend passes it to Meta as `anon_id`. Meta then matches those events to the same device it already knows from its own SDK. There is no code for you to write.
+
+No set-up order is required. Linkrunner and the Meta SDK can start in either order, and if the Meta SDK only starts later, for example after a consent prompt, the ID is picked up on the next event. In apps without the Meta SDK nothing is read and nothing extra is sent.
+
+<Note>
+
+Finish the setup by removing your own Meta `logEvent` calls for the events you already send through Linkrunner, so each event reaches Meta from one source instead of two.
+
+</Note>
+
+**For a privacy review:** Linkrunner reads a single value, the Meta SDK's anonymous app ID. The Meta SDK creates it on the device, it is scoped to your app, and Linkrunner sends it only to Meta. Linkrunner creates no ID of its own and never writes to the Meta SDK's storage. Supported on Android.
+
+### Turning it off
+
+```xml
+<!-- android/app/src/main/AndroidManifest.xml, inside <application> -->
+<meta-data
+    android:name="io.linkrunner.sdk.MetaAnonymousIdCollectionEnabled"
+    android:value="false" />
+```
+
+With the flag set, the SDK makes no lookup and sends no `meta_anonymous_id`.
+
 ## Function Placement Guide
 
 | Function | Requirement | Where to Call | When |
@@ -1555,6 +1599,8 @@ Unity's `PBXProject` API does not natively support adding SPM packages. After th
 7. Call `GetAttributionData()` to confirm attribution is returned
 
 For detailed testing steps, see the [Integration Testing Guide](/testing/integration-testing).
+
+For an Android build, you can also [check it with SDK Health](/testing/sdk-health) for a report with fixes.
 
 ---
 

@@ -44,7 +44,7 @@ Alternatively, you can add the package dependency to your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "5.1.0")
+    .package(url: "https://github.com/linkrunner-labs/linkrunner-ios.git", from: "5.3.0")
 ]
 ```
 
@@ -594,6 +594,30 @@ func setAdditionalData() async {
 }
 ```
 
+## Meta Anonymous ID
+
+If your app also has the Meta (Facebook) SDK, update to `LinkrunnerKit` 5.2.0. Linkrunner reads the Meta SDK's anonymous ID automatically and sends it with your events, and the Linkrunner backend passes it to Meta as `anon_id`. Meta then matches those events to the same device it already knows from its own SDK. There is no code for you to write.
+
+No set-up order is required. Linkrunner and the Meta SDK can start in either order, and if the Meta SDK only starts later, for example after a consent prompt, the ID is picked up on the next event. In apps without the Meta SDK nothing is read and nothing extra is sent.
+
+<Note>
+
+Finish the setup by removing your own Meta `logEvent` calls for the events you already send through Linkrunner, so each event reaches Meta from one source instead of two.
+
+</Note>
+
+**For a privacy review:** Linkrunner reads a single value, the Meta SDK's anonymous app ID. The Meta SDK creates it on the device, it is scoped to your app, and Linkrunner sends it only to Meta. Linkrunner creates no ID of its own and never writes to the Meta SDK's storage. Supported on Android and iOS.
+
+### Turning it off
+
+```xml
+<!-- ios/<YourApp>/Info.plist -->
+<key>LinkrunnerMetaAnonymousIdCollectionEnabled</key>
+<false/>
+```
+
+With the flag set, the SDK makes no lookup and sends no `meta_anonymous_id`.
+
 ## Revenue Tracking
 
 <Note>
@@ -698,7 +722,7 @@ Track custom events in your app:
 func trackEvent() async {
     await LinkrunnerSDK.shared.trackEvent(
         eventName: "purchase_initiated", // Event name
-        eventData: [ // Optional: Event data
+        eventData: [ // Optional: event parameters
             "product_id": "12345",
             "category": "electronics"
         ],
@@ -711,8 +735,23 @@ func trackEvent() async {
 #### Parameters for `LinkrunnerSDK.shared.trackEvent`
 
 - `eventName`: `String` (required) - Name of the event to track
-- `eventData`: `[String: Any]` (optional) - Key-value pairs for additional event data, including Meta ecommerce properties. Add `amount`, `paymentId`, `currency`, and `userId` to make it a payment. See [Tracking Payments](#tracking-payments).
+- `eventData`: `[String: Any]` (optional) - [Event parameters](/features/event-parameters): key-value pairs that describe the event, including the Meta and Google ecommerce keys. Add `amount`, `paymentId`, `currency`, and `userId` to make it a payment. See [Tracking Payments](#tracking-payments).
 - `eventId`: `String` (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
+
+### Event parameters
+
+Put details that change from one event to the next, such as a plan or a product category, in `eventData` instead of creating one event per variant. Track `purchase` with a `plan` parameter, not `purchase_gold` and `purchase_silver`. You can then filter and break down the event by each parameter in the dashboard. See [Event parameters](/features/event-parameters) for value types, limits, and reserved keys.
+
+```swift
+await LinkrunnerSDK.shared.trackEvent(
+    eventName: "purchase",
+    eventData: [
+        "plan": "gold",
+        "billing_period": "yearly",
+        "is_trial": false
+    ]
+)
+```
 
 ### Revenue Sharing with Ad Networks
 

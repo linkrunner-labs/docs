@@ -9,13 +9,12 @@ description: "Set up Linkrunner's beta Web Attribution SDK for page views, users
 
 The Linkrunner Web SDK tracks page views, known users, custom events, and the traffic sources that brought visitors to your website.
 
-<Warning>
+<Note>
 
-Web Attribution is currently in beta. To use it, [create a website project](/features/website-projects), or ask a
-project admin to turn on **Web Campaigns** in **Settings → Project Details** for your app project. Linkrunner then
-creates your Web project token.
+To get a Web project token, [create a website project](/features/website-projects), or ask a project admin to turn on
+**Web Campaigns** in **Settings → Project Details** for your app project. Linkrunner then creates your Web project token.
 
-</Warning>
+</Note>
 
 The SDK automatically captures:
 
@@ -129,14 +128,17 @@ The SDK saves this ID in `localStorage` and includes it as `user_id` on later ev
 
 Which events to send, and the exact names Linkrunner counts as sign-ups and purchases, are in [Track sign-ups and purchases on your website](/features/web-events-tracking).
 
-Track a custom event with `track`:
+Track a custom event with `track(eventName, eventData)`. The second argument, `eventData`, is optional and holds the event's [event parameters](/features/event-parameters): key-value pairs that describe it. `track` takes no third argument.
 
 ```js
 lr.track('purchase', {
   amount: 49.99,
   currency: 'USD',
+  plan: 'gold',
 })
 ```
+
+Put details that change from one event to the next, such as a plan or a product category, in `eventData` instead of creating one event per variant: track `purchase` with a `plan` parameter, not `purchase_gold`. Keep each event's parameters under 2,048 characters in total. The SDK sends them as one piece of text, and longer text is cut. See [Event parameters](/features/event-parameters) for value types and reserved keys.
 
 To show a signed-up user's details in the Web Events dashboard, identify the user and then send a `signup` event:
 

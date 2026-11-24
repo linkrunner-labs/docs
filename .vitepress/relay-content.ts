@@ -272,6 +272,7 @@ export const PAGE_TITLES: Record<string, PageTitle> = {
 
   "/testing/integration-testing": { title: "Test your SDK setup" },
   "/testing/event-and-revenue-testing": { title: "Test events and payments" },
+  "/testing/sdk-health": { label: "Check your Android build" },
   "/testing/web-sdk-testing": { title: "Test the Web SDK" },
   "/testing/meta-android-attribution-testing": { title: "Test Meta attribution on Android", label: "Test Meta on Android" },
   "/testing/testing-attribution-troubleshooting": {
@@ -303,6 +304,7 @@ export const PAGE_TITLES: Record<string, PageTitle> = {
 
   "/features/users-tab": { title: "Users" },
   "/features/events-tab": { title: "Events" },
+  "/features/event-parameters": { title: "Event parameters" },
   "/features/data-export": { title: "Export data as CSV", label: "Export data" },
 
   "/features/uninstall-tracking": { title: "Track uninstalls" },
@@ -311,6 +313,7 @@ export const PAGE_TITLES: Record<string, PageTitle> = {
   "/features/send-consent": { title: "Send user consent" },
   "/features/ios-campaign-data-limitations": { title: "Why some iOS campaign data is missing", label: "Missing iOS data" },
   "/features/attribution-windows": { title: "Attribution windows" },
+  "/features/multi-touch-attribution": { title: "Multi-touch attribution" },
   "/features/ctv-attribution": { title: "Connected TV attribution", label: "Connected TV" },
   "/features/fraud-control": { title: "Fraud control" },
   "/features/skadnetwork-integration": { title: "Set up SKAN" },

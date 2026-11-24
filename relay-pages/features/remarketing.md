@@ -54,7 +54,7 @@ If both conditions are met, the user's return is attributed to the campaign link
 
 | Window | What it means | Default |
 | --- | --- | --- |
-| **Inactivity window** | The minimum number of days a user must be inactive before they can qualify for reattribution. Linkrunner measures inactivity from the **last app open**: the time since the user last opened the app is compared against the configured inactivity window. | 0 days |
+| **Inactivity window** | The minimum number of days a user must be inactive before they can qualify for reattribution. Linkrunner measures inactivity from the **last app open**: the time since the user last opened the app is compared against the configured inactivity window. For a reinstall, it is the time since the previous install. | 0 days |
 | **Reattribution window** (also called the reattribution eligibility window) | The maximum time between an uninstall and a reinstall for the reinstall to count as a reattribution. | 90 days |
 
 **Example:** With a 7-day inactivity window, a user whose last app open was 3 days ago would **not** qualify for reattribution. A user whose last app open was 10 days ago **would** qualify.

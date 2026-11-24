@@ -66,6 +66,8 @@ Google Ads then shows the generated link ID. Copy it.
 
 <Note>Link IDs are per platform. Repeat Step 2 for your other platform if you ship both Android and iOS.</Note>
 
+Allow 12 hours after you save a new link ID in Linkrunner before it is used, and longer if Google is slow to activate it. Google installs before then can show as organic.
+
 ### Step 3: Configure in Linkrunner Dashboard
 
 Now paste that link ID into Linkrunner.
@@ -122,6 +124,29 @@ A success message does not prove that Google received the event, discovered a co
 </Step>
 
 </Steps>
+
+### Send a mapping only when parameters match
+
+Use **Only when** to send a mapping only for events with certain [event parameters](/features/event-parameters). For example, send a `subscribe_gold` event to Google only for `purchase` events where `plan` is gold, without adding a `purchase_gold` event to your app.
+
+1. On a mapping row in **App Event Mapping**, click the filter icon **Only when** next to **Your Events**.
+2. Pick a parameter, then its value. The row under the mapping reads, for example, `Only when plan is gold`.
+3. To add another condition, click **+ Filter**. Click the **and** between two conditions to switch it to **or**.
+4. Click **Save condition**, or **Cancel** to discard the change. On a new mapping, the condition is saved with the mapping.
+
+Every mapping whose condition matches is sent, and a mapping without a condition is sent for every event. With the two mappings below, a gold purchase sends both `in_app_purchase` and `subscribe_gold` to Google, and a silver purchase sends only `in_app_purchase`.
+
+| Your Events                          | Google Ads Event          |
+| ------------------------------------ | ------------------------- |
+| `purchase`                           | `in_app_purchase`         |
+| `purchase`, only when `plan is gold` | `subscribe_gold` (custom) |
+
+- Conditions use the same filters as the Events Log, such as **is**, **contains**, and **is greater than**. See [value types and limits](/features/event-parameters#value-types-and-limits). **is not** also matches events that do not send the parameter.
+- One event can have several mappings, one per condition. The same event with the same condition is refused as a duplicate.
+- If two mappings of one event match and send the same Google event, Google receives it once. Two different events mapped to the same Google event can still count one conversion twice.
+- For SKAN, Linkrunner reads only mappings without a condition. Keep one for each event in your [SKAN schema](/features/google-skan-setup).
+- The test event does not check the condition. To test a condition, trigger the event in your app with and without the parameter.
+- Only the project's **Admin** and **Member** roles can add, change, or see conditions.
 
 <span id="4-importing-events-for-conversion-actions-setup"></span>
 

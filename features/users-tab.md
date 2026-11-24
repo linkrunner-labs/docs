@@ -9,7 +9,7 @@ description: "Look up any user, trace their journey from ad click to in-app even
 
 The **Users** tab lists the individual people using your app. For each one you can see where they came from, what device they are on, and every action they have taken in your app since they installed it.
 
-A person appears here once Linkrunner has **attributed** them, which means Linkrunner has worked out where they came from and matched their app install back to the ad click or link that led to it. When there was no ad click to match, the user is attributed to **Organic**.
+A person appears here once your app identifies them with `signup` (see [User Identification](/sdk/react-native#user-identification-required)). Each user is **attributed**: Linkrunner credits their install to the campaign whose ad click or link led to it, or to **Organic** when there was no click to match. Organic users appear in the table with their events, the same as users from campaigns.
 
 Open the tab at [dashboard.linkrunner.io/dashboard/users](https://dashboard.linkrunner.io/dashboard/users). The dashboard adds `?p_id=YOUR_PROJECT_ID` to the address for the project you have selected, so you can bookmark or share a link that opens on a specific project.
 
@@ -26,14 +26,14 @@ The table lists every user in the project. Each row shows **User ID**, **Name**,
 
 Use the filters above the table to narrow the list down:
 
-| Filter           | What it does                                                                                       |
-| ---------------- | -------------------------------------------------------------------------------------------------- |
-| **Search**       | Matches on name, email, phone, or user ID                                                          |
-| **Channel**      | Where the user came from: Meta Ads, Google Ads, TikTok, Apple Search Ads, Organic, Referral        |
-| **Platform**     | Android or iOS                                                                                     |
-| **Select dates** | Limits the list by when the user was first created                                                 |
-| **Events**       | Keeps only users who took particular actions. Use AND to require all of them, OR to accept any one |
-| **Campaign**     | Pick one or more of your campaigns                                                                 |
+| Filter           | What it does                                                                                                                                                                          |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Search**       | Matches on name, email, phone, or user ID                                                                                                                                             |
+| **Channel**      | Where the user came from: Meta Ads, Google Ads, TikTok, Apple Search Ads, Organic, Referral                                                                                           |
+| **Platform**     | Android or iOS                                                                                                                                                                        |
+| **Select dates** | Limits the list by when the user was first created                                                                                                                                    |
+| **Events**       | Keeps only users who took particular actions. Use AND to require all of them, OR to accept any one. Each action can be narrowed by its [event parameters](/features/event-parameters) |
+| **Campaign**     | Pick one or more of your campaigns                                                                                                                                                    |
 
 Filters stack on top of each other, so you can ask for iOS users from a Meta Ads campaign who triggered `add_to_cart` in the last 30 days.
 
@@ -44,6 +44,10 @@ Filters stack on top of each other, so you can ask for iOS users from a Meta Ads
 If a set of filters is worth keeping, save it as a **cohort**, a named group of users you can come back to. See [Cohorts](#cohorts) below.
 
 </Tip>
+
+### Filtering by event parameters
+
+An action in the **Events** filter can be narrowed by the [event parameters](/features/event-parameters) it was sent with. When a condition holds a single event, click **+ Filter** under it and add a row such as "where `plan` is diamond". That keeps only users who bought the diamond plan. Rows after the first start with **and**; click it to switch to **or**. Parameter filters work with one event at a time, so adding a second event to the condition removes them.
 
 ## The user profile
 
@@ -68,7 +72,7 @@ The heatmap is the quickest way to judge how engaged someone is. A dense block o
 The left side is the list of everything the user has done, in order, grouped by day. You can collapse and expand each day.
 
 - Look for **App installed** and **First open** to see how the user arrived. The install shows the campaign that drove it, with a **View Details** link through to that campaign.
-- Expand any action to see its event ID, the exact time, the screen or URL path involved, and the session ID.
+- Expand any action to see its event ID, the exact time, the screen or URL path involved, the session ID, and its **Parameters**: the [event parameters](/features/event-parameters) it was sent with.
 - Actions where the user interacted with an ad show a thumbnail and the creative details.
 - Search by name to show only certain actions.
 - Set a date range to reload the journey over a narrower window.
@@ -100,7 +104,7 @@ The file contains every user matching your current filters, not just the rows yo
 
 ## Cohorts
 
-A cohort is a saved group of users who have something in common, defined by the actions they have taken and the platform they use. "Triggered `add_to_cart` but never triggered `purchase`, Android only" is a cohort. Naming it once means you stop rebuilding the same set of filters every time you need that group.
+A cohort is a saved group of users who have something in common, defined by the actions they have taken and the platform they use. "Triggered `add_to_cart` but never triggered `purchase`, Android only" is a cohort, and so is "triggered `purchase` where `plan` is gold". Naming it once means you stop rebuilding the same set of filters every time you need that group.
 
 The **Cohorts** sub-tab shows each saved cohort as a card with its name, description, how many users are in it, and the events it is built from. Each card separates **Events Done** from **Events Not Done**, so you can see at a glance whether a cohort is defined by what people did, what they did not do, or both. Search by name or filter by event name to find one.
 
@@ -129,7 +133,7 @@ filter on the table, those are not carried over.
 
 ### Building a cohort from scratch
 
-In the **Cohorts** sub-tab, click **Create Cohort** and set the conditions directly. Choose the events, decide whether a user has to match all of them or just one of them, mark whether each event must have been done or not done, and set the platform. Editing an existing cohort opens the same builder.
+In the **Cohorts** sub-tab, click **Create Cohort** and set the conditions directly. Choose the events, narrow any of them by its [event parameters](/features/event-parameters), decide whether a user has to match all of them or just one of them, mark whether each event must have been done or not done, and set the platform. Editing an existing cohort opens the same builder.
 
 ### Using a cohort
 
@@ -153,9 +157,10 @@ Cohorts let you group users for analysis, and to target them with ads. To act on
 
 <Accordion title="A user I expect to see is not in the table">
 
-Linkrunner only keeps data for users it has attributed. If Linkrunner never matched that person's install to a
-click or an organic install, they will not appear. Also check your date range, and clear the **Channel** and
-**Campaign** filters in case one of them is excluding the user.
+The table lists users your app has identified with `signup`, organic users included. Someone who installed the
+app but never signed up is not listed. If an identified user is missing, check the date range, which filters by
+when the user was first created, and clear the **Channel** and **Campaign** filters in case one of them is
+excluding the user.
 
 </Accordion>
 

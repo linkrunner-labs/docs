@@ -392,6 +392,42 @@ linkrunner.setAdditionalData({
 
 This method allows you to connect user identities across different analytics and marketing platforms.
 
+## Meta Anonymous ID
+
+If your app also has the Meta (Facebook) SDK, update to `cordova-linkrunner` 2.2.0. Linkrunner reads the Meta SDK's anonymous ID automatically and sends it with your events, and the Linkrunner backend passes it to Meta as `anon_id`. Meta then matches those events to the same device it already knows from its own SDK. There is no code for you to write.
+
+No set-up order is required. Linkrunner and the Meta SDK can start in either order, and if the Meta SDK only starts later, for example after a consent prompt, the ID is picked up on the next event. In apps without the Meta SDK nothing is read and nothing extra is sent.
+
+<Note>
+
+Finish the setup by removing your own Meta `logEvent` calls for the events you already send through Linkrunner, so each event reaches Meta from one source instead of two.
+
+</Note>
+
+**For a privacy review:** Linkrunner reads a single value, the Meta SDK's anonymous app ID. The Meta SDK creates it on the device, it is scoped to your app, and Linkrunner sends it only to Meta. Linkrunner creates no ID of its own and never writes to the Meta SDK's storage. Supported on Android and iOS.
+
+### Turning it off
+
+Cordova regenerates the native projects, so declare the flags in `config.xml` rather than editing them by hand:
+
+```xml
+<platform name="android">
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+        <meta-data
+            android:name="io.linkrunner.sdk.MetaAnonymousIdCollectionEnabled"
+            android:value="false" />
+    </config-file>
+</platform>
+
+<platform name="ios">
+    <config-file target="*-Info.plist" parent="LinkrunnerMetaAnonymousIdCollectionEnabled">
+        <false/>
+    </config-file>
+</platform>
+```
+
+With the flag set, the SDK makes no lookup and sends no `meta_anonymous_id`.
+
 ## Revenue Tracking
 
 <Note>
@@ -580,7 +616,7 @@ Track custom events in your app:
 ```javascript
 linkrunner.trackEvent(
     "purchase_initiated", // Event name
-    { product_id: "12345", category: "electronics" }, // Optional: Event data
+    { product_id: "12345", category: "electronics" }, // Optional: event parameters
     "order_12345" // Optional: Your own unique event identifier (string or number)
 ).then(function () {
     console.log("Event tracked");
@@ -590,8 +626,20 @@ linkrunner.trackEvent(
 #### Parameters for `linkrunner.trackEvent`
 
 - `eventName`: string (required) - Name of the event to track
-- `eventData`: object (optional) - Key-value pairs for additional event data, including Meta ecommerce properties. Add `amount`, `paymentId`, `currency`, and `userId` to make it a payment. See [Tracking Payments](#tracking-payments).
+- `eventData`: object (optional) - [Event parameters](/features/event-parameters): key-value pairs that describe the event, including the Meta and Google ecommerce keys. Add `amount`, `paymentId`, `currency`, and `userId` to make it a payment. See [Tracking Payments](#tracking-payments).
 - `eventId`: string | number (optional) - Your own unique identifier for the event, useful for deduplication and correlating with your backend
+
+### Event parameters
+
+Put details that change from one event to the next, such as a plan or a product category, in `eventData` instead of creating one event per variant. Track `purchase` with a `plan` parameter, not `purchase_gold` and `purchase_silver`. You can then filter and break down the event by each parameter in the dashboard. See [Event parameters](/features/event-parameters) for value types, limits, and reserved keys.
+
+```javascript
+linkrunner.trackEvent("purchase", {
+    plan: "gold",
+    billing_period: "yearly",
+    is_trial: false,
+});
+```
 
 ### Revenue Sharing with Ad Networks
 
@@ -866,6 +914,12 @@ Validate your setup end-to-end
 <Card title="Set Up Deep Linking" icon="link" href="/features/deep-linking-setup">
 
 Configure deep links for your app
+
+</Card>
+
+<Card title="Check Your Android Build" icon="shield-check" href="/testing/sdk-health">
+
+Get a report with fixes
 
 </Card>
 

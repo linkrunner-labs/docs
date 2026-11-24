@@ -119,6 +119,28 @@ Start with the default install/signup behavior and a purchase mapping. Add searc
 
 </Tip>
 
+### Send a mapping only when parameters match
+
+Use **Only when** to send a mapping only for events with certain [event parameters](/features/event-parameters). For example, send `PURCHASE` to Reddit only for `purchase` events where `plan` is gold, so Reddit optimizes toward gold buyers, without adding a `purchase_gold` event to your app.
+
+1. On a mapping row, click the filter icon **Only when** next to **Your Events**.
+2. Pick a parameter, then its value. The row under the mapping reads, for example, `Only when plan is gold`.
+3. To add another condition, click **+ Filter**. Click the **and** between two conditions to switch it to **or**.
+4. Click **Save condition**, or **Cancel** to discard the change. On a new mapping, the condition is saved with the mapping.
+
+Every mapping whose condition matches is sent, and a mapping without a condition is sent for every event. With the two mappings below, a gold purchase sends both `PURCHASE` and `LEAD` to Reddit, and a silver purchase sends only `PURCHASE`.
+
+| Your Events                          | Reddit Ads Event |
+| ------------------------------------ | ---------------- |
+| `purchase`                           | `PURCHASE`       |
+| `purchase`, only when `plan is gold` | `LEAD`           |
+
+- Conditions use the same filters as the Events Log, such as **is**, **contains**, and **is greater than**. See [value types and limits](/features/event-parameters#value-types-and-limits). **is not** also matches events that do not send the parameter.
+- One event can have several mappings, one per condition. The same event with the same condition is refused as a duplicate.
+- If two mappings of one event match and send the same Reddit event, Reddit receives it once. Two different events mapped to the same Reddit event can still count one conversion twice.
+- Linkrunner's test-event action does not check the condition. To test a condition, trigger the event in your app with and without the parameter, then check Reddit Events Manager.
+- Only the project's **Admin** and **Member** roles can add, change, or see conditions.
+
 ## 4. Create a Linkrunner campaign link
 
 Before you create the Reddit ad, create the Linkrunner campaign link that Reddit will send users to.
@@ -239,6 +261,28 @@ Review the campaign, ad group, and ad before publishing.
 If you create multiple Reddit ads in the same ad group, create a separate Linkrunner campaign link for each ad when you want ad-level reporting in Linkrunner.
 
 </Tip>
+
+## Website conversions
+
+Linkrunner also sends conversions from your **website** to the Reddit Conversions API with `action_source` set to `WEBSITE`, matched to the ad click with the `rdt_cid` click ID the Web SDK captured when the visitor landed.
+
+Capturing `rdt_cid` needs **Web SDK 0.1.24 or later**. Sites on the hosted `v1` script already have it; a pinned or self-hosted copy needs updating, or Reddit has no click ID to match and nothing is sent.
+
+1. On this integration, switch to **Web** at the top and open the **Web Event Mapping** tab.
+2. Mapping is only available once the account has credentials. If the tab asks for them, click **Add Reddit Pixel** and add your Reddit Pixel ID and Conversions API access token.
+
+   ![The Web Event Mapping tab asking for Reddit CAPI credentials before events can be mapped](/images/reddit-ads/web-event-mapping.webp)
+
+3. Click **Add Mapping**.
+4. Under **Your Web Events**, pick your website event, such as `purchase`.
+5. Under **Reddit Ads Event**, pick the closest match, such as **Purchase**, **Sign Up**, **Add to Cart** or **Lead**.
+6. For purchases, turn on **Send Revenue** and pick the **Currency** your website sends.
+
+For each mapped event Reddit receives the event name, the time, the click ID as `click_id`, the page when it is available, and the value and currency when **Send Revenue** is on.
+
+- **Only visits from a Reddit ad click are sent.** A conversion without `rdt_cid` is recorded in Postback Logs and not sent.
+- **Website mappings have no test send.** These rows carry no paper plane icon, unlike Meta and Google Ads, because a Reddit test builds an app-shaped postback. Confirm delivery from a real conversion in Postback Logs instead.
+- Don't see your event in the list? Your website hasn't sent it yet. See [Track sign-ups and purchases on your website](/features/web-events-tracking).
 
 ## How attribution and CAPI work
 

@@ -11,7 +11,7 @@ Create an affiliate account before you receive Linkrunner tracking links or post
 
 <Info>
 
-You need a work email, a network logo, a short description, and a valid post-install event URL. The install postback URL and website are optional.
+You need a work email, a network logo, a short description, and a valid event postback URL. The install postback URL and website are optional.
 
 </Info>
 
@@ -62,7 +62,7 @@ Click **Continue** to add your callback URLs.
 Enter the endpoints where Linkrunner should send attributed conversions:
 
 - **Install Postback URL:** Optional. Add it if you want a separate callback for installs.
-- **Post-Install Event URL:** Required. Add the endpoint that receives signup, purchase, and other in-app event postbacks.
+- **Event postback URL:** Required. Add the endpoint that receives signup, purchase, and other in-app event postbacks. It also receives website conversions from [web campaigns](/affiliate-partners/web-campaigns), unless you add a separate URL for them later.
 
 Use complete HTTPS URLs, including any credentials that Linkrunner should use. You can edit the URLs later from your affiliate settings.
 
@@ -93,7 +93,7 @@ Return to [Affiliate Partner Sign Up](https://dashboard.linkrunner.io/affiliate/
 Upload a supported logo, enter an affiliate name, and add a description.
 
 **Complete setup is disabled.**
-Enter a valid HTTPS post-install event URL. The install postback URL can remain blank.
+Enter a valid HTTPS event postback URL. The install postback URL can remain blank.
 
 **Your workspace still shows Pending verification.**
 Your application is waiting for Linkrunner approval. You receive an email after the review is complete.

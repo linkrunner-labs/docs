@@ -130,6 +130,29 @@ If you cannot see **MobileAppInstall** or **CompleteRegistration** in Meta Event
 
 </Tip>
 
+### Send a mapping only when parameters match
+
+Use **Only when** to send a mapping only for events with certain [event parameters](/features/event-parameters). For example, send `Subscribe_Gold` to Meta only for `purchase` events where `plan` is gold, without adding a `purchase_gold` event to your app.
+
+1. On a mapping row, click the filter icon **Only when** next to **Your Events**.
+2. Pick a parameter, then its value. The row under the mapping reads, for example, `Only when plan is gold`.
+3. To add another condition, click **+ Filter**. Click the **and** between two conditions to switch it to **or**.
+4. Click **Save condition**, or **Cancel** to discard the change. On a new mapping, the condition is saved with the mapping.
+
+Every mapping whose condition matches is sent, and a mapping without a condition is sent for every event. With the two mappings below, a gold purchase sends both `Purchase` and `Subscribe_Gold` to Meta, and a silver purchase sends only `Purchase`.
+
+| Your Events                          | Meta Ads Event   |
+| ------------------------------------ | ---------------- |
+| `purchase`                           | `Purchase`       |
+| `purchase`, only when `plan is gold` | `Subscribe_Gold` |
+
+- Conditions use the same filters as the Events Log, such as **is**, **contains**, and **is greater than**. See [value types and limits](/features/event-parameters#value-types-and-limits). **is not** also matches events that do not send the parameter.
+- One event can have several mappings, one per condition. The same event with the same condition is refused as a duplicate.
+- If two mappings of one event match and send the same Meta event, Meta receives it once. Two different events mapped to the same Meta event can still count one conversion twice.
+- For SKAN, Linkrunner reads only mappings without a condition. Keep one for each event in your [SKAN schema](/features/meta-skan-setup).
+- The paper plane test event does not check the condition. To test a condition, trigger the event in your app with and without the parameter, then check Meta Events Manager.
+- Only the project's **Admin** and **Member** roles can add, change, or see conditions.
+
 ## 3. Configure Events in Meta Events Manager
 
 Use Meta Events Manager to verify that Meta receives events from Linkrunner.
@@ -378,6 +401,31 @@ For more details, see the [Meta Install Referrer](/features/meta-install-referre
 
 Test the complete preview, install, and first attribution response with [Meta Android attribution testing](/testing/meta-android-attribution-testing).
 
+## 7. Send the Meta Anonymous ID (apps with the Meta SDK)
+
+If your app also has the Meta (Facebook) SDK, Meta credits far fewer of the in-app events Linkrunner sends it, because Meta matches those events against the anonymous ID its own SDK created on the device and Linkrunner had no way to send it.
+
+From the SDK versions below, Linkrunner reads that ID automatically and sends it with your events, and the backend passes it to Meta as `anon_id`. There is no code to write and no new dependency: apps without the Meta SDK are unaffected.
+
+| SDK | Version |
+| -- | -- |
+| [Android](/sdk/android#meta-anonymous-id) | 5.2.0 |
+| [iOS](/sdk/ios#meta-anonymous-id) | 5.2.0 |
+| [React Native](/sdk/react-native#meta-anonymous-id) | 4.2.0 |
+| [Expo](/sdk/expo#meta-anonymous-id) | 4.2.0 |
+| [Flutter](/sdk/flutter#meta-anonymous-id) | 5.2.0 |
+| [Capacitor](/sdk/capacitor#meta-anonymous-id) | 3.2.0 |
+| [Cordova](/sdk/cordova#meta-anonymous-id) | 2.2.0 |
+| [Unity](/sdk/unity#meta-anonymous-id) | 3.1.0 |
+
+<Note>
+
+Finish the setup by removing your own Meta `logEvent` calls for the events you already send through Linkrunner, so each event reaches Meta from one source instead of two.
+
+</Note>
+
+Your SDK page also covers how to turn the collection off, and what the ID is for a privacy review.
+
 ## FAQ and Discrepancies
 
 For answers to common questions and an explanation of why numbers in Meta Ads Manager may not exactly match Linkrunner, see [Meta Ads FAQ and Discrepancies](/ad-networks/meta-ads-discrepancies).
@@ -422,7 +470,7 @@ To fix a paused dataset:
 2. Click **Update token** in the alert, paste the token, choose the dataset and click **Save**. Project admins and members see this button.
 3. The status changes to **Waiting for first event**, then to **Sending** when Meta accepts your next conversion event.
 
-Reconnecting the ad account with **Add Meta Account** does not fix a paused dataset. Only a new token or dataset does.
+Reconnecting the ad account with **Reconnect** in the **Auth Status** column does not fix a paused dataset. Only a new token or dataset does.
 
 <Warning>
 

@@ -1,4 +1,4 @@
-import { defineComponent, h } from "vue";
+import { defineComponent, h, toRaw } from "vue";
 import DefaultTheme from "vitepress/theme";
 import type { Theme } from "vitepress";
 import "@fontsource/dm-mono/400.css";
@@ -63,8 +63,10 @@ export default {
   extends: DefaultTheme,
   Layout,
   enhanceApp({ app, siteData }) {
-    // Runs before the first render (client and SSR build).
-    siteData.value.themeConfig.sidebar = buildRelaySidebar();
+    // Runs before the first render (client and SSR build). Dev serves site
+    // data as a readonly proxy, so write through toRaw or the sidebar is
+    // silently dropped and `dev:relay` renders every page without one.
+    toRaw(siteData.value).themeConfig.sidebar = buildRelaySidebar();
     for (const [name, component] of Object.entries(components)) {
       app.component(name, component);
     }

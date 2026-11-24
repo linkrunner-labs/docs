@@ -14,6 +14,9 @@ your checkout gets a custom pixel.
 Once both are in, every sign-up and purchase is linked back to the ad, campaign, or link
 that brought the shopper in.
 
+To send that campaign back the other way, onto your Shopify orders, customers and marketing
+reports, see [Shopify sync](/features/shopify-sync).
+
 <Note>
 
 This takes about 30 minutes and needs no developer access to your servers. Everything
@@ -373,6 +376,12 @@ if (e.target.closest('a[href*="/pages/contact"]')) {
 
 Don't use `signup` or `purchase` as custom event names. Those names feed the **Sign-ups**
 and **Purchases** columns.
+
+The second argument of `lr.track` holds the event's [event parameters](/features/event-parameters),
+such as `page` above. Put details that change from one click to the next in parameters
+instead of creating one event per variant: track `catalog_click` with a `collection`
+parameter rather than one event per collection. Keep each event's parameters under 2,048
+characters in total.
 
 To see an event in [Web Events](https://dashboard.linkrunner.io/dashboard/web-events), click
 the columns icon above the table, click **Custom Event**, select your event, and click

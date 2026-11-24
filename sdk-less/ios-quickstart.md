@@ -123,7 +123,7 @@ final class LinkrunnerClient {
     }
 
     @discardableResult
-    func trackEvent(_ name: String, data eventData: [String: Any]? = nil, payment: Payment? = nil) async throws -> [String: Any] {
+    func trackEvent(_ name: String, eventData: [String: Any]? = nil, payment: Payment? = nil) async throws -> [String: Any] {
         var body = base()
         body["event_name"] = name
         if let eventData { body["event_data"] = eventData }
@@ -354,7 +354,7 @@ Use `trackEvent` for both. Pass a `Payment` when the event is a payment, so Link
 Task {
     try? await LinkrunnerClient.shared.trackEvent(
         "purchase_initiated",
-        data: ["product_id": "12345"]
+        eventData: ["product_id": "12345"]
     )
 }
 
@@ -362,7 +362,7 @@ Task {
 Task {
     try? await LinkrunnerClient.shared.trackEvent(
         "purchase_completed",
-        data: ["product_id": "12345"],
+        eventData: ["product_id": "12345"],
         payment: .init(amount: 99.99, paymentId: "payment_123", currency: "USD")
     )
 }
