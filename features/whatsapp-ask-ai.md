@@ -30,7 +30,7 @@ Open **Settings → MCP → WhatsApp** in the [dashboard](https://dashboard.link
 
 <Step title="Send the message">
 
-WhatsApp opens with a message already typed. On a computer, scan the QR code with your phone's camera instead. Press send.
+WhatsApp opens with a message already typed. On a computer, scan the QR code with your phone's camera instead. Press send. You can also type the 4-digit code the dashboard shows and send it to Linkrunner AI yourself.
 
 </Step>
 
@@ -105,7 +105,7 @@ You also need to have connected your number first. If you have not, Linkrunner A
 
 - **Read-only.** Linkrunner AI reads your data and answers. It never changes anything. To change a campaign or setting, use the dashboard.
 - **Your own access.** Every question runs as your Linkrunner account, so you can only get answers about projects you can already open.
-- **Codes in groups are cancelled.** If a connect code is posted in a WhatsApp group, Linkrunner AI cancels it and asks you to get a new one, because everyone in the group could see it. Send your code in a direct chat only.
+- **Codes in groups are cancelled.** If the connect message is posted in a WhatsApp group, Linkrunner AI cancels it and asks you to get a new one, because everyone in the group could see it. Send your code in a direct chat only.
 - **Numbers expire.** A number that is not used for 90 days needs to be connected again.
 - **WhatsApp number privacy.** If you have number privacy turned on in WhatsApp, WhatsApp hides your number from us and you cannot connect yet. Turn it off for the chat with Linkrunner AI, or ask from your team's group with us.
 
