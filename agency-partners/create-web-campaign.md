@@ -39,7 +39,7 @@ In their project, they go to **Settings → Members** and click the sliders icon
 
 On the **Web campaigns** tab, they turn on **Edit** next to **Web campaigns**. This also turns on **Read**. Then they click **Save**.
 
-![The agency access window on the Web campaigns tab, with Read and Edit turned on](/images/agency-partners/agency-access-web-tab.webp)
+![The agency access window on the Web campaigns tab, with Read and Edit turned on](/images/agency-partners/agency-access-web-tab-edit-on.webp)
 
 </Step>
 
