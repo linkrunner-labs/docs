@@ -1,0 +1,190 @@
+{
+  "info": {
+    "name": "Linkrunner Channels Reporting API",
+    "description": "Test the Linkrunner Channels Reporting API: one row per acquisition channel, including Organic and Referrals. Set the `linkrunner_key` collection variable once, then run any request.\n\nDocs: https://docs.linkrunner.io/api-reference/reporting-channels\n\nRate limit: 1 request per minute per API key, separate from /reporting/campaigns and /reporting/web-campaigns.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.linkrunner.io/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "linkrunner_key",
+      "value": "REPLACE_WITH_YOUR_LINKRUNNER_KEY",
+      "type": "string",
+      "description": "Your project's server key. Find it under Dashboard → Settings → Data APIs."
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "linkrunner-key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{linkrunner_key}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "List channels (all time)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/channels",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reporting",
+            "channels"
+          ],
+          "query": []
+        }
+      }
+    },
+    {
+      "name": "List channels (date range)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/channels?from=2026-11-19&to=2026-11-25",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reporting",
+            "channels"
+          ],
+          "query": [
+            {
+              "key": "from",
+              "value": "2026-11-19",
+              "description": "YYYY-MM-DD, inclusive, project timezone."
+            },
+            {
+              "key": "to",
+              "value": "2026-11-25"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List channels (iOS only)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/channels?from=2026-11-19&to=2026-11-25&platform=ios",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reporting",
+            "channels"
+          ],
+          "query": [
+            {
+              "key": "from",
+              "value": "2026-11-19"
+            },
+            {
+              "key": "to",
+              "value": "2026-11-25"
+            },
+            {
+              "key": "platform",
+              "value": "ios",
+              "description": "ios or android. Applies to every channel, Organic included."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List channels with events",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/channels?from=2026-11-19&to=2026-11-25&events=Purchase&payment_events=PURCHASE",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reporting",
+            "channels"
+          ],
+          "query": [
+            {
+              "key": "from",
+              "value": "2026-11-19"
+            },
+            {
+              "key": "to",
+              "value": "2026-11-25"
+            },
+            {
+              "key": "events",
+              "value": "Purchase",
+              "description": "Comma separated event names."
+            },
+            {
+              "key": "payment_events",
+              "value": "PURCHASE"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Day-level breakdown",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/reporting/channels?granularity=day&from=2026-11-01&to=2026-11-30",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "reporting",
+            "channels"
+          ],
+          "query": [
+            {
+              "key": "granularity",
+              "value": "day",
+              "description": "Adds a daily array to every channel."
+            },
+            {
+              "key": "from",
+              "value": "2026-11-01",
+              "description": "Required with granularity=day."
+            },
+            {
+              "key": "to",
+              "value": "2026-11-30",
+              "description": "At most 31 days per request."
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
