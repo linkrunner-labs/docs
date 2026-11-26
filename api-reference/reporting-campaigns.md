@@ -117,6 +117,7 @@ Numeric fields are returned as **formatted strings** (`"3,201"`, `"$12,540.50"`)
 | `page` | number | `1` | 1-indexed. |
 | `limit` | number | `10` | **Max 100.** Larger values return `422`. |
 | `granularity` | string | (none) | `day` adds a `daily` array to each campaign, one row per day of `from` to `to`. Needs both `from` and `to`, at most 31 days. See [Day-level breakdown](#day-level-breakdown). |
+| `include_organic` | string | `false` | `true` adds an Organic row (`id` `0`) as the first row of page 1. See [Organic row](#organic-row). |
 
 <Note>
 
@@ -157,6 +158,20 @@ Each campaign keeps its totals for the whole range and gets a `daily` array, old
 - Counts, revenue and spend add up across days to the campaign total. Distinct-user counts (`sign-ups`, columns in `unique_user_events`) can add up to slightly more than the total, because a user counted on two days is counted once for the range. Ratios such as `roas` and `conversion` are per day; don't add them.
 - A day-level request is still one request for the rate limit.
 
+### Organic row
+
+Organic installs are not credited to any campaign, so they are not in the list by default. Add `include_organic=true` to get them as one extra row with `id` `0` and `name` `"Organic"`:
+
+```json
+{ "id": 0, "name": "Organic", "installs": "11", "sign-ups": "8", "revenue": "2,048", "clicks": "-", "spend": "-", "roas": "-", "link": null, "adSets": [] }
+```
+
+- The row is first on page 1 only. It ignores `sort_field` and is not counted in `pagination.total`, so page 1 has up to `limit` campaigns plus Organic.
+- It uses the same `from`, `to`, `platform` and [event columns](#event-columns) as the campaigns.
+- Paid-only fields (`clicks`, `impressions`, `spend`, `roas`, `cost_per_*`, `reinstalls`, `suspicious_installs`, and the attribution counts) are `"-"`. Campaign-link fields (`link`, `domain`, `ad_network_code`, `created_at`, `active`) are `null`.
+- With [`granularity=day`](#day-level-breakdown), the row also gets a `daily` array.
+- Organic cannot be combined with a filter that narrows the campaigns. `network`, `search`, `active`, `meta_account_id` and `view=retargeting` return `422`.
+
 ### Event columns
 
 Event columns are opt-in. Name the events you want and the response carries those and no others, which keeps the payload small and the query fast.
@@ -184,16 +199,9 @@ Find your project's event names under [Dashboard → Events](https://dashboard.l
 
 <Note>
 
-**This changed on 2026-09-11.** Previously the endpoint tried to infer which
-events you wanted from the saved dashboard column settings of one of your
-project admins, so the same request returned different events for different
-projects, changed whenever that person edited their dashboard, and gave no
-way to tell which events you were looking at. Those settings are no longer
-read.
+**This changed on 2026-09-11.** The endpoint used to infer events from the saved dashboard column settings of one of your project admins, so the same request returned different events per project and changed when that person edited their dashboard. Those settings are no longer read.
 
-If you were relying on events appearing without asking for them, add an
-`events=` list naming them. If a count dropped, that event was previously
-being counted per distinct user: add it to `unique_user_events` as well.
+If you relied on events appearing without asking for them, add an `events=` list naming them. If a count dropped, that event was previously counted per distinct user: add it to `unique_user_events` as well.
 
 </Note>
 
@@ -290,10 +298,10 @@ Each result comes back under its `name`, in `custom_events` for custom columns a
 | `400` | `event_columns` is invalid: not a JSON array, more than 10 columns, a missing or repeated `name`, an unknown `op`, a filter missing the values its `op` needs, a non-number value for a number `op`, a filter over its limits, or more than 60 filters or 1,000 values across all columns. |
 | `401` | Missing or invalid `linkrunner-key`. |
 | `402` | Billing account suspended. Body includes `payment_link`. |
-| `422` | `limit` is non-numeric, less than 1, or greater than 100. Or `granularity` is not `day`, or a `granularity=day` request is missing `from` or `to`, has `to` before `from`, or covers more than 31 days. |
+| `422` | `limit` is non-numeric, less than 1, or greater than 100. Or `granularity` is not `day`, or a `granularity=day` request is missing `from` or `to`, has `to` before `from`, or covers more than 31 days. Or `include_organic` is not `true` or `false`, or is `true` with a filter listed under [Organic row](#organic-row). |
 | `429` | Rate limit exceeded. |
 | `500` | Unexpected server error. Retry after a short backoff. |
-| `503` | A `granularity=day` request took too long (about 50 seconds). Use a shorter range, a smaller `limit` or fewer event columns. |
+| `503` | A `granularity=day` request took too long (about 50 seconds). Use a shorter range, a smaller `limit` or fewer event columns. Also returned when the Organic row cannot be read. |
 
 ## Troubleshooting
 
@@ -340,12 +348,21 @@ export interface ReportingCampaignsResponse {
     };
 }
 
-export interface Campaign {
+// Custom & payment events: map of event name → count/amount
+interface EventFields {
+    custom_events?: { [name: string]: { count: string; amount?: string } | string };
+    payment_events?: { [type: string]: { count: string; total: string } };
+    cost_per_custom_events?: { [name: string]: string };
+    cost_per_payment_events?: { [type: string]: string };
+}
+
+export interface Campaign extends EventFields {
     id: number;
-    active: boolean;
-    created_at: string;
-    display_id: string;
-    link: string;
+    // id 0 is the Organic row (include_organic=true): active, created_at, display_id and link are null
+    active: boolean | null;
+    created_at: string | null;
+    display_id: string | null;
+    link: string | null;
     name: string;
 
     // Counts (formatted strings)
@@ -390,12 +407,6 @@ export interface Campaign {
     custom_store_listing: string | null;
     active_users?: number | string;
 
-    // Custom & payment events: map of event name → count/amount
-    custom_events?: { [name: string]: { count: string; amount?: string } | string };
-    payment_events?: { [type: string]: { count: string; total: string } };
-    cost_per_custom_events?: { [name: string]: string };
-    cost_per_payment_events?: { [type: string]: string };
-
     // Retention buckets (rates as percentages). `retention` carries cumulative retention.
     retention: { d1: number | string; d7: number | string; d14: number | string; d30: number | string };
     rolling_retention?: { d1: number | string; d7: number | string };
@@ -421,7 +432,7 @@ export interface Campaign {
 }
 
 // One day of a campaign. Same field names and formatting as Campaign.
-export interface DailyRow {
+export interface DailyRow extends EventFields {
     date: string; // YYYY-MM-DD, project timezone
     clicks?: string;
     impressions?: string;
@@ -441,40 +452,18 @@ export interface DailyRow {
     cost_per_install?: string;
     cost_per_reinstall?: string;
     cost_per_signup?: string;
-    custom_events?: Campaign["custom_events"];
-    payment_events?: Campaign["payment_events"];
-    cost_per_custom_events?: Campaign["cost_per_custom_events"];
-    cost_per_payment_events?: Campaign["cost_per_payment_events"];
 }
 
-export interface AdSet {
-    id: string;
-    name: string;
-    clicks: string;
-    installs: string;
-    "sign-ups": string;
-    spend: string;
-    revenue: string;
-    revenue_event_count?: string;
-    conversion: string;
-    roas?: string;
-    cost_per_install?: string;
-    cost_per_signup?: string;
+export interface AdSet extends Omit<AdCreative, "type" | "deeplink"> {
     suspicious_installs?: string;
-    custom_events?: Campaign["custom_events"];
-    payment_events?: Campaign["payment_events"];
-    cost_per_custom_events?: { [name: string]: string };
-    cost_per_payment_events?: { [type: string]: string };
     daywise_revenue?: Campaign["daywise_revenue"];
     ios: boolean;
     android: boolean;
-    retention: { d1: number | string; d7: number | string; d14: number | string; d30: number | string };
-    rolling_retention?: { d1: number | string; d7: number | string };
     adCreatives?: AdCreative[];
     keywords?: Keyword[];
 }
 
-export interface AdCreative {
+export interface AdCreative extends EventFields {
     id: string;
     name: string;
     type: string;
@@ -489,35 +478,14 @@ export interface AdCreative {
     roas?: string;
     cost_per_install?: string;
     cost_per_signup?: string;
-    custom_events?: Campaign["custom_events"];
-    payment_events?: Campaign["payment_events"];
-    cost_per_custom_events?: { [name: string]: string };
-    cost_per_payment_events?: { [type: string]: string };
-    retention: { d1: number | string; d7: number | string; d14: number | string; d30: number | string };
-    rolling_retention?: { d1: number | string; d7: number | string };
+    retention: Campaign["retention"];
+    rolling_retention?: Campaign["rolling_retention"];
 }
 
 // Apple Search Ads keyword-level rows. Same shape as AdCreative metrics.
-export interface Keyword {
-    id: string;
-    name: string;
-    clicks: string;
-    installs: string;
-    "sign-ups": string;
-    spend: string;
-    revenue: string;
-    revenue_event_count?: string;
-    conversion: string;
-    roas?: string;
-    cost_per_install?: string;
-    cost_per_signup?: string;
+export interface Keyword extends Omit<AdCreative, "type" | "deeplink" | "retention"> {
     suspicious_installs?: string;
-    custom_events?: Campaign["custom_events"];
-    payment_events?: Campaign["payment_events"];
-    cost_per_custom_events?: { [name: string]: string };
-    cost_per_payment_events?: { [type: string]: string };
-    retention?: { d1: number | string; d7: number | string; d14: number | string; d30: number | string };
-    rolling_retention?: { d1: number | string; d7: number | string };
+    retention?: Campaign["retention"];
 }
 ```
 
