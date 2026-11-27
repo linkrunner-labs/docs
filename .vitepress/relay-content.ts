@@ -342,6 +342,7 @@ export const PAGE_TITLES: Record<string, PageTitle> = {
   "/api-reference/revenue-tracking": { title: "Revenue tracking API" },
   "/api-reference/event-capture": { title: "Event capture API" },
   "/api-reference/reporting-web-campaigns": { title: "Web campaigns reporting API" },
+  "/api-reference/reporting-channels": { title: "Channels reporting API" },
   "/api-reference/s2s-clicks": { title: "S2S click API" },
   "/api-reference/s2s-impressions": { title: "S2S impression API" },
   "/api-reference/ctv-impressions": { title: "CTV impression API" },

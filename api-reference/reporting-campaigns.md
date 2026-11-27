@@ -9,6 +9,8 @@ description: "Programmatic access to campaign analytics: clicks, installs, signu
 
 The Reporting API returns the same campaign analytics shown on the Linkrunner dashboard. For website traffic, use the [Web Campaigns Reporting API](/api-reference/reporting-web-campaigns).
 
+Organic and referral traffic are not campaigns, so they are not in this list and `network=organic` matches nothing. Use the [Channels Reporting API](/api-reference/reporting-channels) for them.
+
 ## Base URL
 
 ```
