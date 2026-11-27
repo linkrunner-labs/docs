@@ -32,11 +32,15 @@ Open **Settings → MCP → WhatsApp** in the [dashboard](https://dashboard.link
 
 WhatsApp opens with a message already typed. On a computer, scan the QR code with your phone's camera instead. Press send. You can also type the 4-digit code the dashboard shows and send it to Linkrunner AI yourself.
 
+![The Connect WhatsApp window with a QR code, the 4-digit code and a Copy code button](/images/whatsapp-ask-ai/connect-code.webp)
+
 </Step>
 
 <Step title="Confirm it is your number">
 
 Back in the dashboard, you are asked **Is this your WhatsApp number?** Tap **Yes, connect**.
+
+![The Is this your WhatsApp number? question with Not my number and Yes, connect buttons](/images/whatsapp-ask-ai/confirm-number.webp)
 
 </Step>
 
