@@ -14,7 +14,7 @@ You can change a campaign's name, deep link, link preview, redirects and link op
 You need:
 
 - **App campaigns → Edit** turned on for your agency. It is the same switch that lets you create links. See [Ask the customer to turn on link creation](/agency-partners/create-campaign-link#1-ask-the-customer-to-turn-on-link-creation).
-- A campaign you can see in **All Campaigns**. By default that is only the campaigns your agency created. If the customer limited you to certain networks, it is only campaigns on those networks.
+- A campaign you can see in **All Campaigns**. By default that is the campaigns your agency created and the campaigns credited to your agency, including ones the customer built. If the customer limited you to certain networks, it is only campaigns on those networks, plus the campaigns credited to your agency.
 
 ## 1. Open the campaign
 
@@ -88,7 +88,7 @@ Either **App campaigns → Edit** is off for your agency, or the campaign is out
 
 <Accordion title="The campaign is not in your list" description="It is outside what the customer shares with you.">
 
-By default you only see campaigns your agency created. Ask the customer to turn off **Only campaigns they built** if you need to edit their other campaigns.
+By default you only see campaigns your agency created or that are credited to your agency. Ask the customer to turn off **Only campaigns they built or that are credited to them** if you need to edit their other campaigns.
 
 </Accordion>
 

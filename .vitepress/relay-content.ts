@@ -72,6 +72,11 @@ export const RELAY_ANCHOR_ALIASES: Record<string, Record<string, string>> = {
     "1-ask-a-customer-to-invite-you-as-an-agency": "use-a-customer-invitation-instead",
     "2-open-the-invitation": "use-a-customer-invitation-instead",
   },
+  // A campaign with no network is allowed under a network limit now, so that refusal is gone (LIN-2877).
+  "/agency-partners/create-campaign-link": {
+    "your-access-is-limited-to-specific-networks":
+      "you-can-only-create-campaigns-for-the-networks-this-customer-has-given-you-access-to",
+  },
   "/introduction": {
     "key-features": "growth-guides",
     "get-started": "start",
