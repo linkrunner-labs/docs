@@ -29,7 +29,7 @@ The panel also opens by itself the moment you connect an agency from **Integrati
 
 ## 2. Choose their screens and actions
 
-The top of the panel is **Manage integrations**, then a switch between **App campaigns** and **Web campaigns**. Each tab has its own switches and its own data scope. A new engagement has every switch off except **Sign-ups**, which starts on and only shows once **Read** is on for that tab. Agencies you engaged before **Sign-ups** existed have it on too, so nothing changes for them until you turn it off.
+The top of the panel is **Manage integrations** and **Attribution windows**, then a switch between **App campaigns** and **Web campaigns**. Each tab has its own switches and its own data scope. A new engagement has every switch off except **Sign-ups**, which starts on and only shows once **Read** is on for that tab. Agencies you engaged before **Sign-ups** existed have it on too, so nothing changes for them until you turn it off.
 
 | Tab               | When you see it                                     |
 | ----------------- | --------------------------------------------------- |
@@ -43,6 +43,23 @@ A project with only one of them shows that side alone, without the switch.
 **Manage integrations** sits above both tabs because ad accounts are shared between App and Web campaigns. It shows the agency the Integrations tab and lets them connect and disconnect ad accounts. Replacing the credentials of an account that is already connected stays with your admins.
 
 It does not need **Read** on either side.
+
+### Attribution windows
+
+**Attribution windows** lets the agency see and change the click windows of paid networks, such as Meta and Google. It is off by default. It is one switch for App and Web campaigns, and it only works on a side where **Read** is on.
+
+- **Which networks.** Paid networks only. With **Only certain networks** on, only the networks you ticked on that side. With it off, every paid network on that side.
+- **What they can change.** The click window of each of those networks, from **Attribution Windows** in their sidebar. They confirm each change the way you do.
+- **What stays with you.** The agency cannot see or change the windows of affiliate partners or agencies, or view-through attribution.
+- **With the switch off.** The agency does not see **Attribution Windows** at all.
+
+<Note>
+
+A window applies to every campaign on that network, yours included, so a change moves how installs are credited across your project.
+
+</Note>
+
+See [Attribution Windows](/features/attribution-windows) for what a click window is.
 
 ### App campaigns
 
@@ -116,6 +133,12 @@ Web campaigns are not turned on for your project. The panel only shows the sides
 
 **The agency still cannot see a screen you turned on.**
 Ask them to refresh. If it persists, check that **Read** is on for the tab that screen belongs to. App and Web each have their own.
+
+**The agency cannot see Attribution Windows.**
+**Attribution windows** is off, or **Read** is off on both tabs. Turn on **Attribution windows**, and **Read** on at least one tab.
+
+**Attribution Windows is empty for the agency.**
+**Read** is off on that side, or **Only certain networks** has no paid network ticked there. Turn **Read** on, or tick a paid network.
 
 **The agency can see App campaigns but not Web campaigns.**
 **Web campaigns · Read** is off. Open the **Web campaigns** tab and turn it on.
