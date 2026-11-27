@@ -87,7 +87,7 @@ Click a row to expand it.
 
 1. **Attempts.** Every call Linkrunner made, with the time, the response code, how long it took, and whether it would retry.
 2. **Request sent.** The exact URL Linkrunner called, with your macros filled in. Secret values are removed.
-3. **Last response received.** What your endpoint answered on the last attempt, exactly as it came back.
+3. **Last response received.** The start of your endpoint's answer to the last attempt, up to 512 characters. Secret values, IDs and IPs are hidden. An HTML page shows as its plain text; binary answers and answers over 2 KB are not shown.
 4. **Click ID.** The `tid` you sent on the click. Use it to find the conversion in your own system.
 
 The expanded row also shows the final response code, the time of the first and last attempt, the campaign, and the **Install instance** ID. Share the install instance ID with Linkrunner support when you ask about a specific conversion.
@@ -113,7 +113,7 @@ A **Withheld (fraud)** row has no request. Linkrunner did not call your endpoint
 
 <Accordion title="A postback shows Failed">
 
-Expand the row and read **Last response received**. A `5xx` means your server had an error. A `4xx` usually means the URL or a parameter was rejected. Fix it on your side. If your endpoint only accepts listed IPs, check you have allowlisted [Linkrunner's postback IPs](/affiliate-partners/postbacks#allowlist-linkrunner-postback-ips).
+Expand the row and read **Last response received**. A `5xx` means your server had an error. A `4xx` usually means the URL or a parameter was rejected. A `3xx` is a redirect Linkrunner could not follow. Fix it on your side. If your endpoint only accepts listed IPs, check you have allowlisted [Linkrunner's postback IPs](/affiliate-partners/postbacks#allowlist-linkrunner-postback-ips).
 
 </Accordion>
 
