@@ -54,7 +54,7 @@ A website conversion has no app install behind it, so the app-only macros are se
 | Always         | `{click_id}`, `{tid}`, `{event_name}`, `{event}`, `{timestamp}`, `{event_time}`, `{platform}` (`web`)                                                                                                    |
 | Revenue        | `{revenue}`, `{sale_amount}`, `{amount}` and `{currency}` carry the amount when the web mapping has **Send Revenue** on. Otherwise the amount is `0`.                                                     |
 | When available | `{ip}` and `{user_agent}`: the visitor's IP address and browser when they converted                                                                                                                      |
-| Empty          | `{install_id}`, `{campaign_id}`, `{cc}`, `{gaid}`, `{idfa}`, `{s2}`, `{s3}`, `{s4}`, `{click_time}`, `{install_time}`, `{bundle_id}`, `{app_version}`, `{os_version}`, `{device_model}`, `{device_brand}`, `{is_reinstall}`, `{touch_type}` |
+| Empty          | `{install_id}`, `{campaign_id}`, `{cc}`, `{gaid}`, `{idfa}`, `{s2}`, `{s3}`, `{s4}`, `{click_time}`, `{install_time}`, `{bundle_id}`, `{app_version}`, `{os_version}`, `{device_model}`, `{device_brand}`, `{is_reinstall}`, `{is_reattribution}`, `{touch_type}` |
 
 If your endpoint needs one of the empty macros, use a separate **Web Postback URL** without it.
 
@@ -333,15 +333,36 @@ not 9.99 cents. Parse it as a decimal amount.
 
 ### Attribution
 
-| Macro            | Description                                                                                              | Example |
-| ---------------- | -------------------------------------------------------------------------------------------------------- | ------- |
-| `{is_reinstall}` | `1` if the user had installed the app before, `0` if this is a first install.                            | `0`     |
-| `{touch_type}`   | The type of touch the conversion was attributed to: `click`, or `impression` for a view-through install. | `click` |
+| Macro                | Description                                                                                                                                                                                                           | Example |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `{is_reinstall}`     | `1` if the user had installed the app before, `0` if this is a first install.                                                                                                                                         | `0`     |
+| `{is_reattribution}` | `1` if the install was re-attributed: the user had the app before, reinstalled it, and the reinstall was credited to a new click inside the advertiser's re-engagement window. See the note below for what `0` means. | `0`     |
+| `{touch_type}`       | The type of touch the conversion was attributed to: `click`, or `impression` for a view-through install.                                                                                                              | `click` |
 
 <Note>
 
 `{touch_type}` is `impression` only when the install was credited to an
 impression you reported through [S2S impressions](/affiliate-partners/s2s-impressions).
+
+</Note>
+
+<Note>
+
+`{is_reinstall}` and `{is_reattribution}` are not the same signal, and they are
+not symmetric. `is_reattribution=1` always comes with `is_reinstall=1`, because it
+marks a user who had the app before and came back inside the advertiser's
+re-engagement window. A reinstall outside that window arrives as `is_reinstall=1`
+with `is_reattribution=0`.
+
+Do not read `is_reattribution=0` as "new user". It covers new users, reinstalls
+outside the window, and re-engagements attributed through a deeplink rather than a
+reinstall. Treat `1` as a positive signal and `0` as "not this specific case".
+
+A user re-engaged through a deeplink keeps their install. Their later events go to
+the partner credited with the install, with the install's `{is_reattribution}` value.
+
+For users who installed before this macro was available, event postbacks can send
+`{is_reattribution}` empty until their cached attribution is refreshed.
 
 </Note>
 
@@ -367,7 +388,7 @@ Do not use `{secret.postbackKey}`. If your endpoint requires a secret key, confi
 
 - **Country code.** There is no country macro. Derive it from `{ip}` if you need one.
 - **App store ID.** Use `{bundle_id}`. On Android it is the same value as the Play Store listing ID.
-- **Retargeting and re-engagement conversions.** Linkrunner does not send affiliate postbacks for these.
+- **Deeplink re-engagements.** When a user who already has the app installed comes back through a deeplink, Linkrunner does not send an affiliate postback for the re-engagement. A reinstall credited to your click inside the re-engagement window is a new install: it is sent, with `{is_reattribution}` set to `1`.
 
 ## Examples
 
@@ -410,13 +431,13 @@ https://partner.example.com/postback?tid=a1b2c3d4e5&event=purchase&amount=9.99&c
 Your template:
 
 ```
-https://partner.example.com/postback?tid={click_id}&event={event_name}&brand={device_brand}&model={device_model}&os={os_version}&app_version={app_version}&ip={ip}&reinstall={is_reinstall}&touch={touch_type}
+https://partner.example.com/postback?tid={click_id}&event={event_name}&brand={device_brand}&model={device_model}&os={os_version}&app_version={app_version}&ip={ip}&reinstall={is_reinstall}&reattribution={is_reattribution}&touch={touch_type}
 ```
 
 What Linkrunner sends:
 
 ```
-https://partner.example.com/postback?tid=a1b2c3d4e5&event=install&brand=POCO&model=Xiaomi+2302EPCC4I&os=13&app_version=15.2.209&ip=203.0.113.24&reinstall=0&touch=click
+https://partner.example.com/postback?tid=a1b2c3d4e5&event=install&brand=POCO&model=Xiaomi+2302EPCC4I&os=13&app_version=15.2.209&ip=203.0.113.24&reinstall=0&reattribution=0&touch=click
 ```
 
 ## Deduplication
@@ -431,7 +452,7 @@ Linkrunner retries a postback if your endpoint does not respond with a success s
 | Revenue (`{revenue}`)                                                        | Decimal, two places, major currency units. |
 | Currency (`{currency}`)                                                      | ISO 4217 three-letter code.                |
 | Platform (`{platform}`)                                                      | Lowercase `android`, `ios` or `web`.       |
-| Reinstall flag (`{is_reinstall}`)                                            | `1` or `0`.                                |
+| Boolean flags (`{is_reinstall}`, `{is_reattribution}`)                       | `1` or `0`.                                |
 | All values                                                                   | URL-encoded.                               |
 
 ## Troubleshooting
