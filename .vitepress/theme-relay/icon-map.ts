@@ -15,6 +15,7 @@ export const PHOSPHOR: Record<string, string> = {
   bell: "bell",
   bolt: "lightning",
   briefcase: "briefcase",
+  whatsapp: "whatsapp-logo",
   browser: "browser",
   bug: "bug",
   bullhorn: "megaphone",

@@ -3,7 +3,7 @@
  * - every link in llms.txt is a built Markdown page, and every built page is listed,
  * - llms-full.txt parses with the Linkrunner MCP's parser (search_documentation,
  *   linkrunner-labs/mcp-server src/tools/documentation.ts) into one entry per
- *   page, under its 2 MB cap,
+ *   page, under its 8 MB cap,
  * - robots.txt, sitemap.xml, skill.md and the .well-known copies exist,
  * - pages link their Markdown copy.
  * Run after `DOCS_THEME=relay vitepress build` (part of build:relay).
@@ -55,7 +55,9 @@ if (!llms.includes("> ## Agent Instructions")) fail("llms.txt: no agent instruct
 // llms-full.txt, parsed the way the MCP does (host check uses our SITE_URL).
 const full = read("llms-full.txt");
 const bytes = Buffer.byteLength(full);
-if (bytes > 2_000_000) fail(`llms-full.txt is ${bytes} bytes; the MCP reads at most 2,000,000`);
+// The MCP's cap is MAX_BUNDLE_BYTES = 8,000,000 (mcp-server src/tools/documentation.ts, raised from
+// 2 MB after llms-full.txt reached 1.88 MB on 17th November 2026).
+if (bytes > 8_000_000) fail(`llms-full.txt is ${bytes} bytes; the MCP reads at most 8,000,000`);
 const host = new URL(SITE_URL).hostname;
 // The MCP cuts a page at the next header of any host, so count them all.
 const headers = [...full.matchAll(/^# (.+)\r?\nSource: (https:\/\/[^\s]+)\r?\n/gm)];
