@@ -115,7 +115,7 @@ Turn these on in **Edit columns**.
 
 ### Event, payment and formula columns
 
-You can add a column for any custom event or payment event your app sends. By default it counts every event. Click the people icon next to the column in **Edit columns** to count unique users instead. You can also add a **Cost Per** column for an event (Spend ÷ the event's count), or a formula column that combines other columns.
+You can add a column for any custom event or payment event your app sends. By default it counts every event; you can filter it by a parameter as you add it. Click the people icon next to the column in **Edit columns** to count unique users instead. You can also add a **Cost Per** column for an event (Spend ÷ the event's count), or a formula column that combines other columns.
 
 ### Actual or Cohort basis
 
