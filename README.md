@@ -122,7 +122,7 @@ The Relay build writes the same agent files Mintlify serves
 |---|---|
 | `/<page>.md` | Each page as Markdown, starting with a pointer to `llms.txt`. Pages link it with `<link rel="alternate" type="text/markdown">` |
 | `/llms.txt`, `/.well-known/llms.txt` | Every page with its description, by sidebar section, after the agent instructions from docs.json `markdown.instructions` (synced into `nav.json` by `gen-nav.ts`) |
-| `/llms-full.txt` | Every page in one file. The Linkrunner MCP `search_documentation` tool reads it: keep the `# Title` + `Source: <url>` header and stay under 2 MB |
+| `/llms-full.txt` | Every page in one file. The Linkrunner MCP `search_documentation` tool reads it: keep the `# Title` + `Source: <url>` header and stay under 8 MB (the MCP's limit) |
 | `/skill.md`, `/.well-known/skills/` | A short skill: how to read these docs, the MCP server, `@linkrunner/skills` |
 | `/sitemap.xml`, `/robots.txt` | VitePress sitemap; robots allows crawling and AI use |
 
