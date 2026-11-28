@@ -208,7 +208,7 @@ Saving a webhook sends a real payload to the new URL, because Linkrunner only sa
 | `update_agency_access` | Change what an agency can see | Team and settings | Admin | No |
 | `disconnect_agency` | End an agency engagement | Team and settings | Admin | No |
 
-A member can approve `invite_member` when the new person is a member or influencer, and `change_member_role` when it moves someone between member and influencer. Anything involving the admin or finance role needs an admin.
+A member can approve `invite_member` when the new person is a member or influencer, and `change_member_role` when it moves someone between member and influencer. Anything involving the admin, finance or limited member role needs an admin.
 
 ## Landing pages
 

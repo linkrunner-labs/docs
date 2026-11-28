@@ -114,7 +114,7 @@ A change can be approved by:
 - **The person who asked**, if their project role lets them make the same change in the dashboard. They can approve on the review page or in the approval card, or confirm in the chat.
 - **A project admin**, on the review page.
 
-Only admins and members can approve. Influencers, finance members, affiliate partners and agencies cannot.
+Only admins and members can approve. Limited members, influencers, finance members, affiliate partners and agencies cannot.
 
 Members can approve most changes they could make themselves in the dashboard, such as creating campaigns, deleting funnels or editing postback mappings. These need an admin:
 
