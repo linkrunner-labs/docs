@@ -40,7 +40,7 @@ Enter their work email. To invite several people, separate the emails with comma
 | --- | --- |
 | **Admin** | Full access, including billing |
 | **Member** | Full access, except billing |
-| **Limited member** | Same as Member, without user-level data, exports, API keys, MCP or Ask AI. See [Limited members](#limited-members) |
+| **Limited member** | Same as Member, without user-level data, exports, API keys, MCP, Ask AI or integration changes. See [Limited members](#limited-members) |
 | **Finance** | Only usage, invoices and payments. See [Add your finance team](/billing/finance-role) |
 | **Influencer** | Only the campaigns shared with them |
 
@@ -66,17 +66,17 @@ Choose **Limited member** for someone who runs campaigns and reads reports but s
 
 <img src="/images/team/customer-invite-limited-member.webp" alt="The Invite Members dialog with the Limited member permission selected and a note on what the permission leaves out" />
 
-A limited member works like a Member: they can create and edit app and web campaigns, and see Home, Signals, funnels, event counts and every campaign report. They cannot:
+A limited member works like a Member: they can create and edit app and web campaigns, and see Home, Signals, funnels, event counts and every campaign report. Funnels work without filtering by event parameter values. They cannot:
 
 - **See user-level data.** The **Users** and **Audience Builder** pages, the **Events Log** tab, and user lists in campaign and web reports are hidden.
 - **Export data.** Every export and CSV download is hidden, along with **Data Export** in settings.
-- **See keys.** Project tokens, the server key and third-party API keys are hidden on **Project Details**.
+- **See keys.** Project tokens, the server key and third-party API keys are hidden.
 - **Use MCP or Ask AI.** They cannot connect an AI app, chat with Ask AI or approve AI changes.
-- **Change integrations or setup.** **Integrations**, **SDK Console**, **SDK Health**, **Fraud Control**, and the **Deeplinks** and **SDK Signing** settings are hidden.
+- **Change integrations or setup.** **Integrations**, **SDK Console**, **SDK Health** and **Fraud Control** are hidden, and so are the **Deeplinks**, **Remarketing**, **SDK Signing** and **Uninstall Tracking** settings. On **Project Details** they can change the name, company, logo, timezone and currency, but not the store links or website, and they cannot add an app.
 - **Manage the team.** They see **Members** but cannot invite people, change roles or share campaigns.
-- **Delete the project.**
+- **Delete the project or a domain.**
 
-If a limited member opens a link to a hidden page, the dashboard takes them to **Campaigns**.
+If a limited member opens a link to a hidden page, the dashboard takes them back to their campaigns, or to **Project Details** for a hidden setting.
 
 ### Let your whole team join
 
