@@ -160,7 +160,7 @@ These are the same rules the dashboard applies.
 - **You need a company email to create a project.** Gmail accounts can sign up and be invited to existing projects, but cannot create one. For help, contact <support@linkrunner.io>.
 - **An app project needs a live App Store or Play Store listing.** You cannot set up an app that is not published yet. Come back once its listing is live. A website-only project needs the website URL instead.
 - **You can create up to 3 projects per day from an AI assistant.** Only projects you created this way count.
-- **To use an existing project, you must be its Admin or Member.** Influencer, finance, partner and agency roles cannot connect.
+- **To use an existing project, you must be its Admin or Member.** Limited member, influencer, finance, partner and agency roles cannot connect.
 - **If you already have a billing account, you choose which one the new project uses.** On your first project, a new billing account is created for you.
 - New projects get the same free allowance and billing setup as projects you create in the dashboard. See [Billing](/billing/overview).
 
